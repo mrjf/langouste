@@ -1,0 +1,8 @@
+.env
+node_modules/
+dist/
+bun.lock
+package-lock.json
+.DS_Store
+supabase/.temp/
+.claude/
