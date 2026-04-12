@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { LANGUAGES } from "../lib/languages";
+  import { LANGUAGES, langOption } from "../lib/languages";
 
   interface Props {
     value?: string;
@@ -8,11 +8,11 @@
 
   let { value = $bindable("fr"), name = "language" }: Props = $props();
 
-  const entries = Object.entries(LANGUAGES);
+  const codes = Object.keys(LANGUAGES);
 </script>
 
 <select {name} bind:value>
-  {#each entries as [code, label]}
-    <option value={code}>{label}</option>
+  {#each codes as code}
+    <option value={code}>{langOption(code)}</option>
   {/each}
 </select>

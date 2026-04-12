@@ -7,89 +7,103 @@
   import LoginForm from "./LoginForm.svelte";
   import ConversationList from "./ConversationList.svelte";
   import ChatThread from "./ChatThread.svelte";
-
-  const ACTIVE_CONV_KEY = "langouste_active_conversation";
+  import NewChatDialog from "./NewChatDialog.svelte";
 
   let ready = $state(false);
+  let routed = $state(false);
+  let showNewChat = $state(false);
   const loggedIn = $derived(!!user.value && !!profile.value);
+  let updatingHash = false;
 
-  // Persist active conversation ID whenever it changes
+  function shortId(id: string): string {
+    return id.slice(0, 8);
+  }
+
+  function findConv(convs: any[], slug: string) {
+    return convs.find((c: any) => c.conversation_id.startsWith(slug));
+  }
+
+  // Update URL hash when active conversation changes — but only after initial routing
   $effect(() => {
+    if (!routed) return;
     const id = activeConversation.value?.conversation_id;
-    if (id) {
-      localStorage.setItem(ACTIVE_CONV_KEY, id);
-    } else {
-      localStorage.removeItem(ACTIVE_CONV_KEY);
+    const target = id ? `#/c/${shortId(id)}` : "";
+    if (location.hash !== target) {
+      updatingHash = true;
+      history.pushState(null, "", target || location.pathname);
+      updatingHash = false;
     }
   });
 
   onMount(async () => {
-    // Initialize Supabase client for realtime
     initSupabase(
       import.meta.env.VITE_SUPABASE_URL,
       import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
     );
 
-    // Try to restore session
     if (loadSession()) {
-      await loadProfile();
+      // Load profile and conversations in parallel before showing anything
+      const [, convs] = await Promise.all([
+        loadProfile(),
+        api.getConversations().catch(() => []),
+      ]);
+      conversations.value = convs;
+      await routeFromHash(convs);
     }
+
+    routed = true;
     ready = true;
 
-    if (loggedIn) {
-      // Load conversations and restore active one
-      const convs = await api.getConversations();
-      conversations.value = convs;
-
-      const savedId = localStorage.getItem(ACTIVE_CONV_KEY);
-      if (savedId) {
-        const saved = convs.find((c: any) => c.conversation_id === savedId);
-        if (saved) activeConversation.value = saved;
+    window.addEventListener("popstate", () => {
+      if (updatingHash) return;
+      const convs = conversations.value;
+      const match = location.hash.match(/^#\/c\/(.+)$/);
+      if (match) {
+        const conv = findConv(convs, match[1]);
+        if (conv) activeConversation.value = conv;
+      } else if (!location.hash || location.hash === "#") {
+        activeConversation.value = null;
       }
-
-      await checkJoinHash();
-    }
+    });
   });
 
-  async function onAuthenticated() {
-    await checkJoinHash();
-  }
-
-  async function checkJoinHash() {
+  async function routeFromHash(convs: any[]) {
     const hash = location.hash;
-    const match = hash.match(/^#join\/(.+)$/);
-    if (!match) return;
 
-    const inviteCode = match[1];
-    history.replaceState(null, "", location.pathname);
+    // Join link: #join/{invite_code}
+    const joinMatch = hash.match(/^#join\/(.+)$/);
+    if (joinMatch) {
+      const inviteCode = joinMatch[1];
+      history.replaceState(null, "", location.pathname);
+      try {
+        const conv = await api.joinConversation(inviteCode);
+        conversations.value = await api.getConversations();
+        activeConversation.value = conv;
+      } catch (err: any) {
+        alert("Failed to join conversation: " + err.message);
+      }
+      return;
+    }
 
-    try {
-      const conv = await api.joinConversation(inviteCode);
-      conversations.value = await api.getConversations();
-      activeConversation.value = conv;
-    } catch (err: any) {
-      alert("Failed to join conversation: " + err.message);
+    // Conversation link: #/c/{short_id}
+    const convMatch = hash.match(/^#\/c\/(.+)$/);
+    if (convMatch) {
+      const conv = findConv(convs, convMatch[1]);
+      if (conv) activeConversation.value = conv;
+      return;
     }
   }
 
-  async function newConversation() {
-    const targetLang = profile.value?.learning_languages?.[0]?.lang || "fr";
-    const baseLang = profile.value?.base_language || "en";
-
-    try {
-      const conv = await api.createConversation({
-        target_language: targetLang,
-        base_language: baseLang,
-      });
-      conversations.value = await api.getConversations();
-      activeConversation.value = conv;
-    } catch (err) {
-      console.error("Failed to create conversation:", err);
-    }
+  async function onAuthenticated() {
+    const convs = await api.getConversations();
+    conversations.value = convs;
+    await routeFromHash(convs);
+    routed = true;
   }
 
   function logout() {
     clearSession();
+    history.replaceState(null, "", location.pathname);
   }
 </script>
 
@@ -102,7 +116,7 @@
     <div class="sidebar">
       <div class="sidebar-header">
         <h2>Langouste</h2>
-        <button class="btn-new" onclick={newConversation}>+ New</button>
+        <button class="btn-new" onclick={() => showNewChat = true}>+ New</button>
       </div>
       <ConversationList />
       <div class="sidebar-footer">
@@ -114,6 +128,9 @@
       <ChatThread />
     </div>
   </div>
+  {#if showNewChat}
+    <NewChatDialog onclose={() => showNewChat = false} />
+  {/if}
 {/if}
 
 <style>

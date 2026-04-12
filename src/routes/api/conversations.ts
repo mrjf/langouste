@@ -25,17 +25,23 @@ conversationRoutes.get("/", async (c) => {
 conversationRoutes.post("/", async (c) => {
   const supabase = c.get("supabase");
   const userId = c.get("userId");
-  const { target_language, base_language } = await c.req.json();
+  const { target_languages, base_languages, target_language, base_language, agent_connector_id } = await c.req.json();
 
-  // Create the conversation
-  const conversation = await createConversation(supabase, userId);
+  // Support both old single-language format and new multi-language format
+  const targetLangs = target_languages ?? [{ lang: target_language, cefr_level: "A1" }];
+  const baseLangs = base_languages ?? [base_language];
 
-  // Add creator as first member
-  await addMember(supabase, {
+  // Use admin client when linking an agent (avoids FK check through RLS)
+  const insertClient = agent_connector_id ? supabaseAdmin : supabase;
+  const conversation = await createConversation(insertClient, userId, agent_connector_id);
+
+  // Add creator as first member (admin for agent chats so the member insert
+  // can reference the conversation before RLS sees it)
+  await addMember(insertClient, {
     conversation_id: conversation.conversation_id,
     user_id: userId,
-    target_language,
-    base_language,
+    target_languages: targetLangs,
+    base_languages: baseLangs,
   });
 
   // Return enriched conversation with members
@@ -82,8 +88,11 @@ conversationRoutes.post("/join", async (c) => {
     .eq("user_id", userId)
     .single();
 
-  const targetLang = profile?.learning_languages?.[0]?.lang ?? "en";
-  const baseLang = profile?.base_language ?? "en";
+  const learningLangs = profile?.learning_languages ?? [];
+  const targetLangs = learningLangs.length > 0
+    ? learningLangs.map((l: any) => ({ lang: l.lang, cefr_level: l.cefr_level ?? "A1" }))
+    : [{ lang: "en", cefr_level: "A1" }];
+  const baseLangs = [profile?.base_language ?? "en"];
 
   // Add as member
   await supabaseAdmin
@@ -91,8 +100,8 @@ conversationRoutes.post("/join", async (c) => {
     .insert({
       conversation_id: conversation.conversation_id,
       user_id: userId,
-      target_language: targetLang,
-      base_language: baseLang,
+      target_languages: targetLangs,
+      base_languages: baseLangs,
     });
 
   // Return enriched conversation via user's client (now a member, RLS allows)
@@ -106,8 +115,22 @@ conversationRoutes.patch("/:conversationId/languages", async (c) => {
   const supabase = c.get("supabase");
   const userId = c.get("userId");
   const conversationId = c.req.param("conversationId");
-  const updates = await c.req.json();
+  const body = await c.req.json();
 
-  const member = await updateMemberLanguages(supabase, conversationId, userId, updates);
+  // Normalize: accept both new format (target_languages/base_languages)
+  // and old format (target_language/base_language) for backward compat
+  const updates: Record<string, unknown> = {};
+  if (body.target_languages) {
+    updates.target_languages = body.target_languages;
+  } else if (body.target_language) {
+    updates.target_languages = [{ lang: body.target_language, cefr_level: "A1" }];
+  }
+  if (body.base_languages) {
+    updates.base_languages = body.base_languages;
+  } else if (body.base_language) {
+    updates.base_languages = [body.base_language];
+  }
+
+  const member = await updateMemberLanguages(supabase, conversationId, userId, updates as any);
   return c.json(member);
 });

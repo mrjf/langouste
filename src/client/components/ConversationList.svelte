@@ -1,16 +1,7 @@
 <script lang="ts">
-  import { api } from "../lib/api";
   import { conversations, activeConversation, profile } from "../lib/stores.svelte";
-  import { langName } from "../lib/languages";
+  import { langTag } from "../lib/languages";
   import type { Conversation } from "../lib/stores.svelte";
-
-  async function loadConversations() {
-    try {
-      conversations.value = await api.getConversations();
-    } catch (err) {
-      console.error("Failed to load conversations:", err);
-    }
-  }
 
   function selectConversation(conv: Conversation) {
     activeConversation.value = conv;
@@ -25,17 +16,22 @@
   }
 
   function displayName(conv: Conversation): string {
+    if (conv.agent_connector_id) {
+      return conv.agent_connector?.name ?? "Agent";
+    }
     const others = otherMembers(conv);
     if (others.length === 0) return "Waiting for partner...";
     return others.map((m) => m.profile?.display_name ?? "Partner").join(", ");
   }
 
-  function myLang(conv: Conversation): string {
-    return myMember(conv)?.target_language ?? "?";
+  function isAgent(conv: Conversation): boolean {
+    return !!conv.agent_connector_id;
   }
 
-  // Load on mount
-  loadConversations();
+  function myLang(conv: Conversation): string {
+    return myMember(conv)?.target_languages?.[0]?.lang ?? "?";
+  }
+
 </script>
 
 <div class="conv-list">
@@ -48,8 +44,8 @@
         class:active={activeConversation.value?.conversation_id === conv.conversation_id}
         onclick={() => selectConversation(conv)}
       >
-        <span class="conv-lang">{langName(myLang(conv))}</span>
-        <span class="conv-partner">{displayName(conv)}</span>
+        <span class="conv-lang">{langTag(myLang(conv))}</span>
+        <span class="conv-partner">{isAgent(conv) ? "🤖 " : ""}{displayName(conv)}</span>
       </button>
     {/each}
   {/if}

@@ -1,6 +1,6 @@
 # Langouste
 
-AI-mediated language learning chat app. People chat in their target languages; AI heals messages, translates across participants, tracks errors, and tailors learning with spaced repetition. See VISION.md for the full product vision.
+AI-mediated language learning chat app. People chat in their target languages; AI checks spelling, explains errors, translates across participants, tracks errors, and tailors learning with spaced repetition. See VISION.md for the full product vision and docs/message-processing.md for the message pipeline spec.
 
 ## Stack
 
@@ -20,7 +20,7 @@ AI-mediated language learning chat app. People chat in their target languages; A
 - `bun test` — run tests (backend, uses bun test runner)
 - `bun run migrate` — apply pending database migrations
 - `bun run start` — run production server (serves Vite build from dist/client)
-- Use `npm` for installing packages (not bun — avoids rollup native binding conflicts)
+- Use `bun` for installing packages
 
 ## Project structure
 
@@ -41,6 +41,8 @@ AI-mediated language learning chat app. People chat in their target languages; A
 - Server env variables via src/lib/config.ts — never read process.env directly elsewhere
 - Client env variables via Vite's import.meta.env (VITE_ prefix)
 - Corrections stored as JSONB, not separate rows
-- Single Claude API call per message (heal + analyze + translate + challenge in one call)
+- Three-service AI pipeline: deterministic spell-check (nspell), Opus for error explanations, Sonnet for post-send vocabulary extraction
+- Messages are never rewritten — user fixes their own errors before sending
+- Spell-check service in src/services/spellcheck/ — deterministic, no LLM
 - SM-2 algorithm in src/services/spaced-repetition/sm2.ts must be a pure function
 - Rely on Supabase Realtime for all live updates — no custom websocket code

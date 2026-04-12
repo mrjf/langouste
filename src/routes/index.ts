@@ -4,6 +4,7 @@ import { profileRoutes } from "./api/profile.ts";
 import { conversationRoutes } from "./api/conversations.ts";
 import { messageRoutes } from "./api/messages.ts";
 import { reviewRoutes } from "./api/review.ts";
+import { agentConnectorRoutes } from "./api/agent-connectors.ts";
 
 export const apiRoutes = new Hono();
 
@@ -12,3 +13,4 @@ apiRoutes.route("/profile", profileRoutes);
 apiRoutes.route("/conversations", conversationRoutes);
 apiRoutes.route("/messages", messageRoutes);
 apiRoutes.route("/review", reviewRoutes);
+apiRoutes.route("/agent-connectors", agentConnectorRoutes);

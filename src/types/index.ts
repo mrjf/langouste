@@ -23,14 +23,26 @@ export interface Conversation {
   conversation_id: string;
   invite_code: string;
   created_by: string;
+  agent_connector_id: string | null;
+  created_at: string;
+}
+
+export type AgentType = "openclaw" | "claude" | "http";
+
+export interface AgentConnector {
+  connector_id: string;
+  name: string;
+  type: AgentType;
+  config: Record<string, unknown>;
+  created_by: string;
   created_at: string;
 }
 
 export interface ConversationMember {
   conversation_id: string;
   user_id: string;
-  target_language: LanguageCode;
-  base_language: LanguageCode;
+  target_languages: Array<{ lang: LanguageCode; cefr_level: CefrLevel }>;
+  base_languages: LanguageCode[];
   joined_at: string;
 }
 
@@ -47,9 +59,14 @@ export interface Message {
   sender_id: string;
   raw_text: string;
   healed_text: string;
+  language: LanguageCode | null;
   translation: string | null;
+  translations: Record<string, string>;
+  transliterations: Record<string, string>; // key: "sourceLang→targetLang" e.g. "ar→en"
+  phonetics: Record<string, string>; // key: "system:lang" e.g. "ipa:fr"
   corrections: Correction[];
   next_challenge: string | null;
+  is_agent: boolean;
   created_at: string;
 }
 
@@ -91,4 +108,22 @@ export interface Assessment {
   cefr_level: CefrLevel;
   assessed_at: string;
   evidence: Record<string, unknown> | null;
+}
+
+// Spell-check pipeline types
+
+export type ErrorKind = "spelling" | "grammar";
+
+export interface TextError {
+  start: number;
+  end: number;
+  text: string;
+  kind: ErrorKind;
+  suggestions?: string[];
+}
+
+export interface ErrorExplanation {
+  error: TextError;
+  corrected: string;
+  explanations: Record<LanguageCode, string>;
 }

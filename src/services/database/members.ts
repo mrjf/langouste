@@ -3,7 +3,7 @@ import type { ConversationMember } from "../../types/index.ts";
 
 export async function addMember(
   supabase: SupabaseClient,
-  member: Pick<ConversationMember, "conversation_id" | "user_id" | "target_language" | "base_language">,
+  member: Pick<ConversationMember, "conversation_id" | "user_id" | "target_languages" | "base_languages">,
 ): Promise<ConversationMember> {
   const { data, error } = await supabase
     .from("conversation_members")
@@ -51,7 +51,7 @@ export async function updateMemberLanguages(
   supabase: SupabaseClient,
   conversationId: string,
   userId: string,
-  updates: Partial<Pick<ConversationMember, "target_language" | "base_language">>,
+  updates: Partial<Pick<ConversationMember, "target_languages" | "base_languages">>,
 ): Promise<ConversationMember> {
   const { data, error } = await supabase
     .from("conversation_members")
