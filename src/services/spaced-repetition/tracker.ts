@@ -1,5 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { ProcessMessageOutput } from "../ai/types.ts";
+import type { VocabularyExtractionOutput } from "../ai/types.ts";
 import type { LanguageCode } from "../../types/index.ts";
 
 /**
@@ -10,7 +10,7 @@ export async function trackLearningProgress(
   supabase: SupabaseClient,
   userId: string,
   language: LanguageCode,
-  aiResult: ProcessMessageOutput,
+  aiResult: VocabularyExtractionOutput,
 ): Promise<void> {
   const vocabPromises = aiResult.new_vocabulary.map((v) =>
     supabase

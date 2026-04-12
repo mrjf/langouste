@@ -31,7 +31,9 @@ export async function insertMessage(
     | "sender_id"
     | "raw_text"
     | "healed_text"
+    | "language"
     | "translation"
+    | "translations"
     | "corrections"
     | "next_challenge"
   >,

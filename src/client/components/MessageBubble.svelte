@@ -1,13 +1,77 @@
 <script lang="ts">
-  import type { Message } from "../lib/stores.svelte";
+  import type { Message, Correction } from "../lib/stores.svelte";
+  import { langTag } from "../lib/languages";
+
+  /** Simple markdown → HTML: bold, italic, code, line breaks */
+  function md(text: string): string {
+    return text
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+      .replace(/\*(.+?)\*/g, "<em>$1</em>")
+      .replace(/`(.+?)`/g, "<code>$1</code>")
+      .replace(/\n/g, "<br>");
+  }
 
   interface Props {
     message: Message;
     sent: boolean;
     senderName?: string | null;
+    viewerLangs?: string[];
+    baseLangs?: string[];
+    challenge?: string | null;
   }
 
-  let { message, sent, senderName = null }: Props = $props();
+  let {
+    message,
+    sent,
+    senderName = null,
+    viewerLangs = [],
+    baseLangs = [],
+    challenge = null,
+  }: Props = $props();
+
+  // Primary viewer language (first target language)
+  const viewerLang = $derived(viewerLangs[0] ?? "");
+  const baseLang = $derived(baseLangs[0] ?? "");
+
+  // What's visible below the bubble
+  let showBase = $state(false);
+  let showOriginal = $state(false);
+  let showCorrections = $state(false);
+  let showChallenge = $state(false);
+  let shownLangs = $state<Set<string>>(new Set());
+
+  let hasTargetTranslation = $derived(
+    !viewerLang || !!message.translations?.[viewerLang]
+  );
+
+  let displayText = $derived(
+    viewerLang && message.translations?.[viewerLang]
+      ? message.translations[viewerLang]
+      : message.healed_text
+  );
+
+  let loading = $derived(viewerLang && !hasTargetTranslation && !message._pending);
+
+  let baseText = $derived.by(() => {
+    if (!baseLang || baseLang === viewerLang) return null;
+    const t = message.translations?.[baseLang];
+    if (!t || t === displayText) return null;
+    return t;
+  });
+
+  let hasOriginal = $derived(message.raw_text !== message.healed_text);
+  let hasCorrections = $derived(message.corrections?.length > 0);
+  let hasChallenge = $derived(!!challenge);
+
+  // Other languages available in translations (not viewer's target or base languages)
+  let otherLangs = $derived.by(() => {
+    if (!message.translations) return [];
+    const exclude = new Set([...viewerLangs, ...baseLangs]);
+    return Object.keys(message.translations).filter((l) => !exclude.has(l));
+  });
 
   let time = $derived(
     new Date(message.created_at).toLocaleTimeString([], {
@@ -16,28 +80,116 @@
     })
   );
 
-  let showRaw = $derived(sent && message.raw_text !== message.healed_text);
+  function toggleLang(lang: string) {
+    const next = new Set(shownLangs);
+    if (next.has(lang)) next.delete(lang); else next.add(lang);
+    shownLangs = next;
+  }
+
+  let hasDetails = $derived(
+    showBase || showOriginal || showCorrections || showChallenge || shownLangs.size > 0
+  );
 </script>
 
 <div class="message-bubble" class:sent class:received={!sent}>
   {#if !sent && senderName}
     <div class="sender-name">{senderName}</div>
   {/if}
-  <div class="bubble" class:pending={message._pending}>
-    <div class="healed-text">{message.healed_text}</div>
-    {#if message.translation}
-      <div class="translation">{message.translation}</div>
+
+  <div class="bubble" class:pending={message._pending} class:loading>
+    {#if loading}
+      <div class="loading-bar"></div>
+      <div class="loading-bar short"></div>
+    {:else}
+      {#if viewerLang}
+        <span class="target-badge">{langTag(viewerLang)}</span>
+      {/if}
+      <div class="healed-text">{@html md(displayText)}</div>
     {/if}
   </div>
-  {#if showRaw}
-    <div class="raw-text">You wrote: {message.raw_text}</div>
+
+  {#if !loading && !message._pending}
+    <div class="actions">
+      {#if baseText}
+        <button class="action-btn" class:active={showBase} onclick={() => showBase = !showBase}>
+          {langTag(baseLang)}
+        </button>
+      {/if}
+      {#each otherLangs as lang}
+        <button class="action-btn" class:active={shownLangs.has(lang)} onclick={() => toggleLang(lang)}>
+          {langTag(lang)}
+        </button>
+      {/each}
+      {#if hasOriginal}
+        <button class="action-btn" class:active={showOriginal} onclick={() => showOriginal = !showOriginal}>
+          original
+        </button>
+      {/if}
+      {#if hasCorrections}
+        <button class="action-btn corrections-btn" class:active={showCorrections} onclick={() => showCorrections = !showCorrections}>
+          {message.corrections.length} correction{message.corrections.length > 1 ? "s" : ""}
+        </button>
+      {/if}
+      {#if hasChallenge}
+        <button class="action-btn challenge-btn" class:active={showChallenge} onclick={() => showChallenge = !showChallenge}>
+          tip
+        </button>
+      {/if}
+      <span class="timestamp">{time}</span>
+    </div>
+
+    {#if hasDetails}
+      <div class="details">
+        {#if showBase && baseText}
+          <div class="detail-row base-row">
+            <span class="detail-label">{langTag(baseLang)}</span>
+            <span class="detail-text">{baseText}</span>
+          </div>
+        {/if}
+
+        {#each otherLangs as lang}
+          {#if shownLangs.has(lang) && message.translations?.[lang]}
+            <div class="detail-row">
+              <span class="detail-label">{langTag(lang)}</span>
+              <span class="detail-text">{message.translations[lang]}</span>
+            </div>
+          {/if}
+        {/each}
+
+        {#if showOriginal && hasOriginal}
+          <div class="detail-row original-row">
+            <span class="detail-label">original</span>
+            <span class="detail-text">{message.raw_text}</span>
+          </div>
+        {/if}
+
+        {#if showCorrections && hasCorrections}
+          <div class="detail-row corrections-row">
+            {#each message.corrections as c}
+              <div class="correction-item">
+                <span class="original-text">{c.original}</span>
+                <span class="arrow">&rarr;</span>
+                <span class="corrected-text">{c.corrected}</span>
+                <span class="explanation">{c.explanation}</span>
+              </div>
+            {/each}
+          </div>
+        {/if}
+
+        {#if showChallenge && challenge}
+          <div class="detail-row challenge-row">
+            <span class="detail-text">{challenge}</span>
+          </div>
+        {/if}
+      </div>
+    {/if}
   {/if}
-  <div class="timestamp">{time}</div>
 </div>
 
 <style>
   .message-bubble {
-    display: block;
+    display: flex;
+    flex-direction: column;
     max-width: 80%;
   }
 
@@ -55,6 +207,7 @@
     line-height: 1.45;
     font-size: 0.95rem;
     position: relative;
+    min-width: 120px;
   }
 
   .sent .bubble {
@@ -68,6 +221,28 @@
     border-bottom-left-radius: 4px;
   }
 
+  .bubble.loading {
+    min-height: 2.5rem;
+  }
+
+  .loading-bar {
+    height: 0.7rem;
+    border-radius: 4px;
+    background: var(--color-border);
+    animation: shimmer 1.5s ease-in-out infinite;
+    margin-bottom: 0.4rem;
+  }
+
+  .loading-bar.short {
+    width: 60%;
+    margin-bottom: 0;
+  }
+
+  @keyframes shimmer {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.7; }
+  }
+
   .sender-name {
     font-size: 0.75rem;
     font-weight: 600;
@@ -76,30 +251,157 @@
     padding: 0 0.25rem;
   }
 
-  .translation {
-    margin-top: 0.4rem;
-    padding-top: 0.4rem;
-    border-top: 1px solid var(--color-border);
-    font-size: 0.85rem;
-    color: var(--color-text-light);
-    font-style: italic;
+  .pending {
+    opacity: 0.6;
   }
 
-  .raw-text {
-    font-size: 0.8rem;
+  /* Action buttons row */
+  .actions {
+    display: flex;
+    gap: 0.25rem;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-top: 0.2rem;
+    padding: 0 0.15rem;
+  }
+
+  .target-badge {
+    float: right;
+    font-size: 0.65rem;
     color: var(--color-text-light);
-    margin-top: 0.25rem;
-    padding: 0 0.25rem;
+    opacity: 0.5;
+    margin-left: 0.5rem;
+    margin-top: -0.1rem;
+    line-height: 1;
+  }
+
+  .action-btn {
+    background: none;
+    border: 1px solid transparent;
+    color: var(--color-text-light);
+    font-size: 0.7rem;
+    padding: 0.1rem 0.35rem;
+    border-radius: 3px;
+    opacity: 0.5;
+    transition: opacity 0.15s, background 0.15s;
+  }
+
+  .action-btn:hover {
+    opacity: 1;
+    background: var(--color-bg);
+  }
+
+  .action-btn.active {
+    opacity: 1;
+    background: var(--color-bg);
+    border-color: var(--color-border);
+  }
+
+  .corrections-btn {
+    color: #f39c12;
+  }
+
+  .challenge-btn {
+    color: #1565c0;
   }
 
   .timestamp {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     color: var(--color-text-light);
-    margin-top: 0.15rem;
-    padding: 0 0.25rem;
+    margin-left: auto;
+    opacity: 0.6;
   }
 
-  .pending {
-    opacity: 0.6;
+  /* Expandable detail panels */
+  .details {
+    margin-top: 0.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .detail-row {
+    padding: 0.4rem 0.6rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.82rem;
+    line-height: 1.4;
+    background: var(--color-bg);
+    border-left: 2px solid var(--color-border);
+  }
+
+  .detail-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--color-text-light);
+    text-transform: lowercase;
+    display: block;
+    margin-bottom: 0.1rem;
+  }
+
+  .detail-text {
+    color: var(--color-text);
+  }
+
+  .base-row {
+    font-style: italic;
+    color: var(--color-text-light);
+  }
+
+  .base-row .detail-text {
+    color: var(--color-text-light);
+  }
+
+  .original-row {
+    border-left-color: var(--color-text-light);
+  }
+
+  .original-row .detail-text {
+    color: var(--color-text-light);
+  }
+
+  .corrections-row {
+    border-left-color: #f39c12;
+    background: var(--color-correction);
+  }
+
+  .correction-item {
+    margin-bottom: 0.3rem;
+  }
+
+  .correction-item:last-child {
+    margin-bottom: 0;
+  }
+
+  .original-text {
+    text-decoration: line-through;
+    color: var(--color-error);
+  }
+
+  .corrected-text {
+    color: var(--color-success);
+    font-weight: 500;
+  }
+
+  .arrow {
+    color: var(--color-text-light);
+    margin: 0 0.25rem;
+    font-size: 0.75rem;
+  }
+
+  .explanation {
+    display: block;
+    color: var(--color-text-light);
+    font-size: 0.78rem;
+    margin-top: 0.1rem;
+  }
+
+  .challenge-row {
+    border-left-color: #1565c0;
+    background: var(--color-challenge);
+    color: #1565c0;
+  }
+
+  .challenge-row .detail-text {
+    color: #1565c0;
   }
 </style>

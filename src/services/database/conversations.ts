@@ -4,11 +4,12 @@ const CONVERSATION_WITH_MEMBERS = `
   *,
   members:conversation_members(
     user_id,
-    target_language,
-    base_language,
+    target_languages,
+    base_languages,
     joined_at,
     profile:profiles(user_id, display_name)
-  )
+  ),
+  agent_connector:agent_connectors(connector_id, name, type, config)
 `;
 
 export async function getConversationsForUser(
@@ -56,10 +57,14 @@ export async function getConversation(
 export async function createConversation(
   supabase: SupabaseClient,
   createdBy: string,
+  agentConnectorId?: string,
 ) {
+  const row: Record<string, unknown> = { created_by: createdBy };
+  if (agentConnectorId) row.agent_connector_id = agentConnectorId;
+
   const { data, error } = await supabase
     .from("conversations")
-    .insert({ created_by: createdBy })
+    .insert(row)
     .select()
     .single();
 
