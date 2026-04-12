@@ -1,0 +1,204 @@
+<script lang="ts">
+  import { onMount } from "svelte";
+  import { user, profile, conversations, activeConversation } from "../lib/stores.svelte";
+  import { loadSession, clearSession, loadProfile } from "../lib/auth";
+  import { initSupabase } from "../lib/supabase";
+  import { api } from "../lib/api";
+  import LoginForm from "./LoginForm.svelte";
+  import ConversationList from "./ConversationList.svelte";
+  import ChatThread from "./ChatThread.svelte";
+
+  const ACTIVE_CONV_KEY = "langouste_active_conversation";
+
+  let ready = $state(false);
+  const loggedIn = $derived(!!user.value && !!profile.value);
+
+  // Persist active conversation ID whenever it changes
+  $effect(() => {
+    const id = activeConversation.value?.conversation_id;
+    if (id) {
+      localStorage.setItem(ACTIVE_CONV_KEY, id);
+    } else {
+      localStorage.removeItem(ACTIVE_CONV_KEY);
+    }
+  });
+
+  onMount(async () => {
+    // Initialize Supabase client for realtime
+    initSupabase(
+      import.meta.env.VITE_SUPABASE_URL,
+      import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+    );
+
+    // Try to restore session
+    if (loadSession()) {
+      await loadProfile();
+    }
+    ready = true;
+
+    if (loggedIn) {
+      // Load conversations and restore active one
+      const convs = await api.getConversations();
+      conversations.value = convs;
+
+      const savedId = localStorage.getItem(ACTIVE_CONV_KEY);
+      if (savedId) {
+        const saved = convs.find((c: any) => c.conversation_id === savedId);
+        if (saved) activeConversation.value = saved;
+      }
+
+      await checkJoinHash();
+    }
+  });
+
+  async function onAuthenticated() {
+    await checkJoinHash();
+  }
+
+  async function checkJoinHash() {
+    const hash = location.hash;
+    const match = hash.match(/^#join\/(.+)$/);
+    if (!match) return;
+
+    const inviteCode = match[1];
+    history.replaceState(null, "", location.pathname);
+
+    try {
+      const conv = await api.joinConversation(inviteCode);
+      conversations.value = await api.getConversations();
+      activeConversation.value = conv;
+    } catch (err: any) {
+      alert("Failed to join conversation: " + err.message);
+    }
+  }
+
+  async function newConversation() {
+    const targetLang = profile.value?.learning_languages?.[0]?.lang || "fr";
+    const baseLang = profile.value?.base_language || "en";
+
+    try {
+      const conv = await api.createConversation({
+        target_language: targetLang,
+        base_language: baseLang,
+      });
+      conversations.value = await api.getConversations();
+      activeConversation.value = conv;
+    } catch (err) {
+      console.error("Failed to create conversation:", err);
+    }
+  }
+
+  function logout() {
+    clearSession();
+  }
+</script>
+
+{#if !ready}
+  <!-- loading -->
+{:else if !loggedIn}
+  <LoginForm onauthenticated={onAuthenticated} />
+{:else}
+  <div class="layout">
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <h2>Langouste</h2>
+        <button class="btn-new" onclick={newConversation}>+ New</button>
+      </div>
+      <ConversationList />
+      <div class="sidebar-footer">
+        <span>{profile.value?.display_name}</span>
+        <button class="btn-logout" onclick={logout}>Logout</button>
+      </div>
+    </div>
+    <div class="main-panel">
+      <ChatThread />
+    </div>
+  </div>
+{/if}
+
+<style>
+  .layout {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .sidebar {
+    width: 300px;
+    background: var(--color-surface);
+    border-right: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+  }
+
+  .sidebar-header {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .sidebar-header h2 {
+    font-size: 1.1rem;
+    color: var(--color-primary);
+  }
+
+  .btn-new {
+    background: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 0.4rem 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .sidebar-footer {
+    padding: 0.75rem 1.25rem;
+    border-top: 1px solid var(--color-border);
+    font-size: 0.8rem;
+    color: var(--color-text-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .btn-logout {
+    background: none;
+    border: none;
+    color: var(--color-text-light);
+    font-size: 0.8rem;
+    text-decoration: underline;
+  }
+
+  .main-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  @media (max-width: 640px) {
+    .sidebar {
+      position: fixed;
+      z-index: 10;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 280px;
+      transform: translateX(-100%);
+      transition: transform 0.2s ease;
+    }
+
+    .sidebar.open {
+      transform: translateX(0);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .main-panel {
+      width: 100%;
+    }
+  }
+</style>
