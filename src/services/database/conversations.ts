@@ -72,19 +72,3 @@ export async function createConversation(
   return data;
 }
 
-export async function getConversationByInvite(
-  supabase: SupabaseClient,
-  inviteCode: string,
-) {
-  const { data, error } = await supabase
-    .from("conversations")
-    .select("*")
-    .eq("invite_code", inviteCode)
-    .single();
-
-  if (error) {
-    if (error.code === "PGRST116") return null;
-    throw error;
-  }
-  return data;
-}

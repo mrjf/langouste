@@ -21,9 +21,8 @@ export interface Profile {
 
 export interface Conversation {
   conversation_id: string;
-  invite_code: string;
   created_by: string;
-  agent_connector_id: string | null;
+  agent_connector_id: string;
   created_at: string;
 }
 

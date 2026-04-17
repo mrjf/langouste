@@ -24,20 +24,8 @@
   const myLang = $derived(myLangs[0] ?? "");
   const myBaseLang = $derived(myBaseLangs[0] ?? "");
 
-  // Agent or human chat?
-  const isAgentChat = $derived(!!conv?.agent_connector_id);
   const agentName = $derived(conv?.agent_connector?.name ?? "Agent");
-
-  // Other members
-  const otherMembers = $derived(conv?.members?.filter((m) => m.user_id !== userId) ?? []);
-  const needsPartner = $derived(!isAgentChat && otherMembers.length === 0);
-  const partnerName = $derived.by(() => {
-    if (isAgentChat) return `🤖 ${agentName}`;
-    if (needsPartner) return "Waiting for partner...";
-    return otherMembers.map((m) => m.profile?.display_name ?? "Partner").join(", ");
-  });
-
-  const joinUrl = $derived(conv ? `${location.origin}/#join/${conv.invite_code}` : "");
+  const partnerName = $derived(`🤖 ${agentName}`);
 
   // Deduplicated messages for rendering
   const uniqueMessages = $derived.by(() => {
@@ -47,16 +35,6 @@
       seen.add(m.message_id);
       return true;
     });
-  });
-
-  // Participant name lookup
-  const participants = $derived.by(() => {
-    if (!conv?.members) return {};
-    const map: Record<string, string> = {};
-    for (const m of conv.members) {
-      if (m.profile) map[m.user_id] = m.profile.display_name;
-    }
-    return map;
   });
 
   // Subscribe to realtime when conversation changes
@@ -209,24 +187,6 @@
     });
   }
 
-  let copyLabel = $state("Copy invite link");
-  let copyLabelInline = $state("Copy");
-
-  async function copyInviteLink(inline = false) {
-    try {
-      await navigator.clipboard.writeText(joinUrl);
-      if (inline) {
-        copyLabelInline = "Copied!";
-        setTimeout(() => copyLabelInline = "Copy", 2000);
-      } else {
-        copyLabel = "Copied!";
-        setTimeout(() => copyLabel = "Copy invite link", 2000);
-      }
-    } catch {
-      // Fallback
-    }
-  }
-
   let translating = $state(false);
 
   async function switchLanguage(field: "target_languages" | "base_languages", value: string) {
@@ -299,18 +259,7 @@
         </label>
       </div>
     </div>
-    {#if needsPartner}
-      <button class="btn-copy-link" onclick={() => copyInviteLink(false)}>{copyLabel}</button>
-    {/if}
   </div>
-
-  {#if needsPartner}
-    <div class="invite-banner">
-      Waiting for a partner to join. Share this link:
-      <span class="invite-url">{joinUrl}</span>
-      <button class="btn-copy-link-inline" onclick={() => copyInviteLink(true)}>{copyLabelInline}</button>
-    </div>
-  {/if}
 
   <div class="messages" bind:this={messagesEl}>
     {#each uniqueMessages as msg (msg.message_id)}
@@ -318,7 +267,7 @@
       <MessageBubble
         message={msg}
         sent={isSent}
-        senderName={msg.is_agent ? `🤖 ${agentName}` : (participants[msg.sender_id] ?? null)}
+        senderName={msg.is_agent ? `🤖 ${agentName}` : null}
         viewerLangs={myLangs}
         baseLangs={myBaseLangs}
         challenge={msg.next_challenge ?? null}
@@ -410,51 +359,6 @@
     border-radius: 4px;
     background: var(--color-bg);
     color: var(--color-text);
-  }
-
-  .btn-copy-link {
-    margin-left: auto;
-    background: var(--color-challenge);
-    color: #1565c0;
-    border: 1px solid #90caf9;
-    border-radius: var(--radius-sm);
-    padding: 0.35rem 0.75rem;
-    font-size: 0.8rem;
-    font-weight: 500;
-    flex-shrink: 0;
-  }
-
-  .invite-banner {
-    padding: 0.75rem 1.25rem;
-    background: var(--color-challenge);
-    border-bottom: 1px solid #90caf9;
-    font-size: 0.85rem;
-    color: #1565c0;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-  }
-
-  .invite-url {
-    font-family: var(--font-mono);
-    font-size: 0.8rem;
-    background: white;
-    padding: 0.2rem 0.5rem;
-    border-radius: 4px;
-    word-break: break-all;
-    user-select: all;
-  }
-
-  .btn-copy-link-inline {
-    background: #1565c0;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    padding: 0.25rem 0.6rem;
-    font-size: 0.8rem;
-    font-weight: 500;
-    flex-shrink: 0;
   }
 
   .messages {

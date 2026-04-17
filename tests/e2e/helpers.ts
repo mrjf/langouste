@@ -118,12 +118,15 @@ export async function expectLoggedIn(page: Page) {
 }
 
 /**
- * Create a new person-to-person conversation via the UI.
+ * Create a new agent conversation via the UI.
+ * Requires at least one configured agent connector.
  */
 export async function createConversation(page: Page) {
   await page.getByRole("button", { name: "+ New" }).click();
-  await page.getByText("Chat with a person").click();
-  // Wait for the conversation to load
+  // Pick the first existing connector, or create one (test setup dependent)
+  const firstConnector = page.locator(".connector-btn").first();
+  await expect(firstConnector).toBeVisible({ timeout: 5_000 });
+  await firstConnector.click();
   await expect(page.locator(".thread-header")).toBeVisible({ timeout: 10_000 });
 }
 

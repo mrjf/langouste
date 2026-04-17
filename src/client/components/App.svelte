@@ -68,29 +68,10 @@
   });
 
   async function routeFromHash(convs: any[]) {
-    const hash = location.hash;
-
-    // Join link: #join/{invite_code}
-    const joinMatch = hash.match(/^#join\/(.+)$/);
-    if (joinMatch) {
-      const inviteCode = joinMatch[1];
-      history.replaceState(null, "", location.pathname);
-      try {
-        const conv = await api.joinConversation(inviteCode);
-        conversations.value = await api.getConversations();
-        activeConversation.value = conv;
-      } catch (err: any) {
-        alert("Failed to join conversation: " + err.message);
-      }
-      return;
-    }
-
-    // Conversation link: #/c/{short_id}
-    const convMatch = hash.match(/^#\/c\/(.+)$/);
+    const convMatch = location.hash.match(/^#\/c\/(.+)$/);
     if (convMatch) {
       const conv = findConv(convs, convMatch[1]);
       if (conv) activeConversation.value = conv;
-      return;
     }
   }
 

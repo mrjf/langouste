@@ -34,19 +34,6 @@ export async function getMember(
   return data;
 }
 
-export async function getMembers(
-  supabase: SupabaseClient,
-  conversationId: string,
-): Promise<ConversationMember[]> {
-  const { data, error } = await supabase
-    .from("conversation_members")
-    .select("*")
-    .eq("conversation_id", conversationId);
-
-  if (error) throw error;
-  return data ?? [];
-}
-
 export async function updateMemberLanguages(
   supabase: SupabaseClient,
   conversationId: string,

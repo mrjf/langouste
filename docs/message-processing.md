@@ -83,12 +83,13 @@ The message is sent. On submit:
 
 Async post-send processing (does not block the UI):
 
-- **Translations** into all participants' target and base languages (via Google TLLM)
-- **Transliterations** if the message language uses non-Latin script (deterministic)
+- **Agent dispatch**: the message is translated to English (if needed) and forwarded to the configured agent connector (Claude, OpenClaw, HTTP). The agent's reply is stored as a message in the same conversation.
+- **Translations** of both the user's message and the agent's reply into the user's target and base languages (via Google TLLM)
+- **Transliterations** if a language uses non-Latin script (deterministic)
 - **Phonetics** (IPA) for all language versions (deterministic where possible, Gemini fallback)
 - **Vocabulary extraction** and **grammar gap tracking** (Sonnet) — feeds the spaced repetition system
 
-Once translations arrive, they become available on the message. Base language translations are accessible but not shown by default — the recipient sees the message in their target language(s) first, with base language translations available on tap/click.
+Once translations arrive, they become available on the message. Base language translations are accessible but not shown by default — the user sees the message in their target language(s) first, with base language translations available on tap/click.
 
 ### Cancel: User presses Enter during processing
 

@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { requireAuth } from "../middleware.ts";
 import { getMessages, getRecentMessageTexts, insertMessage } from "../../services/database/messages.ts";
-import { getMember, getMembers } from "../../services/database/members.ts";
+import { getMember } from "../../services/database/members.ts";
 import { getConversation } from "../../services/database/conversations.ts";
 import { getConnector } from "../../services/database/agent-connectors.ts";
 import { checkSpelling } from "../../services/spellcheck/checker.ts";
@@ -14,26 +14,19 @@ import { ensurePhonetics } from "../../services/ai/phonetician.ts";
 import { getAgentConnection } from "../../services/agents/factory.ts";
 import { trackLearningProgress, getDueReviewItems } from "../../services/spaced-repetition/tracker.ts";
 import { supabaseAdmin } from "../../lib/supabase-client.ts";
-import type { AgentType } from "../../types/index.ts";
+import type { AgentType, ConversationMember } from "../../types/index.ts";
 
 export const messageRoutes = new Hono();
 
 messageRoutes.use("*", requireAuth);
 
-/**
- * Collect all unique languages that members of this conversation need.
- */
-async function allMemberLanguages(
-  supabase: any,
-  conversationId: string,
-): Promise<string[]> {
-  const members = await getMembers(supabase, conversationId);
-  const langs = new Set<string>();
-  for (const m of members) {
-    for (const t of m.target_languages) langs.add(t.lang);
-    for (const b of m.base_languages) langs.add(b);
-  }
-  return [...langs];
+function memberLanguages(member: ConversationMember): string[] {
+  return [
+    ...new Set([
+      ...member.target_languages.map((t) => t.lang),
+      ...member.base_languages,
+    ]),
+  ];
 }
 
 // Get messages for a conversation
@@ -169,16 +162,15 @@ messageRoutes.post("/:conversationId", async (c) => {
     next_challenge: null,
   });
 
-  // Async post-send processing (does not block the response)
-  const memberLangs = await allMemberLanguages(supabase, conversationId);
+  const userLangs = memberLanguages(senderMember);
 
-  ensureTranslations([message], memberLangs).catch(
+  ensureTranslations([message], userLangs).catch(
     (err) => console.error("Failed to pre-translate message:", err),
   );
-  ensureTransliterations([message], msgLanguage, memberLangs).catch(
+  ensureTransliterations([message], msgLanguage, userLangs).catch(
     (err) => console.error("Failed to transliterate message:", err),
   );
-  ensurePhonetics([message], ["ipa"], memberLangs).catch(
+  ensurePhonetics([message], ["ipa"], userLangs).catch(
     (err) => console.error("Failed to generate phonetics:", err),
   );
 
@@ -212,77 +204,70 @@ messageRoutes.post("/:conversationId", async (c) => {
     }
   })();
 
-  // If this is an agent chat, forward to the agent and store its reply
+  // Forward to the agent and store its reply
   const conversation = await getConversation(supabase, conversationId);
-  if (conversation?.agent_connector_id) {
-    try {
-      const connector = await getConnector(supabase, conversation.agent_connector_id);
-      if (connector) {
-        const agent = getAgentConnection(
-          connector.connector_id,
-          connector.type as AgentType,
-          connector.config,
-        );
-
-        // Translate user's message to English for the agent
-        const [englishText] = await translateTexts([text], "en");
-
-        // Build conversation history for context
-        const recentMsgs = await getMessages(supabase, conversationId, 20);
-        const history = recentMsgs
-          .filter((m) => m.message_id !== message.message_id)
-          .map((m) => ({
-            role: m.sender_id === userId ? "user" : "assistant",
-            content: m.translations?.["en"] ?? m.healed_text,
-          }));
-
-        const agentResponse = await agent.sendMessage(englishText, history);
-
-        const agentTranslations: Record<string, string> = { en: agentResponse };
-        const { data: agentMsg } = await supabaseAdmin
-          .from("messages")
-          .insert({
-            conversation_id: conversationId,
-            sender_id: conversation.created_by,
-            raw_text: agentResponse,
-            healed_text: agentResponse,
-            language: "en",
-            translation: null,
-            translations: agentTranslations,
-            corrections: [],
-            next_challenge: null,
-            is_agent: true,
-          })
-          .select()
-          .single();
-
-        if (agentMsg) {
-          const langs = [...new Set([
-            ...senderMember.target_languages.map((t) => t.lang),
-            ...senderMember.base_languages,
-          ])];
-          ensureTranslations([agentMsg], langs).catch(
-            (err) => console.error("Failed to translate agent response:", err),
-          );
-          ensureTransliterations([agentMsg], "en", langs).catch(
-            (err) => console.error("Failed to transliterate agent response:", err),
-          );
-          ensurePhonetics([agentMsg], ["ipa"], langs).catch(
-            (err) => console.error("Failed to generate agent phonetics:", err),
-          );
-        }
-
-        return c.json({
-          message,
-          agent_message: agentMsg,
-        }, 201);
-      }
-    } catch (err) {
-      console.error("Agent communication failed:", err);
-    }
+  if (!conversation?.agent_connector_id) {
+    return c.json({ error: "Conversation has no agent connector" }, 500);
   }
 
-  return c.json({ message }, 201);
+  try {
+    const connector = await getConnector(supabase, conversation.agent_connector_id);
+    if (!connector) {
+      return c.json({ message, agent_message: null }, 201);
+    }
+
+    const agent = getAgentConnection(
+      connector.connector_id,
+      connector.type as AgentType,
+      connector.config,
+    );
+
+    const [englishText] = await translateTexts([text], "en");
+
+    const recentMsgs = await getMessages(supabase, conversationId, 20);
+    const history = recentMsgs
+      .filter((m) => m.message_id !== message.message_id)
+      .map((m) => ({
+        role: m.sender_id === userId ? "user" : "assistant",
+        content: m.translations?.["en"] ?? m.healed_text,
+      }));
+
+    const agentResponse = await agent.sendMessage(englishText, history);
+
+    const { data: agentMsg } = await supabaseAdmin
+      .from("messages")
+      .insert({
+        conversation_id: conversationId,
+        sender_id: conversation.created_by,
+        raw_text: agentResponse,
+        healed_text: agentResponse,
+        language: "en",
+        translation: null,
+        translations: { en: agentResponse },
+        corrections: [],
+        next_challenge: null,
+        is_agent: true,
+      })
+      .select()
+      .single();
+
+    if (agentMsg) {
+      ensureTranslations([agentMsg], userLangs).catch(
+        (err) => console.error("Failed to translate agent response:", err),
+      );
+      ensureTransliterations([agentMsg], "en", userLangs).catch(
+        (err) => console.error("Failed to transliterate agent response:", err),
+      );
+      ensurePhonetics([agentMsg], ["ipa"], userLangs).catch(
+        (err) => console.error("Failed to generate agent phonetics:", err),
+      );
+    }
+
+    return c.json({ message, agent_message: agentMsg }, 201);
+  } catch (err) {
+    console.error("Agent communication failed:", err);
+    return c.json({ message, agent_message: null }, 201);
+  }
 });
 
 // Translate all messages in a conversation into the requested languages

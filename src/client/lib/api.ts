@@ -105,8 +105,6 @@ export const api = {
   getConversations: () => request("/conversations"),
   createConversation: (body: Record<string, unknown>) =>
     request("/conversations", { method: "POST", body: JSON.stringify(body) }),
-  joinConversation: (invite_code: string) =>
-    request("/conversations/join", { method: "POST", body: JSON.stringify({ invite_code }) }),
   updateLanguages: (conversationId: string, body: Record<string, unknown>) =>
     request(`/conversations/${conversationId}/languages`, { method: "PATCH", body: JSON.stringify(body) }),
 

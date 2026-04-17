@@ -37,9 +37,8 @@ export interface AgentConnector {
 
 export interface Conversation {
   conversation_id: string;
-  invite_code: string;
   created_by: string;
-  agent_connector_id: string | null;
+  agent_connector_id: string;
   agent_connector?: AgentConnector | null;
   created_at: string;
   members: ConversationMember[];
