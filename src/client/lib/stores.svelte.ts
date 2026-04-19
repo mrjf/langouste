@@ -31,7 +31,7 @@ export interface ConversationMember {
 export interface AgentConnector {
   connector_id: string;
   name: string;
-  type: "openclaw" | "claude" | "http";
+  type: "openclaw" | "claude" | "claude-code" | "http" | "stub";
   config: Record<string, unknown>;
 }
 

@@ -6,10 +6,10 @@ Language-learning chat with AI agents. The user writes in their target language 
 
 - **Runtime**: Bun
 - **HTTP**: Hono
-- **Database/Auth/Realtime**: Supabase (Postgres + RLS + Realtime)
+- **Database**: pluggable via `DATABASE_MODE` — `sqlite` (default, local file) or `supabase` (Postgres + RLS + Realtime + Auth). See `docs/MODES.md`.
 - **AI**: Claude API via @anthropic-ai/sdk
 - **Frontend**: Svelte 5 (runes) + Vite
-- **Deploy**: Supabase managed
+- **Deploy**: local single-file (sqlite) or managed/self-hosted Supabase
 
 ## Commands
 
@@ -40,7 +40,8 @@ Language-learning chat with AI agents. The user writes in their target language 
 - All AI calls go through src/services/ai/ — never call Anthropic SDK directly from routes
 - Agent traffic goes through src/services/agents/ connectors — never call the WebSocket/HTTP agent directly from routes
 - Every conversation has exactly one `agent_connector_id` — there is no person-to-person chat in this build
-- Database access only through src/services/database/ modules
+- Database access only through the `Database` interface from src/lib/db/. Never import `@supabase/supabase-js` outside src/lib/db/, src/routes/middleware.ts, and src/routes/api/auth.ts.
+- The 7 modules in src/services/database/ are the only place tables are named. Routes call those; they don't call the DB directly.
 - Server env variables via src/lib/config.ts — never read process.env directly elsewhere
 - Client env variables via Vite's import.meta.env (VITE_ prefix)
 - Corrections stored as JSONB, not separate rows

@@ -2,17 +2,7 @@
   import { api } from "../lib/api";
   import { langTag, LANGUAGES } from "../lib/languages";
   import type { ConversationMember } from "../lib/stores.svelte";
-
-  /** Minimal inline markdown: **bold**, *italic*, `code` */
-  function renderMarkdown(text: string): string {
-    return text
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-      .replace(/\*(.+?)\*/g, "<em>$1</em>")
-      .replace(/`(.+?)`/g, "<code>$1</code>");
-  }
+  import { mdInline as renderMarkdown } from "../lib/md";
 
   interface TextError {
     start: number;
@@ -73,54 +63,110 @@
     return map;
   });
 
-  // Filter out errors where the user has already typed the corrected form
+  // Per-error resolution status.
+  //
+  // An individual error is "resolved" when the user has replaced its
+  // erroneous text with the suggested correction. Concretely:
+  //   - If the error text is gone from the current message AND the corrected
+  //     form is present → resolved.
+  //   - If the entire current message matches the LLM's corrected_message
+  //     (whitespace/case-normalised) → every error resolved.
+  //   - Otherwise → unresolved.
+  //
+  // Resolved errors stay visible in the hint panel but marked done, and
+  // their squiggles are dropped from the overlay.
+
+  function isResolved(errText: string, corrected: string, currentLower: string, fullyMatched: boolean): boolean {
+    if (fullyMatched) return true;
+    if (!corrected) return false;
+    const orig = errText.toLowerCase();
+    const fix = corrected.toLowerCase();
+    // Identical correction: can't tell edit state; trust "full match" path.
+    if (orig === fix) return false;
+    const origStill = currentLower.includes(orig);
+    const fixThere = currentLower.includes(fix);
+    if (origStill) return false;          // user hasn't removed the wrong text yet
+    return fixThere;                       // wrong gone AND right arrived
+  }
+
+  // Build a single ordered, de-duplicated list of explanations from both
+  // sources, tagged with resolution state. Used for the hint panel and to
+  // derive the squiggled errors.
+  interface ResolvableExplanation {
+    error: TextError;
+    corrected: string;
+    explanations: Record<string, string>;
+    resolved: boolean;
+  }
+
+  let explanationList = $derived.by<ResolvableExplanation[]>(() => {
+    const currentLower = text.toLowerCase();
+    const target = correctedMessage.trim().toLowerCase();
+    const normCurrent = currentLower.trim().replace(/\s+/g, " ");
+    const normTarget = target.replace(/\s+/g, " ");
+    const fullyMatched = !!target && normCurrent === normTarget;
+
+    const rows: ResolvableExplanation[] = [];
+    const seen = new Set<string>();
+
+    for (const e of explanations) {
+      const key = e.error.text.toLowerCase();
+      if (seen.has(key)) continue;
+      seen.add(key);
+      rows.push({
+        error: e.error,
+        corrected: e.corrected,
+        explanations: e.explanations,
+        resolved: isResolved(e.error.text, e.corrected, currentLower, fullyMatched),
+      });
+    }
+    for (const e of additionalErrors) {
+      const key = e.text.toLowerCase();
+      if (seen.has(key)) continue;
+      seen.add(key);
+      rows.push({
+        error: { start: e.start, end: e.end, text: e.text, kind: e.kind },
+        corrected: e.corrected,
+        explanations: e.explanations,
+        resolved: isResolved(e.text, e.corrected, currentLower, fullyMatched),
+      });
+    }
+
+    return rows.sort((a, b) => a.error.start - b.error.start);
+  });
+
+  // Errors still needing attention — drives the inline squiggles and the
+  // "can submit?" logic. When the LLM hasn't returned a corrected form yet,
+  // fall back to "is the erroneous text still in the message?" so stale
+  // squiggles anchored to deleted characters don't linger.
   let activeErrors = $derived.by(() => {
     if (errors.length === 0 && additionalErrors.length === 0) return [];
 
-    const currentText = text.toLowerCase();
-    const active: TextError[] = [];
+    const currentLower = text.toLowerCase();
+    const anyCorrectedLoaded = explanationList.some((e) => !!e.corrected);
 
-    for (const err of errors) {
-      const corrected = correctionMap.get(err.text.toLowerCase());
-      // If we know the correction, check if it appears in the text where the error was
-      if (corrected && currentText.includes(corrected)) continue;
-      // Also skip if the original erroneous text is no longer in the current text
-      if (!currentText.includes(err.text.toLowerCase())) continue;
-      active.push(err);
+    // Errors we have explanations for: use the resolved flag.
+    const active: TextError[] = [];
+    const explainedKeys = new Set(explanationList.map((e) => e.error.text.toLowerCase()));
+
+    for (const row of explanationList) {
+      if (!row.resolved) active.push(row.error);
     }
 
-    for (const err of additionalErrors) {
-      const corrected = err.corrected?.toLowerCase();
-      if (corrected && currentText.includes(corrected)) continue;
-      if (!currentText.includes(err.text.toLowerCase())) continue;
-      active.push(err);
+    // Raw spell-check errors without an explanation (LLM hasn't answered
+    // yet): keep them visible while the erroneous text is still present.
+    for (const err of errors) {
+      if (explainedKeys.has(err.text.toLowerCase())) continue;
+      if (anyCorrectedLoaded) continue; // partial response; don't re-add
+      if (currentLower.includes(err.text.toLowerCase())) active.push(err);
     }
 
     return active;
   });
 
-  // Active explanations (only for errors that haven't been fixed)
-  let activeExplanations = $derived.by(() => {
-    const activeTexts = new Set(activeErrors.map((e) => e.text.toLowerCase()));
-    const result: Array<{ error: TextError; corrected: string; explanations: Record<string, string> }> = [];
-
-    for (const e of explanations) {
-      if (activeTexts.has(e.error.text.toLowerCase())) {
-        result.push(e);
-      }
-    }
-    for (const e of additionalErrors) {
-      if (activeTexts.has(e.text.toLowerCase())) {
-        result.push({
-          error: { start: e.start, end: e.end, text: e.text, kind: e.kind },
-          corrected: e.corrected,
-          explanations: e.explanations,
-        });
-      }
-    }
-
-    return result.sort((a, b) => a.error.start - b.error.start);
-  });
+  // Backward-compat name for the hint panel: show ALL explanations (resolved
+  // and unresolved), so the user sees what they've fixed.
+  let activeExplanations = $derived(explanationList);
 
   // Refs
   let editableEl: HTMLDivElement | undefined = $state();
@@ -213,30 +259,41 @@
   }
 
   async function handleKeydown(e: KeyboardEvent) {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (e.key !== "Enter") return;
+
+    // Shift+Enter — force submit, bypassing all checks. The agent gets the
+    // user's text verbatim; the translator does its best with whatever's
+    // there. This is the escape hatch when the user knows they're right or
+    // doesn't want to iterate on a correction.
+    if (e.shiftKey) {
       e.preventDefault();
-
-      // Always sync text from DOM before processing
       syncText();
-
-      // Cancel if currently waiting for check/explain results
-      if (state === "checking") {
-        cancelProcessing();
-        return;
-      }
-
       if (!text.trim() || disabled) return;
-
-      // If user's text exactly matches the LLM's corrected message, submit immediately
-      if (correctedMessage && text.trim() === correctedMessage.trim()) {
-        console.log("[Send] Text matches corrected message — submitting without re-check");
-        submit();
-        return;
-      }
-
-      // Re-check (will submit if clean, or show new errors)
-      await runCheckPipeline();
+      cancelProcessing();
+      submit();
+      return;
     }
+
+    // Plain Enter — run the check / explain pipeline.
+    e.preventDefault();
+    syncText();
+
+    if (state === "checking") {
+      cancelProcessing();
+      return;
+    }
+
+    if (!text.trim() || disabled) return;
+
+    // If user's text exactly matches the LLM's corrected message, submit immediately
+    if (correctedMessage && text.trim() === correctedMessage.trim()) {
+      console.log("[Send] Text matches corrected message — submitting without re-check");
+      submit();
+      return;
+    }
+
+    // Re-check (will submit if clean, or show new errors)
+    await runCheckPipeline();
   }
 
   function cancelProcessing() {
@@ -409,21 +466,37 @@
       rows={1}
       bind:value={intentText}
       onkeydown={(e) => {
-        if (e.key === "Enter" && !e.shiftKey) {
+        if (e.key !== "Enter") return;
+        if (e.shiftKey) {
           e.preventDefault();
           syncText();
-          if (text.trim() && !disabled) runCheckPipeline();
+          if (text.trim() && !disabled) {
+            cancelProcessing();
+            submit();
+          }
+          return;
         }
+        e.preventDefault();
+        syncText();
+        if (text.trim() && !disabled) runCheckPipeline();
       }}
     ></textarea>
   </div>
 
-  <!-- Hint panel (explanations from Opus) -->
+  <!-- Hint panel (explanations from Opus). Shows all errors with resolved
+       ones marked done rather than removed, so the user keeps the context. -->
   {#if explanations.length > 0 || additionalErrors.length > 0}
+    {@const totalCount = activeExplanations.length}
+    {@const resolvedCount = activeExplanations.filter((e) => e.resolved).length}
+    {@const remainingCount = totalCount - resolvedCount}
     <div class="hint-panel">
       <div class="hint-header">
         <span class="hint-title">
-          {activeExplanations.length} error{activeExplanations.length !== 1 ? "s" : ""} found
+          {#if remainingCount === 0}
+            ✓ All {totalCount} error{totalCount !== 1 ? "s" : ""} fixed — press Enter to send
+          {:else}
+            {remainingCount} of {totalCount} error{totalCount !== 1 ? "s" : ""} remaining
+          {/if}
         </span>
         {#if member.base_languages.length > 1}
           <div class="base-lang-toggle">
@@ -440,7 +513,15 @@
         {/if}
       </div>
       {#each activeExplanations as hint}
-        <div class="hint-item" class:spelling={hint.error.kind === "spelling"} class:grammar={hint.error.kind === "grammar"}>
+        <div
+          class="hint-item"
+          class:spelling={hint.error.kind === "spelling"}
+          class:grammar={hint.error.kind === "grammar"}
+          class:resolved={hint.resolved}
+        >
+          {#if hint.resolved}
+            <span class="hint-check" aria-label="Resolved">✓</span>
+          {/if}
           <span class="hint-word">"{hint.error.text}"</span>
           {#if hint.corrected}
             <span class="hint-correction">&rarr; <strong>{hint.corrected}</strong></span>
@@ -699,10 +780,27 @@
     padding: 0.35rem 0;
     border-top: 1px solid rgba(243, 156, 18, 0.2);
     font-size: 0.82rem;
+    transition: opacity 0.15s;
   }
 
   .hint-item:first-of-type {
     border-top: none;
+  }
+
+  .hint-item.resolved {
+    opacity: 0.55;
+  }
+
+  .hint-item.resolved .hint-word,
+  .hint-item.resolved .hint-correction {
+    text-decoration: line-through;
+    text-decoration-color: rgba(0, 0, 0, 0.3);
+  }
+
+  .hint-check {
+    color: var(--color-success, #27ae60);
+    font-weight: 700;
+    margin-right: 0.25rem;
   }
 
   .hint-word {
@@ -711,6 +809,10 @@
 
   .spelling .hint-word { color: #e74c3c; }
   .grammar .hint-word { color: #4a90d9; }
+
+  .hint-item.resolved .hint-word {
+    color: var(--color-text-light);
+  }
 
   .hint-correction {
     color: var(--color-success, #27ae60);

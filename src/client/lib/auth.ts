@@ -56,6 +56,22 @@ export function loadSession(): boolean {
   }
 }
 
+/**
+ * Single-user mode: fetch a session from /api/auth/local and store it. The
+ * backend auto-creates the local user on first call. No credentials involved.
+ */
+export async function loadLocalSession(): Promise<boolean> {
+  try {
+    const result = await api.localSession();
+    if (!result?.session?.access_token) return false;
+    saveSession(result.session, result.user);
+    return true;
+  } catch (err) {
+    console.error("[auth] local session fetch failed:", err);
+    return false;
+  }
+}
+
 export function saveSession(sess: unknown, u: unknown) {
   session.value = sess as any;
   user.value = u as any;

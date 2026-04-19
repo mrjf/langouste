@@ -13,7 +13,7 @@ import { ensureTransliterations } from "../../services/ai/transliterator.ts";
 import { ensurePhonetics } from "../../services/ai/phonetician.ts";
 import { getAgentConnection } from "../../services/agents/factory.ts";
 import { trackLearningProgress, getDueReviewItems } from "../../services/spaced-repetition/tracker.ts";
-import { supabaseAdmin } from "../../lib/supabase-client.ts";
+import { adminDb } from "../../lib/db/index.ts";
 import type { AgentType, ConversationMember } from "../../types/index.ts";
 
 export const messageRoutes = new Hono();
@@ -31,18 +31,18 @@ function memberLanguages(member: ConversationMember): string[] {
 
 // Get messages for a conversation
 messageRoutes.get("/:conversationId", async (c) => {
-  const supabase = c.get("supabase");
+  const db = c.get("db");
   const conversationId = c.req.param("conversationId");
   const before = c.req.query("before");
   const limit = parseInt(c.req.query("limit") ?? "50", 10);
 
-  const messages = await getMessages(supabase, conversationId, limit, before);
+  const messages = await getMessages(db, conversationId, limit, before);
   return c.json(messages);
 });
 
 // Deterministic spell-check (instant, no LLM)
 messageRoutes.post("/:conversationId/check", async (c) => {
-  const supabase = c.get("supabase");
+  const db = c.get("db");
   const userId = c.get("userId");
   const conversationId = c.req.param("conversationId");
   const checkBody = await c.req.json();
@@ -54,7 +54,7 @@ messageRoutes.post("/:conversationId/check", async (c) => {
     return c.json({ error: "Text cannot be empty" }, 400);
   }
 
-  const senderMember = await getMember(supabase, conversationId, userId);
+  const senderMember = await getMember(db, conversationId, userId);
   if (!senderMember) {
     return c.json({ error: "Not a member of this conversation" }, 403);
   }
@@ -84,7 +84,7 @@ messageRoutes.post("/:conversationId/check", async (c) => {
 
 // Opus error explanation (slow, rich)
 messageRoutes.post("/:conversationId/explain", async (c) => {
-  const supabase = c.get("supabase");
+  const db = c.get("db");
   const userId = c.get("userId");
   const conversationId = c.req.param("conversationId");
   const { text, errors, language, intent } = await c.req.json();
@@ -93,7 +93,7 @@ messageRoutes.post("/:conversationId/explain", async (c) => {
     return c.json({ error: "text and language are required" }, 400);
   }
 
-  const senderMember = await getMember(supabase, conversationId, userId);
+  const senderMember = await getMember(db, conversationId, userId);
   if (!senderMember) {
     return c.json({ error: "Not a member of this conversation" }, 403);
   }
@@ -101,7 +101,7 @@ messageRoutes.post("/:conversationId/explain", async (c) => {
   const targetLang = senderMember.target_languages.find((t) => t.lang === language);
   const cefrLevel = targetLang?.cefr_level ?? "A1";
 
-  const context = await getRecentMessageTexts(supabase, conversationId);
+  const context = await getRecentMessageTexts(db, conversationId);
 
   const result = await explainErrors({
     text,
@@ -122,7 +122,7 @@ messageRoutes.post("/:conversationId/explain", async (c) => {
 
 // Send a message (no rewriting — user's text goes through as-is)
 messageRoutes.post("/:conversationId", async (c) => {
-  const supabase = c.get("supabase");
+  const db = c.get("db");
   const userId = c.get("userId");
   const conversationId = c.req.param("conversationId");
   const body = await c.req.json();
@@ -134,7 +134,7 @@ messageRoutes.post("/:conversationId", async (c) => {
     return c.json({ error: "Message cannot be empty" }, 400);
   }
 
-  const senderMember = await getMember(supabase, conversationId, userId);
+  const senderMember = await getMember(db, conversationId, userId);
   if (!senderMember) {
     return c.json({ error: "Not a member of this conversation" }, 403);
   }
@@ -150,7 +150,7 @@ messageRoutes.post("/:conversationId", async (c) => {
     [msgLanguage]: text,
   };
 
-  const message = await insertMessage(supabase, {
+  const message = await insertMessage(db, {
     conversation_id: conversationId,
     sender_id: userId,
     raw_text: text,
@@ -180,7 +180,7 @@ messageRoutes.post("/:conversationId", async (c) => {
 
   (async () => {
     try {
-      const context = await getRecentMessageTexts(supabase, conversationId);
+      const context = await getRecentMessageTexts(db, conversationId);
       const vocabResult = await extractVocabulary({
         text,
         language: msgLanguage,
@@ -190,14 +190,15 @@ messageRoutes.post("/:conversationId", async (c) => {
         conversation_context: context,
       });
 
-      await trackLearningProgress(supabase, userId, msgLanguage, vocabResult);
+      await trackLearningProgress(db, userId, msgLanguage, vocabResult, message.message_id);
 
       // Update message with the challenge
       if (vocabResult.next_challenge) {
-        await supabaseAdmin
-          .from("messages")
-          .update({ next_challenge: vocabResult.next_challenge })
-          .eq("message_id", message.message_id);
+        await adminDb().update(
+          "messages",
+          { next_challenge: vocabResult.next_challenge },
+          [{ op: "eq", column: "message_id", value: message.message_id }],
+        );
       }
     } catch (err) {
       console.error("Failed to extract vocabulary:", err);
@@ -205,13 +206,13 @@ messageRoutes.post("/:conversationId", async (c) => {
   })();
 
   // Forward to the agent and store its reply
-  const conversation = await getConversation(supabase, conversationId);
+  const conversation = await getConversation(db, conversationId);
   if (!conversation?.agent_connector_id) {
     return c.json({ error: "Conversation has no agent connector" }, 500);
   }
 
   try {
-    const connector = await getConnector(supabase, conversation.agent_connector_id);
+    const connector = await getConnector(db, conversation.agent_connector_id);
     if (!connector) {
       return c.json({ message, agent_message: null }, 201);
     }
@@ -224,7 +225,7 @@ messageRoutes.post("/:conversationId", async (c) => {
 
     const [englishText] = await translateTexts([text], "en");
 
-    const recentMsgs = await getMessages(supabase, conversationId, 20);
+    const recentMsgs = await getMessages(db, conversationId, 20);
     const history = recentMsgs
       .filter((m) => m.message_id !== message.message_id)
       .map((m) => ({
@@ -234,22 +235,18 @@ messageRoutes.post("/:conversationId", async (c) => {
 
     const agentResponse = await agent.sendMessage(englishText, history);
 
-    const { data: agentMsg } = await supabaseAdmin
-      .from("messages")
-      .insert({
-        conversation_id: conversationId,
-        sender_id: conversation.created_by,
-        raw_text: agentResponse,
-        healed_text: agentResponse,
-        language: "en",
-        translation: null,
-        translations: { en: agentResponse },
-        corrections: [],
-        next_challenge: null,
-        is_agent: true,
-      })
-      .select()
-      .single();
+    const agentMsg = await adminDb().insert<typeof message>("messages", {
+      conversation_id: conversationId,
+      sender_id: conversation.created_by,
+      raw_text: agentResponse,
+      healed_text: agentResponse,
+      language: "en",
+      translation: null,
+      translations: { en: agentResponse },
+      corrections: [],
+      next_challenge: null,
+      is_agent: true,
+    });
 
     if (agentMsg) {
       ensureTranslations([agentMsg], userLangs).catch(
@@ -265,14 +262,18 @@ messageRoutes.post("/:conversationId", async (c) => {
 
     return c.json({ message, agent_message: agentMsg }, 201);
   } catch (err) {
+    const detail = err instanceof Error ? err.message : String(err);
     console.error("Agent communication failed:", err);
-    return c.json({ message, agent_message: null }, 201);
+    return c.json(
+      { message, agent_message: null, agent_error: detail },
+      201,
+    );
   }
 });
 
 // Translate all messages in a conversation into the requested languages
 messageRoutes.post("/:conversationId/translate", async (c) => {
-  const supabase = c.get("supabase");
+  const db = c.get("db");
   const userId = c.get("userId");
   const conversationId = c.req.param("conversationId");
   const { languages } = await c.req.json();
@@ -281,12 +282,12 @@ messageRoutes.post("/:conversationId/translate", async (c) => {
     return c.json({ error: "languages array required" }, 400);
   }
 
-  const member = await getMember(supabase, conversationId, userId);
+  const member = await getMember(db, conversationId, userId);
   if (!member) {
     return c.json({ error: "Not a member of this conversation" }, 403);
   }
 
-  const messages = await getMessages(supabase, conversationId, 500);
+  const messages = await getMessages(db, conversationId, 500);
   await ensureTranslations(messages, languages as string[]);
   return c.json(messages);
 });

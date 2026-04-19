@@ -7,15 +7,16 @@
     "dev:client": "vite dev",
     "build": "vite build",
     "start": "bun src/main.ts",
-    "test": "bun test",
+    "test": "bun test tests/services",
     "test:e2e": "bunx playwright test",
     "test:e2e:ui": "bunx playwright test --ui",
+    "test:all": "bun run test && bun run test:e2e",
     "migrate": "bun scripts/migrate.ts"
   },
   "dependencies": {
+    "@anthropic-ai/claude-agent-sdk": "^0.2.112",
     "@anthropic-ai/sdk": "^0.39.0",
     "@google-cloud/translate": "^9.3.0",
-    "@google/genai": "^1.48.0",
     "@supabase/supabase-js": "^2.49.0",
     "dictionary-de": "^3.0.0",
     "dictionary-es": "^4.0.0",

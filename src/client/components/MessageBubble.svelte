@@ -1,18 +1,7 @@
 <script lang="ts">
   import type { Message, Correction } from "../lib/stores.svelte";
   import { langTag } from "../lib/languages";
-
-  /** Simple markdown → HTML: bold, italic, code, line breaks */
-  function md(text: string): string {
-    return text
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-      .replace(/\*(.+?)\*/g, "<em>$1</em>")
-      .replace(/`(.+?)`/g, "<code>$1</code>")
-      .replace(/\n/g, "<br>");
-  }
+  import { md } from "../lib/md";
 
   interface Props {
     message: Message;
@@ -143,7 +132,7 @@
         {#if showBase && baseText}
           <div class="detail-row base-row">
             <span class="detail-label">{langTag(baseLang)}</span>
-            <span class="detail-text">{baseText}</span>
+            <div class="detail-text">{@html md(baseText)}</div>
           </div>
         {/if}
 
@@ -151,7 +140,7 @@
           {#if shownLangs.has(lang) && message.translations?.[lang]}
             <div class="detail-row">
               <span class="detail-label">{langTag(lang)}</span>
-              <span class="detail-text">{message.translations[lang]}</span>
+              <div class="detail-text">{@html md(message.translations[lang])}</div>
             </div>
           {/if}
         {/each}
@@ -159,7 +148,7 @@
         {#if showOriginal && hasOriginal}
           <div class="detail-row original-row">
             <span class="detail-label">original</span>
-            <span class="detail-text">{message.raw_text}</span>
+            <div class="detail-text">{@html md(message.raw_text)}</div>
           </div>
         {/if}
 
@@ -340,6 +329,74 @@
 
   .detail-text {
     color: var(--color-text);
+  }
+
+  /* Compact markdown blocks inside message content. User-agent defaults on
+     <p>/<ul>/<ol>/<h1-3>/<hr> add too much vertical margin for a chat bubble. */
+  .healed-text :global(p),
+  .detail-text :global(p) {
+    margin: 0 0 0.35rem;
+  }
+
+  .healed-text :global(p:last-child),
+  .detail-text :global(p:last-child) {
+    margin-bottom: 0;
+  }
+
+  .healed-text :global(ul),
+  .healed-text :global(ol),
+  .detail-text :global(ul),
+  .detail-text :global(ol) {
+    margin: 0.25rem 0 0.35rem;
+    padding-left: 1.2rem;
+  }
+
+  .healed-text :global(li),
+  .detail-text :global(li) {
+    margin: 0.1rem 0;
+  }
+
+  .healed-text :global(h1),
+  .healed-text :global(h2),
+  .healed-text :global(h3),
+  .detail-text :global(h1),
+  .detail-text :global(h2),
+  .detail-text :global(h3) {
+    margin: 0.5rem 0 0.25rem;
+    font-size: 1em;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .healed-text :global(h1:first-child),
+  .healed-text :global(h2:first-child),
+  .healed-text :global(h3:first-child),
+  .detail-text :global(h1:first-child),
+  .detail-text :global(h2:first-child),
+  .detail-text :global(h3:first-child) {
+    margin-top: 0;
+  }
+
+  .healed-text :global(hr),
+  .detail-text :global(hr) {
+    border: none;
+    border-top: 1px solid var(--color-border);
+    margin: 0.5rem 0;
+  }
+
+  .healed-text :global(code),
+  .detail-text :global(code) {
+    font-family: var(--font-mono);
+    font-size: 0.88em;
+    background: rgba(0, 0, 0, 0.06);
+    padding: 0.05em 0.3em;
+    border-radius: 3px;
+  }
+
+  .healed-text :global(a),
+  .detail-text :global(a) {
+    color: var(--color-primary);
+    text-decoration: underline;
   }
 
   .base-row {

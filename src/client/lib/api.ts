@@ -95,6 +95,7 @@ export const api = {
     request("/auth/signup", { method: "POST", body: JSON.stringify(body) }),
   login: (body: Record<string, unknown>) =>
     request("/auth/login", { method: "POST", body: JSON.stringify(body) }),
+  localSession: () => request("/auth/local", { method: "POST" }),
 
   // Profile
   getProfile: () => request("/profile"),
@@ -135,10 +136,26 @@ export const api = {
   getAgentConnectors: () => request("/agent-connectors"),
   createAgentConnector: (body: Record<string, unknown>) =>
     request("/agent-connectors", { method: "POST", body: JSON.stringify(body) }),
+  updateAgentConnector: (connectorId: string, body: Record<string, unknown>) =>
+    request(`/agent-connectors/${connectorId}`, { method: "PATCH", body: JSON.stringify(body) }),
   deleteAgentConnector: (connectorId: string) =>
     request(`/agent-connectors/${connectorId}`, { method: "DELETE" }),
   testAgentConnector: (connectorId: string) =>
     request(`/agent-connectors/${connectorId}/test`, { method: "POST" }),
+  setConversationConnector: (conversationId: string, agentConnectorId: string) =>
+    request(`/conversations/${conversationId}/connector`, {
+      method: "PATCH",
+      body: JSON.stringify({ agent_connector_id: agentConnectorId }),
+    }),
+
+  // Profile stats
+  getLanguageStats: (language: string) => request(`/profile/stats/${language}`),
+  getDimensionItems: (language: string, dimension: string, params?: Record<string, string>) => {
+    const qs = params ? "?" + new URLSearchParams(params).toString() : "";
+    return request(`/profile/dimension/${language}/${dimension}${qs}`);
+  },
+  getProfileItem: (itemType: "vocabulary" | "grammar", itemId: string) =>
+    request(`/profile/item/${itemType}/${itemId}`),
 
   // Review
   getDueReview: (language: string) => request(`/review/due/${language}`),

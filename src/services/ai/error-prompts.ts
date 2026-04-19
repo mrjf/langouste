@@ -36,6 +36,7 @@ export function buildErrorExplanationPrompt(input: ExplainErrorsPromptInput): st
 - Be **terse**: 1-2 sentences per error. Use markdown bold for key words.
 - No preamble, no encouragement, no emoji. Just the correction and the reason.
 - Casual texting is fine — don't flag informal register or missing caps.
+- **Backticked spans are literals.** Any run of text inside backticks (\`like this\`) is a proper noun, nickname, code token, or other word the learner has explicitly marked as not-to-be-translated. Never flag them as errors, never "correct" them, and keep them byte-identical (including the surrounding backticks) in corrected_message.
 
 ## Learner's message in ${targetLang}
 "${input.text}"

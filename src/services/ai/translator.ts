@@ -1,4 +1,6 @@
-import { supabaseAdmin } from "../../lib/supabase-client.ts";
+import { adminDb } from "../../lib/db/index.ts";
+import { config } from "../../lib/config.ts";
+import { testRegistry } from "../../lib/test-registry.ts";
 import { getTranslationProvider } from "./translation/index.ts";
 import type { Message } from "../../types/index.ts";
 
@@ -11,6 +13,9 @@ export async function translateTexts(
   targetLanguage: string,
   context?: string,
 ): Promise<string[]> {
+  if (config.testMode) {
+    return texts.map((t) => testRegistry.getTranslation(t, targetLanguage));
+  }
   const provider = getTranslationProvider();
   const providerName = provider.constructor.name;
   console.log(`[Translation] [${providerName}] ${texts.length} text(s) → ${targetLanguage}: ${texts.map(t => `"${t.slice(0, 50)}"`).join(", ")}`);
@@ -52,10 +57,11 @@ export async function ensureTranslations(
       const msg = missing[i];
       const updated = { ...(msg.translations ?? {}), [lang]: translated[i] };
       msg.translations = updated;
-      await supabaseAdmin
-        .from("messages")
-        .update({ translations: updated })
-        .eq("message_id", msg.message_id);
+      await adminDb().update(
+        "messages",
+        { translations: updated },
+        [{ op: "eq", column: "message_id", value: msg.message_id }],
+      );
     }
   }
 

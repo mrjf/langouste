@@ -1,4 +1,6 @@
 import { getAnthropicClient } from "./client.ts";
+import { config } from "../../lib/config.ts";
+import { testRegistry } from "../../lib/test-registry.ts";
 import { languageName } from "../../lib/languages.ts";
 import type {
   VocabularyExtractionInput,
@@ -47,6 +49,15 @@ const VOCABULARY_EXTRACTION_TOOL = {
 export async function extractVocabulary(
   input: VocabularyExtractionInput,
 ): Promise<VocabularyExtractionOutput> {
+  if (config.testMode) {
+    const stub = testRegistry.getVocabResponse(input.text);
+    return {
+      new_vocabulary: stub.new_vocabulary ?? [],
+      grammar_gaps_detected: stub.grammar_gaps_detected ?? [],
+      next_challenge: stub.next_challenge ?? "",
+    };
+  }
+
   const client = getAnthropicClient();
   const targetLang = languageName(input.language);
   const baseLang = languageName(input.base_languages[0] ?? "en");
@@ -73,7 +84,10 @@ ${context}
 
 2. **Detect grammar gaps**: If you notice grammar patterns the sender struggles with (from this message or the conversation context), categorize them (e.g., "verb:passé_composé", "gender:articles", "prepositions:à_vs_de"). Only include categories where actual issues are evident.
 
-3. **Generate a challenge**: Suggest something specific for their next message. Prioritize practicing weak areas. Be encouraging. One sentence.`;
+3. **Generate a challenge**: Suggest something specific for their next message. Prioritize practicing weak areas. Be encouraging. One sentence.
+
+## Backtick convention
+Any text inside backticks (\`like this\`) is a literal the user marked as not-to-be-translated — a proper noun, nickname, brand, code token, or similar. Do NOT extract it as vocabulary and do NOT treat it as a grammar gap. Ignore it entirely for learning purposes.`;
 
   const response = await client.messages.create({
     model: "claude-sonnet-4-6",

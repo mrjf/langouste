@@ -4,6 +4,7 @@ import {
   getConnectorsForUser,
   getConnector,
   createConnector,
+  updateConnector,
   deleteConnector,
 } from "../../services/database/agent-connectors.ts";
 import { getAgentConnection, disconnectAgent } from "../../services/agents/factory.ts";
@@ -15,19 +16,19 @@ agentConnectorRoutes.use("*", requireAuth);
 
 // List user's connectors
 agentConnectorRoutes.get("/", async (c) => {
-  const supabase = c.get("supabase");
+  const db = c.get("db");
   const userId = c.get("userId");
-  const connectors = await getConnectorsForUser(supabase, userId);
+  const connectors = await getConnectorsForUser(db, userId);
   return c.json(connectors);
 });
 
 // Create a connector
 agentConnectorRoutes.post("/", async (c) => {
-  const supabase = c.get("supabase");
+  const db = c.get("db");
   const userId = c.get("userId");
   const { name, type, config } = await c.req.json();
 
-  const connector = await createConnector(supabase, {
+  const connector = await createConnector(db, {
     name,
     type,
     config: config ?? {},
@@ -37,21 +38,57 @@ agentConnectorRoutes.post("/", async (c) => {
   return c.json(connector, 201);
 });
 
-// Delete a connector
-agentConnectorRoutes.delete("/:connectorId", async (c) => {
-  const supabase = c.get("supabase");
+// Edit a connector's name and/or config. Type is immutable — to change it,
+// delete and recreate.
+agentConnectorRoutes.patch("/:connectorId", async (c) => {
+  const db = c.get("db");
+  const userId = c.get("userId");
   const connectorId = c.req.param("connectorId");
+  const body = await c.req.json();
+
+  const existing = await getConnector(db, connectorId);
+  if (!existing) return c.json({ error: "Connector not found" }, 404);
+  if (existing.created_by !== userId) return c.json({ error: "Forbidden" }, 403);
+
+  const updates: Partial<{ name: string; config: Record<string, unknown> }> = {};
+  if (typeof body.name === "string" && body.name.trim()) updates.name = body.name.trim();
+  if (body.config && typeof body.config === "object") updates.config = body.config;
+
+  if (Object.keys(updates).length === 0) {
+    return c.json(existing);
+  }
+
+  // Drop the cached in-memory agent so the next send constructs a fresh one
+  // with the updated config.
   disconnectAgent(connectorId);
-  await deleteConnector(supabase, connectorId);
+
+  const updated = await updateConnector(db, connectorId, updates);
+  return c.json(updated);
+});
+
+// Delete a connector. Conversations that used it will have their
+// agent_connector_id set to null by the FK ON DELETE SET NULL clause; the
+// client shows an orphan banner so the user can reattach.
+agentConnectorRoutes.delete("/:connectorId", async (c) => {
+  const db = c.get("db");
+  const userId = c.get("userId");
+  const connectorId = c.req.param("connectorId");
+
+  const existing = await getConnector(db, connectorId);
+  if (!existing) return c.json({ ok: true }); // idempotent
+  if (existing.created_by !== userId) return c.json({ error: "Forbidden" }, 403);
+
+  disconnectAgent(connectorId);
+  await deleteConnector(db, connectorId);
   return c.json({ ok: true });
 });
 
 // Get connector connection status
 agentConnectorRoutes.get("/:connectorId/status", async (c) => {
-  const supabase = c.get("supabase");
+  const db = c.get("db");
   const connectorId = c.req.param("connectorId");
 
-  const connector = await getConnector(supabase, connectorId);
+  const connector = await getConnector(db, connectorId);
   if (!connector) return c.json({ error: "Connector not found" }, 404);
 
   try {
@@ -74,10 +111,10 @@ agentConnectorRoutes.get("/:connectorId/status", async (c) => {
 
 // Test a connector
 agentConnectorRoutes.post("/:connectorId/test", async (c) => {
-  const supabase = c.get("supabase");
+  const db = c.get("db");
   const connectorId = c.req.param("connectorId");
 
-  const connector = await getConnector(supabase, connectorId);
+  const connector = await getConnector(db, connectorId);
   if (!connector) return c.json({ error: "Connector not found" }, 404);
 
   try {

@@ -1,4 +1,6 @@
 import { getAnthropicClient } from "./client.ts";
+import { config } from "../../lib/config.ts";
+import { testRegistry } from "../../lib/test-registry.ts";
 import {
   buildErrorExplanationPrompt,
   ERROR_EXPLANATION_TOOL,
@@ -30,6 +32,27 @@ export interface ExplainErrorsOutput {
 export async function explainErrors(
   input: ExplainErrorsInput,
 ): Promise<ExplainErrorsOutput> {
+  if (config.testMode) {
+    const stub = testRegistry.getExplainResponse(input.text);
+    const explanations: ErrorExplanation[] = (stub.explanations ?? []).map((e) => ({
+      error: input.errors[e.error_index],
+      corrected: e.corrected,
+      explanations: e.explanations,
+    }));
+    return {
+      corrected_message: stub.corrected_message,
+      explanations,
+      additional_errors: (stub.additional_errors ?? []).map((e) => ({
+        start: e.start,
+        end: e.end,
+        text: e.text,
+        corrected: e.corrected,
+        kind: "grammar" as const,
+        explanations: e.explanations,
+      })),
+    };
+  }
+
   const client = getAnthropicClient();
   const prompt = buildErrorExplanationPrompt(input);
 

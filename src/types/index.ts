@@ -26,7 +26,7 @@ export interface Conversation {
   created_at: string;
 }
 
-export type AgentType = "openclaw" | "claude" | "http";
+export type AgentType = "openclaw" | "claude" | "claude-code" | "http" | "stub";
 
 export interface AgentConnector {
   connector_id: string;

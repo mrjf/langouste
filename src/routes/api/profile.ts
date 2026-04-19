@@ -7,10 +7,10 @@ export const profileRoutes = new Hono();
 profileRoutes.use("*", requireAuth);
 
 profileRoutes.get("/", async (c) => {
-  const supabase = c.get("supabase");
+  const db = c.get("db");
   const userId = c.get("userId");
 
-  const profile = await getProfile(supabase, userId);
+  const profile = await getProfile(db, userId);
   if (!profile) {
     return c.json({ error: "Profile not found" }, 404);
   }
@@ -18,10 +18,10 @@ profileRoutes.get("/", async (c) => {
 });
 
 profileRoutes.patch("/", async (c) => {
-  const supabase = c.get("supabase");
+  const db = c.get("db");
   const userId = c.get("userId");
   const updates = await c.req.json();
 
-  const profile = await updateProfile(supabase, userId, updates);
+  const profile = await updateProfile(db, userId, updates);
   return c.json(profile);
 });

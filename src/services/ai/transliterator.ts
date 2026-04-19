@@ -1,4 +1,4 @@
-import { supabaseAdmin } from "../../lib/supabase-client.ts";
+import { adminDb } from "../../lib/db/index.ts";
 import { getTransliterationProvider } from "./transliteration/index.ts";
 import type { Message } from "../../types/index.ts";
 
@@ -61,10 +61,11 @@ export async function ensureTransliterations(
       const msg = missing[i];
       const updated = { ...(msg.transliterations ?? {}), [key]: results[i] };
       msg.transliterations = updated;
-      await supabaseAdmin
-        .from("messages")
-        .update({ transliterations: updated })
-        .eq("message_id", msg.message_id);
+      await adminDb().update(
+        "messages",
+        { transliterations: updated },
+        [{ op: "eq", column: "message_id", value: msg.message_id }],
+      );
     }
   }
 

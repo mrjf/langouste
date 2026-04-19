@@ -34,6 +34,19 @@ export interface ClaudeConfig {
   api_key?: string; // if not set, uses the app's ANTHROPIC_API_KEY
 }
 
+export interface ClaudeCodeConfig {
+  model?: string; // optional Claude model pin
+  // Advanced override; leave unset to use Claude Code's own system prompt.
+  // Overriding disables Claude Code's built-in tool guidance.
+  system_prompt?: string;
+  // Working directory for the session. Defaults to an isolated scratch dir
+  // under the Langouste data directory. Set to your project's absolute path
+  // for the regular "cd && claude" behaviour.
+  cwd?: string;
+  // Extra absolute paths Claude Code may read beyond cwd. Use sparingly.
+  additional_directories?: string[];
+}
+
 export interface HttpConfig {
   url: string; // POST endpoint
   headers?: Record<string, string>;
