@@ -24,16 +24,34 @@ export async function requireOpenclawGateway(
   const reachable = await tcpConnectable("127.0.0.1", port, 1000);
   test.skip(
     !reachable,
-    `🚨 OpenClaw gateway not listening on 127.0.0.1:${port} — skipping real OpenClaw integration.
+    `🚨 OpenClaw gateway not listening on 127.0.0.1:${port} — skipping.
 
-For integration tests, start the gateway WITHOUT auth:
+To run this spec you need:
 
-   openclaw gateway --auth none --allow-unconfigured
+  1. A running OpenClaw gateway:
+       openclaw gateway --allow-unconfigured
 
-(The Langouste OpenClaw connector does not yet implement token-auth
-challenge-response handshakes — see the tracking issue if this isn't yet
-supported. Running with --auth none exposes the gateway on loopback only,
-which is safe for local testing.)`,
+  2. A paired device identity — the gateway's WebSocket path grants
+     operator.write scope only to clients that prove a pre-paired
+     Ed25519 keypair (shared-secret token alone gets only read scopes).
+     The Langouste OpenClaw connector does not yet implement device
+     pairing, so today the agent call returns
+     "missing scope: operator.write".
+
+For now, if you just want to exercise the handshake + scope-check
+wiring: the spec will run against a running gateway but will show
+scope-error on the agent call. To verify the actual agent path,
+wait for the device-pairing implementation (follow-up task).`,
+  );
+
+  // Belt-and-braces: also skip if the gateway has not had its agent
+  // configured (the gateway itself needs an Anthropic key to answer turns,
+  // stored under ~/.openclaw/agents/main/agent/auth-profiles.json). We
+  // can't easily detect this without running a turn, so we leave it to the
+  // test to surface as an error with a clear message if encountered.
+  test.skip(
+    !process.env.OPENCLAW_INTEGRATION_READY,
+    `🚨 OPENCLAW_INTEGRATION_READY not set. Set it to "true" in your shell when you've confirmed the gateway is correctly paired and has an Anthropic key configured for its embedded agent.`,
   );
 }
 

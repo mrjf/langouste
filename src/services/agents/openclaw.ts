@@ -10,18 +10,42 @@ const CONNECT_TIMEOUT_MS = 10_000;
 const REQUEST_TIMEOUT_MS = 120_000;
 
 /**
- * OpenClaw agent connector.
- * Connects lazily on first sendMessage. If the gateway isn't available,
- * records the status and doesn't retry until the next sendMessage call.
- * Once connected, auto-reconnects on disconnect so in-session drops recover.
+ * OpenClaw agent connector. Speaks the gateway's protocol v3 frame format:
+ *
+ *   → { type: "req", id: "<string>", method: "connect", params: {...} }
+ *   ← { type: "event", event: "connect.challenge", payload: {...} }   (ignored when auth=none)
+ *   ← { type: "res", id: "<same>", ok: true, payload: { type: "hello-ok", ... } }
+ *
+ *   → { type: "req", id: "<string>", method: "agent", params: { message } }
+ *   ← { type: "res", id: "<same>", ok: true, payload: {...} }
+ *
+ * See docs.openclaw.ai/cli/gateway and the ConnectParamsSchema in the
+ * gateway bundle. Frame IDs are strings (per schema), so we track pending
+ * requests keyed by string.
+ *
+ * Auth:
+ *   - `auth=none` gateway: leave `config.token` empty. Works out of the box.
+ *   - `auth=token` gateway: set `config.token` to the value in
+ *     ~/.openclaw/openclaw.json → gateway.auth.token. BUT the gateway only
+ *     grants operator.write scope to device-keypair-signed clients, so even
+ *     with the correct token the agent calls will fail "missing scope:
+ *     operator.write" until we implement device identity (Ed25519 pairing).
+ *     For integration testing, `openclaw gateway --auth none` is the path.
  */
+
+const CLIENT_PROTOCOL_VERSION = 3;
+const CLIENT_ID = "gateway-client"; // one of the valid GATEWAY_CLIENT_IDS
+const CLIENT_MODE = "backend"; // one of the valid GATEWAY_CLIENT_MODES
+const CLIENT_VERSION = "0.1.0"; // Langouste's openclaw connector version
+
 export class OpenClawAgent implements AgentConnection {
   private url: string;
   private deviceName: string;
+  private token: string | undefined;
   private ws: WebSocket | null = null;
-  private requestId = 0;
+  private requestCounter = 0;
   private pendingRequests = new Map<
-    number,
+    string,
     { resolve: (value: string) => void; reject: (reason: Error) => void }
   >();
 
@@ -37,6 +61,7 @@ export class OpenClawAgent implements AgentConnection {
   constructor(config: OpenClawConfig) {
     this.url = config.url || "ws://127.0.0.1:18789";
     this.deviceName = config.device_name || "langouste";
+    this.token = (config as { token?: string }).token?.trim() || undefined;
   }
 
   // --- Status ---
@@ -62,11 +87,8 @@ export class OpenClawAgent implements AgentConnection {
             ? this.statusInfo.failedAttempts + 1
             : this.statusInfo.failedAttempts,
     };
-    // Only log transitions, not repeated errors
     if (!(status === "error" && wasError)) {
-      console.log(
-        `[OpenClaw] status=${status}${detail ? ` (${detail})` : ""}`,
-      );
+      console.log(`[OpenClaw] status=${status}${detail ? ` (${detail})` : ""}`);
     }
     for (const listener of this.listeners) {
       try {
@@ -79,8 +101,11 @@ export class OpenClawAgent implements AgentConnection {
 
   // --- Connection ---
 
+  private nextRequestId(): string {
+    return `langouste-${++this.requestCounter}-${Date.now().toString(36)}`;
+  }
+
   private connect(): Promise<WebSocket> {
-    // Deduplicate concurrent connect attempts
     if (this.connecting) return this.connecting;
 
     this.setStatus("connecting", this.url);
@@ -91,62 +116,91 @@ export class OpenClawAgent implements AgentConnection {
       const connectTimeout = setTimeout(() => {
         if (ws.readyState !== WebSocket.OPEN) {
           ws.close();
-          // Don't reject here — onclose/onerror will handle it
         }
       }, CONNECT_TIMEOUT_MS);
 
+      const connectId = this.nextRequestId();
+      let handshakeComplete = false;
+
       ws.onopen = () => {
         clearTimeout(connectTimeout);
-        this.ws = ws;
-        this.connecting = null;
-
-        const handshake = {
-          type: "connect",
-          device: {
-            name: this.deviceName,
-            role: "client",
-            capabilities: [],
+        const frame = {
+          type: "req",
+          id: connectId,
+          method: "connect",
+          params: {
+            minProtocol: CLIENT_PROTOCOL_VERSION,
+            maxProtocol: CLIENT_PROTOCOL_VERSION,
+            client: {
+              id: CLIENT_ID,
+              displayName: this.deviceName,
+              version: CLIENT_VERSION,
+              platform: process.platform,
+              mode: CLIENT_MODE,
+            },
+            role: "operator",
+            scopes: ["operator.write", "operator.read"],
+            ...(this.token ? { auth: { token: this.token } } : {}),
           },
         };
         console.log(`[OpenClaw] → handshake as "${this.deviceName}"`);
-        ws.send(JSON.stringify(handshake));
-        this.setStatus("connected", this.url);
-        resolve(ws);
+        ws.send(JSON.stringify(frame));
       };
 
       ws.onmessage = (event) => {
         const raw = String(event.data);
         console.log(`[OpenClaw] ← ${raw.slice(0, 200)}`);
+        let frame: Record<string, unknown>;
         try {
-          const frame = JSON.parse(raw);
-          if (frame.type === "res" && frame.id != null) {
-            const pending = this.pendingRequests.get(frame.id);
-            if (pending) {
-              this.pendingRequests.delete(frame.id);
-              if (frame.ok) {
-                const text =
-                  frame.payload?.text ??
-                  frame.payload?.message ??
-                  frame.payload?.content ??
-                  JSON.stringify(frame.payload);
-                pending.resolve(String(text));
-              } else {
-                pending.reject(
-                  new Error(frame.error?.message ?? "Agent request failed"),
-                );
-              }
-            }
-          }
+          frame = JSON.parse(raw);
         } catch {
           console.warn(`[OpenClaw] Unparseable frame: ${raw.slice(0, 200)}`);
+          return;
+        }
+
+        // Handshake response to our connect request.
+        if (!handshakeComplete && frame.type === "res" && frame.id === connectId) {
+          if (frame.ok) {
+            handshakeComplete = true;
+            this.ws = ws;
+            this.connecting = null;
+            this.setStatus("connected", this.url);
+            resolve(ws);
+          } else {
+            const err = frame.error as { message?: string } | undefined;
+            const msg = err?.message ?? "Handshake rejected";
+            this.connecting = null;
+            this.setStatus("error", msg);
+            ws.close();
+            reject(new Error(`OpenClaw handshake failed: ${msg}`));
+          }
+          return;
+        }
+
+        // Ignore events and pre-handshake frames.
+        if (frame.type !== "res" || typeof frame.id !== "string") return;
+
+        const pending = this.pendingRequests.get(frame.id);
+        if (!pending) return;
+        this.pendingRequests.delete(frame.id);
+
+        if (frame.ok) {
+          const payload = frame.payload as { text?: string; message?: string; content?: string } | undefined;
+          const text = payload?.text ?? payload?.message ?? payload?.content ?? JSON.stringify(payload ?? {});
+          pending.resolve(String(text));
+        } else {
+          const err = frame.error as { message?: string } | undefined;
+          pending.reject(new Error(err?.message ?? "Agent request failed"));
         }
       };
 
       ws.onerror = () => {
         clearTimeout(connectTimeout);
-        this.connecting = null;
-        this.setStatus("error", `Failed to connect to ${this.url}`);
-        reject(new Error(`Failed to connect to OpenClaw at ${this.url}`));
+        if (!handshakeComplete) {
+          this.connecting = null;
+          this.setStatus("error", `Failed to connect to ${this.url}`);
+          reject(new Error(`Failed to connect to OpenClaw at ${this.url}`));
+        }
       };
 
       ws.onclose = (event) => {
@@ -154,18 +208,17 @@ export class OpenClawAgent implements AgentConnection {
         this.ws = null;
         this.connecting = null;
 
-        // Reject any pending requests
         for (const [id, pending] of this.pendingRequests) {
-          pending.reject(new Error("Connection lost"));
+          pending.reject(new Error(`Connection lost (code=${event.code})`));
           this.pendingRequests.delete(id);
         }
 
-        if (this.statusInfo.status === "connected") {
-          // Was connected, lost connection — mark as error so next sendMessage retries
-          this.setStatus(
-            "error",
-            `Connection lost (code=${event.code})`,
-          );
+        if (!handshakeComplete) {
+          // Reject the pending connect promise if we haven't already.
+          this.setStatus("error", `Handshake closed (code=${event.code})`);
+          reject(new Error(`OpenClaw connection closed before handshake (code=${event.code})`));
+        } else if (this.statusInfo.status === "connected") {
+          this.setStatus("error", `Connection lost (code=${event.code})`);
         }
       };
     });
@@ -182,12 +235,11 @@ export class OpenClawAgent implements AgentConnection {
 
     console.log(`[OpenClaw] sendMessage: "${text.slice(0, 100)}..."`);
 
-    // Connect or reconnect on demand
     if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
       await this.connect();
     }
 
-    const id = ++this.requestId;
+    const id = this.nextRequestId();
 
     return new Promise((resolve, reject) => {
       this.pendingRequests.set(id, { resolve, reject });

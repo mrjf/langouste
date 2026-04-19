@@ -26,6 +26,10 @@ export interface AgentConnection {
 export interface OpenClawConfig {
   url: string; // ws://host:18789
   device_name?: string;
+  // Shared-secret token from ~/.openclaw/openclaw.json gateway.auth.token
+  // (or whatever the gateway was started with via --token). Leave empty for
+  // gateways running in --auth none mode.
+  token?: string;
 }
 
 export interface ClaudeConfig {
