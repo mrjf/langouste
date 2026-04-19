@@ -4,55 +4,102 @@ import { connect } from "node:net";
 import { TestApi } from "../e2e/helpers";
 
 /**
- * Preflight check: fail loudly and skip if a precondition isn't met.
- * We *don't* want "test passes because it was skipped" to be invisible, so
- * the message is noisy.
+ * Preflight check: fail loudly and skip if a precondition isn't met. Used
+ * from `beforeEach`. Passes the Playwright test object so skip marks the
+ * current test, not the whole file.
+ *
+ * Signature note: we accept a `SkipTest` shape so callers can pass either
+ * the imported `test` (for describe-level skips) or `test.info()` (for
+ * runtime skips inside beforeEach). Both expose `.skip(cond, msg)`.
  */
-export async function requireAnthropicKey(test: { skip: (cond: boolean, msg: string) => void }): Promise<void> {
+type SkipTest = { skip: (cond: boolean, msg?: string) => void };
+
+export async function requireAnthropicKey(test: SkipTest): Promise<void> {
   const key = process.env.ANTHROPIC_API_KEY;
   const missing = !key || !key.startsWith("sk-");
-  test.skip(
-    missing,
-    "🚨 ANTHROPIC_API_KEY not set in the parent env — skipping real Claude integration. Set it in .env or export it before running real tests.",
-  );
+  if (missing) {
+    test.skip(
+      true,
+      "🚨 ANTHROPIC_API_KEY not set in the parent env — skipping real Claude integration. Set it in .env or export it before running real tests.",
+    );
+  }
 }
 
 export async function requireOpenclawGateway(
-  test: { skip: (cond: boolean, msg: string) => void },
+  test: SkipTest,
   port = 18789,
 ): Promise<void> {
   const reachable = await tcpConnectable("127.0.0.1", port, 1000);
-  test.skip(
-    !reachable,
-    `🚨 OpenClaw gateway not listening on 127.0.0.1:${port} — skipping.
+  if (!reachable) {
+    test.skip(
+      true,
+      `🚨 OpenClaw gateway not listening on 127.0.0.1:${port} — skipping.\n\nStart it:\n   openclaw gateway --allow-unconfigured\n\nThe connector auto-pairs via Ed25519 device identity on first connect.`,
+    );
+    return;
+  }
 
-To run this spec you need:
+  // The gateway's EMBEDDED agent needs its own provider credentials to
+  // answer turns. Detect up front rather than failing opaquely mid-turn.
+  // NOTE: test.skip() throws a PlaywrightSkip exception that must propagate;
+  // do not wrap the skip calls in try/catch.
+  let authProfilesPath: string;
+  let profilesJson: string | null = null;
+  try {
+    const { readFileSync, existsSync } = await import("node:fs");
+    const { homedir } = await import("node:os");
+    const { join } = await import("node:path");
+    authProfilesPath = join(homedir(), ".openclaw/agents/main/agent/auth-profiles.json");
+    if (existsSync(authProfilesPath)) {
+      profilesJson = readFileSync(authProfilesPath, "utf-8");
+    }
+  } catch (err) {
+    console.warn(`[e2e-real] openclaw preflight config read failed: ${err}`);
+    return;
+  }
 
-  1. A running OpenClaw gateway:
-       openclaw gateway --allow-unconfigured
+  if (!profilesJson) {
+    test.skip(
+      true,
+      `🚨 OpenClaw main agent config missing. Run: openclaw agents add main`,
+    );
+    return;
+  }
 
-  2. A paired device identity — the gateway's WebSocket path grants
-     operator.write scope only to clients that prove a pre-paired
-     Ed25519 keypair (shared-secret token alone gets only read scopes).
-     The Langouste OpenClaw connector does not yet implement device
-     pairing, so today the agent call returns
-     "missing scope: operator.write".
+  let hasAnthropic = false;
+  try {
+    const profiles = JSON.parse(profilesJson) as {
+      profiles?: Record<string, { provider?: string }>;
+    };
+    hasAnthropic = Object.values(profiles.profiles ?? {}).some(
+      (p) => p.provider === "anthropic",
+    );
+  } catch {
+    // malformed — treat as missing
+  }
 
-For now, if you just want to exercise the handshake + scope-check
-wiring: the spec will run against a running gateway but will show
-scope-error on the agent call. To verify the actual agent path,
-wait for the device-pairing implementation (follow-up task).`,
-  );
+  if (!hasAnthropic) {
+    test.skip(
+      true,
+      `🚨 OpenClaw's main agent has no Anthropic provider. Run: openclaw agents add main`,
+    );
+  }
+}
 
-  // Belt-and-braces: also skip if the gateway has not had its agent
-  // configured (the gateway itself needs an Anthropic key to answer turns,
-  // stored under ~/.openclaw/agents/main/agent/auth-profiles.json). We
-  // can't easily detect this without running a turn, so we leave it to the
-  // test to surface as an error with a clear message if encountered.
-  test.skip(
-    !process.env.OPENCLAW_INTEGRATION_READY,
-    `🚨 OPENCLAW_INTEGRATION_READY not set. Set it to "true" in your shell when you've confirmed the gateway is correctly paired and has an Anthropic key configured for its embedded agent.`,
-  );
+/** Read OpenClaw's shared-secret token from its config file. */
+export async function readOpenclawToken(): Promise<string | undefined> {
+  try {
+    const { readFileSync, existsSync } = await import("node:fs");
+    const { homedir } = await import("node:os");
+    const { join } = await import("node:path");
+    const path = join(homedir(), ".openclaw/openclaw.json");
+    if (!existsSync(path)) return undefined;
+    const cfg = JSON.parse(readFileSync(path, "utf-8")) as {
+      gateway?: { auth?: { token?: string } };
+    };
+    return cfg.gateway?.auth?.token?.trim() || undefined;
+  } catch {
+    return undefined;
+  }
 }
 
 function tcpConnectable(host: string, port: number, timeoutMs: number): Promise<boolean> {

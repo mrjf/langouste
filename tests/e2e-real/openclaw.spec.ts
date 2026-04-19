@@ -3,6 +3,7 @@ import {
   test,
   TestApi,
   createConnector,
+  readOpenclawToken,
   requireOpenclawGateway,
   sendAndAwaitReply,
   startChatWith,
@@ -15,18 +16,22 @@ test.describe("OpenClaw connector (real gateway)", () => {
   });
 
   test("send a message and get a real reply from the gateway", async ({ page, request }) => {
+    const token = await readOpenclawToken();
     await createConnector(request, {
       name: "openclaw-real",
       type: "openclaw",
-      config: { url: "ws://127.0.0.1:18789", device_name: "langouste-test" },
+      config: {
+        url: "ws://127.0.0.1:18789",
+        device_name: "langouste-test",
+        ...(token ? { token } : {}),
+      },
     });
 
     await startChatWith(page, "openclaw-real");
-    // Short, cheap prompt. We don't care exactly what OpenClaw says back,
-    // only that a bubble arrives and state persists.
-    await sendAndAwaitReply(page, "Say hi in exactly three words.");
+    // OpenClaw's embedded agent answers via whatever provider it's configured
+    // for. We don't assert exact content — just that a non-empty reply comes back.
+    await sendAndAwaitReply(page, "Say hi in exactly three words.", { timeout: 120_000 });
 
-    // Persistence.
     const api = new TestApi(request);
     const messages = (await api.dbTable("messages")) as Array<{
       raw_text: string;
@@ -36,21 +41,37 @@ test.describe("OpenClaw connector (real gateway)", () => {
     const user = messages.find((m) => !m.is_agent);
     const agent = messages.find((m) => !!m.is_agent);
     expect(user?.raw_text).toBe("Say hi in exactly three words.");
-    expect(agent?.raw_text).toBeTruthy();
     expect((agent?.raw_text ?? "").length).toBeGreaterThan(0);
   });
 
-  test("history survives reload", async ({ page, request }) => {
+  test("history survives reload and second turn reuses the session", async ({
+    page,
+    request,
+  }) => {
+    const token = await readOpenclawToken();
     await createConnector(request, {
       name: "openclaw-reload",
       type: "openclaw",
-      config: { url: "ws://127.0.0.1:18789" },
+      config: {
+        url: "ws://127.0.0.1:18789",
+        ...(token ? { token } : {}),
+      },
     });
+
     await startChatWith(page, "openclaw-reload");
-    await sendAndAwaitReply(page, "one line please");
+    await sendAndAwaitReply(page, "Respond with exactly the single word: acknowledged", {
+      timeout: 120_000,
+    });
 
     await page.reload();
     await page.locator(".conv-item").first().click();
     await expect(page.locator(".messages .message-bubble")).toHaveCount(2);
+
+    // Second turn on the same connector — the connector reuses its persisted
+    // device identity so no re-pairing happens.
+    await sendAndAwaitReply(page, "Reply with the single word: confirmed", {
+      timeout: 120_000,
+    });
+    await expect(page.locator(".messages .message-bubble")).toHaveCount(4);
   });
 });

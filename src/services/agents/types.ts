@@ -28,8 +28,18 @@ export interface OpenClawConfig {
   device_name?: string;
   // Shared-secret token from ~/.openclaw/openclaw.json gateway.auth.token
   // (or whatever the gateway was started with via --token). Leave empty for
-  // gateways running in --auth none mode.
+  // gateways running in --auth none mode. Still required on the WS path
+  // even when a device identity is present, if the gateway's auth mode is
+  // "token".
   token?: string;
+  // One-shot pairing token from `openclaw devices create-bootstrap` (or
+  // similar). Only needed for non-loopback gateways where silent local
+  // pairing doesn't apply. Consumed on first successful connect.
+  bootstrap_token?: string;
+  // Stable identifier used to key the device-identity file on disk
+  // (<data-dir>/openclaw-devices/<connector_id>.json). The agent factory
+  // injects this; defaults to "default" when absent.
+  connector_id?: string;
 }
 
 export interface ClaudeConfig {

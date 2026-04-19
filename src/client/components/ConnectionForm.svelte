@@ -43,6 +43,9 @@
       ? (initConfig.additional_directories as string[]).join("\n")
       : "",
   );
+  let agentDeviceName = $state((initConfig.device_name as string) ?? "langouste");
+  let agentToken = $state((initConfig.token as string) ?? "");
+  let agentBootstrapToken = $state((initConfig.bootstrap_token as string) ?? "");
 
   function buildPayload(): SavePayload {
     const config: Record<string, unknown> = {};
@@ -59,6 +62,9 @@
       if (extras.length > 0) config.additional_directories = extras;
     } else if (agentType === "openclaw") {
       config.url = agentUrl.trim() || "ws://127.0.0.1:18789";
+      if (agentDeviceName.trim()) config.device_name = agentDeviceName.trim();
+      if (agentToken.trim()) config.token = agentToken.trim();
+      if (agentBootstrapToken.trim()) config.bootstrap_token = agentBootstrapToken.trim();
     } else if (agentType === "http") {
       config.url = agentUrl.trim();
     }
@@ -158,6 +164,48 @@
         bind:value={agentUrl}
         placeholder="ws://127.0.0.1:18789"
       >
+      <span class="field-help">
+        The OpenClaw gateway WebSocket URL. For a local gateway, leave as default.
+      </span>
+    </div>
+    <div class="field">
+      <label for="ct-device-name">Device name</label>
+      <input
+        id="ct-device-name"
+        type="text"
+        bind:value={agentDeviceName}
+        placeholder="langouste"
+      >
+      <span class="field-help">
+        Shown in <code>openclaw devices list</code> so you can identify this connector.
+      </span>
+    </div>
+    <div class="field">
+      <label for="ct-token">Gateway token (optional)</label>
+      <input
+        id="ct-token"
+        type="text"
+        bind:value={agentToken}
+        placeholder="from ~/.openclaw/openclaw.json gateway.auth.token"
+      >
+      <span class="field-help">
+        Required if the gateway runs in <code>auth.mode=token</code>. For a loopback
+        gateway started with <code>--auth none</code>, leave blank.
+      </span>
+    </div>
+    <div class="field">
+      <label for="ct-bootstrap">Bootstrap token (one-time)</label>
+      <input
+        id="ct-bootstrap"
+        type="text"
+        bind:value={agentBootstrapToken}
+        placeholder="only for non-loopback gateways"
+      >
+      <span class="field-help">
+        Loopback connections auto-pair silently. For a remote gateway, generate a
+        bootstrap token via the OpenClaw CLI and paste it here; it's consumed on first
+        connect and replaced with a persistent device token.
+      </span>
     </div>
   {:else if agentType === "http"}
     <div class="field">

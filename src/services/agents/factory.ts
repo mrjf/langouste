@@ -26,7 +26,7 @@ export function getAgentConnection(
       conn = new ClaudeCodeAgent(config as any);
       break;
     case "openclaw":
-      conn = new OpenClawAgent(config as any);
+      conn = new OpenClawAgent({ ...(config as any), connector_id: connectorId });
       break;
     case "http":
       conn = new HttpAgent(config as any);
