@@ -1,4 +1,6 @@
 .env
+.env.*
+!.env.example
 node_modules/
 dist/
 bun.lock
@@ -7,3 +9,6 @@ package-lock.json
 supabase/.temp/
 .claude/
 .keys/
+test-results/
+playwright-report/
+data/
