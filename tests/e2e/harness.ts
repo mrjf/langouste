@@ -1,6 +1,6 @@
 import { spawn, type ChildProcess } from "node:child_process";
 import { createServer } from "node:net";
-import { existsSync, mkdtempSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
@@ -25,15 +25,39 @@ export interface TestAppHandle {
   backend: ChildProcess;
 }
 
+export interface TestAppOptions {
+  /**
+   * Intercept AI service calls with canned responses. Default `true` —
+   * stub-only integration tests never hit real APIs. Set to `false` for
+   * tests under tests/e2e-real/ that exercise real connectors and real
+   * LLM services end-to-end.
+   */
+  stubAi?: boolean;
+}
+
 const PROJECT_ROOT = resolve(import.meta.dirname, "..", "..");
 
-export async function setupTestApp(): Promise<TestAppHandle> {
+export async function setupTestApp(options: TestAppOptions = {}): Promise<TestAppHandle> {
+  const stubAi = options.stubAi ?? true;
+
+  // Real-integration mode needs credentials. Load from .env into
+  // process.env (without overwriting anything that's already set).
+  if (!stubAi) loadDotEnvIntoProcess();
+
   // Tests hit the production bundle served by the backend. Build it if it
   // doesn't exist — subsequent test runs skip this.
   await ensureClientBuild();
 
   const dataDir = mkdtempSync(join(tmpdir(), "langouste-e2e-"));
   const port = await pickFreePort();
+
+  // When stubbing, we don't need a real Anthropic key; drop in a placeholder
+  // so misconfigured local envs can't accidentally exfiltrate credentials.
+  // When NOT stubbing (real-integration tests), pass the real key through
+  // verbatim — callers must have it set in their parent env.
+  const anthropicKey = stubAi
+    ? "sk-test-placeholder-never-used"
+    : (process.env.ANTHROPIC_API_KEY ?? "");
 
   const env: Record<string, string> = {
     ...process.env,
@@ -42,13 +66,20 @@ export async function setupTestApp(): Promise<TestAppHandle> {
     LANGOUSTE_JWT_SECRET: "test-jwt-secret-do-not-use-in-production",
     LANGOUSTE_SINGLE_USER: "true",
     LANGOUSTE_TEST_MODE: "true",
-    ANTHROPIC_API_KEY: "sk-test-placeholder-never-used",
+    LANGOUSTE_STUB_AI: stubAi ? "true" : "false",
+    ANTHROPIC_API_KEY: anthropicKey,
     PORT: String(port),
-    // Avoid any optional Google creds bleed-in.
-    GOOGLE_APPLICATION_CREDENTIALS: "",
-    GOOGLE_CLOUD_PROJECT: "",
     TRANSLATION_PROVIDER: "claude",
   };
+
+  // Google creds are bleed-in risks; only pass them through when AI is
+  // stubbed (where they'll never be called) OR when the caller explicitly
+  // wants the google-tllm path. For real tests against Claude translator
+  // (the default), scrub them.
+  if (stubAi || env.TRANSLATION_PROVIDER === "claude") {
+    env.GOOGLE_APPLICATION_CREDENTIALS = "";
+    env.GOOGLE_CLOUD_PROJECT = "";
+  }
 
   // 1. Run migrations.
   const migrateResult = await runOnce(["bun", "scripts/migrate.ts"], env);
@@ -90,6 +121,28 @@ export async function teardownTestApp(handle: TestAppHandle): Promise<void> {
     });
   }
   rmSync(handle.dataDir, { recursive: true, force: true });
+}
+
+function loadDotEnvIntoProcess(): void {
+  const envPath = resolve(PROJECT_ROOT, ".env");
+  if (!existsSync(envPath)) return;
+  const text = readFileSync(envPath, "utf-8");
+  for (const rawLine of text.split(/\r?\n/)) {
+    const line = rawLine.trim();
+    if (!line || line.startsWith("#")) continue;
+    const eq = line.indexOf("=");
+    if (eq <= 0) continue;
+    const key = line.slice(0, eq).trim();
+    let value = line.slice(eq + 1).trim();
+    // Strip surrounding quotes if present.
+    if ((value.startsWith('"') && value.endsWith('"')) ||
+        (value.startsWith("'") && value.endsWith("'"))) {
+      value = value.slice(1, -1);
+    }
+    if (!(key in process.env)) {
+      process.env[key] = value;
+    }
+  }
 }
 
 async function ensureClientBuild(): Promise<void> {

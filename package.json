@@ -10,7 +10,12 @@
     "test": "bun test tests/services",
     "test:e2e": "bunx playwright test",
     "test:e2e:ui": "bunx playwright test --ui",
+    "test:e2e:real": "bunx playwright test --config playwright.config.real.ts",
+    "test:e2e:openclaw": "bunx playwright test --config playwright.config.real.ts tests/e2e-real/openclaw.spec.ts",
+    "test:e2e:claude": "bunx playwright test --config playwright.config.real.ts tests/e2e-real/claude.spec.ts",
+    "test:e2e:claude-code": "bunx playwright test --config playwright.config.real.ts tests/e2e-real/claude-code.spec.ts",
     "test:all": "bun run test && bun run test:e2e",
+    "test:all:real": "bun run test && bun run test:e2e && bun run test:e2e:real",
     "migrate": "bun scripts/migrate.ts"
   },
   "dependencies": {

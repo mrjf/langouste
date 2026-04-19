@@ -32,7 +32,7 @@ export interface ExplainErrorsOutput {
 export async function explainErrors(
   input: ExplainErrorsInput,
 ): Promise<ExplainErrorsOutput> {
-  if (config.testMode) {
+  if (config.stubAi) {
     const stub = testRegistry.getExplainResponse(input.text);
     const explanations: ErrorExplanation[] = (stub.explanations ?? []).map((e) => ({
       error: input.errors[e.error_index],

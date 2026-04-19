@@ -130,6 +130,46 @@ Budget: ~$5/run at current token prices. Nightly is fine; per-PR eval is too cos
 - **Visual regression testing.** Svelte + Vite is stable enough; eyeballs catch the rare CSS regression.
 - **Load testing at v1.** Single-user-per-session means contention is low. Revisit in Phase 4.
 
+## Real-integration tests
+
+On top of the stub-based e2e suite, there's a parallel `tests/e2e-real/` directory with specs that exercise the **real** external services — no mocks, no stubs. These tests hit the Anthropic API, spawn actual Claude Code sessions via the Agent SDK, and talk to a locally-running OpenClaw gateway. They cost real tokens, take real time, and require real preconditions.
+
+### Commands
+
+```bash
+bun run test:e2e:real          # all three real-connector specs
+bun run test:e2e:openclaw      # just openclaw
+bun run test:e2e:claude        # just direct Claude API
+bun run test:e2e:claude-code   # just Claude Code SDK
+bun run test:all:real          # unit + stub e2e + real e2e
+```
+
+### Preconditions
+
+Each real spec preflight-checks its dependency and **skips loudly** if missing:
+
+- **Claude + Claude Code**: `ANTHROPIC_API_KEY` in `.env` or the shell. Tests pin `claude-haiku-4-5-20251001` to keep per-run cost in the cents.
+- **OpenClaw**: gateway must be listening on `127.0.0.1:18789`. Because the Langouste OpenClaw connector doesn't yet speak the token-auth challenge-response handshake, **start it without auth**:
+  ```
+  openclaw gateway --auth none --allow-unconfigured
+  ```
+
+### Architecture
+
+- The same `tests/e2e/harness.ts` boots the backend with an isolated SQLite DB under `/tmp`. For real tests it sets `LANGOUSTE_STUB_AI=false` so the real LLM services are wired up, but keeps `LANGOUSTE_TEST_MODE=true` so `/api/test/*` DB-reset routes are available between tests.
+- `playwright.config.real.ts` is the separate config pointing at `tests/e2e-real/`. 120s timeout per test for Claude Code's slower subprocess spawn.
+- `tests/e2e-real/helpers.ts` provides preflight checks (`requireAnthropicKey`, `requireOpenclawGateway`), a `sendAndAwaitReply(text)` that defaults to Shift+Enter force-submit (bypassing the real Opus check pipeline for prompts in the "wrong" language), and a `waitFor(pred, ms)` poller for async post-send pipelines (real Sonnet vocab extraction takes a few seconds).
+
+### What the specs cover
+
+- **openclaw.spec**: real WebSocket round-trip through the gateway; history persists across reload.
+- **claude.spec**: real Anthropic API turn; real Sonnet vocabulary extraction populates the vocab table with a production event in `review_log`.
+- **claude-code.spec**: real SDK subprocess + `query()` iteration; per-connector `cwd` isolation; session_id resume across turns proves the SDK's memory holds ("remember 42" → "what number?" → agent answers 42 on turn 2).
+
+### What they're NOT for
+
+Real tests verify the connector round-trip and the pipeline wiring. They don't verify LLM *quality* — that's the evaluation harness in a future phase. A real test passes if a non-empty reply comes back, not if the reply is pedagogically sound.
+
 ## The testing ladder in practice
 
 When you fix a bug:

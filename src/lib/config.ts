@@ -42,10 +42,21 @@ export const config = {
     return databaseMode === "sqlite";
   })(),
 
-  // Test mode: enables /api/test/* routes, the `stub` agent type, and canned
-  // responses from LLM-backed services so integration tests don't call real
-  // Anthropic / Google APIs. Must NOT be set in production.
+  // Test mode: enables /api/test/* routes and the `stub` agent type. Safe to
+  // leave on for both stub-only and real-integration test runs.
+  // Must NOT be set in production.
   testMode: process.env.LANGOUSTE_TEST_MODE === "true",
+
+  // Stub AI: intercept error-explainer / vocabulary-extractor / translator
+  // calls with canned responses. On by default whenever testMode is on (so
+  // stub-only tests don't need to set it explicitly). Set to false when
+  // running real-integration tests so the services hit real APIs.
+  stubAi: (() => {
+    const raw = process.env.LANGOUSTE_STUB_AI?.trim().toLowerCase();
+    if (raw === "true") return true;
+    if (raw === "false") return false;
+    return process.env.LANGOUSTE_TEST_MODE === "true";
+  })(),
 
   port: parseInt(process.env.PORT ?? "8000", 10),
 };

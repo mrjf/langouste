@@ -13,7 +13,7 @@ export async function translateTexts(
   targetLanguage: string,
   context?: string,
 ): Promise<string[]> {
-  if (config.testMode) {
+  if (config.stubAi) {
     return texts.map((t) => testRegistry.getTranslation(t, targetLanguage));
   }
   const provider = getTranslationProvider();

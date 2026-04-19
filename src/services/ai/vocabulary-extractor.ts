@@ -49,7 +49,7 @@ const VOCABULARY_EXTRACTION_TOOL = {
 export async function extractVocabulary(
   input: VocabularyExtractionInput,
 ): Promise<VocabularyExtractionOutput> {
-  if (config.testMode) {
+  if (config.stubAi) {
     const stub = testRegistry.getVocabResponse(input.text);
     return {
       new_vocabulary: stub.new_vocabulary ?? [],
