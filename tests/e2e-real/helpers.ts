@@ -38,49 +38,87 @@ export async function requireOpenclawGateway(
     return;
   }
 
-  // The gateway's EMBEDDED agent needs its own provider credentials to
-  // answer turns. Detect up front rather than failing opaquely mid-turn.
+  // The gateway's EMBEDDED agent needs *some* way to answer turns. Three
+  // shapes satisfy this:
+  //   1. auth-profiles.json has an anthropic provider (API-key mode).
+  //   2. The main agent is configured to a claude-cli/* model — i.e. OpenClaw
+  //      shells out to Claude Code locally and uses its credentials.
+  //   3. Some other model shape we don't know about but the user has wired up.
+  // We're liberal by default (don't skip if we can't tell) and only hard-skip
+  // when we know the agent can't answer.
+  //
   // NOTE: test.skip() throws a PlaywrightSkip exception that must propagate;
   // do not wrap the skip calls in try/catch.
   let authProfilesPath: string;
   let profilesJson: string | null = null;
+  let agentsConfig: { list?: Array<{ id?: string; model?: string }> } = {};
   try {
     const { readFileSync, existsSync } = await import("node:fs");
     const { homedir } = await import("node:os");
     const { join } = await import("node:path");
-    authProfilesPath = join(homedir(), ".openclaw/agents/main/agent/auth-profiles.json");
+    const home = homedir();
+    authProfilesPath = join(home, ".openclaw/agents/main/agent/auth-profiles.json");
     if (existsSync(authProfilesPath)) {
       profilesJson = readFileSync(authProfilesPath, "utf-8");
+    }
+    const openclawJsonPath = join(home, ".openclaw/openclaw.json");
+    if (existsSync(openclawJsonPath)) {
+      const root = JSON.parse(readFileSync(openclawJsonPath, "utf-8")) as {
+        agents?: typeof agentsConfig;
+      };
+      agentsConfig = root.agents ?? {};
     }
   } catch (err) {
     console.warn(`[e2e-real] openclaw preflight config read failed: ${err}`);
     return;
   }
 
-  if (!profilesJson) {
-    test.skip(
-      true,
-      `🚨 OpenClaw main agent config missing. Run: openclaw agents add main`,
-    );
-    return;
+  const mainAgent = agentsConfig.list?.find((a) => a.id === "main");
+  const usesClaudeCli = typeof mainAgent?.model === "string" && mainAgent.model.startsWith("claude-cli/");
+
+  let hasAnthropicProfile = false;
+  if (profilesJson) {
+    try {
+      const profiles = JSON.parse(profilesJson) as {
+        profiles?: Record<string, { provider?: string }>;
+      };
+      hasAnthropicProfile = Object.values(profiles.profiles ?? {}).some(
+        (p) => p.provider === "anthropic",
+      );
+    } catch {
+      // malformed — fall through
+    }
   }
 
-  let hasAnthropic = false;
-  try {
-    const profiles = JSON.parse(profilesJson) as {
-      profiles?: Record<string, { provider?: string }>;
-    };
-    hasAnthropic = Object.values(profiles.profiles ?? {}).some(
-      (p) => p.provider === "anthropic",
-    );
-  } catch {
-    // malformed — treat as missing
+  // If the agent is configured for claude-cli/* but the backend isn't
+  // registered (status "missing" in `openclaw models list`), turns will fail
+  // with "model_not_found". Check the models list for clarity.
+  if (usesClaudeCli && !hasAnthropicProfile) {
+    const { spawnSync } = await import("node:child_process");
+    const out = spawnSync("openclaw", ["models", "list"], { encoding: "utf-8" });
+    const modelLine = out.stdout?.split("\n").find((l) => l.includes(mainAgent!.model!)) ?? "";
+    const isMissing = modelLine.includes("missing");
+    if (isMissing) {
+      test.skip(
+        true,
+        `🚨 OpenClaw main agent uses ${mainAgent!.model} but that backend is "missing".\n` +
+          `Options:\n` +
+          `  - install the plugin that provides ${mainAgent!.model}, or\n` +
+          `  - add an Anthropic API profile (openclaw configure --section model), or\n` +
+          `  - set the main agent's model to anthropic/claude-opus-4-6`,
+      );
+      return;
+    }
   }
 
-  if (!hasAnthropic) {
+  if (!hasAnthropicProfile && !usesClaudeCli) {
     test.skip(
       true,
-      `🚨 OpenClaw's main agent has no Anthropic provider. Run: openclaw agents add main`,
+      `🚨 OpenClaw's main agent isn't configured to answer turns.\n` +
+        `Either:\n` +
+        `  - add an Anthropic API profile: openclaw configure --section model\n` +
+        `  - or point the main agent at a working CLI backend\n` +
+        `Current model: ${mainAgent?.model ?? "(unset)"}`,
     );
   }
 }
@@ -156,12 +194,25 @@ export async function sendAndAwaitReply(
 
   if (opts.expectAgentBubble === false) return;
 
-  // Wait for the agent bubble (bubblesBefore + 2).
-  await page.waitForFunction(
-    ({ count }) => document.querySelectorAll(".messages .message-bubble").length >= count,
+  // Wait for EITHER the agent bubble (bubblesBefore + 2) OR the agent-error
+  // banner to appear. The latter means the connector failed — we surface it
+  // as a test failure with the backend's error text instead of a 2-minute
+  // bubble-count timeout.
+  const result = await page.waitForFunction(
+    ({ count }) => {
+      const bubbles = document.querySelectorAll(".messages .message-bubble").length;
+      if (bubbles >= count) return { ok: true };
+      const errorEl = document.querySelector(".agent-error");
+      if (errorEl) return { ok: false, error: errorEl.textContent?.trim() ?? "unknown error" };
+      return null;
+    },
     { count: bubblesBefore + 2 },
     { timeout },
   );
+  const resolved = (await result.jsonValue()) as { ok: boolean; error?: string };
+  if (!resolved.ok) {
+    throw new Error(`Agent returned an error: ${resolved.error ?? "(empty)"}`);
+  }
 }
 
 /** Create a connector via API using the default-single-user token. */
