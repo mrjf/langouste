@@ -100,11 +100,25 @@ export class TestApi {
   }
 
   private async post(path: string, body: unknown): Promise<void> {
-    const res = await this.request.post(`${BASE_URL}${path}`, { data: body });
-    if (!res.ok()) {
-      const text = await res.text();
-      throw new Error(`POST ${path} → ${res.status()}: ${text}`);
+    // Retry once on ECONNRESET: Playwright's request fixture pools keep-alive
+    // sockets, and Bun's HTTP server may idle-close a pooled socket between
+    // tests. The retry opens a fresh connection.
+    let lastErr: unknown;
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        const res = await this.request.post(`${BASE_URL}${path}`, { data: body });
+        if (!res.ok()) {
+          const text = await res.text();
+          throw new Error(`POST ${path} → ${res.status()}: ${text}`);
+        }
+        return;
+      } catch (err) {
+        lastErr = err;
+        const msg = err instanceof Error ? err.message : String(err);
+        if (!msg.includes("ECONNRESET")) throw err;
+      }
     }
+    throw lastErr;
   }
 }
 

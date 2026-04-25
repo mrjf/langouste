@@ -49,8 +49,9 @@ export default defineConfig({
   fullyParallel: false,
   workers: 1,
   retries: 0,
-  // Real agent turns can take 20+ seconds (Claude Code especially).
-  timeout: 120_000,
+  // Real agent turns can take 20-40 seconds each (Claude Code especially),
+  // and some tests do multiple turns. Budget generously.
+  timeout: 300_000,
   expect: { timeout: 20_000 },
   reporter: [["list"]],
   use: {

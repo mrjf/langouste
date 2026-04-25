@@ -196,6 +196,11 @@ export class OpenClawAgent implements AgentConnection {
           return;
         }
         const type = frame.type as string | undefined;
+        if (process.env.LANGOUSTE_OPENCLAW_DEBUG === "1") {
+          const ev = (frame as { event?: string }).event;
+          const fid = (frame as { id?: string }).id;
+          console.log(`[OpenClaw] ← ${type}${ev ? `/${ev}` : ""}${fid ? ` id=${fid}` : ""} ${raw.slice(0, 200)}`);
+        }
 
         // Phase 1: server's challenge nonce. Sign it and send our connect.
         if (
@@ -276,25 +281,44 @@ export class OpenClawAgent implements AgentConnection {
                 text?: string;
                 message?: string;
                 content?: string;
+                summary?: string;
                 status?: string;
                 runId?: string;
-                result?: { text?: string; message?: string };
-                reply?: { text?: string; message?: string };
+                result?: {
+                  text?: string;
+                  message?: string;
+                  summary?: string;
+                  payloads?: Array<{ text?: string; mediaUrl?: string | null }>;
+                };
+                reply?: { text?: string; message?: string; summary?: string };
               }
             | undefined;
           // Intermediate acknowledgement — keep waiting for the real reply.
           if (payload?.status === "accepted") return;
 
           this.pendingRequests.delete(frameId);
+          // Gateway's final agent response shape:
+          //   payload.result.payloads[].text  — the actual reply text(s)
+          //   payload.summary                 — a status word like "completed"
+          // Prefer payloads[].text; fall back through alternate shapes seen
+          // on different gateway versions.
+          const payloads = payload?.result?.payloads;
+          const fromPayloads = Array.isArray(payloads)
+            ? payloads.map((p) => p?.text).filter((t): t is string => !!t).join("\n\n")
+            : "";
           const text =
-            payload?.text ??
-            payload?.message ??
-            payload?.content ??
-            payload?.result?.text ??
-            payload?.result?.message ??
-            payload?.reply?.text ??
-            payload?.reply?.message ??
-            JSON.stringify(payload ?? {});
+            fromPayloads ||
+            payload?.text ||
+            payload?.message ||
+            payload?.content ||
+            payload?.result?.text ||
+            payload?.result?.message ||
+            payload?.reply?.text ||
+            payload?.reply?.message ||
+            payload?.result?.summary ||
+            payload?.reply?.summary ||
+            payload?.summary ||
+            "No reply from agent.";
           pending.resolve(String(text));
         } else {
           this.pendingRequests.delete(frameId);
