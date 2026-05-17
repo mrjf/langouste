@@ -37,6 +37,9 @@
   const partnerName = $derived(`🤖 ${agentName}`);
   const isOrphan = $derived(conv != null && !conv.agent_connector_id);
 
+  // Agent error banner for the *open* chat only (cleared on switch).
+  let agentError: string | null = $state(null);
+
   // Available connections to reattach to when this conversation is orphaned.
   let availableConnections: Array<{ connector_id: string; name: string; type: string }> = $state([]);
   let reattaching = $state(false);
@@ -83,6 +86,9 @@
   $effect(() => {
     const c = conv;
     const convId = c?.conversation_id;
+
+    // Transient, chat-scoped UI must not bleed across a switch.
+    agentError = null;
 
     if (!convId) {
       messages = [];
@@ -162,15 +168,28 @@
   });
 
   /** Send a message (called by MessageInput after check passes) */
-  async function handleSend(text: string, language: string, intent?: string) {
-    if (sending || !conv) return;
-    console.log(`[Send] handleSend text="${text.slice(0, 50)}" lang=${language} intent=${intent ?? "none"}`);
+  async function handleSend(
+    convId: string,
+    text: string,
+    language: string,
+    intent?: string,
+  ) {
+    if (sending) return;
+    console.log(`[Send] handleSend conv=${convId.slice(0, 8)} text="${text.slice(0, 50)}" lang=${language} intent=${intent ?? "none"}`);
 
     sending = true;
 
+    // Everything here is scoped to convId (the chat the text was composed
+    // in), never the currently-active conv. We only touch the visible
+    // `messages` array when convId is still the open conversation;
+    // otherwise we update that conversation's cache so it's correct when
+    // the user returns.
+    const isActive = () => activeConversation.value?.conversation_id === convId;
+    const base = messageCache.get(convId) ?? (isActive() ? messages : []);
+
     const pendingMsg: Message = {
       message_id: "pending-" + Date.now(),
-      conversation_id: conv.conversation_id,
+      conversation_id: convId,
       sender_id: userId!,
       raw_text: text,
       healed_text: text,
@@ -183,31 +202,38 @@
       _pending: true,
     };
 
-    messages = [...messages, pendingMsg];
+    let convMsgs = [...base, pendingMsg];
+    messageCache.set(convId, convMsgs);
+    if (isActive()) messages = convMsgs;
 
     try {
-      const result = await api.sendMessage(conv.conversation_id, text, language, intent);
-      messages = messages.map((m) =>
+      const result = await api.sendMessage(convId, text, language, intent);
+      convMsgs = (messageCache.get(convId) ?? convMsgs).map((m) =>
         m.message_id === pendingMsg.message_id ? result.message : m
       );
       if (result.agent_message) {
-        if (!messages.find((m) => m.message_id === result.agent_message.message_id)) {
-          messages = [...messages, result.agent_message];
+        if (!convMsgs.find((m) => m.message_id === result.agent_message.message_id)) {
+          convMsgs = [...convMsgs, result.agent_message];
         }
-        fillMissingTranslations(conv.conversation_id);
-      } else if (result.agent_error) {
+      } else if (result.agent_error && isActive()) {
         agentError = result.agent_error;
       }
-      messageCache.set(conv.conversation_id, messages);
+      messageCache.set(convId, convMsgs);
+      if (isActive()) {
+        messages = convMsgs;
+        if (result.agent_message) fillMissingTranslations(convId);
+      }
     } catch (err) {
       console.error("Failed to send message:", err);
-      messages = messages.filter((m) => m.message_id !== pendingMsg.message_id);
+      const pruned = (messageCache.get(convId) ?? convMsgs).filter(
+        (m) => m.message_id !== pendingMsg.message_id,
+      );
+      messageCache.set(convId, pruned);
+      if (isActive()) messages = pruned;
     } finally {
       sending = false;
     }
   }
-
-  let agentError: string | null = $state(null);
 
   async function fillMissingTranslations(convId: string) {
     const langs = [...new Set([...myLangs, ...myBaseLangs].filter(Boolean))];

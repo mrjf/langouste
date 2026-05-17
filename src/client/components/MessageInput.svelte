@@ -39,7 +39,14 @@
     conversationId: string;
     member: ConversationMember;
     disabled?: boolean;
-    onSend: (text: string, language: string, intent?: string) => void;
+    // conversationId is passed through so the parent always sends to the
+    // chat the text was composed in, never whatever is active now.
+    onSend: (
+      conversationId: string,
+      text: string,
+      language: string,
+      intent?: string,
+    ) => void;
   }
 
   let {
@@ -372,15 +379,23 @@
   }
 
   async function runCheckPipeline() {
+    // Pin this run to the conversation it started in. Every result is
+    // discarded if either this run was aborted OR the user has since
+    // switched conversations — otherwise an in-flight check for chat A
+    // would land its correction/errors in whatever chat is open now.
+    const myConvId = conversationId;
+    const myController = new AbortController();
+    checkController = myController;
+    const stale = () => myController.signal.aborted || conversationId !== myConvId;
+
     state = "checking";
-    checkController = new AbortController();
     checkedText = text;
-    console.log(`[SpellCheck] Checking "${text}" (lang: ${detectedLang})`);
+    console.log(`[SpellCheck] Checking "${text}" (lang: ${detectedLang}) [conv ${myConvId.slice(0, 8)}]`);
 
     try {
       // Step 1: deterministic spell check (may be noop)
-      const result = await api.checkMessage(conversationId, text, detectedLang);
-      if (checkController?.signal.aborted) return;
+      const result = await api.checkMessage(myConvId, text, detectedLang);
+      if (stale()) return;
 
       detectedLang = result.language;
       errors = result.errors;
@@ -391,17 +406,20 @@
       }
 
       // Step 2: always call LLM for corrections/explanations
-      explainController = new AbortController();
+      const myExplain = new AbortController();
+      explainController = myExplain;
+      const explainStale = () =>
+        myExplain.signal.aborted || conversationId !== myConvId;
       console.log(`[Explain] Requesting Opus review (${result.errors.length} spell error(s) to explain)`);
       try {
-        const explainResult = await api.explainErrors(conversationId, {
+        const explainResult = await api.explainErrors(myConvId, {
           text,
           errors: result.errors,
           language: result.language,
           intent: intentText.trim() || undefined,
         });
 
-        if (explainController?.signal.aborted) return;
+        if (explainStale()) return;
 
         correctedMessage = explainResult.corrected_message ?? "";
         explanations = explainResult.explanations ?? [];
@@ -425,7 +443,7 @@
           submit();
         }
       } catch (err: any) {
-        if (err?.name === "AbortError") return;
+        if (err?.name === "AbortError" || explainStale()) return;
         console.error("[Explain] Failed:", err);
         // LLM failed — if spell check was clean, submit anyway
         if (result.clean) {
@@ -433,7 +451,7 @@
         }
       }
     } catch (err: any) {
-      if (err?.name === "AbortError") return;
+      if (err?.name === "AbortError" || stale()) return;
       console.error("Failed to check message:", err);
       submit();
     }
@@ -443,11 +461,12 @@
     const trimmed = text.trim();
     if (!trimmed) return;
 
-    console.log(`[Send] Sending "${trimmed}" (lang: ${detectedLang}, intent: ${intentText.trim() || "none"})`);
-    onSend(trimmed, detectedLang, intentText.trim() || undefined);
+    const convId = conversationId;
+    console.log(`[Send] Sending "${trimmed}" (lang: ${detectedLang}, intent: ${intentText.trim() || "none"}) [conv ${convId.slice(0, 8)}]`);
+    onSend(convId, trimmed, detectedLang, intentText.trim() || undefined);
 
     // Sent — drop any saved draft for this conversation.
-    draftCache.delete(conversationId);
+    draftCache.delete(convId);
 
     // Clear state
     text = "";
