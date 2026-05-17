@@ -1,6 +1,12 @@
 <script lang="ts">
   import { api } from "../lib/api";
-  import { activeConversation, conversations, user, clearUnread } from "../lib/stores.svelte";
+  import {
+    activeConversation,
+    conversations,
+    user,
+    clearUnread,
+    setAgentWorking,
+  } from "../lib/stores.svelte";
   import { subscribeToMessages, subscribeToConversation } from "../lib/supabase";
   import { langTag, langOption, langName, LANGUAGES } from "../lib/languages";
   import type { Message } from "../lib/stores.svelte";
@@ -206,6 +212,12 @@
     messageCache.set(convId, convMsgs);
     if (isActive()) messages = convMsgs;
 
+    // Sidebar "agent working" indicator — scoped to convId so it keeps
+    // showing on this chat even if the user switches away while the
+    // (blocking) agent request is in flight. Cleared in finally for
+    // every exit: success, agent_error, exception.
+    setAgentWorking(convId, true);
+
     try {
       const result = await api.sendMessage(convId, text, language, intent);
       convMsgs = (messageCache.get(convId) ?? convMsgs).map((m) =>
@@ -232,6 +244,7 @@
       if (isActive()) messages = pruned;
     } finally {
       sending = false;
+      setAgentWorking(convId, false);
     }
   }
 

@@ -109,3 +109,24 @@ export function clearUnread(conversationId: string): void {
 export function totalUnread(): number {
   return conversations.value.reduce((n, c) => n + (c.unread_count ?? 0), 0);
 }
+
+// --- Agent-working state --------------------------------------------------
+// Set of conversation_ids whose agent is currently processing a send. Kept
+// here (not in ChatThread) so it's scoped to the conversation, not the open
+// chat — a send in chat A keeps showing while the user is in chat B. The
+// Set is wrapped in $state and reassigned on change so the sidebar reacts.
+
+export const agentWorking = $state<{ value: Set<string> }>({ value: new Set() });
+
+export function setAgentWorking(conversationId: string, working: boolean): void {
+  const has = agentWorking.value.has(conversationId);
+  if (working === has) return;
+  const next = new Set(agentWorking.value);
+  if (working) next.add(conversationId);
+  else next.delete(conversationId);
+  agentWorking.value = next;
+}
+
+export function isAgentWorking(conversationId: string): boolean {
+  return agentWorking.value.has(conversationId);
+}

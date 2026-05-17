@@ -4,6 +4,7 @@
     activeConversation,
     profile,
     clearUnread,
+    isAgentWorking,
   } from "../lib/stores.svelte";
   import { langTag } from "../lib/languages";
   import { api } from "../lib/api";
@@ -56,7 +57,12 @@
         onclick={() => selectConversation(conv)}
       >
         <span class="conv-lang">{langTag(myLang(conv))}</span>
-        <span class="conv-partner">🤖 {displayName(conv)}</span>
+        <span class="conv-main">
+          <span class="conv-partner">🤖 {displayName(conv)}</span>
+          {#if isAgentWorking(conv.conversation_id)}
+            <span class="conv-working">working…</span>
+          {/if}
+        </span>
         {#if unreadFor(conv) > 0}
           <span
             class="unread-badge"
@@ -115,12 +121,28 @@
     flex-shrink: 0;
   }
 
+  /* Name + optional working line, stacked. Takes the row's flex space. */
+  .conv-main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+  }
+
   .conv-partner {
     color: var(--color-text);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    flex: 1;
+  }
+
+  /* Subtle, static "agent is working" hint. No animation by design. */
+  .conv-working {
+    font-size: 0.72rem;
+    color: var(--color-text-light);
+    font-style: italic;
+    line-height: 1;
   }
 
   /* Slack-style number-in-circle unread indicator. */
