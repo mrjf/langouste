@@ -123,7 +123,9 @@ agentConnectorRoutes.post("/:connectorId/test", async (c) => {
       connector.type as AgentType,
       connector.config,
     );
-    const response = await agent.sendMessage("Hello, this is a test message. Please respond briefly.");
+    const response = await agent.sendMessage(
+      "Hello, this is a test message. Please respond briefly.",
+    );
     return c.json({ ok: true, response });
   } catch (err: any) {
     return c.json({ ok: false, error: err.message }, 400);

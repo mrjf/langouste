@@ -34,13 +34,10 @@ export async function getConversationsForUser(
   db: Database,
   userId: string,
 ): Promise<EnrichedConversation[]> {
-  const memberRows = await db.select<{ conversation_id: string }>(
-    "conversation_members",
-    {
-      columns: "conversation_id",
-      filters: [{ op: "eq", column: "user_id", value: userId }],
-    },
-  );
+  const memberRows = await db.select<{ conversation_id: string }>("conversation_members", {
+    columns: "conversation_id",
+    filters: [{ op: "eq", column: "user_id", value: userId }],
+  });
   if (memberRows.length === 0) return [];
 
   const convIds = memberRows.map((m) => m.conversation_id);
@@ -80,11 +77,9 @@ export async function setConversationConnector(
   conversationId: string,
   agentConnectorId: string,
 ): Promise<void> {
-  await db.update(
-    "conversations",
-    { agent_connector_id: agentConnectorId },
-    [{ op: "eq", column: "conversation_id", value: conversationId }],
-  );
+  await db.update("conversations", { agent_connector_id: agentConnectorId }, [
+    { op: "eq", column: "conversation_id", value: conversationId },
+  ]);
 }
 
 // --- Supabase nested-select path ---
@@ -116,11 +111,12 @@ async function sqliteSelectEnriched(
     order: [{ column: "created_at", ascending: false }],
   });
 
-  const members = await db.select<
-    ConversationMember & { display_name?: string | null }
-  >("conversation_members", {
-    filters: [{ op: "in", column: "conversation_id", values: convIds }],
-  });
+  const members = await db.select<ConversationMember & { display_name?: string | null }>(
+    "conversation_members",
+    {
+      filters: [{ op: "in", column: "conversation_id", values: convIds }],
+    },
+  );
 
   const userIds = [...new Set(members.map((m) => m.user_id))];
   const profiles = userIds.length
@@ -131,9 +127,7 @@ async function sqliteSelectEnriched(
     : [];
   const profileById = new Map(profiles.map((p) => [p.user_id, p]));
 
-  const connectorIds = convs
-    .map((c) => c.agent_connector_id)
-    .filter((id): id is string => !!id);
+  const connectorIds = convs.map((c) => c.agent_connector_id).filter((id): id is string => !!id);
   const connectors = connectorIds.length
     ? await db.select<AgentConnector>("agent_connectors", {
         filters: [{ op: "in", column: "connector_id", values: connectorIds }],
@@ -150,7 +144,7 @@ async function sqliteSelectEnriched(
         profile: profileById.get(m.user_id) ?? null,
       })),
     agent_connector: c.agent_connector_id
-      ? connectorById.get(c.agent_connector_id) ?? null
+      ? (connectorById.get(c.agent_connector_id) ?? null)
       : null,
   }));
 }

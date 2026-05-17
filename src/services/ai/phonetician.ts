@@ -52,11 +52,9 @@ export async function ensurePhonetics(
         const msg = missing[i];
         const updated = { ...(msg.phonetics ?? {}), [key]: results[i] };
         msg.phonetics = updated;
-        await adminDb().update(
-          "messages",
-          { phonetics: updated },
-          [{ op: "eq", column: "message_id", value: msg.message_id }],
-        );
+        await adminDb().update("messages", { phonetics: updated }, [
+          { op: "eq", column: "message_id", value: msg.message_id },
+        ]);
       }
     }
   }

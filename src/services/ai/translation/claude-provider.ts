@@ -84,7 +84,7 @@ export class ClaudeTranslationProvider implements TranslationProvider {
   private async translateBatch(
     texts: string[],
     targetLanguage: string,
-    context?: string,
+    _context?: string,
   ): Promise<string[]> {
     const client = getAnthropicClient();
     const numbered = texts.map((t, i) => `[${i}] ${t}`).join("\n");
@@ -152,9 +152,7 @@ ${numbered}`,
       );
     }
     if (translated.length !== texts.length) {
-      throw new Error(
-        `AI returned ${translated.length} translations for ${texts.length} inputs`,
-      );
+      throw new Error(`AI returned ${translated.length} translations for ${texts.length} inputs`);
     }
     return translated.map((t) => String(t ?? ""));
   }

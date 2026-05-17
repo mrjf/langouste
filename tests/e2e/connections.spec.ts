@@ -15,7 +15,10 @@ test.describe("Connections page", () => {
   test("creates a claude connection via the form", async ({ page, request }) => {
     await page.goto("/#/connections");
     // Click the primary "+ New connection" in the header.
-    await page.getByRole("button", { name: /\+ New connection/ }).first().click();
+    await page
+      .getByRole("button", { name: /\+ New connection/ })
+      .first()
+      .click();
 
     // Form renders with Type dropdown.
     await expect(page.getByLabel("Type")).toBeVisible();
@@ -45,7 +48,10 @@ test.describe("Connections page", () => {
 
     await page.goto("/#/connections");
     await expect(page.getByText("original-name")).toBeVisible();
-    await page.getByRole("button", { name: /✎ Edit/ }).first().click();
+    await page
+      .getByRole("button", { name: /✎ Edit/ })
+      .first()
+      .click();
 
     const nameField = page.getByLabel("Name");
     await nameField.fill("renamed");

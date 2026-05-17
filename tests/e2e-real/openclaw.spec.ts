@@ -44,10 +44,7 @@ test.describe("OpenClaw connector (real gateway)", () => {
     expect((agent?.raw_text ?? "").length).toBeGreaterThan(0);
   });
 
-  test("history survives reload and second turn reuses the session", async ({
-    page,
-    request,
-  }) => {
+  test("history survives reload and second turn reuses the session", async ({ page, request }) => {
     const token = await readOpenclawToken();
     await createConnector(request, {
       name: "openclaw-reload",

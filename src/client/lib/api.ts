@@ -81,7 +81,7 @@ async function request(path: string, options: RequestInit = {}) {
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
     ...(sess ? { Authorization: `Bearer ${sess.access_token}` } : {}),
-    ...(options.headers as Record<string, string> ?? {}),
+    ...((options.headers as Record<string, string>) ?? {}),
   };
 
   const method = options.method ?? "GET";
@@ -131,19 +131,25 @@ export const api = {
   createConversation: (body: Record<string, unknown>) =>
     request("/conversations", { method: "POST", body: JSON.stringify(body) }),
   updateLanguages: (conversationId: string, body: Record<string, unknown>) =>
-    request(`/conversations/${conversationId}/languages`, { method: "PATCH", body: JSON.stringify(body) }),
+    request(`/conversations/${conversationId}/languages`, {
+      method: "PATCH",
+      body: JSON.stringify(body),
+    }),
 
   // Messages
   getMessages: (conversationId: string, params?: Record<string, string>) => {
     const qs = params ? new URLSearchParams(params).toString() : "";
-    return request(`/messages/${conversationId}${qs ? "?" + qs : ""}`);
+    return request(`/messages/${conversationId}${qs ? `?${qs}` : ""}`);
   },
   checkMessage: (conversationId: string, text: string, language?: string) =>
     request(`/messages/${conversationId}/check`, {
       method: "POST",
       body: JSON.stringify({ text, language }),
     }),
-  explainErrors: (conversationId: string, body: { text: string; errors: any[]; language: string; intent?: string }) =>
+  explainErrors: (
+    conversationId: string,
+    body: { text: string; errors: any[]; language: string; intent?: string },
+  ) =>
     request(`/messages/${conversationId}/explain`, {
       method: "POST",
       body: JSON.stringify(body),
@@ -154,11 +160,18 @@ export const api = {
       body: JSON.stringify({ text, language, intent }),
     }),
   translateMessages: (conversationId: string, languages: string[]) =>
-    request(`/messages/${conversationId}/translate`, { method: "POST", body: JSON.stringify({ languages }) }),
+    request(`/messages/${conversationId}/translate`, {
+      method: "POST",
+      body: JSON.stringify({ languages }),
+    }),
 
   /** Fetch synthesised audio for a message+language. Returns a blob URL the
    *  caller is responsible for revoking. Throws if the server returns non-200. */
-  fetchMessageAudio: async (conversationId: string, messageId: string, lang: string): Promise<string> => {
+  fetchMessageAudio: async (
+    conversationId: string,
+    messageId: string,
+    lang: string,
+  ): Promise<string> => {
     const sess = session.value;
     const headers: Record<string, string> = sess
       ? { Authorization: `Bearer ${sess.access_token}` }
@@ -198,7 +211,7 @@ export const api = {
   // Profile stats
   getLanguageStats: (language: string) => request(`/profile/stats/${language}`),
   getDimensionItems: (language: string, dimension: string, params?: Record<string, string>) => {
-    const qs = params ? "?" + new URLSearchParams(params).toString() : "";
+    const qs = params ? `?${new URLSearchParams(params).toString()}` : "";
     return request(`/profile/dimension/${language}/${dimension}${qs}`);
   },
   getProfileItem: (itemType: "vocabulary" | "grammar", itemId: string) =>

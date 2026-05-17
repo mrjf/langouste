@@ -28,9 +28,7 @@ export async function updateMemberLanguages(
   db: Database,
   conversationId: string,
   userId: string,
-  updates: Partial<
-    Pick<ConversationMember, "target_languages" | "base_languages">
-  >,
+  updates: Partial<Pick<ConversationMember, "target_languages" | "base_languages">>,
 ): Promise<ConversationMember> {
   return db.updateOne<ConversationMember>("conversation_members", updates, [
     { op: "eq", column: "conversation_id", value: conversationId },

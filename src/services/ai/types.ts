@@ -52,7 +52,9 @@ export interface ExplainErrorsInput {
 export interface ExplainErrorsOutput {
   corrected_message: string;
   explanations: ErrorExplanation[];
-  additional_errors: Array<TextError & { corrected: string; explanations: Record<LanguageCode, string> }>;
+  additional_errors: Array<
+    TextError & { corrected: string; explanations: Record<LanguageCode, string> }
+  >;
 }
 
 export interface VocabularyExtractionInput {

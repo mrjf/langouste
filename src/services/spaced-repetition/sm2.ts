@@ -56,9 +56,7 @@ export function sm2(item: SM2Item, quality: number): SM2Result {
     item.ease_factor + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02)),
   );
 
-  const next_review_at = new Date(
-    now.getTime() + interval_days * 24 * 60 * 60 * 1000,
-  );
+  const next_review_at = new Date(now.getTime() + interval_days * 24 * 60 * 60 * 1000);
 
   return { ease_factor, interval_days, repetitions, next_review_at };
 }

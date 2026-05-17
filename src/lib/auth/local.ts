@@ -46,10 +46,10 @@ export async function ensureLocalSession(): Promise<LocalSession> {
 
   if (!user) {
     // Password is a random value the user never sees. Auth is bypassed.
-    const passwordHash = await Bun.password.hash(
-      crypto.randomUUID(),
-      { algorithm: "bcrypt", cost: 10 },
-    );
+    const passwordHash = await Bun.password.hash(crypto.randomUUID(), {
+      algorithm: "bcrypt",
+      cost: 10,
+    });
     user = await db.insert<LocalUser>("users", {
       user_id: Bun.randomUUIDv7(),
       email: LOCAL_USER_EMAIL,
@@ -67,10 +67,7 @@ export async function ensureLocalSession(): Promise<LocalSession> {
   return issueSession(user);
 }
 
-export async function signup(
-  email: string,
-  password: string,
-): Promise<LocalSession> {
+export async function signup(email: string, password: string): Promise<LocalSession> {
   const normalizedEmail = email.trim().toLowerCase();
   const db = adminDb();
 
@@ -91,10 +88,7 @@ export async function signup(
   return issueSession(user);
 }
 
-export async function login(
-  email: string,
-  password: string,
-): Promise<LocalSession> {
+export async function login(email: string, password: string): Promise<LocalSession> {
   const normalizedEmail = email.trim().toLowerCase();
   const user = await adminDb().selectOne<LocalUser>("users", {
     filters: [{ op: "eq", column: "email", value: normalizedEmail }],
@@ -127,10 +121,7 @@ export async function validateToken(token: string): Promise<{ userId: string } |
 async function issueSession(user: LocalUser): Promise<LocalSession> {
   const now = Math.floor(Date.now() / 1000);
   const exp = now + TOKEN_TTL_SECONDS;
-  const access_token = await sign(
-    { sub: user.user_id, iat: now, exp },
-    config.jwtSecret,
-  );
+  const access_token = await sign({ sub: user.user_id, iat: now, exp }, config.jwtSecret);
   return {
     access_token,
     expires_at: exp,

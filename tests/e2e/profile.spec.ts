@@ -15,9 +15,7 @@ test.describe("Profile dashboard", () => {
       new_vocabulary: [
         { term: "salut", translation: "hi", context_sentence: "Salut", cefr_level: "A1" },
       ],
-      grammar_gaps_detected: [
-        { category: "verb:agreement", description: "Subject-verb mismatch" },
-      ],
+      grammar_gaps_detected: [{ category: "verb:agreement", description: "Subject-verb mismatch" }],
       next_challenge: "",
     });
     await seedConnector(request, "stub");
@@ -40,8 +38,12 @@ test.describe("Profile dashboard", () => {
     // Messages sent tile is 1 (we sent one).
     const tiles = page.locator(".tile");
     await expect(tiles.filter({ hasText: "Messages sent" }).locator(".tile-value")).toHaveText("1");
-    await expect(tiles.filter({ hasText: "Vocabulary items" }).locator(".tile-value")).toHaveText("1");
-    await expect(tiles.filter({ hasText: "Grammar concepts" }).locator(".tile-value")).toHaveText("1");
+    await expect(tiles.filter({ hasText: "Vocabulary items" }).locator(".tile-value")).toHaveText(
+      "1",
+    );
+    await expect(tiles.filter({ hasText: "Grammar concepts" }).locator(".tile-value")).toHaveText(
+      "1",
+    );
   });
 
   test("lexis drill-down lists vocabulary items; clicking opens item view", async ({

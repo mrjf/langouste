@@ -14,7 +14,10 @@ export type AgentStatusListener = (info: AgentStatusInfo) => void;
 
 export interface AgentConnection {
   /** Send a message to the agent and get its response */
-  sendMessage(text: string, conversationHistory?: Array<{ role: string; content: string }>): Promise<string>;
+  sendMessage(
+    text: string,
+    conversationHistory?: Array<{ role: string; content: string }>,
+  ): Promise<string>;
   /** Clean up any persistent connections and stop reconnecting */
   disconnect(): void;
   /** Current connection status */

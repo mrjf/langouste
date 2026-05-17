@@ -32,18 +32,11 @@ export async function updateConnector(
   connectorId: string,
   updates: Partial<Pick<AgentConnector, "name" | "config">>,
 ): Promise<AgentConnector> {
-  return db.updateOne<AgentConnector>(
-    "agent_connectors",
-    updates,
-    [{ op: "eq", column: "connector_id", value: connectorId }],
-  );
-}
-
-export async function deleteConnector(
-  db: Database,
-  connectorId: string,
-): Promise<void> {
-  await db.delete("agent_connectors", [
+  return db.updateOne<AgentConnector>("agent_connectors", updates, [
     { op: "eq", column: "connector_id", value: connectorId },
   ]);
+}
+
+export async function deleteConnector(db: Database, connectorId: string): Promise<void> {
+  await db.delete("agent_connectors", [{ op: "eq", column: "connector_id", value: connectorId }]);
 }

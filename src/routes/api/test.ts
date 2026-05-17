@@ -102,9 +102,16 @@ testRoutes.post("/reset-agents", async (c) => {
 testRoutes.get("/db/:table", async (c) => {
   const table = c.req.param("table");
   const allowed = new Set([
-    "users", "profiles", "agent_connectors", "conversations",
-    "conversation_members", "messages", "vocabulary", "grammar_gaps",
-    "assessments", "review_log",
+    "users",
+    "profiles",
+    "agent_connectors",
+    "conversations",
+    "conversation_members",
+    "messages",
+    "vocabulary",
+    "grammar_gaps",
+    "assessments",
+    "review_log",
   ]);
   if (!allowed.has(table)) return c.json({ error: "unknown table" }, 400);
   const rows = await adminDb().raw(`SELECT * FROM "${table}"`);

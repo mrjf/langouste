@@ -1,9 +1,5 @@
 import { config } from "../../../lib/config.ts";
-import type {
-  AudioProvider,
-  AudioSynthesisOptions,
-  AudioSynthesisResult,
-} from "./provider.ts";
+import type { AudioProvider, AudioSynthesisOptions, AudioSynthesisResult } from "./provider.ts";
 
 const ENDPOINT = "https://api.elevenlabs.io/v1/text-to-speech";
 // eleven_multilingual_v2 supports 29 languages including all of ours.
@@ -21,10 +17,7 @@ export class ElevenLabsAudioProvider implements AudioProvider {
     return !!config.elevenLabsApiKey;
   }
 
-  async synthesize(
-    text: string,
-    opts: AudioSynthesisOptions = {},
-  ): Promise<AudioSynthesisResult> {
+  async synthesize(text: string, opts: AudioSynthesisOptions = {}): Promise<AudioSynthesisResult> {
     if (!config.elevenLabsApiKey) {
       throw new Error("ElevenLabs API key not configured");
     }

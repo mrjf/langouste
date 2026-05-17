@@ -1,7 +1,11 @@
 import { Hono } from "hono";
 import { requireAuth } from "../middleware.ts";
 import { languageStats } from "../../services/profile/stats.ts";
-import { ALL_DIMENSIONS, dimensionForCategory, type Dimension } from "../../services/profile/dimensions.ts";
+import {
+  ALL_DIMENSIONS,
+  dimensionForCategory,
+  type Dimension,
+} from "../../services/profile/dimensions.ts";
 
 export const profileStatsRoutes = new Hono();
 
@@ -226,9 +230,7 @@ function sortItems(items: ListedItem[], sort: string): ListedItem[] {
   const copy = [...items];
   switch (sort) {
     case "recent":
-      copy.sort((a, b) =>
-        (b.last_activity_at ?? "").localeCompare(a.last_activity_at ?? ""),
-      );
+      copy.sort((a, b) => (b.last_activity_at ?? "").localeCompare(a.last_activity_at ?? ""));
       break;
     case "due":
       copy.sort((a, b) => a.next_review_at.localeCompare(b.next_review_at));
@@ -236,7 +238,6 @@ function sortItems(items: ListedItem[], sort: string): ListedItem[] {
     case "strength":
       copy.sort((a, b) => accuracy(b) - accuracy(a));
       break;
-    case "problematic":
     default:
       copy.sort((a, b) => {
         // Low accuracy first; break ties with high error_count.

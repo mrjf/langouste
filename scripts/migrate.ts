@@ -75,9 +75,7 @@ async function runSupabaseMigrations() {
     process.exit(1);
   }
 
-  const projectRef = supabaseUrl
-    .replace("https://", "")
-    .replace(".supabase.co", "");
+  const projectRef = supabaseUrl.replace("https://", "").replace(".supabase.co", "");
 
   const accessToken = getSupabaseAccessToken();
   if (!accessToken) {
@@ -88,17 +86,14 @@ async function runSupabaseMigrations() {
   const API_BASE = "https://api.supabase.com/v1";
 
   async function runSQL(sql: string): Promise<unknown> {
-    const res = await fetch(
-      `${API_BASE}/projects/${projectRef}/database/query`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ query: sql }),
+    const res = await fetch(`${API_BASE}/projects/${projectRef}/database/query`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
       },
-    );
+      body: JSON.stringify({ query: sql }),
+    });
     if (!res.ok) {
       const body = await res.text();
       throw new Error(`SQL query failed (${res.status}): ${body}`);
@@ -115,9 +110,9 @@ async function runSupabaseMigrations() {
        );`,
     );
 
-    const appliedRows = (await runSQL(
-      "SELECT name FROM _migrations ORDER BY name",
-    )) as Array<{ name: string }>;
+    const appliedRows = (await runSQL("SELECT name FROM _migrations ORDER BY name")) as Array<{
+      name: string;
+    }>;
     const applied = new Set(appliedRows.map((r) => r.name));
 
     const migrationsDir = resolve(projectDir, "supabase/migrations");
@@ -134,16 +129,12 @@ async function runSupabaseMigrations() {
       console.log(`  Applying ${file}...`);
       const sql = readFileSync(resolve(migrationsDir, file), "utf-8");
       await runSQL(sql);
-      await runSQL(
-        `INSERT INTO _migrations (name) VALUES ('${file.replace(/'/g, "''")}')`,
-      );
+      await runSQL(`INSERT INTO _migrations (name) VALUES ('${file.replace(/'/g, "''")}')`);
       console.log(`  OK`);
       count++;
     }
 
-    console.log(
-      count > 0 ? `\nApplied ${count} migration(s).` : "\nNo new migrations.",
-    );
+    console.log(count > 0 ? `\nApplied ${count} migration(s).` : "\nNo new migrations.");
   } catch (err) {
     console.error("Migration failed:", err);
     process.exit(1);
@@ -151,10 +142,9 @@ async function runSupabaseMigrations() {
 }
 
 function getSupabaseAccessToken(): string {
-  const raw = execSync(
-    'security find-generic-password -s "Supabase CLI" -a "access-token" -w',
-    { encoding: "utf-8" },
-  ).trim();
+  const raw = execSync('security find-generic-password -s "Supabase CLI" -a "access-token" -w', {
+    encoding: "utf-8",
+  }).trim();
   if (raw.startsWith("go-keyring-base64:")) {
     const b64 = raw.replace("go-keyring-base64:", "");
     return Buffer.from(b64, "base64").toString("utf-8");

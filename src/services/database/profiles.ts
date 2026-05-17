@@ -9,10 +9,7 @@ export async function getProfile(db: Database, userId: string): Promise<Profile 
 
 export async function createProfile(
   db: Database,
-  profile: Pick<
-    Profile,
-    "user_id" | "display_name" | "base_language" | "learning_languages"
-  >,
+  profile: Pick<Profile, "user_id" | "display_name" | "base_language" | "learning_languages">,
 ): Promise<Profile> {
   return db.insert<Profile>("profiles", profile);
 }
@@ -20,13 +17,9 @@ export async function createProfile(
 export async function updateProfile(
   db: Database,
   userId: string,
-  updates: Partial<
-    Pick<Profile, "display_name" | "base_language" | "learning_languages">
-  >,
+  updates: Partial<Pick<Profile, "display_name" | "base_language" | "learning_languages">>,
 ): Promise<Profile> {
-  return db.updateOne<Profile>(
-    "profiles",
-    { ...updates, updated_at: new Date().toISOString() },
-    [{ op: "eq", column: "user_id", value: userId }],
-  );
+  return db.updateOne<Profile>("profiles", { ...updates, updated_at: new Date().toISOString() }, [
+    { op: "eq", column: "user_id", value: userId },
+  ]);
 }

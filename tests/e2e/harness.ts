@@ -135,8 +135,10 @@ function loadDotEnvIntoProcess(): void {
     const key = line.slice(0, eq).trim();
     let value = line.slice(eq + 1).trim();
     // Strip surrounding quotes if present.
-    if ((value.startsWith('"') && value.endsWith('"')) ||
-        (value.startsWith("'") && value.endsWith("'"))) {
+    if (
+      (value.startsWith('"') && value.endsWith('"')) ||
+      (value.startsWith("'") && value.endsWith("'"))
+    ) {
       value = value.slice(1, -1);
     }
     if (!(key in process.env)) {
@@ -203,11 +205,12 @@ function pipePrefixed(stream: NodeJS.ReadableStream | null, prefix: string): voi
   stream.setEncoding("utf8");
   stream.on("data", (chunk: string) => {
     buffer += chunk;
-    let nl;
-    while ((nl = buffer.indexOf("\n")) !== -1) {
+    let nl = buffer.indexOf("\n");
+    while (nl !== -1) {
       const line = buffer.slice(0, nl);
       buffer = buffer.slice(nl + 1);
       if (line) process.stderr.write(`${prefix} ${line}\n`);
+      nl = buffer.indexOf("\n");
     }
   });
   stream.on("end", () => {
@@ -215,7 +218,11 @@ function pipePrefixed(stream: NodeJS.ReadableStream | null, prefix: string): voi
   });
 }
 
-interface RunResult { code: number; stdout: string; stderr: string; }
+interface RunResult {
+  code: number;
+  stdout: string;
+  stderr: string;
+}
 
 function runOnce(cmd: string[], env: NodeJS.ProcessEnv): Promise<RunResult> {
   return new Promise((resolveRun) => {
@@ -226,8 +233,12 @@ function runOnce(cmd: string[], env: NodeJS.ProcessEnv): Promise<RunResult> {
     });
     let stdout = "";
     let stderr = "";
-    p.stdout?.on("data", (d) => { stdout += d; });
-    p.stderr?.on("data", (d) => { stderr += d; });
+    p.stdout?.on("data", (d) => {
+      stdout += d;
+    });
+    p.stderr?.on("data", (d) => {
+      stderr += d;
+    });
     p.on("exit", (code) => resolveRun({ code: code ?? 0, stdout, stderr }));
     p.on("error", (err) => resolveRun({ code: 1, stdout, stderr: String(err) }));
   });

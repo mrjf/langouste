@@ -27,10 +27,7 @@ export function stopCurrent(): void {
  * Call site should not also wire its own `ended`/`error` handlers if it
  * wants the stop callback as the single source of truth.
  */
-export async function playExclusive(
-  audio: HTMLAudioElement,
-  onStop: () => void,
-): Promise<void> {
+export async function playExclusive(audio: HTMLAudioElement, onStop: () => void): Promise<void> {
   stopCurrent();
   current = { audio, onStop };
 
@@ -54,7 +51,11 @@ export async function playExclusive(
     // controller calls audio.pause() in stopCurrent(), which fires this.
     if (current?.audio !== audio) {
       cleanup();
-      try { onStop(); } catch { /* ignore */ }
+      try {
+        onStop();
+      } catch {
+        /* ignore */
+      }
     }
   };
 

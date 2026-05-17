@@ -19,9 +19,7 @@ export function getTranslationProvider(): TranslationProvider {
         _provider = new ClaudeTranslationProvider();
         break;
       default:
-        throw new Error(
-          `Unknown translation provider: ${config.translationProvider}`,
-        );
+        throw new Error(`Unknown translation provider: ${config.translationProvider}`);
     }
     console.log(`[Translation] Provider initialized: ${config.translationProvider}`);
   }

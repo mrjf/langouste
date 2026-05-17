@@ -24,7 +24,12 @@ registerRpc("upsert_grammar_gap", async (db, args) => {
        error_count = grammar_gaps.error_count + 1,
        last_error_at = datetime('now'),
        description = excluded.description`,
-    [row.user_id as string, row.language as string, row.category as string, row.description as string],
+    [
+      row.user_id as string,
+      row.language as string,
+      row.category as string,
+      row.description as string,
+    ],
   );
   return null;
 });

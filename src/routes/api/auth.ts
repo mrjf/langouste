@@ -24,8 +24,7 @@ authRoutes.post("/local", async (c) => {
 });
 
 authRoutes.post("/signup", async (c) => {
-  const { email, password, display_name, base_language, learning_languages } =
-    await c.req.json();
+  const { email, password, display_name, base_language, learning_languages } = await c.req.json();
 
   if (config.databaseMode === "sqlite") {
     try {

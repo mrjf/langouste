@@ -58,10 +58,7 @@ test.describe("Claude connector (direct Anthropic API)", () => {
 
     // Vocab extractor is fire-and-forget; real Sonnet takes a few seconds.
     const api = new TestApi(request);
-    await waitFor(
-      async () => ((await api.dbTable("vocabulary")) as unknown[]).length > 0,
-      30_000,
-    );
+    await waitFor(async () => ((await api.dbTable("vocabulary")) as unknown[]).length > 0, 30_000);
 
     const vocab = (await api.dbTable("vocabulary")) as Array<{ term: string }>;
     expect(vocab.length).toBeGreaterThan(0);

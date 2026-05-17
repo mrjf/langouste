@@ -19,11 +19,7 @@ export const config = {
 
   // Supabase credentials only required when running in supabase mode.
   supabaseUrl: requiredIf("supabase", databaseMode, "SUPABASE_URL"),
-  supabasePublishableKey: requiredIf(
-    "supabase",
-    databaseMode,
-    "SUPABASE_PUBLISHABLE_KEY",
-  ),
+  supabasePublishableKey: requiredIf("supabase", databaseMode, "SUPABASE_PUBLISHABLE_KEY"),
   supabaseSecretKey: requiredIf("supabase", databaseMode, "SUPABASE_SECRET_KEY"),
 
   anthropicApiKey: required("ANTHROPIC_API_KEY"),

@@ -1,9 +1,5 @@
 import { testRegistry } from "../../lib/test-registry.ts";
-import type {
-  AgentConnection,
-  AgentStatusInfo,
-  AgentStatusListener,
-} from "./types.ts";
+import type { AgentConnection, AgentStatusInfo, AgentStatusListener } from "./types.ts";
 
 /**
  * Test-only agent connector. Returns scripted replies from testRegistry.

@@ -199,7 +199,9 @@ export class OpenClawAgent implements AgentConnection {
         if (process.env.LANGOUSTE_OPENCLAW_DEBUG === "1") {
           const ev = (frame as { event?: string }).event;
           const fid = (frame as { id?: string }).id;
-          console.log(`[OpenClaw] ← ${type}${ev ? `/${ev}` : ""}${fid ? ` id=${fid}` : ""} ${raw.slice(0, 200)}`);
+          console.log(
+            `[OpenClaw] ← ${type}${ev ? `/${ev}` : ""}${fid ? ` id=${fid}` : ""} ${raw.slice(0, 200)}`,
+          );
         }
 
         // Phase 1: server's challenge nonce. Sign it and send our connect.
@@ -238,16 +240,16 @@ export class OpenClawAgent implements AgentConnection {
             this.setStatus("connected", this.url);
             resolve(ws);
           } else {
-            const err = frame.error as { message?: string; details?: { code?: string } } | undefined;
+            const err = frame.error as
+              | { message?: string; details?: { code?: string } }
+              | undefined;
             const detailCode = err?.details?.code;
             const msg = err?.message ?? "Handshake rejected";
             this.connecting = null;
             this.setStatus("error", msg);
             ws.close();
             reject(
-              new Error(
-                `OpenClaw handshake failed: ${msg}${detailCode ? ` [${detailCode}]` : ""}`,
-              ),
+              new Error(`OpenClaw handshake failed: ${msg}${detailCode ? ` [${detailCode}]` : ""}`),
             );
           }
           return;
@@ -304,7 +306,10 @@ export class OpenClawAgent implements AgentConnection {
           // on different gateway versions.
           const payloads = payload?.result?.payloads;
           const fromPayloads = Array.isArray(payloads)
-            ? payloads.map((p) => p?.text).filter((t): t is string => !!t).join("\n\n")
+            ? payloads
+                .map((p) => p?.text)
+                .filter((t): t is string => !!t)
+                .join("\n\n")
             : "";
           const text =
             fromPayloads ||

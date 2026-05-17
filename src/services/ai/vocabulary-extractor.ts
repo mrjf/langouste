@@ -2,14 +2,12 @@ import { getAnthropicClient } from "./client.ts";
 import { config } from "../../lib/config.ts";
 import { testRegistry } from "../../lib/test-registry.ts";
 import { languageName } from "../../lib/languages.ts";
-import type {
-  VocabularyExtractionInput,
-  VocabularyExtractionOutput,
-} from "./types.ts";
+import type { VocabularyExtractionInput, VocabularyExtractionOutput } from "./types.ts";
 
 const VOCABULARY_EXTRACTION_TOOL = {
   name: "extract_vocabulary" as const,
-  description: "Extract new vocabulary, detect grammar gaps, and generate a learning challenge from a sent message.",
+  description:
+    "Extract new vocabulary, detect grammar gaps, and generate a learning challenge from a sent message.",
   input_schema: {
     type: "object" as const,
     properties: {
@@ -19,7 +17,10 @@ const VOCABULARY_EXTRACTION_TOOL = {
           type: "object",
           properties: {
             term: { type: "string", description: "The word in target language" },
-            translation: { type: "string", description: "Translation to the learner's primary base language" },
+            translation: {
+              type: "string",
+              description: "Translation to the learner's primary base language",
+            },
             context_sentence: { type: "string", description: "The sentence containing this word" },
             cefr_level: { type: ["string", "null"] as const, description: "Estimated CEFR level" },
           },
@@ -31,7 +32,10 @@ const VOCABULARY_EXTRACTION_TOOL = {
         items: {
           type: "object",
           properties: {
-            category: { type: "string", description: 'Grammar category, e.g. "verb:passé_composé"' },
+            category: {
+              type: "string",
+              description: 'Grammar category, e.g. "verb:passé_composé"',
+            },
             description: { type: "string", description: "Brief description of the gap" },
           },
           required: ["category", "description"],
@@ -62,9 +66,10 @@ export async function extractVocabulary(
   const targetLang = languageName(input.language);
   const baseLang = languageName(input.base_languages[0] ?? "en");
 
-  const context = input.conversation_context.length > 0
-    ? input.conversation_context.join("\n")
-    : "(start of conversation)";
+  const context =
+    input.conversation_context.length > 0
+      ? input.conversation_context.join("\n")
+      : "(start of conversation)";
 
   const intentSection = input.intent
     ? `\nThe sender described their intent as: "${input.intent}"\n`

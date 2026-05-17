@@ -1,8 +1,4 @@
-import type {
-  AudioProvider,
-  AudioSynthesisOptions,
-  AudioSynthesisResult,
-} from "./provider.ts";
+import type { AudioProvider, AudioSynthesisOptions, AudioSynthesisResult } from "./provider.ts";
 
 /** Used when no audio provider is configured. Always reports unavailable. */
 export class NoopAudioProvider implements AudioProvider {
@@ -10,10 +6,7 @@ export class NoopAudioProvider implements AudioProvider {
   isAvailable(): boolean {
     return false;
   }
-  async synthesize(
-    _text: string,
-    _opts?: AudioSynthesisOptions,
-  ): Promise<AudioSynthesisResult> {
+  async synthesize(_text: string, _opts?: AudioSynthesisOptions): Promise<AudioSynthesisResult> {
     throw new Error("No audio provider configured (set AUDIO_PROVIDER + provider credentials)");
   }
 }
