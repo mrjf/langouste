@@ -106,7 +106,20 @@
       : message.healed_text
   );
 
-  let loading = $derived(viewerLang && !hasTargetTranslation && !message._pending);
+  // Only show the skeleton when there is genuinely nothing readable yet
+  // (no healed_text at all). When the target-language translation is
+  // missing but we DO have source/English text, show that immediately —
+  // the translation fills in shortly. Never leave the bubble as an
+  // indefinite skeleton ("straight lines that never become a message").
+  let loading = $derived(
+    !!viewerLang && !hasTargetTranslation && !message._pending && !message.healed_text,
+  );
+
+  // Subtle hint that the viewer-language translation is still loading,
+  // shown alongside the readable fallback text rather than instead of it.
+  let translationPending = $derived(
+    !!viewerLang && !hasTargetTranslation && !message._pending && !!message.healed_text,
+  );
 
   // A pending agent bubble with no text yet = "agent is typing".
   let agentTyping = $derived(
@@ -164,7 +177,9 @@
       <div class="loading-bar short"></div>
     {:else}
       {#if viewerLang}
-        <span class="target-badge">{langTag(viewerLang)}</span>
+        <span class="target-badge" class:translating={translationPending}>
+          {translationPending ? "…" : langTag(viewerLang)}
+        </span>
       {/if}
       <div class="healed-text">{@html md(displayText)}</div>
     {/if}
@@ -400,6 +415,11 @@
     margin-left: 0.5rem;
     margin-top: -0.1rem;
     line-height: 1;
+  }
+
+  .target-badge.translating {
+    opacity: 0.4;
+    font-style: italic;
   }
 
   .action-btn {

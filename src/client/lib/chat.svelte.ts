@@ -140,8 +140,52 @@ export class Chat {
       const byId = new Set(loaded.map((m) => m.message_id));
       this.messages = [...loaded, ...pending.filter((p) => !byId.has(p.message_id))];
       this.#messagesLoaded = true;
+      this.#ensureTranslations();
     } catch (err) {
       console.error(`[Chat ${this.id.slice(0, 8)}] load failed:`, err);
+    }
+  }
+
+  /**
+   * The viewer's languages (target + base). MessageBubble renders the
+   * target-language translation; agent replies arrive English-only, so
+   * those translations must be filled in or the bubble stays in its
+   * loading skeleton forever (regression fix — this used to live in
+   * ChatThread.fillMissingTranslations before the Chat-model rewrite).
+   */
+  #viewerLangs(): string[] {
+    const m = this.member;
+    if (!m) return [];
+    return [
+      ...new Set([...m.target_languages.map((t) => t.lang), ...m.base_languages].filter(Boolean)),
+    ];
+  }
+
+  #translating = false;
+
+  /** If any non-pending message is missing a viewer-language translation,
+   *  fetch translations and merge them in. Idempotent + self-throttling. */
+  async #ensureTranslations(): Promise<void> {
+    if (this.#translating) return;
+    const langs = this.#viewerLangs();
+    if (langs.length === 0) return;
+
+    const needs = this.messages.some(
+      (msg) => !msg._pending && langs.some((l) => !msg.translations?.[l]),
+    );
+    if (!needs) return;
+
+    this.#translating = true;
+    try {
+      const translated = (await api.translateMessages(this.id, langs)) as Message[];
+      const byId = new Map(translated.map((m) => [m.message_id, m]));
+      // Merge: keep pending placeholders, swap in translated versions of
+      // anything the server returned, leave the rest untouched.
+      this.messages = this.messages.map((m) => (m._pending ? m : (byId.get(m.message_id) ?? m)));
+    } catch (err) {
+      console.error(`[Chat ${this.id.slice(0, 8)}] translate fill failed:`, err);
+    } finally {
+      this.#translating = false;
     }
   }
 
@@ -168,6 +212,9 @@ export class Chat {
     } else {
       this.messages = [...this.messages, msg];
     }
+    // Agent replies arrive English-only — fill the viewer's translation
+    // so the bubble doesn't sit in its loading skeleton.
+    this.#ensureTranslations();
   }
 
   dispose(): void {
@@ -383,6 +430,10 @@ export class Chat {
       );
     } finally {
       this.working = false;
+      // Agent reply + the user's stored message arrive English/source-only;
+      // fill the viewer-language translations so bubbles don't get stuck
+      // in the loading skeleton.
+      this.#ensureTranslations();
     }
   }
 
