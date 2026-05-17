@@ -29,6 +29,12 @@ export const config = {
   anthropicApiKey: required("ANTHROPIC_API_KEY"),
   translationProvider: process.env.TRANSLATION_PROVIDER ?? "claude",
 
+  // Text-to-speech provider. "none" (default) disables audio playback.
+  // "elevenlabs" requires ELEVENLABS_API_KEY.
+  audioProvider: (process.env.AUDIO_PROVIDER ?? "none").toLowerCase(),
+  elevenLabsApiKey: process.env.ELEVENLABS_API_KEY ?? "",
+  elevenLabsVoiceId: process.env.ELEVENLABS_VOICE_ID ?? "",
+
   // Local auth JWT secret (sqlite mode). Required only when DATABASE_MODE=sqlite.
   jwtSecret: requiredIf("sqlite", databaseMode, "LANGOUSTE_JWT_SECRET"),
 

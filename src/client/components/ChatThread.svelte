@@ -331,6 +331,7 @@
         viewerLangs={myLangs}
         baseLangs={myBaseLangs}
         challenge={msg.next_challenge ?? null}
+        conversationId={conv?.conversation_id}
       />
     {/each}
   </div>

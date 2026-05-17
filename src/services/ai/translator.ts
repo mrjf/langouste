@@ -19,7 +19,20 @@ export async function translateTexts(
   const provider = getTranslationProvider();
   const providerName = provider.constructor.name;
   console.log(`[Translation] [${providerName}] ${texts.length} text(s) → ${targetLanguage}: ${texts.map(t => `"${t.slice(0, 50)}"`).join(", ")}`);
-  const results = await provider.translateTexts(texts, targetLanguage, context);
+  // One retry: tool_use sometimes comes back without the expected key on the
+  // first call; a fresh attempt almost always succeeds.
+  let results: string[] | undefined;
+  let lastErr: unknown;
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      results = await provider.translateTexts(texts, targetLanguage, context);
+      break;
+    } catch (err) {
+      lastErr = err;
+      console.warn(`[Translation] [${providerName}] attempt ${attempt + 1} failed:`, (err as Error).message);
+    }
+  }
+  if (!results) throw lastErr ?? new Error("Translation failed");
   console.log(`[Translation] [${providerName}] Results: ${results.map(t => `"${t.slice(0, 50)}"`).join(", ")}`);
   return results;
 }

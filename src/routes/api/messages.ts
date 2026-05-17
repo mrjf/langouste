@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { requireAuth } from "../middleware.ts";
-import { getMessages, getRecentMessageTexts, insertMessage } from "../../services/database/messages.ts";
+import { getMessageById, getMessages, getRecentMessageTexts, insertMessage } from "../../services/database/messages.ts";
 import { getMember } from "../../services/database/members.ts";
 import { getConversation } from "../../services/database/conversations.ts";
 import { getConnector } from "../../services/database/agent-connectors.ts";
@@ -12,6 +12,7 @@ import { ensureTranslations, translateTexts } from "../../services/ai/translator
 import { ensureTransliterations } from "../../services/ai/transliterator.ts";
 import { ensurePhonetics } from "../../services/ai/phonetician.ts";
 import { getAgentConnection } from "../../services/agents/factory.ts";
+import { getAudioProvider } from "../../services/ai/audio/index.ts";
 import { trackLearningProgress, getDueReviewItems } from "../../services/spaced-repetition/tracker.ts";
 import { adminDb } from "../../lib/db/index.ts";
 import type { AgentType, ConversationMember } from "../../types/index.ts";
@@ -268,6 +269,53 @@ messageRoutes.post("/:conversationId", async (c) => {
       { message, agent_message: null, agent_error: detail },
       201,
     );
+  }
+});
+
+// Synthesise audio for a single message in a chosen language. Returns the
+// audio bytes directly (audio/mpeg from ElevenLabs). 404 when the provider
+// is unconfigured or the requested language isn't translated yet.
+messageRoutes.get("/:conversationId/:messageId/audio", async (c) => {
+  const db = c.get("db");
+  const userId = c.get("userId");
+  const conversationId = c.req.param("conversationId");
+  const messageId = c.req.param("messageId");
+  const lang = (c.req.query("lang") || "").trim();
+
+  const member = await getMember(db, conversationId, userId);
+  if (!member) return c.json({ error: "Not a member of this conversation" }, 403);
+
+  const provider = getAudioProvider();
+  if (!provider.isAvailable()) {
+    return c.json({ error: "Audio provider not configured" }, 503);
+  }
+
+  const message = await getMessageById(db, messageId);
+  if (!message || message.conversation_id !== conversationId) {
+    return c.json({ error: "Message not found" }, 404);
+  }
+
+  const targetLang = lang || message.language;
+  const text =
+    (lang && message.translations?.[lang]) ||
+    (targetLang === message.language ? message.healed_text : message.translations?.[targetLang]) ||
+    message.healed_text;
+  if (!text?.trim()) return c.json({ error: "Nothing to synthesise" }, 400);
+
+  try {
+    const result = await provider.synthesize(text, { language: targetLang });
+    return new Response(result.audio, {
+      status: 200,
+      headers: {
+        "Content-Type": result.contentType,
+        "Cache-Control": "private, max-age=86400",
+        "Content-Length": String(result.audio.byteLength),
+      },
+    });
+  } catch (err) {
+    const detail = err instanceof Error ? err.message : String(err);
+    console.error("[Audio] synthesize failed:", detail);
+    return c.json({ error: detail }, 502);
   }
 });
 
