@@ -1,3 +1,21 @@
+<script module lang="ts">
+  // Per-conversation unsent-draft cache. Module-scoped so a draft survives
+  // switching conversations (and even a remount of this component). Entries
+  // are written when leaving a conversation and cleared on successful send.
+  interface DraftSnapshot {
+    text: string;
+    checkedText: string;
+    intentText: string;
+    detectedLang: string;
+    state: "idle" | "checking" | "squiggled" | "explained";
+    errors: unknown[];
+    explanations: unknown[];
+    additionalErrors: unknown[];
+    correctedMessage: string;
+  }
+  const draftCache = new Map<string, DraftSnapshot>();
+</script>
+
 <script lang="ts">
   import { api } from "../lib/api";
   import { langTag, LANGUAGES } from "../lib/languages";
@@ -173,27 +191,72 @@
   let checkController: AbortController | null = null;
   let explainController: AbortController | null = null;
 
-  // Reset state when conversation changes — track only conversationId
+  // Snapshot the current draft into the module cache (or drop the entry if
+  // there's nothing worth keeping).
+  function captureDraft(convId: string) {
+    if (!text.trim() && !intentText.trim()) {
+      draftCache.delete(convId);
+      return;
+    }
+    // These arrays are always replaced wholesale (never mutated in place),
+    // so a shallow copy is a safe snapshot and avoids $state.snapshot().
+    draftCache.set(convId, {
+      text,
+      checkedText,
+      intentText,
+      detectedLang,
+      state,
+      errors: [...errors],
+      explanations: [...explanations],
+      additionalErrors: [...additionalErrors],
+      correctedMessage,
+    });
+  }
+
+  // Restore a cached draft for `convId`, or reset to a clean idle editor.
+  // If the draft was mid-check when we left (no results yet), re-run the
+  // pipeline so the user lands back where they were.
+  function restoreDraft(convId: string) {
+    const d = draftCache.get(convId);
+    text = d?.text ?? "";
+    checkedText = d?.checkedText ?? "";
+    intentText = d?.intentText ?? "";
+    if (d?.detectedLang) detectedLang = d.detectedLang;
+    errors = (d?.errors ?? []) as TextError[];
+    explanations = (d?.explanations ?? []) as ErrorExplanation[];
+    additionalErrors = (d?.additionalErrors ?? []) as typeof additionalErrors;
+    correctedMessage = d?.correctedMessage ?? "";
+    state = d?.state ?? "idle";
+
+    // Re-sync the contenteditable (it isn't reactively bound to `text`).
+    requestAnimationFrame(() => {
+      if (editableEl) editableEl.innerText = text;
+    });
+
+    // We aborted any in-flight check on the way out. If we left while
+    // still "checking" there are no results to show — kick it off again.
+    if (state === "checking" && text.trim()) {
+      runCheckPipeline();
+    }
+  }
+
+  // Save the outgoing draft and restore the incoming one when the
+  // conversation changes. Track only conversationId.
   let prevConvId = conversationId;
   $effect.pre(() => {
     if (conversationId === prevConvId) return;
+    const leaving = prevConvId;
     prevConvId = conversationId;
 
+    // In-flight requests are conversation-specific; cancel them. A draft
+    // restored as "checking" re-runs the pipeline on return.
     checkController?.abort();
     explainController?.abort();
     checkController = null;
     explainController = null;
-    text = "";
-    checkedText = "";
-    correctedMessage = "";
-    intentText = "";
-    errors = [];
-    explanations = [];
-    additionalErrors = [];
-    state = "idle";
-    requestAnimationFrame(() => {
-      if (editableEl) editableEl.innerText = "";
-    });
+
+    captureDraft(leaving);
+    restoreDraft(conversationId);
   });
 
   // Debounce timer for language detection
@@ -382,6 +445,9 @@
 
     console.log(`[Send] Sending "${trimmed}" (lang: ${detectedLang}, intent: ${intentText.trim() || "none"})`);
     onSend(trimmed, detectedLang, intentText.trim() || undefined);
+
+    // Sent — drop any saved draft for this conversation.
+    draftCache.delete(conversationId);
 
     // Clear state
     text = "";

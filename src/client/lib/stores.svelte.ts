@@ -25,6 +25,7 @@ export interface ConversationMember {
   target_languages: Array<{ lang: string; cefr_level: string }>;
   base_languages: string[];
   joined_at: string;
+  last_read_at?: string;
   profile?: { user_id: string; display_name: string } | null;
 }
 
@@ -42,6 +43,9 @@ export interface Conversation {
   agent_connector?: AgentConnector | null;
   created_at: string;
   members: ConversationMember[];
+  /** Unread agent messages (server-computed on list fetch). Live-updated
+   *  client-side via the Realtime subscription / mark-read. */
+  unread_count?: number;
 }
 
 export interface Message {
@@ -73,3 +77,35 @@ export const session = $state<{ value: UserSession | null }>({ value: null });
 export const profile = $state<{ value: Profile | null }>({ value: null });
 export const conversations = $state<{ value: Conversation[] }>({ value: [] });
 export const activeConversation = $state<{ value: Conversation | null }>({ value: null });
+
+// --- Unread badge helpers -------------------------------------------------
+// unread_count lives on each Conversation. We mutate the array immutably so
+// Svelte's reactivity picks up the change in the sidebar.
+
+function patchConversation(id: string, patch: Partial<Conversation>): void {
+  const i = conversations.value.findIndex((c) => c.conversation_id === id);
+  if (i === -1) return;
+  const next = conversations.value.slice();
+  next[i] = { ...next[i], ...patch };
+  conversations.value = next;
+}
+
+/** A new agent message arrived. Bump the badge unless that chat is open. */
+export function bumpUnread(conversationId: string): void {
+  if (activeConversation.value?.conversation_id === conversationId) return;
+  const conv = conversations.value.find((c) => c.conversation_id === conversationId);
+  if (!conv) return; // not one of ours (or list not loaded yet)
+  patchConversation(conversationId, { unread_count: (conv.unread_count ?? 0) + 1 });
+}
+
+/** Conversation has been read — clear its badge. */
+export function clearUnread(conversationId: string): void {
+  const conv = conversations.value.find((c) => c.conversation_id === conversationId);
+  if (!conv?.unread_count) return;
+  patchConversation(conversationId, { unread_count: 0 });
+}
+
+/** Total across all conversations (for a future global indicator). */
+export function totalUnread(): number {
+  return conversations.value.reduce((n, c) => n + (c.unread_count ?? 0), 0);
+}

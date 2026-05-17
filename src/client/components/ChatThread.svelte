@@ -1,6 +1,6 @@
 <script lang="ts">
   import { api } from "../lib/api";
-  import { activeConversation, conversations, user } from "../lib/stores.svelte";
+  import { activeConversation, conversations, user, clearUnread } from "../lib/stores.svelte";
   import { subscribeToMessages, subscribeToConversation } from "../lib/supabase";
   import { langTag, langOption, langName, LANGUAGES } from "../lib/languages";
   import type { Message } from "../lib/stores.svelte";
@@ -13,6 +13,15 @@
 
   // Per-conversation message cache so switching is instant
   const messageCache = new Map<string, Message[]>();
+
+  // Persist that the open conversation is read, so its badge stays cleared
+  // across reloads. Optimistic + non-fatal; clears the local badge too.
+  function markActiveRead(convId: string) {
+    clearUnread(convId);
+    api
+      .markConversationRead(convId)
+      .catch((err) => console.error("[Unread] mark-read failed:", err));
+  }
 
   const conv = $derived(activeConversation.value);
   const userId = $derived(user.value?.id);
@@ -100,6 +109,7 @@
         messages = loaded;
         messageCache.set(convId, loaded);
         fillMissingTranslations(convId);
+        markActiveRead(convId); // opening the chat marks it read
       } catch (err) {
         console.error("[Messages] Failed to load:", err);
       }
@@ -120,6 +130,9 @@
       }
       messageCache.set(convId, messages);
       fillMissingTranslations(convId);
+      // This chat is open, so a freshly-arrived agent reply is already
+      // "read" — advance the server cursor so it doesn't resurface.
+      if (newMsg.is_agent) markActiveRead(convId);
     });
 
     const unsubConv = subscribeToConversation(convId, async () => {

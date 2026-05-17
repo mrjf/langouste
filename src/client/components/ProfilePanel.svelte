@@ -19,6 +19,16 @@
     { key: "discourse",   label: "Discourse",   subtitle: "Connectors, coherence" },
   ] as const;
 
+  const DIMENSION_KEYS = new Set(DIMENSIONS.map((d) => d.key) as readonly string[]);
+
+  interface Props {
+    /** Active dimension from the URL ("" = dashboard). Owned by App's router. */
+    section?: string;
+    /** Notify the router when the active dimension changes (drives the URL). */
+    onSectionChange?: (section: string) => void;
+  }
+  let { section = "", onSectionChange }: Props = $props();
+
   const learningLangs = $derived.by(() => {
     const profs = profile.value?.learning_languages ?? [];
     if (profs.length > 0) return profs;
@@ -43,6 +53,23 @@
     loadDashboard(selectedLang);
   });
 
+  // Reconcile local drill-down state with the URL-driven `section` prop.
+  // Handles deep links and browser back/forward. Idempotent: only acts
+  // when the prop and the current level actually diverge, so it won't
+  // loop against onSectionChange. The item level is intentionally not
+  // URL-addressed — leaving it alone here keeps item detail working.
+  $effect(() => {
+    const wantsDimension = section && DIMENSION_KEYS.has(section);
+    if (wantsDimension) {
+      if (level.kind === "dimension" && level.dimension === section) return;
+      if (level.kind === "item") return; // deeper view; URL only tracks dimension
+      openDimension(section);
+    } else {
+      // section === "" (or unknown) → dashboard
+      if (level.kind !== "dashboard") backToDashboard();
+    }
+  });
+
   async function loadDashboard(lang: string) {
     loading = true;
     try {
@@ -57,6 +84,7 @@
 
   async function openDimension(dimension: string) {
     level = { kind: "dimension", dimension };
+    onSectionChange?.(dimension);
     loading = true;
     try {
       dimensionData = await api.getDimensionItems(selectedLang, dimension, { sort: "problematic" });
@@ -85,6 +113,7 @@
     level = { kind: "dashboard" };
     dimensionData = null;
     itemData = null;
+    onSectionChange?.("");
   }
 
   function backToDimension() {

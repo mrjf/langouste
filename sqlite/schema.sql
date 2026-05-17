@@ -44,6 +44,7 @@ CREATE TABLE IF NOT EXISTS conversation_members (
   target_languages   TEXT NOT NULL DEFAULT '[]',  -- JSON: [{lang, cefr_level}]
   base_languages     TEXT NOT NULL DEFAULT '[]',  -- JSON: [lang, ...]
   joined_at          TEXT NOT NULL DEFAULT (datetime('now')),
+  last_read_at       TEXT NOT NULL DEFAULT (datetime('now')),  -- unread badge tracking
   PRIMARY KEY (conversation_id, user_id)
 );
 

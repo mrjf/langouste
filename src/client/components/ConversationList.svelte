@@ -1,10 +1,35 @@
 <script lang="ts">
-  import { conversations, activeConversation, profile } from "../lib/stores.svelte";
+  import {
+    conversations,
+    activeConversation,
+    profile,
+    clearUnread,
+  } from "../lib/stores.svelte";
   import { langTag } from "../lib/languages";
+  import { api } from "../lib/api";
   import type { Conversation } from "../lib/stores.svelte";
 
   function selectConversation(conv: Conversation) {
     activeConversation.value = conv;
+    // Optimistically clear the badge, then persist last_read_at. Failure
+    // is non-fatal — the count reconciles on the next list reload.
+    if (conv.unread_count) {
+      clearUnread(conv.conversation_id);
+      api
+        .markConversationRead(conv.conversation_id)
+        .catch((err) => console.error("[Unread] mark-read failed:", err));
+    }
+  }
+
+  /** Slack-style: show the number, cap the width at "99+". */
+  function badgeLabel(n: number): string {
+    return n > 99 ? "99+" : String(n);
+  }
+
+  function unreadFor(conv: Conversation): number {
+    // Never show a badge on the open conversation.
+    if (activeConversation.value?.conversation_id === conv.conversation_id) return 0;
+    return conv.unread_count ?? 0;
   }
 
   function myMember(conv: Conversation) {
@@ -32,6 +57,14 @@
       >
         <span class="conv-lang">{langTag(myLang(conv))}</span>
         <span class="conv-partner">🤖 {displayName(conv)}</span>
+        {#if unreadFor(conv) > 0}
+          <span
+            class="unread-badge"
+            aria-label={`${unreadFor(conv)} unread messages`}
+          >
+            {badgeLabel(unreadFor(conv))}
+          </span>
+        {/if}
       </button>
     {/each}
   {/if}
@@ -87,5 +120,22 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    flex: 1;
+  }
+
+  /* Slack-style number-in-circle unread indicator. */
+  .unread-badge {
+    flex-shrink: 0;
+    min-width: 1.25rem;
+    height: 1.25rem;
+    padding: 0 0.4rem;
+    border-radius: 999px;
+    background: var(--color-primary, #e02f5b);
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    line-height: 1.25rem;
+    text-align: center;
+    box-sizing: border-box;
   }
 </style>
