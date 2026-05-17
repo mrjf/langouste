@@ -1,7 +1,8 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { api } from "../lib/api";
-  import { profile, conversations, activeConversation } from "../lib/stores.svelte";
+  import { profile } from "../lib/stores.svelte";
+  import { chatStore } from "../lib/chat.svelte";
   import type { AgentConnector } from "../lib/stores.svelte";
   import ConnectionForm from "./ConnectionForm.svelte";
 
@@ -38,8 +39,8 @@
         base_languages: baseLangs,
         agent_connector_id: connector.connector_id,
       });
-      conversations.value = await api.getConversations();
-      activeConversation.value = conv;
+      chatStore.setConversations(await api.getConversations());
+      chatStore.setActive((conv as { conversation_id: string }).conversation_id);
       onclose();
     } catch (err) {
       console.error("Failed to create chat:", err);

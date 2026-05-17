@@ -62,6 +62,28 @@ export function subscribeToMessages(
   };
 }
 
+/**
+ * Subscribe to message INSERTs across every conversation the user can see
+ * (RLS scopes the stream). Used by the sidebar to drive unread badges
+ * without a per-conversation channel. No-op in sqlite mode.
+ */
+export function subscribeToAllMessages(
+  onMessage: (msg: Record<string, unknown>) => void,
+): () => void {
+  if (!supabase) return () => {};
+
+  const channel = supabase
+    .channel("messages:all")
+    .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages" }, (payload) =>
+      onMessage(payload.new as Record<string, unknown>),
+    )
+    .subscribe();
+
+  return () => {
+    channel.unsubscribe();
+  };
+}
+
 export function subscribeToConversation(
   conversationId: string,
   onUpdate: (conv: Record<string, unknown>) => void,

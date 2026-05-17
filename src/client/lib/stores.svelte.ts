@@ -25,6 +25,7 @@ export interface ConversationMember {
   target_languages: Array<{ lang: string; cefr_level: string }>;
   base_languages: string[];
   joined_at: string;
+  last_read_at?: string;
   profile?: { user_id: string; display_name: string } | null;
 }
 
@@ -42,6 +43,9 @@ export interface Conversation {
   agent_connector?: AgentConnector | null;
   created_at: string;
   members: ConversationMember[];
+  /** Unread agent messages (server-computed on list fetch). Live-updated
+   *  client-side via the Realtime subscription / mark-read. */
+  unread_count?: number;
 }
 
 export interface Message {
@@ -67,9 +71,10 @@ export interface Correction {
   category: string;
 }
 
-// Reactive state using Svelte 5 runes
+// User-scoped reactive state. Per-conversation state (messages, draft,
+// review, working, unread, realtime) lives on the Chat model in
+// chat.svelte.ts — see ChatStore. These three are the only truly global,
+// not-conversation-scoped pieces.
 export const user = $state<{ value: User | null }>({ value: null });
 export const session = $state<{ value: UserSession | null }>({ value: null });
 export const profile = $state<{ value: Profile | null }>({ value: null });
-export const conversations = $state<{ value: Conversation[] }>({ value: [] });
-export const activeConversation = $state<{ value: Conversation | null }>({ value: null });

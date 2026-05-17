@@ -47,6 +47,22 @@ if (mode === "sqlite") {
   await runSupabaseMigrations();
 }
 
+// Add a column to an existing SQLite table only if it isn't already there.
+// SQLite has no ADD COLUMN IF NOT EXISTS, so probe via PRAGMA first.
+function sqliteAddColumnIfMissing(
+  db: { query: (sql: string) => { all: () => unknown[] }; exec: (sql: string) => void },
+  table: string,
+  column: string,
+  definition: string,
+  backfill?: () => void,
+): void {
+  const cols = db.query(`PRAGMA table_info(${table})`).all() as Array<{ name: string }>;
+  if (cols.some((c) => c.name === column)) return;
+  db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`);
+  backfill?.();
+  console.log(`  + ${table}.${column}`);
+}
+
 // ---------- SQLite path ----------
 async function runSqliteMigrations() {
   const { Database } = await import("bun:sqlite");
@@ -62,6 +78,18 @@ async function runSqliteMigrations() {
   db.exec("PRAGMA journal_mode = WAL");
   db.exec("PRAGMA foreign_keys = ON");
   db.exec(schema);
+
+  // schema.sql uses CREATE TABLE IF NOT EXISTS, so columns added to an
+  // existing table definition do NOT reach already-created databases.
+  // Apply idempotent additive column migrations here.
+  // SQLite forbids ALTER ADD COLUMN with a non-constant NOT NULL default,
+  // so add it nullable and backfill existing rows to "now".
+  sqliteAddColumnIfMissing(db, "conversation_members", "last_read_at", "TEXT", () => {
+    db.exec(
+      "UPDATE conversation_members SET last_read_at = datetime('now') WHERE last_read_at IS NULL",
+    );
+  });
+
   db.close();
 
   console.log("OK — SQLite schema applied.");

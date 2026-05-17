@@ -135,6 +135,12 @@ export const api = {
       method: "PATCH",
       body: JSON.stringify(body),
     }),
+  /** Mark a conversation read for the current user (clears its unread badge). */
+  markConversationRead: (conversationId: string) =>
+    request(`/conversations/${conversationId}/read`, {
+      method: "PATCH",
+      body: JSON.stringify({}),
+    }),
 
   // Messages
   getMessages: (conversationId: string, params?: Record<string, string>) => {

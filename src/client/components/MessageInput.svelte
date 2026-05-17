@@ -1,97 +1,59 @@
 <script lang="ts">
-  import { api } from "../lib/api";
   import { langTag, LANGUAGES } from "../lib/languages";
-  import type { ConversationMember } from "../lib/stores.svelte";
   import { mdInline as renderMarkdown } from "../lib/md";
+  import type { Chat, TextError } from "../lib/chat.svelte";
 
-  interface TextError {
-    start: number;
-    end: number;
-    text: string;
-    kind: "spelling" | "grammar";
-    suggestions?: string[];
-  }
-
-  interface ErrorExplanation {
-    error: TextError;
-    explanations: Record<string, string>;
-  }
-
+  // Pure renderer: all draft / review / send state lives on the Chat.
   interface Props {
-    conversationId: string;
-    member: ConversationMember;
+    chat: Chat;
     disabled?: boolean;
-    onSend: (text: string, language: string, intent?: string) => void;
   }
+  let { chat, disabled = false }: Props = $props();
 
-  let {
-    conversationId,
-    member,
-    disabled = false,
-    onSend,
-  }: Props = $props();
+  const member = $derived(chat.member);
+  const targetLangCodes = $derived(member?.target_languages.map((t) => t.lang) ?? []);
+  const baseLangs = $derived(member?.base_languages ?? []);
 
-  // State
-  let text = $state("");
-  let checkedText = "";  // the text that was last spell-checked (not reactive)
-  let intentText = $state("");
-  let detectedLang = $state(member.target_languages[0]?.lang ?? "");
-  // Update detected language when member changes (e.g. conversation switch)
-  $effect.pre(() => {
-    const lang = member.target_languages[0]?.lang;
-    if (lang && lang !== detectedLang) detectedLang = lang;
+  // Editor element. The contenteditable is not reactively bound to
+  // chat.draft.text (browsers fight two-way innerText binding), so we sync
+  // it: DOM → model on input, model → DOM when the chat (or its draft)
+  // changes underneath us — e.g. switching conversations, or a pipeline
+  // that auto-cleared the draft on send.
+  let editableEl = $state<HTMLDivElement>();
+  let domText = $state(""); // last value we wrote to / read from the DOM
+
+  $effect(() => {
+    const text = chat.draft.text;
+    if (!editableEl) return;
+    if (text !== domText) {
+      editableEl.innerText = text;
+      domText = text;
+    }
   });
+
   let showLangDropdown = $state(false);
-
-  type InputState = "idle" | "checking" | "squiggled" | "explained";
-  let state: InputState = $state("idle");
-
-  let errors: TextError[] = $state([]);
-  let explanations: ErrorExplanation[] = $state([]);
-  let additionalErrors: Array<TextError & { corrected: string; explanations: Record<string, string> }> = $state([]);
-  let correctedMessage = "";  // the fully corrected message from Opus
-
-  // Build a map from error text → corrected form (from both explanation sources)
-  let correctionMap = $derived.by(() => {
-    const map = new Map<string, string>();
-    for (const e of explanations) {
-      if (e.corrected) map.set(e.error.text.toLowerCase(), e.corrected.toLowerCase());
-    }
-    for (const e of additionalErrors) {
-      if (e.corrected) map.set(e.text.toLowerCase(), e.corrected.toLowerCase());
-    }
-    return map;
+  let shownBaseLang = $state("");
+  $effect(() => {
+    if (!shownBaseLang && baseLangs.length) shownBaseLang = baseLangs[0];
   });
 
-  // Per-error resolution status.
-  //
-  // An individual error is "resolved" when the user has replaced its
-  // erroneous text with the suggested correction. Concretely:
-  //   - If the error text is gone from the current message AND the corrected
-  //     form is present → resolved.
-  //   - If the entire current message matches the LLM's corrected_message
-  //     (whitespace/case-normalised) → every error resolved.
-  //   - Otherwise → unresolved.
-  //
-  // Resolved errors stay visible in the hint panel but marked done, and
-  // their squiggles are dropped from the overlay.
+  // --- view derivations of the review state (pure) ---------------------
 
-  function isResolved(errText: string, corrected: string, currentLower: string, fullyMatched: boolean): boolean {
+  function isResolved(
+    errText: string,
+    corrected: string,
+    currentLower: string,
+    fullyMatched: boolean,
+  ): boolean {
     if (fullyMatched) return true;
     if (!corrected) return false;
     const orig = errText.toLowerCase();
     const fix = corrected.toLowerCase();
-    // Identical correction: can't tell edit state; trust "full match" path.
     if (orig === fix) return false;
-    const origStill = currentLower.includes(orig);
-    const fixThere = currentLower.includes(fix);
-    if (origStill) return false;          // user hasn't removed the wrong text yet
-    return fixThere;                       // wrong gone AND right arrived
+    if (currentLower.includes(orig)) return false;
+    return currentLower.includes(fix);
   }
 
-  // Build a single ordered, de-duplicated list of explanations from both
-  // sources, tagged with resolution state. Used for the hint panel and to
-  // derive the squiggled errors.
   interface ResolvableExplanation {
     error: TextError;
     corrected: string;
@@ -99,17 +61,17 @@
     resolved: boolean;
   }
 
-  let explanationList = $derived.by<ResolvableExplanation[]>(() => {
-    const currentLower = text.toLowerCase();
-    const target = correctedMessage.trim().toLowerCase();
+  const explanationList = $derived.by<ResolvableExplanation[]>(() => {
+    const r = chat.review;
+    const currentLower = chat.draft.text.toLowerCase();
+    const target = r.correctedMessage.trim().toLowerCase();
     const normCurrent = currentLower.trim().replace(/\s+/g, " ");
     const normTarget = target.replace(/\s+/g, " ");
     const fullyMatched = !!target && normCurrent === normTarget;
 
     const rows: ResolvableExplanation[] = [];
     const seen = new Set<string>();
-
-    for (const e of explanations) {
+    for (const e of r.explanations) {
       const key = e.error.text.toLowerCase();
       if (seen.has(key)) continue;
       seen.add(key);
@@ -120,7 +82,7 @@
         resolved: isResolved(e.error.text, e.corrected, currentLower, fullyMatched),
       });
     }
-    for (const e of additionalErrors) {
+    for (const e of r.additionalErrors) {
       const key = e.text.toLowerCase();
       if (seen.has(key)) continue;
       seen.add(key);
@@ -131,100 +93,26 @@
         resolved: isResolved(e.text, e.corrected, currentLower, fullyMatched),
       });
     }
-
     return rows.sort((a, b) => a.error.start - b.error.start);
   });
 
-  // Errors still needing attention — drives the inline squiggles and the
-  // "can submit?" logic. When the LLM hasn't returned a corrected form yet,
-  // fall back to "is the erroneous text still in the message?" so stale
-  // squiggles anchored to deleted characters don't linger.
-  let activeErrors = $derived.by(() => {
-    if (errors.length === 0 && additionalErrors.length === 0) return [];
-
-    const currentLower = text.toLowerCase();
+  const activeErrors = $derived.by<TextError[]>(() => {
+    const r = chat.review;
+    if (r.errors.length === 0 && r.additionalErrors.length === 0) return [];
+    const currentLower = chat.draft.text.toLowerCase();
     const anyCorrectedLoaded = explanationList.some((e) => !!e.corrected);
-
-    // Errors we have explanations for: use the resolved flag.
-    const active: TextError[] = [];
     const explainedKeys = new Set(explanationList.map((e) => e.error.text.toLowerCase()));
-
-    for (const row of explanationList) {
-      if (!row.resolved) active.push(row.error);
-    }
-
-    // Raw spell-check errors without an explanation (LLM hasn't answered
-    // yet): keep them visible while the erroneous text is still present.
-    for (const err of errors) {
+    const active: TextError[] = [];
+    for (const row of explanationList) if (!row.resolved) active.push(row.error);
+    for (const err of r.errors) {
       if (explainedKeys.has(err.text.toLowerCase())) continue;
-      if (anyCorrectedLoaded) continue; // partial response; don't re-add
+      if (anyCorrectedLoaded) continue;
       if (currentLower.includes(err.text.toLowerCase())) active.push(err);
     }
-
     return active;
   });
 
-  // Backward-compat name for the hint panel: show ALL explanations (resolved
-  // and unresolved), so the user sees what they've fixed.
-  let activeExplanations = $derived(explanationList);
-
-  // Refs
-  let editableEl: HTMLDivElement | undefined = $state();
-  let checkController: AbortController | null = null;
-  let explainController: AbortController | null = null;
-
-  // Reset state when conversation changes — track only conversationId
-  let prevConvId = conversationId;
-  $effect.pre(() => {
-    if (conversationId === prevConvId) return;
-    prevConvId = conversationId;
-
-    checkController?.abort();
-    explainController?.abort();
-    checkController = null;
-    explainController = null;
-    text = "";
-    checkedText = "";
-    correctedMessage = "";
-    intentText = "";
-    errors = [];
-    explanations = [];
-    additionalErrors = [];
-    state = "idle";
-    requestAnimationFrame(() => {
-      if (editableEl) editableEl.innerText = "";
-    });
-  });
-
-  // Debounce timer for language detection
-  let detectTimer: ReturnType<typeof setTimeout> | null = null;
-
-  // Preferred base language for showing explanations
-  let preferredBaseLang = $derived(member.base_languages[0] ?? "en");
-  let shownBaseLang = $state("");
-  $effect(() => { if (!shownBaseLang) shownBaseLang = preferredBaseLang; });
-
-  const targetLangCodes = $derived(member.target_languages.map((t) => t.lang));
-
-  // Build decorated HTML for the overlay
-  let decoratedHtml = $derived.by(() => {
-    if (activeErrors.length === 0 || !text) return escapeHtml(text);
-
-    // Sort errors by start position
-    const sorted = [...activeErrors].sort((a, b) => a.start - b.start);
-    let result = "";
-    let lastEnd = 0;
-
-    for (const err of sorted) {
-      if (err.start < lastEnd) continue; // skip overlapping
-      result += escapeHtml(text.slice(lastEnd, err.start));
-      const cls = err.kind === "spelling" ? "squiggle-spelling" : "squiggle-grammar";
-      result += `<span class="${cls}">${escapeHtml(text.slice(err.start, err.end))}</span>`;
-      lastEnd = err.end;
-    }
-    result += escapeHtml(text.slice(lastEnd));
-    return result;
-  });
+  const activeExplanations = $derived(explanationList);
 
   function escapeHtml(s: string): string {
     return s
@@ -234,175 +122,76 @@
       .replace(/\n/g, "<br>");
   }
 
+  const decoratedHtml = $derived.by(() => {
+    const text = chat.draft.text;
+    if (activeErrors.length === 0 || !text) return escapeHtml(text);
+    const sorted = [...activeErrors].sort((a, b) => a.start - b.start);
+    let result = "";
+    let lastEnd = 0;
+    for (const err of sorted) {
+      if (err.start < lastEnd) continue;
+      result += escapeHtml(text.slice(lastEnd, err.start));
+      const cls = err.kind === "spelling" ? "squiggle-spelling" : "squiggle-grammar";
+      result += `<span class="${cls}">${escapeHtml(text.slice(err.start, err.end))}</span>`;
+      lastEnd = err.end;
+    }
+    result += escapeHtml(text.slice(lastEnd));
+    return result;
+  });
+
+  const detectedLang = $derived(chat.draft.lang);
+  const showProcessing = $derived(chat.review.phase === "checking");
+
+  // --- input handlers --------------------------------------------------
+
   function handleInput() {
     if (!editableEl) return;
-    text = editableEl.innerText;
-
-    // Errors are filtered reactively via activeErrors — no need to clear manually
-
-    // Debounced language detection
-    if (detectTimer) clearTimeout(detectTimer);
-    detectTimer = setTimeout(() => {
-      if (text.trim().length >= 3 && targetLangCodes.length > 1) {
-        // Client-side detection using simple heuristic:
-        // We'll rely on the server's detection since tinyld is server-side
-        // For now, keep the current detected language
-      }
-    }, 300);
+    domText = editableEl.innerText;
+    chat.setDraftText(domText);
   }
 
-  /** Sync text state from the contenteditable element */
   function syncText() {
     if (editableEl) {
-      text = editableEl.innerText ?? "";
+      domText = editableEl.innerText ?? "";
+      chat.setDraftText(domText);
     }
   }
 
-  async function handleKeydown(e: KeyboardEvent) {
+  function handleKeydown(e: KeyboardEvent) {
     if (e.key !== "Enter") return;
 
-    // Shift+Enter — force submit, bypassing all checks. The agent gets the
-    // user's text verbatim; the translator does its best with whatever's
-    // there. This is the escape hatch when the user knows they're right or
-    // doesn't want to iterate on a correction.
+    // Shift+Enter — force-send verbatim.
     if (e.shiftKey) {
       e.preventDefault();
       syncText();
-      if (!text.trim() || disabled) return;
-      cancelProcessing();
-      submit();
+      if (!chat.draft.text.trim() || disabled) return;
+      chat.sendNow();
       return;
     }
 
-    // Plain Enter — run the check / explain pipeline.
     e.preventDefault();
     syncText();
 
-    if (state === "checking") {
-      cancelProcessing();
+    // Enter while a check is running cancels it.
+    if (chat.review.phase === "checking") {
+      chat.cancelReview();
       return;
     }
+    if (!chat.draft.text.trim() || disabled) return;
 
-    if (!text.trim() || disabled) return;
-
-    // If user's text exactly matches the LLM's corrected message, submit immediately
-    if (correctedMessage && text.trim() === correctedMessage.trim()) {
-      console.log("[Send] Text matches corrected message — submitting without re-check");
-      submit();
+    // Text already matches Opus's correction → send straight away.
+    const corrected = chat.review.correctedMessage.trim();
+    if (corrected && chat.draft.text.trim() === corrected) {
+      chat.sendNow();
       return;
     }
-
-    // Re-check (will submit if clean, or show new errors)
-    await runCheckPipeline();
-  }
-
-  function cancelProcessing() {
-    console.log("[Pipeline] Cancelled");
-    checkController?.abort();
-    explainController?.abort();
-    checkController = null;
-    explainController = null;
-    errors = [];
-    explanations = [];
-    additionalErrors = [];
-    state = "idle";
-  }
-
-  async function runCheckPipeline() {
-    state = "checking";
-    checkController = new AbortController();
-    checkedText = text;
-    console.log(`[SpellCheck] Checking "${text}" (lang: ${detectedLang})`);
-
-    try {
-      // Step 1: deterministic spell check (may be noop)
-      const result = await api.checkMessage(conversationId, text, detectedLang);
-      if (checkController?.signal.aborted) return;
-
-      detectedLang = result.language;
-      errors = result.errors;
-      console.log(`[SpellCheck] Result: clean=${result.clean}, errors=${result.errors.length}, detected=${result.language}`, result.errors);
-
-      if (result.errors.length > 0) {
-        state = "squiggled";
-      }
-
-      // Step 2: always call LLM for corrections/explanations
-      explainController = new AbortController();
-      console.log(`[Explain] Requesting Opus review (${result.errors.length} spell error(s) to explain)`);
-      try {
-        const explainResult = await api.explainErrors(conversationId, {
-          text,
-          errors: result.errors,
-          language: result.language,
-          intent: intentText.trim() || undefined,
-        });
-
-        if (explainController?.signal.aborted) return;
-
-        correctedMessage = explainResult.corrected_message ?? "";
-        explanations = explainResult.explanations ?? [];
-        additionalErrors = explainResult.additional_errors ?? [];
-        console.log(`[Explain] Corrected: "${correctedMessage}"`);
-        console.log(`[Explain] Got ${explanations.length} explanation(s), ${additionalErrors.length} additional grammar error(s)`, $state.snapshot(explanations), $state.snapshot(additionalErrors));
-
-        // If LLM says the message is already correct, submit
-        if (correctedMessage && text.trim() === correctedMessage.trim() && activeErrors.length === 0 && additionalErrors.length === 0) {
-          console.log("[Explain] Message is correct — submitting");
-          submit();
-          return;
-        }
-
-        // If LLM found issues, show them
-        if (explanations.length > 0 || additionalErrors.length > 0) {
-          state = "explained";
-        } else {
-          // No issues found by anyone — submit
-          console.log("[Explain] No issues found — submitting");
-          submit();
-        }
-      } catch (err: any) {
-        if (err?.name === "AbortError") return;
-        console.error("[Explain] Failed:", err);
-        // LLM failed — if spell check was clean, submit anyway
-        if (result.clean) {
-          submit();
-        }
-      }
-    } catch (err: any) {
-      if (err?.name === "AbortError") return;
-      console.error("Failed to check message:", err);
-      submit();
-    }
-  }
-
-  function submit() {
-    const trimmed = text.trim();
-    if (!trimmed) return;
-
-    console.log(`[Send] Sending "${trimmed}" (lang: ${detectedLang}, intent: ${intentText.trim() || "none"})`);
-    onSend(trimmed, detectedLang, intentText.trim() || undefined);
-
-    // Clear state
-    text = "";
-    checkedText = "";
-    correctedMessage = "";
-    intentText = "";
-    errors = [];
-    explanations = [];
-    additionalErrors = [];
-    state = "idle";
-    if (editableEl) editableEl.innerText = "";
+    chat.runReview();
   }
 
   function selectLanguage(lang: string) {
-    detectedLang = lang;
+    chat.setDraftLang(lang);
     showLangDropdown = false;
   }
-
-  let showProcessing = $derived(state === "checking");
-
-  // Allow submit when all errors are fixed (activeErrors empty) even if state is squiggled/explained
 </script>
 
 <div class="message-input" class:processing={showProcessing}>
@@ -435,7 +224,7 @@
       <div class="lang-indicator">
         <button
           class="lang-flag-btn"
-          onclick={() => showLangDropdown = !showLangDropdown}
+          onclick={() => (showLangDropdown = !showLangDropdown)}
           disabled={targetLangCodes.length <= 1}
         >
           {langTag(detectedLang)}
@@ -464,28 +253,25 @@
       class="intent-input"
       placeholder="What are you trying to say? (any language)"
       rows={1}
-      bind:value={intentText}
+      value={chat.draft.intent}
+      oninput={(e) => chat.setDraftIntent((e.currentTarget as HTMLTextAreaElement).value)}
       onkeydown={(e) => {
         if (e.key !== "Enter") return;
         if (e.shiftKey) {
           e.preventDefault();
           syncText();
-          if (text.trim() && !disabled) {
-            cancelProcessing();
-            submit();
-          }
+          if (chat.draft.text.trim() && !disabled) chat.sendNow();
           return;
         }
         e.preventDefault();
         syncText();
-        if (text.trim() && !disabled) runCheckPipeline();
+        if (chat.draft.text.trim() && !disabled) chat.runReview();
       }}
     ></textarea>
   </div>
 
-  <!-- Hint panel (explanations from Opus). Shows all errors with resolved
-       ones marked done rather than removed, so the user keeps the context. -->
-  {#if explanations.length > 0 || additionalErrors.length > 0}
+  <!-- Hint panel (explanations from Opus). -->
+  {#if chat.review.explanations.length > 0 || chat.review.additionalErrors.length > 0}
     {@const totalCount = activeExplanations.length}
     {@const resolvedCount = activeExplanations.filter((e) => e.resolved).length}
     {@const remainingCount = totalCount - resolvedCount}
@@ -498,13 +284,13 @@
             {remainingCount} of {totalCount} error{totalCount !== 1 ? "s" : ""} remaining
           {/if}
         </span>
-        {#if member.base_languages.length > 1}
+        {#if baseLangs.length > 1}
           <div class="base-lang-toggle">
-            {#each member.base_languages as bl}
+            {#each baseLangs as bl}
               <button
                 class="base-lang-btn"
                 class:active={bl === shownBaseLang}
-                onclick={() => shownBaseLang = bl}
+                onclick={() => (shownBaseLang = bl)}
               >
                 {langTag(bl)}
               </button>
@@ -532,7 +318,7 @@
         </div>
       {/each}
     </div>
-  {:else if state === "squiggled" && errors.length > 0}
+  {:else if chat.review.phase === "reviewing" && chat.review.errors.length > 0}
     <div class="hint-panel loading">
       <span class="loading-dot"></span>
       Getting explanations...
@@ -540,7 +326,7 @@
   {/if}
 
   <!-- Processing indicator -->
-  {#if state === "checking"}
+  {#if chat.review.phase === "checking"}
     <div class="processing-indicator">
       <span class="loading-dot"></span>
       Checking...

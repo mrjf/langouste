@@ -9,12 +9,29 @@ export { NoopProvider } from "./noop-provider.ts";
 export { LanguageToolProvider } from "./languagetool-provider.ts";
 export { NspellProvider } from "./nspell-provider.ts";
 
+// Spell-check is an async, swappable boundary (SpellCheckProvider). The
+// long-term plan is a separate per-language spelling SERVICE called over an
+// API / off-thread — implement SpellCheckProvider (its check() is already
+// async) and select it here; no caller changes. checkSpelling() is the
+// single entry point everything goes through.
+//
+// Default is "noop" (no deterministic spell-check; Opus still explains
+// spelling+grammar on every message). The bundled in-process "nspell"
+// provider is intentionally NOT the default: nspell's dictionary init is
+// synchronous and pathologically slow for several languages (es ~0.4s,
+// fr ~1.8s, pl ~4.8s, pt ~7.9s, Hungarian = minutes), which blocks the
+// server's event loop. It remains selectable for experimentation only.
 function createProvider(): SpellCheckProvider {
   const setting = process.env.SPELLCHECK_PROVIDER ?? "noop";
   switch (setting) {
     case "languagetool":
       return new LanguageToolProvider();
     case "nspell":
+      console.warn(
+        "[SpellCheck] nspell selected — its dictionary init is synchronous " +
+          "and blocks the event loop (minutes for some languages). " +
+          "Not for production.",
+      );
       return new NspellProvider();
     case "noop":
       return new NoopProvider();

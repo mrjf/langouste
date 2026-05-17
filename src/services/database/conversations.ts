@@ -16,6 +16,11 @@ export interface EnrichedConversation extends Conversation {
     ConversationMember & { profile: Pick<Profile, "user_id" | "display_name"> | null }
   >;
   agent_connector: AgentConnector | null;
+  /**
+   * Agent messages with created_at after the requesting user's
+   * last_read_at. Drives the Slack-style unread badge. 0 when caught up.
+   */
+  unread_count: number;
 }
 
 const SUPABASE_NESTED_SELECT = `
@@ -25,6 +30,7 @@ const SUPABASE_NESTED_SELECT = `
     target_languages,
     base_languages,
     joined_at,
+    last_read_at,
     profile:profiles(user_id, display_name)
   ),
   agent_connector:agent_connectors(connector_id, name, type, config)
@@ -44,9 +50,54 @@ export async function getConversationsForUser(
 
   // Supabase supports nested selects via PostgREST embedding; SQLite doesn't,
   // so branch here.
-  return config.databaseMode === "supabase"
-    ? supabaseSelectNested(db, convIds)
-    : sqliteSelectEnriched(db, convIds);
+  const convs =
+    config.databaseMode === "supabase"
+      ? await supabaseSelectNested(db, convIds)
+      : await sqliteSelectEnriched(db, convIds);
+
+  return annotateUnread(db, convs, userId);
+}
+
+/**
+ * Fill in `unread_count` for each conversation: agent messages created
+ * after the requesting user's last_read_at for that conversation.
+ *
+ * One messages query for all the user's conversations (is_agent only,
+ * just the timestamp + conversation_id), counted in TS. The Filter
+ * surface has no `gt`, so the cutoff comparison is done here rather than
+ * in SQL — fine at single-user scale; revisit with an RPC if it grows.
+ */
+async function annotateUnread(
+  db: Database,
+  convs: EnrichedConversation[],
+  userId: string,
+): Promise<EnrichedConversation[]> {
+  if (convs.length === 0) return convs;
+
+  const lastReadByConv = new Map<string, string>();
+  for (const c of convs) {
+    const me = c.members.find((m) => m.user_id === userId);
+    if (me?.last_read_at) lastReadByConv.set(c.conversation_id, me.last_read_at);
+  }
+
+  const agentMsgs = await db.select<{ conversation_id: string; created_at: string }>("messages", {
+    columns: "conversation_id, created_at",
+    filters: [
+      { op: "in", column: "conversation_id", values: convs.map((c) => c.conversation_id) },
+      { op: "eq", column: "is_agent", value: true },
+    ],
+  });
+
+  const counts = new Map<string, number>();
+  for (const m of agentMsgs) {
+    const cutoff = lastReadByConv.get(m.conversation_id);
+    // No member row / no cutoff → treat as all read (don't flood badges).
+    if (cutoff && m.created_at > cutoff) {
+      counts.set(m.conversation_id, (counts.get(m.conversation_id) ?? 0) + 1);
+    }
+  }
+
+  return convs.map((c) => ({ ...c, unread_count: counts.get(c.conversation_id) ?? 0 }));
 }
 
 export async function getConversation(
@@ -89,12 +140,14 @@ async function supabaseSelectNested(
   db: Database,
   convIds: string[],
 ): Promise<EnrichedConversation[]> {
-  const rows = await db.select<EnrichedConversation>("conversations", {
+  const rows = await db.select<Omit<EnrichedConversation, "unread_count">>("conversations", {
     columns: SUPABASE_NESTED_SELECT,
     filters: [{ op: "in", column: "conversation_id", values: convIds }],
     order: [{ column: "created_at", ascending: false }],
   });
-  return rows;
+  // unread_count is filled by annotateUnread (list path); default 0 so
+  // single-conversation callers get a valid shape.
+  return rows.map((r) => ({ ...r, unread_count: 0 }));
 }
 
 // --- SQLite fan-out path ---
@@ -146,5 +199,8 @@ async function sqliteSelectEnriched(
     agent_connector: c.agent_connector_id
       ? (connectorById.get(c.agent_connector_id) ?? null)
       : null,
+    // Filled by annotateUnread on the list path; 0 default keeps the
+    // single-conversation shape valid.
+    unread_count: 0,
   }));
 }

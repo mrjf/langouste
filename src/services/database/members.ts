@@ -24,6 +24,23 @@ export async function getMember(
   });
 }
 
+/**
+ * Mark a conversation read for a user: set last_read_at to now (or an
+ * explicit ISO timestamp). Resets the unread badge. No-op-safe: if the
+ * member row doesn't exist the update matches zero rows.
+ */
+export async function markConversationRead(
+  db: Database,
+  conversationId: string,
+  userId: string,
+  at: string = new Date().toISOString(),
+): Promise<void> {
+  await db.update("conversation_members", { last_read_at: at }, [
+    { op: "eq", column: "conversation_id", value: conversationId },
+    { op: "eq", column: "user_id", value: userId },
+  ]);
+}
+
 export async function updateMemberLanguages(
   db: Database,
   conversationId: string,

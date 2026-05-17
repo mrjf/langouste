@@ -106,7 +106,51 @@
       : message.healed_text
   );
 
-  let loading = $derived(viewerLang && !hasTargetTranslation && !message._pending);
+  // Awaiting the viewer-language (e.g. hu) translation while we already
+  // have source/English text. We hold the skeleton during this window
+  // rather than flashing the English text and hard-swapping a moment
+  // later. A timeout guards against it ever sticking: if the translation
+  // hasn't arrived in TRANSLATION_GRACE_MS we fall back to the readable
+  // text (never an indefinite skeleton — that was the original bug).
+  const TRANSLATION_GRACE_MS = 5000;
+  let translationTimedOut = $state(false);
+
+  let awaitingTranslation = $derived(
+    !!viewerLang && !hasTargetTranslation && !message._pending && !!message.healed_text,
+  );
+
+  // Restart the grace timer whenever we (re)enter the awaiting state for
+  // this message; clear the timed-out flag once a translation arrives.
+  $effect(() => {
+    if (!awaitingTranslation) {
+      translationTimedOut = false;
+      return;
+    }
+    translationTimedOut = false;
+    const id = setTimeout(() => {
+      translationTimedOut = true;
+    }, TRANSLATION_GRACE_MS);
+    return () => clearTimeout(id);
+  });
+
+  // Show the skeleton when there's nothing readable yet (no healed_text)
+  // OR while we're waiting for the target translation within the grace
+  // window. After the grace timeout we stop showing the skeleton and the
+  // English fallback text renders instead.
+  let loading = $derived(
+    !message._pending &&
+      ((!!viewerLang && !hasTargetTranslation && !message.healed_text) ||
+        (awaitingTranslation && !translationTimedOut)),
+  );
+
+  // Subtle "translating…" badge, shown only once we've fallen back to the
+  // readable text (translation was slow) — not during the skeleton phase.
+  let translationPending = $derived(awaitingTranslation && translationTimedOut);
+
+  // A pending agent bubble with no text yet = "agent is typing".
+  let agentTyping = $derived(
+    !!message._pending && !!message.is_agent && !message.healed_text,
+  );
 
   let baseText = $derived.by(() => {
     if (!baseLang || baseLang === viewerLang) return null;
@@ -149,13 +193,19 @@
     <div class="sender-name">{senderName}</div>
   {/if}
 
-  <div class="bubble" class:pending={message._pending} class:loading>
-    {#if loading}
+  <div class="bubble" class:pending={message._pending} class:loading class:typing={agentTyping}>
+    {#if agentTyping}
+      <div class="typing-dots" aria-label="Agent is responding">
+        <span></span><span></span><span></span>
+      </div>
+    {:else if loading}
       <div class="loading-bar"></div>
       <div class="loading-bar short"></div>
     {:else}
       {#if viewerLang}
-        <span class="target-badge">{langTag(viewerLang)}</span>
+        <span class="target-badge" class:translating={translationPending}>
+          {translationPending ? "…" : langTag(viewerLang)}
+        </span>
       {/if}
       <div class="healed-text">{@html md(displayText)}</div>
     {/if}
@@ -332,6 +382,35 @@
     50% { opacity: 0.7; }
   }
 
+  /* Pending agent reply — animated "typing" dots. */
+  .bubble.typing {
+    min-height: 1.6rem;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .typing-dots {
+    display: inline-flex;
+    gap: 0.25rem;
+    align-items: center;
+  }
+
+  .typing-dots span {
+    width: 0.4rem;
+    height: 0.4rem;
+    border-radius: 50%;
+    background: var(--color-text-light, #888);
+    animation: typing-bounce 1.2s ease-in-out infinite;
+  }
+
+  .typing-dots span:nth-child(2) { animation-delay: 0.15s; }
+  .typing-dots span:nth-child(3) { animation-delay: 0.3s; }
+
+  @keyframes typing-bounce {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+    30% { transform: translateY(-0.2rem); opacity: 1; }
+  }
+
   .sender-name {
     font-size: 0.75rem;
     font-weight: 600;
@@ -362,6 +441,11 @@
     margin-left: 0.5rem;
     margin-top: -0.1rem;
     line-height: 1;
+  }
+
+  .target-badge.translating {
+    opacity: 0.4;
+    font-style: italic;
   }
 
   .action-btn {

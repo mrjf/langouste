@@ -1,11 +1,12 @@
 <script lang="ts">
-  import { onMount } from "svelte";
-  import { user, profile, conversations, activeConversation } from "../lib/stores.svelte";
+  import { onMount, onDestroy } from "svelte";
+  import { user, profile } from "../lib/stores.svelte";
+  import { chatStore } from "../lib/chat.svelte";
   import { loadSession, clearSession, loadProfile, loadLocalSession } from "../lib/auth";
 
   const SINGLE_USER =
     (import.meta.env.VITE_SINGLE_USER as string | undefined)?.toLowerCase() === "true";
-  import { initSupabase } from "../lib/supabase";
+  import { initSupabase, subscribeToAllMessages } from "../lib/supabase";
   import { api } from "../lib/api";
   import LoginForm from "./LoginForm.svelte";
   import ConversationList from "./ConversationList.svelte";
@@ -18,15 +19,27 @@
   let routed = $state(false);
   let showNewChat = $state(false);
   let view: "chat" | "profile" | "connections" = $state("chat");
+  // Active profile dimension when view === "profile". "" = dashboard,
+  // otherwise a DIMENSION key (e.g. "morphology"). Mirrors #/profile/<dim>.
+  let profileSection = $state("");
   const loggedIn = $derived(!!user.value && !!profile.value);
   let updatingHash = false;
+
+  // Parse the dimension slug out of a #/profile[/<dim>] hash. Returns ""
+  // for the bare dashboard.
+  function profileSectionFromHash(hash: string): string {
+    const m = hash.match(/^#\/profile\/([^/]+)/);
+    return m ? decodeURIComponent(m[1]) : "";
+  }
 
   function shortId(id: string): string {
     return id.slice(0, 8);
   }
 
-  function findConv(convs: any[], slug: string) {
-    return convs.find((c: any) => c.conversation_id.startsWith(slug));
+  // Resolve a #/c/<slug> short id to a full conversation id in the store.
+  function activeIdFromSlug(slug: string): string | null {
+    const chat = chatStore.list.find((c) => c.id.startsWith(slug));
+    return chat?.id ?? null;
   }
 
   // Update URL hash when view / active conversation changes.
@@ -34,11 +47,13 @@
     if (!routed) return;
     let target = "";
     if (view === "profile") {
-      target = "#/profile";
+      target = profileSection
+        ? `#/profile/${encodeURIComponent(profileSection)}`
+        : "#/profile";
     } else if (view === "connections") {
       target = "#/connections";
     } else {
-      const id = activeConversation.value?.conversation_id;
+      const id = chatStore.activeId;
       target = id ? `#/c/${shortId(id)}` : "";
     }
     if (location.hash !== target) {
@@ -66,8 +81,9 @@
         loadProfile(),
         api.getConversations().catch(() => []),
       ]);
-      conversations.value = convs;
-      await routeFromHash(convs);
+      chatStore.setConversations(convs);
+      routeFromHash();
+      startUnreadSubscription();
     }
 
     routed = true;
@@ -77,28 +93,29 @@
       if (updatingHash) return;
       if (location.hash.startsWith("#/profile")) {
         view = "profile";
+        profileSection = profileSectionFromHash(location.hash);
         return;
       }
       if (location.hash.startsWith("#/connections")) {
         view = "connections";
         return;
       }
-      const convs = conversations.value;
       const match = location.hash.match(/^#\/c\/(.+)$/);
       if (match) {
         view = "chat";
-        const conv = findConv(convs, match[1]);
-        if (conv) activeConversation.value = conv;
+        const id = activeIdFromSlug(match[1]);
+        if (id) chatStore.setActive(id);
       } else if (!location.hash || location.hash === "#") {
         view = "chat";
-        activeConversation.value = null;
+        chatStore.setActive(null);
       }
     });
   });
 
-  async function routeFromHash(convs: any[]) {
+  function routeFromHash() {
     if (location.hash.startsWith("#/profile")) {
       view = "profile";
+      profileSection = profileSectionFromHash(location.hash);
       return;
     }
     if (location.hash.startsWith("#/connections")) {
@@ -108,19 +125,46 @@
     const convMatch = location.hash.match(/^#\/c\/(.+)$/);
     if (convMatch) {
       view = "chat";
-      const conv = findConv(convs, convMatch[1]);
-      if (conv) activeConversation.value = conv;
+      const id = activeIdFromSlug(convMatch[1]);
+      if (id) chatStore.setActive(id);
     }
   }
 
+  // Sidebar-wide Realtime subscription: a new agent message anywhere bumps
+  // that conversation's unread badge (unless it's the open chat). No-op in
+  // sqlite mode (no Realtime); badges there refresh on list reload.
+  let unsubUnread: (() => void) | null = null;
+
+  function startUnreadSubscription() {
+    if (unsubUnread) return;
+    unsubUnread = subscribeToAllMessages((msg) => {
+      if (!msg.is_agent) return; // only agent replies count as unread
+      const convId = msg.conversation_id as string | undefined;
+      if (!convId) return;
+      const chat = chatStore.get(convId);
+      // The Chat's own realtime sub ingests the message; here we only own
+      // the badge. Don't badge the conversation that's open on screen.
+      if (chat && chatStore.activeId !== convId) chat.bumpUnread();
+    });
+  }
+
+  function stopUnreadSubscription() {
+    unsubUnread?.();
+    unsubUnread = null;
+  }
+
+  onDestroy(stopUnreadSubscription);
+
   async function onAuthenticated() {
     const convs = await api.getConversations();
-    conversations.value = convs;
-    await routeFromHash(convs);
+    chatStore.setConversations(convs);
+    routeFromHash();
+    startUnreadSubscription();
     routed = true;
   }
 
   function logout() {
+    stopUnreadSubscription();
     clearSession();
     history.replaceState(null, "", location.pathname);
   }
@@ -140,7 +184,7 @@
       <nav class="sidebar-nav">
         <button
           class="nav-item"
-          class:active={view === "chat" && !!activeConversation.value}
+          class:active={view === "chat" && !!chatStore.activeId}
           onclick={() => { view = "chat"; }}
         >
           💬 Chats
@@ -148,21 +192,22 @@
         <button
           class="nav-item"
           class:active={view === "profile"}
-          onclick={() => { view = "profile"; activeConversation.value = null; }}
+          onclick={() => { view = "profile"; chatStore.setActive(null); }}
         >
           📊 Your progress
         </button>
         <button
           class="nav-item"
           class:active={view === "connections"}
-          onclick={() => { view = "connections"; activeConversation.value = null; }}
+          onclick={() => { view = "connections"; chatStore.setActive(null); }}
         >
           🔌 Connections
         </button>
       </nav>
-      {#if view === "chat"}
-        <ConversationList />
-      {/if}
+      <!-- Sidebar list is always mounted: working/unread indicators must
+           stay visible no matter which main view (chat/profile/connections)
+           is open. -->
+      <ConversationList />
       <div class="sidebar-footer">
         <span>{profile.value?.display_name}</span>
         {#if !SINGLE_USER}
@@ -172,7 +217,10 @@
     </div>
     <div class="main-panel">
       {#if view === "profile"}
-        <ProfilePanel />
+        <ProfilePanel
+          section={profileSection}
+          onSectionChange={(s) => (profileSection = s)}
+        />
       {:else if view === "connections"}
         <ConnectionsPanel />
       {:else}

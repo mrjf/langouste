@@ -6,7 +6,11 @@ import {
   getConversation,
   setConversationConnector,
 } from "../../services/database/conversations.ts";
-import { addMember, updateMemberLanguages } from "../../services/database/members.ts";
+import {
+  addMember,
+  markConversationRead,
+  updateMemberLanguages,
+} from "../../services/database/members.ts";
 import { getConnector } from "../../services/database/agent-connectors.ts";
 import { adminDb } from "../../lib/db/index.ts";
 
@@ -71,6 +75,25 @@ conversationRoutes.patch("/:conversationId/connector", async (c) => {
   await setConversationConnector(adminDb(), conversationId, agent_connector_id);
   const enriched = await getConversation(db, conversationId);
   return c.json(enriched);
+});
+
+// Mark a conversation read for the requesting user (clears its unread
+// badge). Idempotent. Body optional: { at?: ISO-8601 } to backdate.
+conversationRoutes.patch("/:conversationId/read", async (c) => {
+  const db = c.get("db");
+  const userId = c.get("userId");
+  const conversationId = c.req.param("conversationId");
+
+  let at: string | undefined;
+  try {
+    const body = await c.req.json();
+    if (body && typeof body.at === "string") at = body.at;
+  } catch {
+    // empty / non-JSON body → mark read as of now
+  }
+
+  await markConversationRead(db, conversationId, userId, at);
+  return c.json({ ok: true });
 });
 
 // Update own language settings in a conversation

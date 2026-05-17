@@ -43,6 +43,8 @@ export interface ConversationMember {
   target_languages: Array<{ lang: LanguageCode; cefr_level: CefrLevel }>;
   base_languages: LanguageCode[];
   joined_at: string;
+  /** When this member last read the conversation. Drives unread badges. */
+  last_read_at: string;
 }
 
 export interface Correction {

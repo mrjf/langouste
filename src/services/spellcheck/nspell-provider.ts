@@ -30,6 +30,15 @@ const ELISION_PREFIXES = new Set([
 
 const MIN_TOKEN_LENGTH = 2;
 
+// nspell's suggest() is cheap for a near-miss typo (~10ms) but expensive
+// for gibberish (~0.5-1s each — it exhaustively searches with no close
+// match). A message of several nonsense "words" would otherwise stack up
+// to many seconds and hang "checking…". Cap the total time spent on
+// suggestions per check; misspellings are still flagged immediately, they
+// just stop getting an inline suggestion list once the budget is spent
+// (Opus explains the fix anyway).
+const SUGGEST_BUDGET_MS = 300;
+
 // Map of language codes to their dictionary package import functions
 const DICTIONARY_LOADERS: Record<string, () => Promise<{ aff: Buffer; dic: Buffer }>> = {
   fr: () => import("dictionary-fr").then((m) => m.default as any),
@@ -91,8 +100,10 @@ export class NspellProvider implements SpellCheckProvider {
     if (!dict) return [];
 
     const tokens = tokenize(text);
-    const errors: TextError[] = [];
 
+    // Pass 1: find every misspelling (fast — correct() is ~constant time).
+    // No suggest() here so flagging never blocks on gibberish.
+    const misspelled: TextError[] = [];
     for (const token of tokens) {
       const word = token.word;
 
@@ -114,15 +125,23 @@ export class NspellProvider implements SpellCheckProvider {
         if (allPartsCorrect) continue;
       }
 
-      errors.push({
+      misspelled.push({
         start: token.start,
         end: token.end,
         text: word,
         kind: "spelling",
-        suggestions: dict.suggest(word).slice(0, 5),
+        suggestions: [],
       });
     }
 
-    return errors;
+    // Pass 2: fill suggestions within a shared time budget. Once spent,
+    // remaining errors keep suggestions: [] — they're still flagged.
+    const deadline = Date.now() + SUGGEST_BUDGET_MS;
+    for (const err of misspelled) {
+      if (Date.now() >= deadline) break;
+      err.suggestions = dict.suggest(err.text).slice(0, 5);
+    }
+
+    return misspelled;
   }
 }

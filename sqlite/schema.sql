@@ -44,6 +44,7 @@ CREATE TABLE IF NOT EXISTS conversation_members (
   target_languages   TEXT NOT NULL DEFAULT '[]',  -- JSON: [{lang, cefr_level}]
   base_languages     TEXT NOT NULL DEFAULT '[]',  -- JSON: [lang, ...]
   joined_at          TEXT NOT NULL DEFAULT (datetime('now')),
+  last_read_at       TEXT NOT NULL DEFAULT (datetime('now')),  -- unread badge tracking
   PRIMARY KEY (conversation_id, user_id)
 );
 
@@ -148,3 +149,23 @@ CREATE TABLE IF NOT EXISTS assessments (
 );
 
 CREATE INDEX IF NOT EXISTS idx_assessments_user ON assessments(user_id, language, assessed_at DESC);
+
+-- Persistent per-interaction profiling. One row per review/send cycle:
+-- phase timings + counts for evals and latency benchmarks. See
+-- supabase/migrations/013_message_traces.sql for the phases JSON shape.
+CREATE TABLE IF NOT EXISTS message_traces (
+  trace_id         TEXT PRIMARY KEY,
+  conversation_id  TEXT,
+  user_id          TEXT,
+  created_at       TEXT NOT NULL DEFAULT (datetime('now')),
+  target_lang      TEXT,
+  text_len         INTEGER NOT NULL DEFAULT 0,
+  text_preview     TEXT,
+  outcome          TEXT NOT NULL DEFAULT 'unknown',
+  total_ms         INTEGER,
+  phases           TEXT NOT NULL DEFAULT '{}'   -- JSON
+);
+
+CREATE INDEX IF NOT EXISTS idx_message_traces_conv    ON message_traces(conversation_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_message_traces_created ON message_traces(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_message_traces_lang    ON message_traces(target_lang, created_at DESC);

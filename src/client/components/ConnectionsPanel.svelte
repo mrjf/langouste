@@ -1,7 +1,8 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { api } from "../lib/api";
-  import { profile, conversations, activeConversation } from "../lib/stores.svelte";
+  import { profile } from "../lib/stores.svelte";
+  import { chatStore } from "../lib/chat.svelte";
   import type { AgentConnector } from "../lib/stores.svelte";
   import ConnectionForm from "./ConnectionForm.svelte";
 
@@ -92,7 +93,7 @@
       deleteConfirmId = null;
       await load();
       // Refresh conversations list — any that used this connector are now orphaned.
-      conversations.value = await api.getConversations();
+      chatStore.setConversations(await api.getConversations());
     } catch (err) {
       console.error("Delete failed:", err);
       alert("Delete failed: " + (err instanceof Error ? err.message : String(err)));
@@ -113,8 +114,8 @@
         base_languages: baseLangs,
         agent_connector_id: c.connector_id,
       });
-      conversations.value = await api.getConversations();
-      activeConversation.value = conv;
+      chatStore.setConversations(await api.getConversations());
+      chatStore.setActive(conv.conversation_id);
       location.hash = `#/c/${conv.conversation_id.slice(0, 8)}`;
     } catch (err) {
       console.error("Start chat failed:", err);
