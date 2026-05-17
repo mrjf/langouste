@@ -1,17 +1,40 @@
 import { config } from "../../../lib/config.ts";
 import type { AudioProvider, AudioSynthesisOptions, AudioSynthesisResult } from "./provider.ts";
+import {
+  EnvVoiceResolver,
+  parseVoiceMap,
+  type VoiceMap,
+  type VoiceResolver,
+} from "./voice-resolver.ts";
 
 const ENDPOINT = "https://api.elevenlabs.io/v1/text-to-speech";
-// eleven_multilingual_v2 supports 29 languages including all of ours.
-const DEFAULT_MODEL = "eleven_multilingual_v2";
-// "Sarah" — a `premade` voice that works on free + paid plans. (The widely
-// quoted default "Rachel" is a `library` voice and 402s on free.) Override
-// with ELEVENLABS_VOICE_ID for a specific cloned/professional voice.
-const DEFAULT_VOICE_ID = "EXAVITQu4vr4xnSDxMaL";
 const OUTPUT_FORMAT = "mp3_44100_128";
+
+/**
+ * Build the env-backed voice map: ELEVENLABS_VOICES, with the legacy
+ * single ELEVENLABS_VOICE_ID folded in as the "default" entry when the
+ * JSON map doesn't already define one (back-compat).
+ */
+function buildEnvVoiceMap(): VoiceMap {
+  const map = parseVoiceMap(config.elevenLabsVoices);
+  if (!map.default && config.elevenLabsVoiceId.trim()) {
+    map.default = { voiceId: config.elevenLabsVoiceId.trim() };
+  }
+  return map;
+}
 
 export class ElevenLabsAudioProvider implements AudioProvider {
   readonly name = "elevenlabs";
+  private readonly resolver: VoiceResolver;
+
+  /**
+   * @param resolver injected for tests; defaults to an env-backed resolver
+   *   built from ELEVENLABS_VOICES (+ legacy ELEVENLABS_VOICE_ID). A future
+   *   per-user DB-backed resolver can be injected here instead.
+   */
+  constructor(resolver?: VoiceResolver) {
+    this.resolver = resolver ?? new EnvVoiceResolver(buildEnvVoiceMap());
+  }
 
   isAvailable(): boolean {
     return !!config.elevenLabsApiKey;
@@ -21,8 +44,24 @@ export class ElevenLabsAudioProvider implements AudioProvider {
     if (!config.elevenLabsApiKey) {
       throw new Error("ElevenLabs API key not configured");
     }
-    const voiceId = opts.voice || config.elevenLabsVoiceId || DEFAULT_VOICE_ID;
-    const url = `${ENDPOINT}/${encodeURIComponent(voiceId)}?output_format=${OUTPUT_FORMAT}`;
+
+    const language = opts.language ?? "";
+    const profile = await this.resolver.resolve(language, {
+      voiceOverride: opts.voice,
+      userId: opts.userId,
+    });
+
+    const url = `${ENDPOINT}/${encodeURIComponent(profile.voiceId)}?output_format=${OUTPUT_FORMAT}`;
+
+    const body: Record<string, unknown> = {
+      text,
+      model_id: profile.model,
+    };
+    // language_code is only accepted by v2.5 models; the resolver returns
+    // null for models that don't support it (e.g. eleven_multilingual_v2).
+    if (profile.languageCode) {
+      body.language_code = profile.languageCode;
+    }
 
     const res = await fetch(url, {
       method: "POST",
@@ -31,18 +70,14 @@ export class ElevenLabsAudioProvider implements AudioProvider {
         "Content-Type": "application/json",
         Accept: "audio/mpeg",
       },
-      body: JSON.stringify({
-        text,
-        model_id: DEFAULT_MODEL,
-        // Note: eleven_multilingual_v2 does NOT accept `language_code` — it
-        // auto-detects instead. Only the v3 / turbo / flash v2.5 models take
-        // a `language_code` parameter. We pass it only for those.
-      }),
+      body: JSON.stringify(body),
     });
 
     if (!res.ok) {
-      const body = await res.text().catch(() => "");
-      throw new Error(`ElevenLabs synthesize failed: ${res.status} ${body.slice(0, 200)}`);
+      const errBody = await res.text().catch(() => "");
+      throw new Error(
+        `ElevenLabs synthesize failed (voice=${profile.voiceId} model=${profile.model} lang=${profile.languageCode ?? "auto"}): ${res.status} ${errBody.slice(0, 200)}`,
+      );
     }
 
     const audio = new Uint8Array(await res.arrayBuffer());
