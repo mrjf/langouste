@@ -27,10 +27,7 @@ export function registerPhoneticProvider(provider: PhoneticProvider): void {
  * Get a phonetic provider for a given system and language.
  * Returns null if no deterministic provider supports the combination.
  */
-export function getPhoneticProvider(
-  system: string,
-  language: string,
-): PhoneticProvider | null {
+export function getPhoneticProvider(system: string, language: string): PhoneticProvider | null {
   const list = registry.get(system);
   if (!list) return null;
   for (const provider of list) {

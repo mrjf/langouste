@@ -170,11 +170,7 @@ function publicKeyRawBase64Url(publicKeyPem: string): string {
 }
 
 function base64UrlEncode(buf: Buffer): string {
-  return buf
-    .toString("base64")
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=+$/g, "");
+  return buf.toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
 }
 
 function sanitizeId(id: string): string {

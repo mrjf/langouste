@@ -15,10 +15,10 @@ export interface LanguageStats {
   messages_sent: number;
   vocab_total: number;
   vocab_by_cefr: Record<string, number>;
-  vocab_mastered: number;         // repetitions >= 3 AND correct recent
-  vocab_struggling: number;       // correct_productions / productions < 0.5, productions >= 2
+  vocab_mastered: number; // repetitions >= 3 AND correct recent
+  vocab_struggling: number; // correct_productions / productions < 0.5, productions >= 2
   grammar_gap_total: number;
-  grammar_gap_active: number;     // error_count > correct_productions
+  grammar_gap_active: number; // error_count > correct_productions
   corrections_count: number;
   activity_30d: Array<{ date: string; messages: number }>;
   dimensions: DimensionStat[];
@@ -29,12 +29,7 @@ export async function languageStats(
   userId: string,
   language: string,
 ): Promise<LanguageStats> {
-  const [
-    messages,
-    vocab,
-    gaps,
-    activity,
-  ] = await Promise.all([
+  const [messages, vocab, gaps, activity] = await Promise.all([
     db.select<{ message_id: string; corrections: unknown[] | null; created_at: string }>(
       "messages",
       {
@@ -84,9 +79,7 @@ export async function languageStats(
     if (Array.isArray(m.corrections)) corrections_count += m.corrections.length;
   }
 
-  const gap_active = gaps.filter(
-    (g) => g.error_count > (g.correct_productions ?? 0),
-  ).length;
+  const gap_active = gaps.filter((g) => g.error_count > (g.correct_productions ?? 0)).length;
 
   const activity_30d = bucketBy30Days(activity.map((a) => a.created_at));
 

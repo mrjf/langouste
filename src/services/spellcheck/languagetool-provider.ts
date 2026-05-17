@@ -60,30 +60,31 @@ export class LanguageToolProvider implements SpellCheckProvider {
         return [];
       }
 
-      const data = await res.json() as {
-      matches: Array<{
-        offset: number;
-        length: number;
-        message: string;
-        shortMessage: string;
-        rule: { id: string; category: { id: string } };
-        replacements: Array<{ value: string }>;
-      }>;
-    };
-
-    return data.matches.map((m) => {
-      const kind = m.rule.category.id === "TYPOS" || m.rule.category.id === "SPELLING"
-        ? "spelling" as const
-        : "grammar" as const;
-
-      return {
-        start: m.offset,
-        end: m.offset + m.length,
-        text: text.slice(m.offset, m.offset + m.length),
-        kind,
-        suggestions: m.replacements.slice(0, 5).map((r) => r.value),
+      const data = (await res.json()) as {
+        matches: Array<{
+          offset: number;
+          length: number;
+          message: string;
+          shortMessage: string;
+          rule: { id: string; category: { id: string } };
+          replacements: Array<{ value: string }>;
+        }>;
       };
-    });
+
+      return data.matches.map((m) => {
+        const kind =
+          m.rule.category.id === "TYPOS" || m.rule.category.id === "SPELLING"
+            ? ("spelling" as const)
+            : ("grammar" as const);
+
+        return {
+          start: m.offset,
+          end: m.offset + m.length,
+          text: text.slice(m.offset, m.offset + m.length),
+          kind,
+          suggestions: m.replacements.slice(0, 5).map((r) => r.value),
+        };
+      });
     } catch (err) {
       console.error(`[LanguageTool] Request failed:`, (err as Error).message);
       return [];

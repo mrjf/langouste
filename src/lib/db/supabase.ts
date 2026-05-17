@@ -1,13 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@supabase/supabase-js";
 import { config } from "../config.ts";
-import type {
-  Database,
-  DatabaseSet,
-  Filter,
-  Scalar,
-  SelectOptions,
-} from "./types.ts";
+import type { Database, DatabaseSet, Filter, Scalar, SelectOptions } from "./types.ts";
 
 /**
  * Supabase-backed Database. Thin wrapper over `@supabase/supabase-js` so
@@ -34,11 +28,7 @@ class SupabaseDatabase implements Database {
   }
 
   async insert<T>(table: string, row: Record<string, unknown>): Promise<T> {
-    const { data, error } = await this.client
-      .from(table)
-      .insert(row)
-      .select()
-      .single();
+    const { data, error } = await this.client.from(table).insert(row).select().single();
     if (error) throw error;
     return data as T;
   }
@@ -57,21 +47,13 @@ class SupabaseDatabase implements Database {
     return data as T;
   }
 
-  async update(
-    table: string,
-    patch: Record<string, unknown>,
-    filters: Filter[],
-  ): Promise<void> {
+  async update(table: string, patch: Record<string, unknown>, filters: Filter[]): Promise<void> {
     const builder = this.applyFilters(this.client.from(table).update(patch), filters);
     const { error } = await builder;
     if (error) throw error;
   }
 
-  async updateOne<T>(
-    table: string,
-    patch: Record<string, unknown>,
-    filters: Filter[],
-  ): Promise<T> {
+  async updateOne<T>(table: string, patch: Record<string, unknown>, filters: Filter[]): Promise<T> {
     const builder = this.applyFilters(this.client.from(table).update(patch), filters)
       .select()
       .single();
@@ -92,16 +74,16 @@ class SupabaseDatabase implements Database {
     return data as T;
   }
 
-  async raw<T>(sql: string, params: Scalar[] = []): Promise<T[]> {
+  // _params is part of the Database.raw() interface signature but unused on
+  // this backend — Supabase has no raw-SQL path (see throw below).
+  async raw<T>(sql: string, _params: Scalar[] = []): Promise<T[]> {
     // Supabase exposes raw SQL only via an RPC named `execute_sql`; we opted
     // not to define that so misuse is loud. If a caller hits this we throw and
     // point them at the right direction.
     throw new Error(
       `raw() is not supported on the Supabase backend (sql=${sql.slice(0, 60)}). ` +
-        `Define a Postgres function and call it via rpc() instead.`,
+        "Define a Postgres function and call it via rpc() instead.",
     );
-    // These args participate only in the signature:
-    void params;
   }
 
   private build(table: string, options: SelectOptions) {
@@ -148,11 +130,9 @@ export function createSupabaseDatabaseSet(): DatabaseSet {
   return {
     admin,
     forUser(accessToken: string) {
-      const userClient = createClient(
-        config.supabaseUrl,
-        config.supabasePublishableKey,
-        { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-      );
+      const userClient = createClient(config.supabaseUrl, config.supabasePublishableKey, {
+        global: { headers: { Authorization: `Bearer ${accessToken}` } },
+      });
       return new SupabaseDatabase(userClient);
     },
     async close() {

@@ -4,14 +4,22 @@ import type { Message } from "../../types/index.ts";
 
 /** Languages that use non-Latin scripts and benefit from transliteration. */
 const NON_LATIN_LANGUAGES = new Set([
-  "ar", "zh", "ja", "ko", "ru", "hi", "th", "he", "fa", "uk", "el", "ka",
+  "ar",
+  "zh",
+  "ja",
+  "ko",
+  "ru",
+  "hi",
+  "th",
+  "he",
+  "fa",
+  "uk",
+  "el",
+  "ka",
 ]);
 
 /** Build the storage key for a transliteration pair. */
-export function transliterationKey(
-  sourceLang: string,
-  targetLang: string,
-): string {
+export function transliterationKey(sourceLang: string, targetLang: string): string {
   return `${sourceLang}→${targetLang}`;
 }
 
@@ -49,9 +57,7 @@ export async function ensureTransliterations(
 
   for (const targetLang of readerLanguages) {
     const key = transliterationKey(sourceLang, targetLang);
-    const missing = messages.filter(
-      (m) => !m.transliterations?.[key],
-    );
+    const missing = messages.filter((m) => !m.transliterations?.[key]);
     if (missing.length === 0) continue;
 
     const texts = missing.map((m) => m.healed_text);
@@ -61,11 +67,9 @@ export async function ensureTransliterations(
       const msg = missing[i];
       const updated = { ...(msg.transliterations ?? {}), [key]: results[i] };
       msg.transliterations = updated;
-      await adminDb().update(
-        "messages",
-        { transliterations: updated },
-        [{ op: "eq", column: "message_id", value: msg.message_id }],
-      );
+      await adminDb().update("messages", { transliterations: updated }, [
+        { op: "eq", column: "message_id", value: msg.message_id },
+      ]);
     }
   }
 

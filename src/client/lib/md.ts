@@ -120,7 +120,8 @@ function parseBlocks(text: string): Block[] {
         H_RE.test(next) ||
         UL_RE.test(next) ||
         OL_RE.test(next)
-      ) break;
+      )
+        break;
       para.push(next);
       i++;
     }

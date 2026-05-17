@@ -22,12 +22,13 @@ export async function requireAuth(c: Context, next: Next) {
   const token = authHeader.slice(7);
 
   if (config.databaseMode === "supabase") {
-    const authClient = createClient(
-      config.supabaseUrl,
-      config.supabasePublishableKey,
-      { global: { headers: { Authorization: `Bearer ${token}` } } },
-    );
-    const { data: { user }, error } = await authClient.auth.getUser();
+    const authClient = createClient(config.supabaseUrl, config.supabasePublishableKey, {
+      global: { headers: { Authorization: `Bearer ${token}` } },
+    });
+    const {
+      data: { user },
+      error,
+    } = await authClient.auth.getUser();
     if (error || !user) {
       return c.json({ error: "Invalid or expired token" }, 401);
     }

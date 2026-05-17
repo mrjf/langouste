@@ -64,10 +64,7 @@ interface ItemRow {
   error_count?: number;
 }
 
-export async function recordInteraction(
-  db: Database,
-  input: InteractionInput,
-): Promise<void> {
+export async function recordInteraction(db: Database, input: InteractionInput): Promise<void> {
   const table = input.itemType === "vocabulary" ? "vocabulary" : "grammar_gaps";
   const idColumn = input.itemType === "vocabulary" ? "vocab_id" : "gap_id";
 
@@ -78,9 +75,7 @@ export async function recordInteraction(
   const before = snapshot(row);
 
   const qualityForEvent = resolveQuality(input);
-  const srs = qualityForEvent !== null
-    ? sm2(row, qualityForEvent)
-    : null;
+  const srs = qualityForEvent !== null ? sm2(row, qualityForEvent) : null;
 
   const now = new Date().toISOString();
   const patch: Record<string, unknown> = {};
@@ -109,9 +104,7 @@ export async function recordInteraction(
   }
 
   if (Object.keys(patch).length > 0) {
-    await db.update(table, patch, [
-      { op: "eq", column: idColumn, value: row.id },
-    ]);
+    await db.update(table, patch, [{ op: "eq", column: idColumn, value: row.id }]);
   }
 
   const after = { ...before, ...patch };

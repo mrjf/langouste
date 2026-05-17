@@ -15,8 +15,7 @@ export function tokenize(text: string): Token[] {
   const tokens: Token[] = [];
   // Match word runs including accented chars and hyphens, plus apostrophe-joined groups
   const regex = /[\p{L}\p{M}]+(?:['-][\p{L}\p{M}]+)*/gu;
-  let match: RegExpExecArray | null;
-  while ((match = regex.exec(text)) !== null) {
+  for (const match of text.matchAll(regex)) {
     const full = match[0];
     const start = match.index;
 

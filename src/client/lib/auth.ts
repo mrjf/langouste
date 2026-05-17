@@ -31,22 +31,28 @@ export function loadSession(): boolean {
     // Refresh tokens in background (non-blocking)
     const supabase = getSupabase();
     if (supabase) {
-      supabase.auth.setSession({
-        access_token: parsed.session.access_token,
-        refresh_token: parsed.session.refresh_token,
-      }).then(({ data }) => {
-        if (data?.session) {
-          session.value = data.session as any;
-          user.value = data.user as any;
-          localStorage.setItem(SESSION_KEY, JSON.stringify({
-            session: data.session,
-            user: data.user,
-          }));
-        }
-      }).catch(() => {
-        // Token refresh failed — stale session will 401 on next API call
-        // and the auto-refresh in api.ts will handle it
-      });
+      supabase.auth
+        .setSession({
+          access_token: parsed.session.access_token,
+          refresh_token: parsed.session.refresh_token,
+        })
+        .then(({ data }) => {
+          if (data?.session) {
+            session.value = data.session as any;
+            user.value = data.user as any;
+            localStorage.setItem(
+              SESSION_KEY,
+              JSON.stringify({
+                session: data.session,
+                user: data.user,
+              }),
+            );
+          }
+        })
+        .catch(() => {
+          // Token refresh failed — stale session will 401 on next API call
+          // and the auto-refresh in api.ts will handle it
+        });
     }
 
     return true;

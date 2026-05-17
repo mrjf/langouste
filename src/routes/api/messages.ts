@@ -1,6 +1,11 @@
 import { Hono } from "hono";
 import { requireAuth } from "../middleware.ts";
-import { getMessages, getRecentMessageTexts, insertMessage } from "../../services/database/messages.ts";
+import {
+  getMessageById,
+  getMessages,
+  getRecentMessageTexts,
+  insertMessage,
+} from "../../services/database/messages.ts";
 import { getMember } from "../../services/database/members.ts";
 import { getConversation } from "../../services/database/conversations.ts";
 import { getConnector } from "../../services/database/agent-connectors.ts";
@@ -12,21 +17,17 @@ import { ensureTranslations, translateTexts } from "../../services/ai/translator
 import { ensureTransliterations } from "../../services/ai/transliterator.ts";
 import { ensurePhonetics } from "../../services/ai/phonetician.ts";
 import { getAgentConnection } from "../../services/agents/factory.ts";
-import { trackLearningProgress, getDueReviewItems } from "../../services/spaced-repetition/tracker.ts";
+import { getAudioProvider } from "../../services/ai/audio/index.ts";
+import { trackLearningProgress } from "../../services/spaced-repetition/tracker.ts";
 import { adminDb } from "../../lib/db/index.ts";
-import type { AgentType, ConversationMember } from "../../types/index.ts";
+import type { AgentType, ConversationMember, TextError } from "../../types/index.ts";
 
 export const messageRoutes = new Hono();
 
 messageRoutes.use("*", requireAuth);
 
 function memberLanguages(member: ConversationMember): string[] {
-  return [
-    ...new Set([
-      ...member.target_languages.map((t) => t.lang),
-      ...member.base_languages,
-    ]),
-  ];
+  return [...new Set([...member.target_languages.map((t) => t.lang), ...member.base_languages])];
 }
 
 // Get messages for a conversation
@@ -62,12 +63,13 @@ messageRoutes.post("/:conversationId/check", async (c) => {
   const targetLangCodes = senderMember.target_languages.map((t) => t.lang);
 
   // Detect or validate language
-  const language = providedLanguage && targetLangCodes.includes(providedLanguage)
-    ? providedLanguage
-    : detectLanguage(text, targetLangCodes);
+  const language =
+    providedLanguage && targetLangCodes.includes(providedLanguage)
+      ? providedLanguage
+      : detectLanguage(text, targetLangCodes);
 
   // Run spell/grammar check
-  let errors;
+  let errors: TextError[];
   try {
     errors = await checkSpelling(text, language);
   } catch (err) {
@@ -141,9 +143,10 @@ messageRoutes.post("/:conversationId", async (c) => {
 
   // Detect language if not provided
   const targetLangCodes = senderMember.target_languages.map((t) => t.lang);
-  const msgLanguage = language && targetLangCodes.includes(language)
-    ? language
-    : detectLanguage(text, targetLangCodes);
+  const msgLanguage =
+    language && targetLangCodes.includes(language)
+      ? language
+      : detectLanguage(text, targetLangCodes);
 
   // Seed translations with the original text in its language
   const translations: Record<string, string> = {
@@ -164,14 +167,14 @@ messageRoutes.post("/:conversationId", async (c) => {
 
   const userLangs = memberLanguages(senderMember);
 
-  ensureTranslations([message], userLangs).catch(
-    (err) => console.error("Failed to pre-translate message:", err),
+  ensureTranslations([message], userLangs).catch((err) =>
+    console.error("Failed to pre-translate message:", err),
   );
-  ensureTransliterations([message], msgLanguage, userLangs).catch(
-    (err) => console.error("Failed to transliterate message:", err),
+  ensureTransliterations([message], msgLanguage, userLangs).catch((err) =>
+    console.error("Failed to transliterate message:", err),
   );
-  ensurePhonetics([message], ["ipa"], userLangs).catch(
-    (err) => console.error("Failed to generate phonetics:", err),
+  ensurePhonetics([message], ["ipa"], userLangs).catch((err) =>
+    console.error("Failed to generate phonetics:", err),
   );
 
   // Vocabulary extraction + learning tracking (async Sonnet call)
@@ -194,11 +197,9 @@ messageRoutes.post("/:conversationId", async (c) => {
 
       // Update message with the challenge
       if (vocabResult.next_challenge) {
-        await adminDb().update(
-          "messages",
-          { next_challenge: vocabResult.next_challenge },
-          [{ op: "eq", column: "message_id", value: message.message_id }],
-        );
+        await adminDb().update("messages", { next_challenge: vocabResult.next_challenge }, [
+          { op: "eq", column: "message_id", value: message.message_id },
+        ]);
       }
     } catch (err) {
       console.error("Failed to extract vocabulary:", err);
@@ -230,7 +231,7 @@ messageRoutes.post("/:conversationId", async (c) => {
       .filter((m) => m.message_id !== message.message_id)
       .map((m) => ({
         role: m.sender_id === userId ? "user" : "assistant",
-        content: m.translations?.["en"] ?? m.healed_text,
+        content: m.translations?.en ?? m.healed_text,
       }));
 
     const agentResponse = await agent.sendMessage(englishText, history);
@@ -249,14 +250,14 @@ messageRoutes.post("/:conversationId", async (c) => {
     });
 
     if (agentMsg) {
-      ensureTranslations([agentMsg], userLangs).catch(
-        (err) => console.error("Failed to translate agent response:", err),
+      ensureTranslations([agentMsg], userLangs).catch((err) =>
+        console.error("Failed to translate agent response:", err),
       );
-      ensureTransliterations([agentMsg], "en", userLangs).catch(
-        (err) => console.error("Failed to transliterate agent response:", err),
+      ensureTransliterations([agentMsg], "en", userLangs).catch((err) =>
+        console.error("Failed to transliterate agent response:", err),
       );
-      ensurePhonetics([agentMsg], ["ipa"], userLangs).catch(
-        (err) => console.error("Failed to generate agent phonetics:", err),
+      ensurePhonetics([agentMsg], ["ipa"], userLangs).catch((err) =>
+        console.error("Failed to generate agent phonetics:", err),
       );
     }
 
@@ -264,10 +265,54 @@ messageRoutes.post("/:conversationId", async (c) => {
   } catch (err) {
     const detail = err instanceof Error ? err.message : String(err);
     console.error("Agent communication failed:", err);
-    return c.json(
-      { message, agent_message: null, agent_error: detail },
-      201,
-    );
+    return c.json({ message, agent_message: null, agent_error: detail }, 201);
+  }
+});
+
+// Synthesise audio for a single message in a chosen language. Returns the
+// audio bytes directly (audio/mpeg from ElevenLabs). 404 when the provider
+// is unconfigured or the requested language isn't translated yet.
+messageRoutes.get("/:conversationId/:messageId/audio", async (c) => {
+  const db = c.get("db");
+  const userId = c.get("userId");
+  const conversationId = c.req.param("conversationId");
+  const messageId = c.req.param("messageId");
+  const lang = (c.req.query("lang") || "").trim();
+
+  const member = await getMember(db, conversationId, userId);
+  if (!member) return c.json({ error: "Not a member of this conversation" }, 403);
+
+  const provider = getAudioProvider();
+  if (!provider.isAvailable()) {
+    return c.json({ error: "Audio provider not configured" }, 503);
+  }
+
+  const message = await getMessageById(db, messageId);
+  if (!message || message.conversation_id !== conversationId) {
+    return c.json({ error: "Message not found" }, 404);
+  }
+
+  const targetLang = lang || message.language;
+  const text =
+    (lang && message.translations?.[lang]) ||
+    (targetLang === message.language ? message.healed_text : message.translations?.[targetLang]) ||
+    message.healed_text;
+  if (!text?.trim()) return c.json({ error: "Nothing to synthesise" }, 400);
+
+  try {
+    const result = await provider.synthesize(text, { language: targetLang });
+    return new Response(result.audio, {
+      status: 200,
+      headers: {
+        "Content-Type": result.contentType,
+        "Cache-Control": "private, max-age=86400",
+        "Content-Length": String(result.audio.byteLength),
+      },
+    });
+  } catch (err) {
+    const detail = err instanceof Error ? err.message : String(err);
+    console.error("[Audio] synthesize failed:", detail);
+    return c.json({ error: detail }, 502);
   }
 });
 

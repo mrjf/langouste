@@ -16,9 +16,8 @@ let _set: DatabaseSet | null = null;
 
 export function db(): DatabaseSet {
   if (!_set) {
-    _set = config.databaseMode === "sqlite"
-      ? createSqliteDatabaseSet()
-      : createSupabaseDatabaseSet();
+    _set =
+      config.databaseMode === "sqlite" ? createSqliteDatabaseSet() : createSupabaseDatabaseSet();
     console.log(`[db] initialised in ${config.databaseMode} mode`);
   }
   return _set;

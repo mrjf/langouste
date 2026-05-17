@@ -12,9 +12,7 @@ export { DefaultTransliterationProvider } from "./default-provider.ts";
 const providers: TransliterationProvider[] = [];
 let _fallback: TransliterationProvider | null = null;
 
-export function registerTransliterationProvider(
-  provider: TransliterationProvider,
-): void {
+export function registerTransliterationProvider(provider: TransliterationProvider): void {
   providers.unshift(provider); // highest priority first
 }
 

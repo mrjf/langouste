@@ -3,8 +3,32 @@ import { getSupabase } from "./supabase";
 
 const BASE = "/api";
 
+const SINGLE_USER =
+  (import.meta.env.VITE_SINGLE_USER as string | undefined)?.toLowerCase() === "true";
+
 /** Try to refresh the Supabase session and update the store. */
 async function refreshSession(): Promise<boolean> {
+  // Single-user / sqlite mode has no Supabase; mint a fresh token from
+  // /auth/local. The backend auto-issues for the local user.
+  if (SINGLE_USER) {
+    try {
+      const res = await fetch(`${BASE}/auth/local`, { method: "POST" });
+      if (!res.ok) return false;
+      const data = await res.json();
+      if (!data?.session?.access_token) return false;
+      session.value = data.session;
+      localStorage.setItem(
+        "langouste_session",
+        JSON.stringify({ session: data.session, user: data.user }),
+      );
+      console.log("[API] Single-user session refreshed via /auth/local");
+      return true;
+    } catch (err) {
+      console.error("[API] /auth/local refresh failed:", err);
+      return false;
+    }
+  }
+
   const supabase = getSupabase();
   if (!supabase) return false;
 
@@ -57,7 +81,7 @@ async function request(path: string, options: RequestInit = {}) {
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
     ...(sess ? { Authorization: `Bearer ${sess.access_token}` } : {}),
-    ...(options.headers as Record<string, string> ?? {}),
+    ...((options.headers as Record<string, string>) ?? {}),
   };
 
   const method = options.method ?? "GET";
@@ -107,19 +131,25 @@ export const api = {
   createConversation: (body: Record<string, unknown>) =>
     request("/conversations", { method: "POST", body: JSON.stringify(body) }),
   updateLanguages: (conversationId: string, body: Record<string, unknown>) =>
-    request(`/conversations/${conversationId}/languages`, { method: "PATCH", body: JSON.stringify(body) }),
+    request(`/conversations/${conversationId}/languages`, {
+      method: "PATCH",
+      body: JSON.stringify(body),
+    }),
 
   // Messages
   getMessages: (conversationId: string, params?: Record<string, string>) => {
     const qs = params ? new URLSearchParams(params).toString() : "";
-    return request(`/messages/${conversationId}${qs ? "?" + qs : ""}`);
+    return request(`/messages/${conversationId}${qs ? `?${qs}` : ""}`);
   },
   checkMessage: (conversationId: string, text: string, language?: string) =>
     request(`/messages/${conversationId}/check`, {
       method: "POST",
       body: JSON.stringify({ text, language }),
     }),
-  explainErrors: (conversationId: string, body: { text: string; errors: any[]; language: string; intent?: string }) =>
+  explainErrors: (
+    conversationId: string,
+    body: { text: string; errors: any[]; language: string; intent?: string },
+  ) =>
     request(`/messages/${conversationId}/explain`, {
       method: "POST",
       body: JSON.stringify(body),
@@ -130,7 +160,37 @@ export const api = {
       body: JSON.stringify({ text, language, intent }),
     }),
   translateMessages: (conversationId: string, languages: string[]) =>
-    request(`/messages/${conversationId}/translate`, { method: "POST", body: JSON.stringify({ languages }) }),
+    request(`/messages/${conversationId}/translate`, {
+      method: "POST",
+      body: JSON.stringify({ languages }),
+    }),
+
+  /** Fetch synthesised audio for a message+language. Returns a blob URL the
+   *  caller is responsible for revoking. Throws if the server returns non-200. */
+  fetchMessageAudio: async (
+    conversationId: string,
+    messageId: string,
+    lang: string,
+  ): Promise<string> => {
+    const sess = session.value;
+    const headers: Record<string, string> = sess
+      ? { Authorization: `Bearer ${sess.access_token}` }
+      : {};
+    const url = `${BASE}/messages/${conversationId}/${messageId}/audio?lang=${encodeURIComponent(lang)}`;
+    const res = await fetch(url, { headers });
+    if (!res.ok) {
+      let msg = `Audio request failed: ${res.status}`;
+      try {
+        const data = await res.json();
+        if (data?.error) msg = data.error;
+      } catch {
+        // body wasn't JSON — keep the status line
+      }
+      throw new Error(msg);
+    }
+    const blob = await res.blob();
+    return URL.createObjectURL(blob);
+  },
 
   // Agent connectors
   getAgentConnectors: () => request("/agent-connectors"),
@@ -151,7 +211,7 @@ export const api = {
   // Profile stats
   getLanguageStats: (language: string) => request(`/profile/stats/${language}`),
   getDimensionItems: (language: string, dimension: string, params?: Record<string, string>) => {
-    const qs = params ? "?" + new URLSearchParams(params).toString() : "";
+    const qs = params ? `?${new URLSearchParams(params).toString()}` : "";
     return request(`/profile/dimension/${language}/${dimension}${qs}`);
   },
   getProfileItem: (itemType: "vocabulary" | "grammar", itemId: string) =>

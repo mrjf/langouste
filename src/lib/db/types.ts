@@ -30,25 +30,16 @@ export interface SelectOptions {
 
 export interface Database {
   /** Return up to `limit` rows matching the filters, optionally ordered. */
-  select<T = Record<string, unknown>>(
-    table: string,
-    options?: SelectOptions,
-  ): Promise<T[]>;
+  select<T = Record<string, unknown>>(table: string, options?: SelectOptions): Promise<T[]>;
 
   /**
    * Return a single row or null. If multiple rows match, the result is
    * implementation-defined — callers must use filters that uniquely identify.
    */
-  selectOne<T = Record<string, unknown>>(
-    table: string,
-    options?: SelectOptions,
-  ): Promise<T | null>;
+  selectOne<T = Record<string, unknown>>(table: string, options?: SelectOptions): Promise<T | null>;
 
   /** Insert a row. Returns the inserted row as stored. */
-  insert<T = Record<string, unknown>>(
-    table: string,
-    row: Record<string, unknown>,
-  ): Promise<T>;
+  insert<T = Record<string, unknown>>(table: string, row: Record<string, unknown>): Promise<T>;
 
   /** Insert-or-update on conflict with the given column list. Returns the row. */
   upsert<T = Record<string, unknown>>(
@@ -58,11 +49,7 @@ export interface Database {
   ): Promise<T>;
 
   /** Update matching rows with the given patch. Does not return rows. */
-  update(
-    table: string,
-    patch: Record<string, unknown>,
-    filters: Filter[],
-  ): Promise<void>;
+  update(table: string, patch: Record<string, unknown>, filters: Filter[]): Promise<void>;
 
   /** Update matching rows and return a single row. Errors if zero match. */
   updateOne<T = Record<string, unknown>>(

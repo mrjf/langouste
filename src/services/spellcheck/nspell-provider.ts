@@ -7,9 +7,25 @@ import { tokenize } from "./tokenizer.ts";
 // These are valid word fragments, not misspellings.
 const ELISION_PREFIXES = new Set([
   // French
-  "l", "d", "j", "n", "s", "c", "m", "t", "qu", "jusqu", "lorsqu", "puisqu", "quelqu",
+  "l",
+  "d",
+  "j",
+  "n",
+  "s",
+  "c",
+  "m",
+  "t",
+  "qu",
+  "jusqu",
+  "lorsqu",
+  "puisqu",
+  "quelqu",
   // Italian
-  "un", "dell", "nell", "all", "sull",
+  "un",
+  "dell",
+  "nell",
+  "all",
+  "sull",
 ]);
 
 const MIN_TOKEN_LENGTH = 2;
@@ -89,7 +105,11 @@ export class NspellProvider implements SpellCheckProvider {
       if (word.includes("-")) {
         const parts = word.split("-");
         const allPartsCorrect = parts.every(
-          (p) => p.length < MIN_TOKEN_LENGTH || ELISION_PREFIXES.has(p.toLowerCase()) || dict.correct(p) || dict.correct(p.toLowerCase()),
+          (p) =>
+            p.length < MIN_TOKEN_LENGTH ||
+            ELISION_PREFIXES.has(p.toLowerCase()) ||
+            dict.correct(p) ||
+            dict.correct(p.toLowerCase()),
         );
         if (allPartsCorrect) continue;
       }

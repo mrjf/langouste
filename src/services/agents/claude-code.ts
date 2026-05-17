@@ -151,7 +151,9 @@ export class ClaudeCodeAgent implements AgentConnection {
             finalText = msg.result;
           } else {
             const errs = (msg as { errors?: string[] }).errors ?? [msg.subtype];
-            console.error(`[ClaudeCode] turn failed subtype=${msg.subtype} full=${JSON.stringify(msg)}`);
+            console.error(
+              `[ClaudeCode] turn failed subtype=${msg.subtype} full=${JSON.stringify(msg)}`,
+            );
             throw new Error(`Claude Code turn failed: ${errs.join("; ")}`);
           }
         }
@@ -162,7 +164,9 @@ export class ClaudeCodeAgent implements AgentConnection {
       throw err;
     }
 
-    console.log(`[ClaudeCode] final text length=${finalText.length} session=${this.sessionId?.slice(0, 8) ?? "none"}`);
+    console.log(
+      `[ClaudeCode] final text length=${finalText.length} session=${this.sessionId?.slice(0, 8) ?? "none"}`,
+    );
     return finalText;
   }
 

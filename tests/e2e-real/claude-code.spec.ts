@@ -24,10 +24,7 @@ test.describe("Claude Code connector (real Agent SDK subprocess)", () => {
     if (scratchCwd) rmSync(scratchCwd, { recursive: true, force: true });
   });
 
-  test("real Claude Code session returns a reply and persists it", async ({
-    page,
-    request,
-  }) => {
+  test("real Claude Code session returns a reply and persists it", async ({ page, request }) => {
     await createConnector(request, {
       name: "claude-code-real",
       type: "claude-code",

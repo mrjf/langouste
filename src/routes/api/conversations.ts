@@ -27,7 +27,8 @@ conversationRoutes.get("/", async (c) => {
 conversationRoutes.post("/", async (c) => {
   const db = c.get("db");
   const userId = c.get("userId");
-  const { target_languages, base_languages, target_language, base_language, agent_connector_id } = await c.req.json();
+  const { target_languages, base_languages, target_language, base_language, agent_connector_id } =
+    await c.req.json();
 
   if (!agent_connector_id) {
     return c.json({ error: "agent_connector_id is required" }, 400);

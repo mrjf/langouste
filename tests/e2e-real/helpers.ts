@@ -16,7 +16,7 @@ type SkipTest = { skip: (cond: boolean, msg?: string) => void };
 
 export async function requireAnthropicKey(test: SkipTest): Promise<void> {
   const key = process.env.ANTHROPIC_API_KEY;
-  const missing = !key || !key.startsWith("sk-");
+  const missing = !key?.startsWith("sk-");
   if (missing) {
     test.skip(
       true,
@@ -25,10 +25,7 @@ export async function requireAnthropicKey(test: SkipTest): Promise<void> {
   }
 }
 
-export async function requireOpenclawGateway(
-  test: SkipTest,
-  port = 18789,
-): Promise<void> {
+export async function requireOpenclawGateway(test: SkipTest, port = 18789): Promise<void> {
   const reachable = await tcpConnectable("127.0.0.1", port, 1000);
   if (!reachable) {
     test.skip(
@@ -74,7 +71,8 @@ export async function requireOpenclawGateway(
   }
 
   const mainAgent = agentsConfig.list?.find((a) => a.id === "main");
-  const usesClaudeCli = typeof mainAgent?.model === "string" && mainAgent.model.startsWith("claude-cli/");
+  const usesClaudeCli =
+    typeof mainAgent?.model === "string" && mainAgent.model.startsWith("claude-cli/");
 
   let hasAnthropicProfile = false;
   if (profilesJson) {
@@ -241,10 +239,7 @@ export async function startChatWith(page: Page, connectorName: string): Promise<
  * Poll `predicate` every 500ms until it returns truthy or the timeout fires.
  * Throws if the timeout is reached.
  */
-export async function waitFor(
-  predicate: () => Promise<boolean>,
-  timeoutMs: number,
-): Promise<void> {
+export async function waitFor(predicate: () => Promise<boolean>, timeoutMs: number): Promise<void> {
   const start = Date.now();
   while (Date.now() - start < timeoutMs) {
     if (await predicate()) return;

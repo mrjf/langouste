@@ -1,12 +1,6 @@
 import { Database as BunDatabase } from "bun:sqlite";
 import { dataPath } from "../data-dir.ts";
-import type {
-  Database,
-  DatabaseSet,
-  Filter,
-  Scalar,
-  SelectOptions,
-} from "./types.ts";
+import type { Database, DatabaseSet, Filter, Scalar, SelectOptions } from "./types.ts";
 
 /**
  * SQLite-backed Database implemented with `bun:sqlite`.
@@ -26,8 +20,8 @@ import type {
 // auto-fills with gen_random_uuid(). In SQLite we don't have that default, so
 // we generate a UUIDv7 client-side when the caller didn't supply one.
 const AUTO_ID_COLUMNS: Record<string, string> = {
-  profiles: "user_id",                 // caller must supply (comes from auth)
-  users: "user_id",                    // caller supplies in local auth
+  profiles: "user_id", // caller must supply (comes from auth)
+  users: "user_id", // caller supplies in local auth
   agent_connectors: "connector_id",
   conversations: "conversation_id",
   messages: "message_id",
@@ -89,10 +83,7 @@ function hydrateAll(rows: Record<string, unknown>[]): Record<string, unknown>[] 
   return rows.map((r) => hydrate(r) as Record<string, unknown>);
 }
 
-function autoFillId(
-  table: string,
-  row: Record<string, unknown>,
-): Record<string, unknown> {
+function autoFillId(table: string, row: Record<string, unknown>): Record<string, unknown> {
   const idCol = AUTO_ID_COLUMNS[table];
   if (!idCol) return row;
   if (row[idCol] != null && row[idCol] !== "") return row;
@@ -130,7 +121,7 @@ function filterClause(filters: Filter[], startIdx = 1): { sql: string; params: S
       }
     }
   }
-  return { sql: " WHERE " + parts.join(" AND "), params };
+  return { sql: ` WHERE ${parts.join(" AND ")}`, params };
 }
 
 export class SqliteDatabase implements Database {
@@ -144,7 +135,7 @@ export class SqliteDatabase implements Database {
       const parts = options.order.map(
         (o) => `"${o.column}" ${o.ascending === false ? "DESC" : "ASC"}`,
       );
-      sql += " ORDER BY " + parts.join(", ");
+      sql += ` ORDER BY ${parts.join(", ")}`;
     }
     if (options.limit != null) sql += ` LIMIT ${options.limit}`;
     const rows = this.db.query(sql).all(...params) as Record<string, unknown>[];
@@ -165,9 +156,11 @@ export class SqliteDatabase implements Database {
     }
     const placeholders = cols.map((_, i) => `?${i + 1}`).join(", ");
     const quoted = cols.map((c) => `"${c}"`).join(", ");
-    const sql =
-      `INSERT INTO "${table}" (${quoted}) VALUES (${placeholders}) RETURNING *`;
-    const result = this.db.query(sql).get(...cols.map((c) => prepared[c] as Scalar)) as Record<string, unknown>;
+    const sql = `INSERT INTO "${table}" (${quoted}) VALUES (${placeholders}) RETURNING *`;
+    const result = this.db.query(sql).get(...cols.map((c) => prepared[c] as Scalar)) as Record<
+      string,
+      unknown
+    >;
     return hydrate(result) as T;
   }
 
@@ -189,15 +182,14 @@ export class SqliteDatabase implements Database {
     const sql =
       `INSERT INTO "${table}" (${quoted}) VALUES (${placeholders}) ` +
       `ON CONFLICT (${conflict}) DO UPDATE SET ${updateCols} RETURNING *`;
-    const result = this.db.query(sql).get(...cols.map((c) => prepared[c] as Scalar)) as Record<string, unknown>;
+    const result = this.db.query(sql).get(...cols.map((c) => prepared[c] as Scalar)) as Record<
+      string,
+      unknown
+    >;
     return hydrate(result) as T;
   }
 
-  async update(
-    table: string,
-    patch: Record<string, unknown>,
-    filters: Filter[],
-  ): Promise<void> {
+  async update(table: string, patch: Record<string, unknown>, filters: Filter[]): Promise<void> {
     const prepared = toStorage(patch);
     const cols = Object.keys(prepared);
     if (cols.length === 0) return;
@@ -208,11 +200,7 @@ export class SqliteDatabase implements Database {
     this.db.query(sql).run(...setParams, ...whereParams);
   }
 
-  async updateOne<T>(
-    table: string,
-    patch: Record<string, unknown>,
-    filters: Filter[],
-  ): Promise<T> {
+  async updateOne<T>(table: string, patch: Record<string, unknown>, filters: Filter[]): Promise<T> {
     const prepared = toStorage(patch);
     const cols = Object.keys(prepared);
     if (cols.length === 0) {
@@ -222,7 +210,10 @@ export class SqliteDatabase implements Database {
     const { sql: where, params: whereParams } = filterClause(filters, cols.length + 1);
     const sql = `UPDATE "${table}" SET ${sets}${where} RETURNING *`;
     const setParams = cols.map((c) => prepared[c] as Scalar);
-    const result = this.db.query(sql).get(...setParams, ...whereParams) as Record<string, unknown> | null;
+    const result = this.db.query(sql).get(...setParams, ...whereParams) as Record<
+      string,
+      unknown
+    > | null;
     if (!result) throw new Error(`updateOne matched no rows in ${table}`);
     return hydrate(result) as T;
   }
