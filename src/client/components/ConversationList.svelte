@@ -1,25 +1,14 @@
 <script lang="ts">
-  import {
-    conversations,
-    activeConversation,
-    profile,
-    clearUnread,
-    isAgentWorking,
-  } from "../lib/stores.svelte";
+  import { chatStore, type Chat } from "../lib/chat.svelte";
   import { langTag } from "../lib/languages";
-  import { api } from "../lib/api";
-  import type { Conversation } from "../lib/stores.svelte";
 
-  function selectConversation(conv: Conversation) {
-    activeConversation.value = conv;
-    // Optimistically clear the badge, then persist last_read_at. Failure
-    // is non-fatal — the count reconciles on the next list reload.
-    if (conv.unread_count) {
-      clearUnread(conv.conversation_id);
-      api
-        .markConversationRead(conv.conversation_id)
-        .catch((err) => console.error("[Unread] mark-read failed:", err));
-    }
+  // Pure renderer of the ChatStore. Each row is a Chat; its draft, unread,
+  // and working state all live on the Chat object itself.
+  const chats = $derived(chatStore.list);
+
+  function select(chat: Chat) {
+    chatStore.setActive(chat.id);
+    chat.markRead();
   }
 
   /** Slack-style: show the number, cap the width at "99+". */
@@ -27,48 +16,44 @@
     return n > 99 ? "99+" : String(n);
   }
 
-  function unreadFor(conv: Conversation): number {
-    // Never show a badge on the open conversation.
-    if (activeConversation.value?.conversation_id === conv.conversation_id) return 0;
-    return conv.unread_count ?? 0;
+  /** Don't badge the conversation that's currently open. */
+  function unreadFor(chat: Chat): number {
+    if (chatStore.activeId === chat.id) return 0;
+    return chat.unread;
   }
 
-  function myMember(conv: Conversation) {
-    return conv.members?.find((m) => m.user_id === profile.value?.user_id);
+  function displayName(chat: Chat): string {
+    return chat.conversation?.agent_connector?.name ?? "Agent";
   }
 
-  function displayName(conv: Conversation): string {
-    return conv.agent_connector?.name ?? "Agent";
-  }
-
-  function myLang(conv: Conversation): string {
-    return myMember(conv)?.target_languages?.[0]?.lang ?? "?";
+  function myLang(chat: Chat): string {
+    return chat.member?.target_languages?.[0]?.lang ?? "?";
   }
 </script>
 
 <div class="conv-list">
-  {#if conversations.value.length === 0}
+  {#if chats.length === 0}
     <div class="conv-empty">No conversations yet</div>
   {:else}
-    {#each conversations.value as conv (conv.conversation_id)}
+    {#each chats as chat (chat.id)}
       <button
         class="conv-item"
-        class:active={activeConversation.value?.conversation_id === conv.conversation_id}
-        onclick={() => selectConversation(conv)}
+        class:active={chatStore.activeId === chat.id}
+        onclick={() => select(chat)}
       >
-        <span class="conv-lang">{langTag(myLang(conv))}</span>
+        <span class="conv-lang">{langTag(myLang(chat))}</span>
         <span class="conv-main">
-          <span class="conv-partner">🤖 {displayName(conv)}</span>
-          {#if isAgentWorking(conv.conversation_id)}
+          <span class="conv-partner">🤖 {displayName(chat)}</span>
+          {#if chat.working}
             <span class="conv-working">working…</span>
           {/if}
         </span>
-        {#if unreadFor(conv) > 0}
+        {#if unreadFor(chat) > 0}
           <span
             class="unread-badge"
-            aria-label={`${unreadFor(conv)} unread messages`}
+            aria-label={`${unreadFor(chat)} unread messages`}
           >
-            {badgeLabel(unreadFor(conv))}
+            {badgeLabel(unreadFor(chat))}
           </span>
         {/if}
       </button>

@@ -71,62 +71,10 @@ export interface Correction {
   category: string;
 }
 
-// Reactive state using Svelte 5 runes
+// User-scoped reactive state. Per-conversation state (messages, draft,
+// review, working, unread, realtime) lives on the Chat model in
+// chat.svelte.ts — see ChatStore. These three are the only truly global,
+// not-conversation-scoped pieces.
 export const user = $state<{ value: User | null }>({ value: null });
 export const session = $state<{ value: UserSession | null }>({ value: null });
 export const profile = $state<{ value: Profile | null }>({ value: null });
-export const conversations = $state<{ value: Conversation[] }>({ value: [] });
-export const activeConversation = $state<{ value: Conversation | null }>({ value: null });
-
-// --- Unread badge helpers -------------------------------------------------
-// unread_count lives on each Conversation. We mutate the array immutably so
-// Svelte's reactivity picks up the change in the sidebar.
-
-function patchConversation(id: string, patch: Partial<Conversation>): void {
-  const i = conversations.value.findIndex((c) => c.conversation_id === id);
-  if (i === -1) return;
-  const next = conversations.value.slice();
-  next[i] = { ...next[i], ...patch };
-  conversations.value = next;
-}
-
-/** A new agent message arrived. Bump the badge unless that chat is open. */
-export function bumpUnread(conversationId: string): void {
-  if (activeConversation.value?.conversation_id === conversationId) return;
-  const conv = conversations.value.find((c) => c.conversation_id === conversationId);
-  if (!conv) return; // not one of ours (or list not loaded yet)
-  patchConversation(conversationId, { unread_count: (conv.unread_count ?? 0) + 1 });
-}
-
-/** Conversation has been read — clear its badge. */
-export function clearUnread(conversationId: string): void {
-  const conv = conversations.value.find((c) => c.conversation_id === conversationId);
-  if (!conv?.unread_count) return;
-  patchConversation(conversationId, { unread_count: 0 });
-}
-
-/** Total across all conversations (for a future global indicator). */
-export function totalUnread(): number {
-  return conversations.value.reduce((n, c) => n + (c.unread_count ?? 0), 0);
-}
-
-// --- Agent-working state --------------------------------------------------
-// Set of conversation_ids whose agent is currently processing a send. Kept
-// here (not in ChatThread) so it's scoped to the conversation, not the open
-// chat — a send in chat A keeps showing while the user is in chat B. The
-// Set is wrapped in $state and reassigned on change so the sidebar reacts.
-
-export const agentWorking = $state<{ value: Set<string> }>({ value: new Set() });
-
-export function setAgentWorking(conversationId: string, working: boolean): void {
-  const has = agentWorking.value.has(conversationId);
-  if (working === has) return;
-  const next = new Set(agentWorking.value);
-  if (working) next.add(conversationId);
-  else next.delete(conversationId);
-  agentWorking.value = next;
-}
-
-export function isAgentWorking(conversationId: string): boolean {
-  return agentWorking.value.has(conversationId);
-}

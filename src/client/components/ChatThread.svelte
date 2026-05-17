@@ -1,75 +1,81 @@
 <script lang="ts">
   import { api } from "../lib/api";
-  import {
-    activeConversation,
-    conversations,
-    user,
-    clearUnread,
-    setAgentWorking,
-  } from "../lib/stores.svelte";
-  import { subscribeToMessages, subscribeToConversation } from "../lib/supabase";
-  import { langTag, langOption, langName, LANGUAGES } from "../lib/languages";
-  import type { Message } from "../lib/stores.svelte";
+  import { user } from "../lib/stores.svelte";
+  import { chatStore } from "../lib/chat.svelte";
+  import { langOption, LANGUAGES } from "../lib/languages";
   import MessageBubble from "./MessageBubble.svelte";
   import MessageInput from "./MessageInput.svelte";
 
-  let messages: Message[] = $state([]);
-  let sending = $state(false);
-  let messagesEl: HTMLElement | undefined = $state();
-
-  // Per-conversation message cache so switching is instant
-  const messageCache = new Map<string, Message[]>();
-
-  // Persist that the open conversation is read, so its badge stays cleared
-  // across reloads. Optimistic + non-fatal; clears the local badge too.
-  function markActiveRead(convId: string) {
-    clearUnread(convId);
-    api
-      .markConversationRead(convId)
-      .catch((err) => console.error("[Unread] mark-read failed:", err));
-  }
-
-  const conv = $derived(activeConversation.value);
+  // Pure renderer of the active Chat. No local message/sending/error state.
+  const chat = $derived(chatStore.active);
   const userId = $derived(user.value?.id);
 
-  // My membership in this conversation
-  const myMember = $derived(conv?.members?.find((m) => m.user_id === userId));
+  // Load messages + realtime whenever the active chat changes. The Chat
+  // caches its own messages, so re-entering is instant and idempotent.
+  $effect(() => {
+    const c = chat;
+    if (!c) return;
+    c.load();
+    c.markRead();
+  });
+
+  const conv = $derived(chat?.conversation ?? null);
+  const myMember = $derived(chat?.member);
   const myLangs = $derived(myMember?.target_languages?.map((t) => t.lang) ?? []);
   const myBaseLangs = $derived(myMember?.base_languages ?? []);
   const myLang = $derived(myLangs[0] ?? "");
   const myBaseLang = $derived(myBaseLangs[0] ?? "");
-
   const agentName = $derived(conv?.agent_connector?.name ?? "Agent");
   const partnerName = $derived(`🤖 ${agentName}`);
   const isOrphan = $derived(conv != null && !conv.agent_connector_id);
 
-  // Agent error banner for the *open* chat only (cleared on switch).
-  let agentError: string | null = $state(null);
+  let messagesEl = $state<HTMLElement>();
+  let translating = $state(false);
 
-  // Available connections to reattach to when this conversation is orphaned.
-  let availableConnections: Array<{ connector_id: string; name: string; type: string }> = $state([]);
+  const uniqueMessages = $derived.by(() => {
+    if (!chat) return [];
+    const seen = new Set<string>();
+    return chat.messages.filter((m) => {
+      if (seen.has(m.message_id)) return false;
+      seen.add(m.message_id);
+      return true;
+    });
+  });
+
+  // Auto-scroll on new messages.
+  $effect(() => {
+    uniqueMessages.length;
+    requestAnimationFrame(() => {
+      if (messagesEl) messagesEl.scrollTop = messagesEl.scrollHeight;
+    });
+  });
+
+  // --- orphan reattach -------------------------------------------------
+  let availableConnections = $state<Array<{ connector_id: string; name: string; type: string }>>([]);
   let reattaching = $state(false);
   let reattachTargetId = $state("");
 
   $effect(() => {
     if (isOrphan) {
-      api.getAgentConnectors().then((list) => {
-        availableConnections = list;
-        if (list.length > 0 && !reattachTargetId) {
-          reattachTargetId = list[0].connector_id;
-        }
-      }).catch(() => { availableConnections = []; });
+      api
+        .getAgentConnectors()
+        .then((list) => {
+          availableConnections = list;
+          if (list.length > 0 && !reattachTargetId) reattachTargetId = list[0].connector_id;
+        })
+        .catch(() => {
+          availableConnections = [];
+        });
     }
   });
 
   async function reattachConnector() {
-    if (!conv || !reattachTargetId) return;
+    if (!chat || !reattachTargetId) return;
     reattaching = true;
     try {
-      const updated = await api.setConversationConnector(conv.conversation_id, reattachTargetId);
-      // Refresh store + active conversation.
-      conversations.value = await api.getConversations();
-      activeConversation.value = updated;
+      await api.setConversationConnector(chat.id, reattachTargetId);
+      const convs = await api.getConversations();
+      chatStore.setConversations(convs);
     } catch (err) {
       console.error("Reattach failed:", err);
       alert("Reattach failed: " + (err instanceof Error ? err.message : String(err)));
@@ -78,231 +84,35 @@
     }
   }
 
-  // Deduplicated messages for rendering
-  const uniqueMessages = $derived.by(() => {
-    const seen = new Set<string>();
-    return messages.filter((m) => {
-      if (seen.has(m.message_id)) return false;
-      seen.add(m.message_id);
-      return true;
-    });
-  });
-
-  // Subscribe to realtime when conversation changes
-  $effect(() => {
-    const c = conv;
-    const convId = c?.conversation_id;
-
-    // Transient, chat-scoped UI must not bleed across a switch.
-    agentError = null;
-
-    if (!convId) {
-      messages = [];
-      return;
-    }
-
-    // Show cached messages immediately, then refresh in background
-    const cached = messageCache.get(convId);
-    if (cached) {
-      console.log(`[Messages] Showing ${cached.length} cached message(s) for ${convId.slice(0, 8)}`);
-      messages = cached;
-    } else {
-      messages = [];
-    }
-
-    let cancelled = false;
-
-    (async () => {
-      try {
-        console.log(`[Messages] Fetching messages for ${convId.slice(0, 8)}`);
-        const loaded = await api.getMessages(convId);
-        if (cancelled) return;
-        console.log(`[Messages] Loaded ${loaded.length} message(s) for ${convId.slice(0, 8)}`);
-        messages = loaded;
-        messageCache.set(convId, loaded);
-        fillMissingTranslations(convId);
-        markActiveRead(convId); // opening the chat marks it read
-      } catch (err) {
-        console.error("[Messages] Failed to load:", err);
-      }
-    })();
-
-    const unsubMessages = subscribeToMessages(convId, async (msg) => {
-      const newMsg = msg as unknown as Message;
-      if (messages.some((m) => m.message_id === newMsg.message_id)) return;
-      console.log(`[Realtime] New message in ${convId.slice(0, 8)}:`, newMsg.healed_text?.slice(0, 50));
-
-      const hasPending = messages.some((m) => m._pending);
-      if (hasPending) {
-        messages = messages.map((m) =>
-          m._pending && m.sender_id === newMsg.sender_id ? newMsg : m
-        );
-      } else {
-        messages = [...messages, newMsg];
-      }
-      messageCache.set(convId, messages);
-      fillMissingTranslations(convId);
-      // This chat is open, so a freshly-arrived agent reply is already
-      // "read" — advance the server cursor so it doesn't resurface.
-      if (newMsg.is_agent) markActiveRead(convId);
-    });
-
-    const unsubConv = subscribeToConversation(convId, async () => {
-      try {
-        const convs = await api.getConversations();
-        const updated = convs.find((cv: any) => cv.conversation_id === convId);
-        if (updated) {
-          conversations.value = convs;
-          activeConversation.value = updated;
-        }
-      } catch (err) {
-        console.error("Failed to refresh conversation:", err);
-      }
-    });
-
-    return () => {
-      cancelled = true;
-      unsubMessages();
-      unsubConv();
-    };
-  });
-
-  // Auto-scroll when messages change
-  $effect(() => {
-    messages.length;
-    scrollToBottom();
-  });
-
-  /** Send a message (called by MessageInput after check passes) */
-  async function handleSend(
-    convId: string,
-    text: string,
-    language: string,
-    intent?: string,
+  // --- language switch + (re)translation -------------------------------
+  async function switchLanguage(
+    field: "target_languages" | "base_languages",
+    value: string,
   ) {
-    if (sending) return;
-    console.log(`[Send] handleSend conv=${convId.slice(0, 8)} text="${text.slice(0, 50)}" lang=${language} intent=${intent ?? "none"}`);
-
-    sending = true;
-
-    // Everything here is scoped to convId (the chat the text was composed
-    // in), never the currently-active conv. We only touch the visible
-    // `messages` array when convId is still the open conversation;
-    // otherwise we update that conversation's cache so it's correct when
-    // the user returns.
-    const isActive = () => activeConversation.value?.conversation_id === convId;
-    const base = messageCache.get(convId) ?? (isActive() ? messages : []);
-
-    const pendingMsg: Message = {
-      message_id: "pending-" + Date.now(),
-      conversation_id: convId,
-      sender_id: userId!,
-      raw_text: text,
-      healed_text: text,
-      language,
-      translation: null,
-      translations: {},
-      corrections: [],
-      next_challenge: null,
-      created_at: new Date().toISOString(),
-      _pending: true,
-    };
-
-    let convMsgs = [...base, pendingMsg];
-    messageCache.set(convId, convMsgs);
-    if (isActive()) messages = convMsgs;
-
-    // Sidebar "agent working" indicator — scoped to convId so it keeps
-    // showing on this chat even if the user switches away while the
-    // (blocking) agent request is in flight. Cleared in finally for
-    // every exit: success, agent_error, exception.
-    setAgentWorking(convId, true);
-
+    if (!chat) return;
+    const id = chat.id;
     try {
-      const result = await api.sendMessage(convId, text, language, intent);
-      convMsgs = (messageCache.get(convId) ?? convMsgs).map((m) =>
-        m.message_id === pendingMsg.message_id ? result.message : m
-      );
-      if (result.agent_message) {
-        if (!convMsgs.find((m) => m.message_id === result.agent_message.message_id)) {
-          convMsgs = [...convMsgs, result.agent_message];
-        }
-      } else if (result.agent_error && isActive()) {
-        agentError = result.agent_error;
-      }
-      messageCache.set(convId, convMsgs);
-      if (isActive()) {
-        messages = convMsgs;
-        if (result.agent_message) fillMissingTranslations(convId);
-      }
-    } catch (err) {
-      console.error("Failed to send message:", err);
-      const pruned = (messageCache.get(convId) ?? convMsgs).filter(
-        (m) => m.message_id !== pendingMsg.message_id,
-      );
-      messageCache.set(convId, pruned);
-      if (isActive()) messages = pruned;
-    } finally {
-      sending = false;
-      setAgentWorking(convId, false);
-    }
-  }
-
-  async function fillMissingTranslations(convId: string) {
-    const langs = [...new Set([...myLangs, ...myBaseLangs].filter(Boolean))];
-    if (langs.length === 0) return;
-
-    const needsWork = messages.some(
-      (m) => !m._pending && langs.some((l) => !m.translations?.[l])
-    );
-    if (!needsWork) return;
-
-    console.log(`[Translation] Filling missing translations for langs=[${langs.join(",")}] in ${convId.slice(0, 8)}`);
-    try {
-      const translated = await api.translateMessages(convId, langs);
-      if (conv?.conversation_id === convId) {
-        console.log(`[Translation] Filled translations for ${translated.length} message(s)`);
-        messages = translated;
-        messageCache.set(convId, translated);
-      }
-    } catch (err) {
-      console.error("[Translation] Failed to fill:", err);
-    }
-  }
-
-  function scrollToBottom() {
-    requestAnimationFrame(() => {
-      if (messagesEl) messagesEl.scrollTop = messagesEl.scrollHeight;
-    });
-  }
-
-  let translating = $state(false);
-
-  async function switchLanguage(field: "target_languages" | "base_languages", value: string) {
-    if (!conv) return;
-    try {
-      // For now, wrap single selection in array format
-      const updates = field === "target_languages"
-        ? { target_languages: [{ lang: value, cefr_level: "A1" }] }
-        : { base_languages: [value] };
-
-      await api.updateLanguages(conv.conversation_id, updates as any);
+      const updates =
+        field === "target_languages"
+          ? { target_languages: [{ lang: value, cefr_level: "A1" }] }
+          : { base_languages: [value] };
+      await api.updateLanguages(id, updates as Record<string, unknown>);
       const convs = await api.getConversations();
-      const updated = convs.find((cv: any) => cv.conversation_id === conv.conversation_id);
-      if (updated) {
-        conversations.value = convs;
-        activeConversation.value = updated;
-      }
+      chatStore.setConversations(convs);
 
-      if (messages.length > 0) {
+      const c = chatStore.get(id);
+      if (c && c.messages.length > 0) {
         translating = true;
         try {
-          const updatedMember = updated?.members?.find((m: any) => m.user_id === userId);
-          const targetLangs = updatedMember?.target_languages?.map((t: any) => t.lang) ?? [myLang];
-          const baseLangs = updatedMember?.base_languages ?? [myBaseLang];
-          const langs = [...new Set([...targetLangs, ...baseLangs])];
-          const translated = await api.translateMessages(conv.conversation_id, langs);
-          messages = translated;
+          const langs = [
+            ...new Set(
+              [
+                ...(c.member?.target_languages?.map((t) => t.lang) ?? []),
+                ...(c.member?.base_languages ?? []),
+              ].filter(Boolean),
+            ),
+          ];
+          c.messages = (await api.translateMessages(id, langs)) as typeof c.messages;
         } catch (err) {
           console.error("Failed to translate messages:", err);
         } finally {
@@ -317,7 +127,7 @@
   const langCodes = Object.keys(LANGUAGES);
 </script>
 
-{#if !conv}
+{#if !chat}
   <div class="empty-state">Select a conversation to start chatting</div>
 {:else}
   {#if isOrphan}
@@ -383,7 +193,7 @@
         viewerLangs={myLangs}
         baseLangs={myBaseLangs}
         challenge={msg.next_challenge ?? null}
-        conversationId={conv?.conversation_id}
+        conversationId={chat.id}
       />
     {/each}
   </div>
@@ -392,21 +202,16 @@
     <div class="translating">Translating messages...</div>
   {/if}
 
-  {#if agentError}
+  {#if chat.agentError}
     <div class="agent-error">
-      <strong>Agent error:</strong> {agentError}
-      <button class="dismiss-btn" onclick={() => agentError = null}>×</button>
+      <strong>Agent error:</strong> {chat.agentError}
+      <button class="dismiss-btn" onclick={() => (chat.agentError = null)}>×</button>
     </div>
   {/if}
 
   <div class="input-area">
     {#if myMember}
-      <MessageInput
-        conversationId={conv.conversation_id}
-        member={myMember}
-        disabled={sending || isOrphan}
-        onSend={handleSend}
-      />
+      <MessageInput {chat} disabled={isOrphan} />
     {/if}
   </div>
 {/if}

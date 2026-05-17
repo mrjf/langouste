@@ -1,131 +1,59 @@
-<script module lang="ts">
-  // Per-conversation unsent-draft cache. Module-scoped so a draft survives
-  // switching conversations (and even a remount of this component). Entries
-  // are written when leaving a conversation and cleared on successful send.
-  interface DraftSnapshot {
-    text: string;
-    checkedText: string;
-    intentText: string;
-    detectedLang: string;
-    state: "idle" | "checking" | "squiggled" | "explained";
-    errors: unknown[];
-    explanations: unknown[];
-    additionalErrors: unknown[];
-    correctedMessage: string;
-  }
-  const draftCache = new Map<string, DraftSnapshot>();
-
-  // Conversations with a check/explain pipeline currently in flight. Used so
-  // that returning to a chat whose check is still running shows its progress
-  // instead of starting a duplicate run, and so an explicit cancel/resend
-  // can still abort it. The pipeline keeps running across conversation
-  // switches (it's pinned to its own convId) — results land in that
-  // conversation's draftCache regardless of which chat is open.
-  const runningChecks = new Map<string, AbortController>();
-</script>
-
 <script lang="ts">
-  import { api } from "../lib/api";
   import { langTag, LANGUAGES } from "../lib/languages";
-  import type { ConversationMember } from "../lib/stores.svelte";
-  import { setAgentWorking } from "../lib/stores.svelte";
   import { mdInline as renderMarkdown } from "../lib/md";
+  import type { Chat, TextError } from "../lib/chat.svelte";
 
-  interface TextError {
-    start: number;
-    end: number;
-    text: string;
-    kind: "spelling" | "grammar";
-    suggestions?: string[];
-  }
-
-  interface ErrorExplanation {
-    error: TextError;
-    explanations: Record<string, string>;
-  }
-
+  // Pure renderer: all draft / review / send state lives on the Chat.
   interface Props {
-    conversationId: string;
-    member: ConversationMember;
+    chat: Chat;
     disabled?: boolean;
-    // conversationId is passed through so the parent always sends to the
-    // chat the text was composed in, never whatever is active now.
-    onSend: (
-      conversationId: string,
-      text: string,
-      language: string,
-      intent?: string,
-    ) => void;
   }
+  let { chat, disabled = false }: Props = $props();
 
-  let {
-    conversationId,
-    member,
-    disabled = false,
-    onSend,
-  }: Props = $props();
+  const member = $derived(chat.member);
+  const targetLangCodes = $derived(member?.target_languages.map((t) => t.lang) ?? []);
+  const baseLangs = $derived(member?.base_languages ?? []);
 
-  // State
-  let text = $state("");
-  let checkedText = "";  // the text that was last spell-checked (not reactive)
-  let intentText = $state("");
-  let detectedLang = $state(member.target_languages[0]?.lang ?? "");
-  // Update detected language when member changes (e.g. conversation switch)
-  $effect.pre(() => {
-    const lang = member.target_languages[0]?.lang;
-    if (lang && lang !== detectedLang) detectedLang = lang;
+  // Editor element. The contenteditable is not reactively bound to
+  // chat.draft.text (browsers fight two-way innerText binding), so we sync
+  // it: DOM → model on input, model → DOM when the chat (or its draft)
+  // changes underneath us — e.g. switching conversations, or a pipeline
+  // that auto-cleared the draft on send.
+  let editableEl = $state<HTMLDivElement>();
+  let domText = $state(""); // last value we wrote to / read from the DOM
+
+  $effect(() => {
+    const text = chat.draft.text;
+    if (!editableEl) return;
+    if (text !== domText) {
+      editableEl.innerText = text;
+      domText = text;
+    }
   });
+
   let showLangDropdown = $state(false);
-
-  type InputState = "idle" | "checking" | "squiggled" | "explained";
-  let state: InputState = $state("idle");
-
-  let errors: TextError[] = $state([]);
-  let explanations: ErrorExplanation[] = $state([]);
-  let additionalErrors: Array<TextError & { corrected: string; explanations: Record<string, string> }> = $state([]);
-  let correctedMessage = "";  // the fully corrected message from Opus
-
-  // Build a map from error text → corrected form (from both explanation sources)
-  let correctionMap = $derived.by(() => {
-    const map = new Map<string, string>();
-    for (const e of explanations) {
-      if (e.corrected) map.set(e.error.text.toLowerCase(), e.corrected.toLowerCase());
-    }
-    for (const e of additionalErrors) {
-      if (e.corrected) map.set(e.text.toLowerCase(), e.corrected.toLowerCase());
-    }
-    return map;
+  let shownBaseLang = $state("");
+  $effect(() => {
+    if (!shownBaseLang && baseLangs.length) shownBaseLang = baseLangs[0];
   });
 
-  // Per-error resolution status.
-  //
-  // An individual error is "resolved" when the user has replaced its
-  // erroneous text with the suggested correction. Concretely:
-  //   - If the error text is gone from the current message AND the corrected
-  //     form is present → resolved.
-  //   - If the entire current message matches the LLM's corrected_message
-  //     (whitespace/case-normalised) → every error resolved.
-  //   - Otherwise → unresolved.
-  //
-  // Resolved errors stay visible in the hint panel but marked done, and
-  // their squiggles are dropped from the overlay.
+  // --- view derivations of the review state (pure) ---------------------
 
-  function isResolved(errText: string, corrected: string, currentLower: string, fullyMatched: boolean): boolean {
+  function isResolved(
+    errText: string,
+    corrected: string,
+    currentLower: string,
+    fullyMatched: boolean,
+  ): boolean {
     if (fullyMatched) return true;
     if (!corrected) return false;
     const orig = errText.toLowerCase();
     const fix = corrected.toLowerCase();
-    // Identical correction: can't tell edit state; trust "full match" path.
     if (orig === fix) return false;
-    const origStill = currentLower.includes(orig);
-    const fixThere = currentLower.includes(fix);
-    if (origStill) return false;          // user hasn't removed the wrong text yet
-    return fixThere;                       // wrong gone AND right arrived
+    if (currentLower.includes(orig)) return false;
+    return currentLower.includes(fix);
   }
 
-  // Build a single ordered, de-duplicated list of explanations from both
-  // sources, tagged with resolution state. Used for the hint panel and to
-  // derive the squiggled errors.
   interface ResolvableExplanation {
     error: TextError;
     corrected: string;
@@ -133,17 +61,17 @@
     resolved: boolean;
   }
 
-  let explanationList = $derived.by<ResolvableExplanation[]>(() => {
-    const currentLower = text.toLowerCase();
-    const target = correctedMessage.trim().toLowerCase();
+  const explanationList = $derived.by<ResolvableExplanation[]>(() => {
+    const r = chat.review;
+    const currentLower = chat.draft.text.toLowerCase();
+    const target = r.correctedMessage.trim().toLowerCase();
     const normCurrent = currentLower.trim().replace(/\s+/g, " ");
     const normTarget = target.replace(/\s+/g, " ");
     const fullyMatched = !!target && normCurrent === normTarget;
 
     const rows: ResolvableExplanation[] = [];
     const seen = new Set<string>();
-
-    for (const e of explanations) {
+    for (const e of r.explanations) {
       const key = e.error.text.toLowerCase();
       if (seen.has(key)) continue;
       seen.add(key);
@@ -154,7 +82,7 @@
         resolved: isResolved(e.error.text, e.corrected, currentLower, fullyMatched),
       });
     }
-    for (const e of additionalErrors) {
+    for (const e of r.additionalErrors) {
       const key = e.text.toLowerCase();
       if (seen.has(key)) continue;
       seen.add(key);
@@ -165,179 +93,26 @@
         resolved: isResolved(e.text, e.corrected, currentLower, fullyMatched),
       });
     }
-
     return rows.sort((a, b) => a.error.start - b.error.start);
   });
 
-  // Errors still needing attention — drives the inline squiggles and the
-  // "can submit?" logic. When the LLM hasn't returned a corrected form yet,
-  // fall back to "is the erroneous text still in the message?" so stale
-  // squiggles anchored to deleted characters don't linger.
-  let activeErrors = $derived.by(() => {
-    if (errors.length === 0 && additionalErrors.length === 0) return [];
-
-    const currentLower = text.toLowerCase();
+  const activeErrors = $derived.by<TextError[]>(() => {
+    const r = chat.review;
+    if (r.errors.length === 0 && r.additionalErrors.length === 0) return [];
+    const currentLower = chat.draft.text.toLowerCase();
     const anyCorrectedLoaded = explanationList.some((e) => !!e.corrected);
-
-    // Errors we have explanations for: use the resolved flag.
-    const active: TextError[] = [];
     const explainedKeys = new Set(explanationList.map((e) => e.error.text.toLowerCase()));
-
-    for (const row of explanationList) {
-      if (!row.resolved) active.push(row.error);
-    }
-
-    // Raw spell-check errors without an explanation (LLM hasn't answered
-    // yet): keep them visible while the erroneous text is still present.
-    for (const err of errors) {
+    const active: TextError[] = [];
+    for (const row of explanationList) if (!row.resolved) active.push(row.error);
+    for (const err of r.errors) {
       if (explainedKeys.has(err.text.toLowerCase())) continue;
-      if (anyCorrectedLoaded) continue; // partial response; don't re-add
+      if (anyCorrectedLoaded) continue;
       if (currentLower.includes(err.text.toLowerCase())) active.push(err);
     }
-
     return active;
   });
 
-  // Backward-compat name for the hint panel: show ALL explanations (resolved
-  // and unresolved), so the user sees what they've fixed.
-  let activeExplanations = $derived(explanationList);
-
-  // Refs
-  let editableEl: HTMLDivElement | undefined = $state();
-  let checkController: AbortController | null = null;
-  let explainController: AbortController | null = null;
-
-  // Snapshot the current draft into the module cache (or drop the entry if
-  // there's nothing worth keeping).
-  function captureDraft(convId: string) {
-    if (!text.trim() && !intentText.trim()) {
-      draftCache.delete(convId);
-      return;
-    }
-    // These arrays are always replaced wholesale (never mutated in place),
-    // so a shallow copy is a safe snapshot and avoids $state.snapshot().
-    draftCache.set(convId, {
-      text,
-      checkedText,
-      intentText,
-      detectedLang,
-      state,
-      errors: [...errors],
-      explanations: [...explanations],
-      additionalErrors: [...additionalErrors],
-      correctedMessage,
-    });
-  }
-
-  // Restore a cached draft for `convId`, or reset to a clean idle editor.
-  // If the draft was mid-check when we left (no results yet), re-run the
-  // pipeline so the user lands back where they were.
-  function restoreDraft(convId: string) {
-    const d = draftCache.get(convId);
-    text = d?.text ?? "";
-    checkedText = d?.checkedText ?? "";
-    intentText = d?.intentText ?? "";
-    if (d?.detectedLang) detectedLang = d.detectedLang;
-    errors = (d?.errors ?? []) as TextError[];
-    explanations = (d?.explanations ?? []) as ErrorExplanation[];
-    additionalErrors = (d?.additionalErrors ?? []) as typeof additionalErrors;
-    correctedMessage = d?.correctedMessage ?? "";
-    state = d?.state ?? "idle";
-
-    // Re-sync the contenteditable (it isn't reactively bound to `text`).
-    requestAnimationFrame(() => {
-      if (editableEl) editableEl.innerText = text;
-    });
-
-    // If a pipeline is still running for this conversation, leave it be —
-    // it will deliver results here via applyToConv. Only re-run when the
-    // draft says "checking" but nothing is actually in flight (e.g. a
-    // check that was interrupted by a reload).
-    if (state === "checking" && text.trim() && !runningChecks.has(convId)) {
-      runCheckPipeline();
-    }
-  }
-
-  // Merge a partial draft into conversation `convId`: always update its
-  // cache entry (so a later switch restores it), and if that conversation
-  // is the one on screen, mirror it into the live editor state too. This
-  // is how a background pipeline delivers its results to the right chat
-  // whether or not the user is looking at it.
-  function applyToConv(convId: string, patch: Partial<DraftSnapshot>) {
-    const prev: DraftSnapshot =
-      draftCache.get(convId) ??
-      ({
-        text,
-        checkedText,
-        intentText,
-        detectedLang,
-        state: "idle",
-        errors: [],
-        explanations: [],
-        additionalErrors: [],
-        correctedMessage: "",
-      } as DraftSnapshot);
-    const merged = { ...prev, ...patch };
-    draftCache.set(convId, merged);
-
-    if (convId === conversationId) {
-      if (patch.text !== undefined) text = merged.text;
-      if (patch.checkedText !== undefined) checkedText = merged.checkedText;
-      if (patch.detectedLang !== undefined) detectedLang = merged.detectedLang;
-      if (patch.state !== undefined) state = merged.state;
-      if (patch.errors !== undefined) errors = merged.errors as TextError[];
-      if (patch.explanations !== undefined)
-        explanations = merged.explanations as ErrorExplanation[];
-      if (patch.additionalErrors !== undefined)
-        additionalErrors = merged.additionalErrors as typeof additionalErrors;
-      if (patch.correctedMessage !== undefined)
-        correctedMessage = merged.correctedMessage;
-    }
-  }
-
-  // Save the outgoing draft and restore the incoming one when the
-  // conversation changes. Track only conversationId. The in-flight check
-  // (if any) is NOT aborted — it keeps running and writes its results into
-  // its own conversation's cache via applyToConv.
-  let prevConvId = conversationId;
-  $effect.pre(() => {
-    if (conversationId === prevConvId) return;
-    const leaving = prevConvId;
-    prevConvId = conversationId;
-
-    captureDraft(leaving);
-    restoreDraft(conversationId);
-  });
-
-  // Debounce timer for language detection
-  let detectTimer: ReturnType<typeof setTimeout> | null = null;
-
-  // Preferred base language for showing explanations
-  let preferredBaseLang = $derived(member.base_languages[0] ?? "en");
-  let shownBaseLang = $state("");
-  $effect(() => { if (!shownBaseLang) shownBaseLang = preferredBaseLang; });
-
-  const targetLangCodes = $derived(member.target_languages.map((t) => t.lang));
-
-  // Build decorated HTML for the overlay
-  let decoratedHtml = $derived.by(() => {
-    if (activeErrors.length === 0 || !text) return escapeHtml(text);
-
-    // Sort errors by start position
-    const sorted = [...activeErrors].sort((a, b) => a.start - b.start);
-    let result = "";
-    let lastEnd = 0;
-
-    for (const err of sorted) {
-      if (err.start < lastEnd) continue; // skip overlapping
-      result += escapeHtml(text.slice(lastEnd, err.start));
-      const cls = err.kind === "spelling" ? "squiggle-spelling" : "squiggle-grammar";
-      result += `<span class="${cls}">${escapeHtml(text.slice(err.start, err.end))}</span>`;
-      lastEnd = err.end;
-    }
-    result += escapeHtml(text.slice(lastEnd));
-    return result;
-  });
+  const activeExplanations = $derived(explanationList);
 
   function escapeHtml(s: string): string {
     return s
@@ -347,229 +122,76 @@
       .replace(/\n/g, "<br>");
   }
 
+  const decoratedHtml = $derived.by(() => {
+    const text = chat.draft.text;
+    if (activeErrors.length === 0 || !text) return escapeHtml(text);
+    const sorted = [...activeErrors].sort((a, b) => a.start - b.start);
+    let result = "";
+    let lastEnd = 0;
+    for (const err of sorted) {
+      if (err.start < lastEnd) continue;
+      result += escapeHtml(text.slice(lastEnd, err.start));
+      const cls = err.kind === "spelling" ? "squiggle-spelling" : "squiggle-grammar";
+      result += `<span class="${cls}">${escapeHtml(text.slice(err.start, err.end))}</span>`;
+      lastEnd = err.end;
+    }
+    result += escapeHtml(text.slice(lastEnd));
+    return result;
+  });
+
+  const detectedLang = $derived(chat.draft.lang);
+  const showProcessing = $derived(chat.review.phase === "checking");
+
+  // --- input handlers --------------------------------------------------
+
   function handleInput() {
     if (!editableEl) return;
-    text = editableEl.innerText;
-
-    // Errors are filtered reactively via activeErrors — no need to clear manually
-
-    // Debounced language detection
-    if (detectTimer) clearTimeout(detectTimer);
-    detectTimer = setTimeout(() => {
-      if (text.trim().length >= 3 && targetLangCodes.length > 1) {
-        // Client-side detection using simple heuristic:
-        // We'll rely on the server's detection since tinyld is server-side
-        // For now, keep the current detected language
-      }
-    }, 300);
+    domText = editableEl.innerText;
+    chat.setDraftText(domText);
   }
 
-  /** Sync text state from the contenteditable element */
   function syncText() {
     if (editableEl) {
-      text = editableEl.innerText ?? "";
+      domText = editableEl.innerText ?? "";
+      chat.setDraftText(domText);
     }
   }
 
-  async function handleKeydown(e: KeyboardEvent) {
+  function handleKeydown(e: KeyboardEvent) {
     if (e.key !== "Enter") return;
 
-    // Shift+Enter — force submit, bypassing all checks. The agent gets the
-    // user's text verbatim; the translator does its best with whatever's
-    // there. This is the escape hatch when the user knows they're right or
-    // doesn't want to iterate on a correction.
+    // Shift+Enter — force-send verbatim.
     if (e.shiftKey) {
       e.preventDefault();
       syncText();
-      if (!text.trim() || disabled) return;
-      cancelProcessing();
-      submit();
+      if (!chat.draft.text.trim() || disabled) return;
+      chat.sendNow();
       return;
     }
 
-    // Plain Enter — run the check / explain pipeline.
     e.preventDefault();
     syncText();
 
-    if (state === "checking") {
-      cancelProcessing();
+    // Enter while a check is running cancels it.
+    if (chat.review.phase === "checking") {
+      chat.cancelReview();
       return;
     }
+    if (!chat.draft.text.trim() || disabled) return;
 
-    if (!text.trim() || disabled) return;
-
-    // If user's text exactly matches the LLM's corrected message, submit immediately
-    if (correctedMessage && text.trim() === correctedMessage.trim()) {
-      console.log("[Send] Text matches corrected message — submitting without re-check");
-      submit();
+    // Text already matches Opus's correction → send straight away.
+    const corrected = chat.review.correctedMessage.trim();
+    if (corrected && chat.draft.text.trim() === corrected) {
+      chat.sendNow();
       return;
     }
-
-    // Re-check (will submit if clean, or show new errors)
-    await runCheckPipeline();
-  }
-
-  function cancelProcessing() {
-    console.log("[Pipeline] Cancelled");
-    const convId = conversationId;
-    runningChecks.get(convId)?.abort();
-    checkController?.abort();
-    explainController?.abort();
-    checkController = null;
-    explainController = null;
-    runningChecks.delete(convId);
-    setAgentWorking(convId, false);
-    // Reflect the cancel in both the live editor and the cache so a
-    // switch-away/return doesn't restore a stale "checking" state.
-    applyToConv(convId, {
-      errors: [],
-      explanations: [],
-      additionalErrors: [],
-      state: "idle",
-    });
-  }
-
-  // Background-safe submit: sends `convId`'s composed text via onSend and
-  // clears that conversation's draft, whether or not it's on screen.
-  function submitConv(
-    convId: string,
-    convText: string,
-    lang: string,
-    intent: string,
-  ) {
-    const trimmed = convText.trim();
-    if (!trimmed) return;
-    console.log(`[Send] Sending "${trimmed}" (lang: ${lang}) [conv ${convId.slice(0, 8)}]`);
-    onSend(convId, trimmed, lang, intent || undefined);
-    draftCache.delete(convId);
-    if (convId === conversationId) clearLiveState();
-  }
-
-  async function runCheckPipeline() {
-    // Pin this run to the conversation + the draft it started with. The
-    // pipeline keeps running across conversation switches; results are
-    // delivered to `myConvId` via applyToConv (live if it's on screen,
-    // otherwise into its draftCache). Only an explicit cancel/resend
-    // (AbortController) stops it — switching chats does not.
-    const myConvId = conversationId;
-    const myText = text;
-    const myIntent = intentText.trim();
-    let myLang = detectedLang;
-    const myController = new AbortController();
-    checkController = myController;
-    runningChecks.set(myConvId, myController);
-    setAgentWorking(myConvId, true);
-    const aborted = () => myController.signal.aborted;
-
-    applyToConv(myConvId, { state: "checking", checkedText: myText });
-    console.log(`[SpellCheck] Checking "${myText}" (lang: ${myLang}) [conv ${myConvId.slice(0, 8)}]`);
-
-    let handedOff = false; // submitConv took ownership — don't clear working
-    try {
-      // Step 1: deterministic spell check (may be noop)
-      const result = await api.checkMessage(myConvId, myText, myLang);
-      if (aborted()) return;
-
-      myLang = result.language;
-      applyToConv(myConvId, {
-        detectedLang: result.language,
-        errors: [...result.errors],
-        ...(result.errors.length > 0 ? { state: "squiggled" as const } : {}),
-      });
-      console.log(`[SpellCheck] Result: clean=${result.clean}, errors=${result.errors.length}, detected=${result.language}`);
-
-      // Step 2: always call LLM for corrections/explanations
-      const myExplain = new AbortController();
-      explainController = myExplain;
-      try {
-        const explainResult = await api.explainErrors(myConvId, {
-          text: myText,
-          errors: result.errors,
-          language: result.language,
-          intent: myIntent || undefined,
-        });
-
-        if (aborted() || myExplain.signal.aborted) return;
-
-        const corrected = explainResult.corrected_message ?? "";
-        const expl = explainResult.explanations ?? [];
-        const addl = explainResult.additional_errors ?? [];
-        const activeErrCount = (result.errors as TextError[]).length;
-        console.log(`[Explain] Corrected: "${corrected}" — ${expl.length} expl, ${addl.length} extra`);
-
-        // LLM says it's already correct → send.
-        if (corrected && myText.trim() === corrected.trim() && activeErrCount === 0 && addl.length === 0) {
-          handedOff = true;
-          submitConv(myConvId, myText, myLang, myIntent);
-          return;
-        }
-
-        if (expl.length > 0 || addl.length > 0) {
-          applyToConv(myConvId, {
-            correctedMessage: corrected,
-            explanations: [...expl],
-            additionalErrors: [...addl],
-            state: "explained",
-          });
-        } else {
-          // No issues found by anyone → send.
-          handedOff = true;
-          submitConv(myConvId, myText, myLang, myIntent);
-        }
-      } catch (err: any) {
-        if (err?.name === "AbortError" || aborted() || myExplain.signal.aborted) return;
-        console.error("[Explain] Failed:", err);
-        if (result.clean) {
-          handedOff = true;
-          submitConv(myConvId, myText, myLang, myIntent);
-        } else {
-          applyToConv(myConvId, { state: "squiggled" });
-        }
-      }
-    } catch (err: any) {
-      if (err?.name === "AbortError" || aborted()) return;
-      console.error("Failed to check message:", err);
-      handedOff = true;
-      submitConv(myConvId, myText, myLang, myIntent);
-    } finally {
-      runningChecks.delete(myConvId);
-      if (checkController === myController) checkController = null;
-      // If we submitted, handleSend re-asserts "working" for the agent
-      // phase — keep it on for a seamless indicator. Otherwise the
-      // check/explain phase is over: stop the indicator.
-      if (!handedOff) setAgentWorking(myConvId, false);
-    }
-  }
-
-  // Reset the live editor (only valid for whatever conversation is on
-  // screen). Does not touch the draftCache — callers handle that.
-  function clearLiveState() {
-    text = "";
-    checkedText = "";
-    correctedMessage = "";
-    intentText = "";
-    errors = [];
-    explanations = [];
-    additionalErrors = [];
-    state = "idle";
-    if (editableEl) editableEl.innerText = "";
-  }
-
-  // Synchronous submit of the on-screen draft (Shift+Enter / "send anyway"
-  // / matches-correction shortcut). Background pipeline sends go through
-  // submitConv directly.
-  function submit() {
-    submitConv(conversationId, text, detectedLang, intentText.trim());
+    chat.runReview();
   }
 
   function selectLanguage(lang: string) {
-    detectedLang = lang;
+    chat.setDraftLang(lang);
     showLangDropdown = false;
   }
-
-  let showProcessing = $derived(state === "checking");
-
-  // Allow submit when all errors are fixed (activeErrors empty) even if state is squiggled/explained
 </script>
 
 <div class="message-input" class:processing={showProcessing}>
@@ -602,7 +224,7 @@
       <div class="lang-indicator">
         <button
           class="lang-flag-btn"
-          onclick={() => showLangDropdown = !showLangDropdown}
+          onclick={() => (showLangDropdown = !showLangDropdown)}
           disabled={targetLangCodes.length <= 1}
         >
           {langTag(detectedLang)}
@@ -631,28 +253,25 @@
       class="intent-input"
       placeholder="What are you trying to say? (any language)"
       rows={1}
-      bind:value={intentText}
+      value={chat.draft.intent}
+      oninput={(e) => chat.setDraftIntent((e.currentTarget as HTMLTextAreaElement).value)}
       onkeydown={(e) => {
         if (e.key !== "Enter") return;
         if (e.shiftKey) {
           e.preventDefault();
           syncText();
-          if (text.trim() && !disabled) {
-            cancelProcessing();
-            submit();
-          }
+          if (chat.draft.text.trim() && !disabled) chat.sendNow();
           return;
         }
         e.preventDefault();
         syncText();
-        if (text.trim() && !disabled) runCheckPipeline();
+        if (chat.draft.text.trim() && !disabled) chat.runReview();
       }}
     ></textarea>
   </div>
 
-  <!-- Hint panel (explanations from Opus). Shows all errors with resolved
-       ones marked done rather than removed, so the user keeps the context. -->
-  {#if explanations.length > 0 || additionalErrors.length > 0}
+  <!-- Hint panel (explanations from Opus). -->
+  {#if chat.review.explanations.length > 0 || chat.review.additionalErrors.length > 0}
     {@const totalCount = activeExplanations.length}
     {@const resolvedCount = activeExplanations.filter((e) => e.resolved).length}
     {@const remainingCount = totalCount - resolvedCount}
@@ -665,13 +284,13 @@
             {remainingCount} of {totalCount} error{totalCount !== 1 ? "s" : ""} remaining
           {/if}
         </span>
-        {#if member.base_languages.length > 1}
+        {#if baseLangs.length > 1}
           <div class="base-lang-toggle">
-            {#each member.base_languages as bl}
+            {#each baseLangs as bl}
               <button
                 class="base-lang-btn"
                 class:active={bl === shownBaseLang}
-                onclick={() => shownBaseLang = bl}
+                onclick={() => (shownBaseLang = bl)}
               >
                 {langTag(bl)}
               </button>
@@ -699,7 +318,7 @@
         </div>
       {/each}
     </div>
-  {:else if state === "squiggled" && errors.length > 0}
+  {:else if chat.review.phase === "reviewing" && chat.review.errors.length > 0}
     <div class="hint-panel loading">
       <span class="loading-dot"></span>
       Getting explanations...
@@ -707,7 +326,7 @@
   {/if}
 
   <!-- Processing indicator -->
-  {#if state === "checking"}
+  {#if chat.review.phase === "checking"}
     <div class="processing-indicator">
       <span class="loading-dot"></span>
       Checking...

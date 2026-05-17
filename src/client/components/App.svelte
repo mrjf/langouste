@@ -1,12 +1,7 @@
 <script lang="ts">
   import { onMount, onDestroy } from "svelte";
-  import {
-    user,
-    profile,
-    conversations,
-    activeConversation,
-    bumpUnread,
-  } from "../lib/stores.svelte";
+  import { user, profile } from "../lib/stores.svelte";
+  import { chatStore } from "../lib/chat.svelte";
   import { loadSession, clearSession, loadProfile, loadLocalSession } from "../lib/auth";
 
   const SINGLE_USER =
@@ -41,8 +36,10 @@
     return id.slice(0, 8);
   }
 
-  function findConv(convs: any[], slug: string) {
-    return convs.find((c: any) => c.conversation_id.startsWith(slug));
+  // Resolve a #/c/<slug> short id to a full conversation id in the store.
+  function activeIdFromSlug(slug: string): string | null {
+    const chat = chatStore.list.find((c) => c.id.startsWith(slug));
+    return chat?.id ?? null;
   }
 
   // Update URL hash when view / active conversation changes.
@@ -56,7 +53,7 @@
     } else if (view === "connections") {
       target = "#/connections";
     } else {
-      const id = activeConversation.value?.conversation_id;
+      const id = chatStore.activeId;
       target = id ? `#/c/${shortId(id)}` : "";
     }
     if (location.hash !== target) {
@@ -84,8 +81,8 @@
         loadProfile(),
         api.getConversations().catch(() => []),
       ]);
-      conversations.value = convs;
-      await routeFromHash(convs);
+      chatStore.setConversations(convs);
+      routeFromHash();
       startUnreadSubscription();
     }
 
@@ -103,20 +100,19 @@
         view = "connections";
         return;
       }
-      const convs = conversations.value;
       const match = location.hash.match(/^#\/c\/(.+)$/);
       if (match) {
         view = "chat";
-        const conv = findConv(convs, match[1]);
-        if (conv) activeConversation.value = conv;
+        const id = activeIdFromSlug(match[1]);
+        if (id) chatStore.setActive(id);
       } else if (!location.hash || location.hash === "#") {
         view = "chat";
-        activeConversation.value = null;
+        chatStore.setActive(null);
       }
     });
   });
 
-  async function routeFromHash(convs: any[]) {
+  function routeFromHash() {
     if (location.hash.startsWith("#/profile")) {
       view = "profile";
       profileSection = profileSectionFromHash(location.hash);
@@ -129,8 +125,8 @@
     const convMatch = location.hash.match(/^#\/c\/(.+)$/);
     if (convMatch) {
       view = "chat";
-      const conv = findConv(convs, convMatch[1]);
-      if (conv) activeConversation.value = conv;
+      const id = activeIdFromSlug(convMatch[1]);
+      if (id) chatStore.setActive(id);
     }
   }
 
@@ -144,7 +140,11 @@
     unsubUnread = subscribeToAllMessages((msg) => {
       if (!msg.is_agent) return; // only agent replies count as unread
       const convId = msg.conversation_id as string | undefined;
-      if (convId) bumpUnread(convId);
+      if (!convId) return;
+      const chat = chatStore.get(convId);
+      // The Chat's own realtime sub ingests the message; here we only own
+      // the badge. Don't badge the conversation that's open on screen.
+      if (chat && chatStore.activeId !== convId) chat.bumpUnread();
     });
   }
 
@@ -157,8 +157,8 @@
 
   async function onAuthenticated() {
     const convs = await api.getConversations();
-    conversations.value = convs;
-    await routeFromHash(convs);
+    chatStore.setConversations(convs);
+    routeFromHash();
     startUnreadSubscription();
     routed = true;
   }
@@ -184,7 +184,7 @@
       <nav class="sidebar-nav">
         <button
           class="nav-item"
-          class:active={view === "chat" && !!activeConversation.value}
+          class:active={view === "chat" && !!chatStore.activeId}
           onclick={() => { view = "chat"; }}
         >
           💬 Chats
@@ -192,14 +192,14 @@
         <button
           class="nav-item"
           class:active={view === "profile"}
-          onclick={() => { view = "profile"; activeConversation.value = null; }}
+          onclick={() => { view = "profile"; chatStore.setActive(null); }}
         >
           📊 Your progress
         </button>
         <button
           class="nav-item"
           class:active={view === "connections"}
-          onclick={() => { view = "connections"; activeConversation.value = null; }}
+          onclick={() => { view = "connections"; chatStore.setActive(null); }}
         >
           🔌 Connections
         </button>

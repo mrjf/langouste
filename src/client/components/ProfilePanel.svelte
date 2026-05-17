@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { profile, activeConversation } from "../lib/stores.svelte";
+  import { profile } from "../lib/stores.svelte";
+  import { chatStore } from "../lib/chat.svelte";
   import { api } from "../lib/api";
   import { langOption, langTag, LANGUAGES } from "../lib/languages";
 
@@ -127,9 +128,7 @@
 
   function jumpToMessage(conversationId: string) {
     const short = conversationId.slice(0, 8);
-    // Find the Conversation object in the store and open it.
-    const conv = { conversation_id: conversationId } as any;
-    activeConversation.value = conv;
+    chatStore.setActive(conversationId);
     location.hash = `#/c/${short}`;
   }
 
