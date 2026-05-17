@@ -300,7 +300,7 @@ messageRoutes.get("/:conversationId/:messageId/audio", async (c) => {
   if (!text?.trim()) return c.json({ error: "Nothing to synthesise" }, 400);
 
   try {
-    const result = await provider.synthesize(text, { language: targetLang });
+    const result = await provider.synthesize(text, { language: targetLang, userId });
     return new Response(result.audio, {
       status: 200,
       headers: {

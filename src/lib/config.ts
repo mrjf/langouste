@@ -29,7 +29,14 @@ export const config = {
   // "elevenlabs" requires ELEVENLABS_API_KEY.
   audioProvider: (process.env.AUDIO_PROVIDER ?? "none").toLowerCase(),
   elevenLabsApiKey: process.env.ELEVENLABS_API_KEY ?? "",
+  // Legacy single global voice. Still honored as the "default" entry when
+  // ELEVENLABS_VOICES has no explicit "default" key (back-compat).
   elevenLabsVoiceId: process.env.ELEVENLABS_VOICE_ID ?? "",
+  // Per-language voice/model map as a JSON object keyed by language code:
+  //   {"hu":{"voiceId":"...","model":"eleven_turbo_v2_5"},
+  //    "default":{"voiceId":"..."}}
+  // Parsed + validated by the voice resolver. See docs/MODES.md / README.
+  elevenLabsVoices: process.env.ELEVENLABS_VOICES ?? "",
 
   // Local auth JWT secret (sqlite mode). Required only when DATABASE_MODE=sqlite.
   jwtSecret: requiredIf("sqlite", databaseMode, "LANGOUSTE_JWT_SECRET"),

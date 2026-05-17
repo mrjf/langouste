@@ -15,6 +15,11 @@ export interface AudioSynthesisOptions {
   language?: string;
   /** Provider-agnostic voice hint. Implementations resolve to a concrete voice. */
   voice?: string;
+  /**
+   * Requesting user. Unused today (env-backed voice resolution), but plumbed
+   * through so a future per-user voice resolver needs no signature changes.
+   */
+  userId?: string;
 }
 
 export interface AudioProvider {
