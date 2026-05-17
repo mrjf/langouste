@@ -23,6 +23,10 @@ Start here. The docs are layered — read in order if you're new, jump to the re
 - [TESTING.md](./TESTING.md) — five-layer testing strategy including the pedagogical eval harness.
 - [RELEASE.md](./RELEASE.md) — two deployment tiers, versioning, migrations, rollbacks, feature flags.
 
+## Landscape
+
+- [PRIOR-ART.md](./PRIOR-ART.md) — adjacent projects in the SRS / LLM-flashcards / agent-driven-review space, with notes on how Langouste differs and where to embed vs reinvent.
+
 ## If you're trying to…
 
 - **Contribute a new language** → `ONTOLOGY.md` (concept catalog, applicability rows), `PARSING.md` (per-language rules + parser availability), `REFERENCES.md` (URL templates), `LEARNING-MODEL.md` (L1 priors).

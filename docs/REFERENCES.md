@@ -10,6 +10,16 @@ Every correction, every vocabulary item, every grammar concept should be one tap
 4. **A healthcheck for every template.** Weekly cron pings each template with canonical test inputs; flags stale templates before a user ever sees a 404.
 5. **Prefer CC-licensed content for ingestion.** Wiktionary (CC-BY-SA), Tatoeba (CC-BY), FrequencyWords (MIT) for anything we store server-side.
 
+## Recommendation pools — explicit, passive, generated
+
+Everything below feeds one of three pools the recommendation engine draws from when surfacing "go learn more about this":
+
+1. **Explicit instructional content** — textbooks, grammar reference sites, OCW, structured lessons. Authoritative, dense, designed to teach. URL templates and indexed sections (see below) let us deeplink straight to the relevant page.
+2. **Passive media with comprehension scaffolding** — film/TV via subtitles, podcasts via transcripts, songs via lyrics, audiobooks via aligned text. Not designed to teach, but native register, motivationally rich, and the user is consuming it anyway. Indexed at the sentence/segment level (see `media_examples` below) and linked to the ambient-listening capture so we know what they're actually hearing.
+3. **Generated media (post-v1)** — synthesized reading passages, dialogue scripts, podcast-style audio, eventually short video — composed at the user's exact CEFR sublevel using their known-lemma set plus a handful of stretch concepts they're currently learning. The pedagogical advantage: we can hit the empirically-supported 95–98% known-content threshold for incidental acquisition exactly, every time, which neither curated explicit content nor wild media reliably can. See `docs/ROADMAP.md` future-phase items.
+
+The recommendation engine treats all three uniformly: each piece of content carries `language`, `lemmas[]`, `concepts[]`, `cefr_band`, and a quality/trust weight. Ranking blends learner state (known lemmas, current gaps, stated goals, recently-heard items from ambient capture) with content metadata.
+
 ## Per-concept URL templates
 
 Stored in `assets/reference-templates.json`, loaded at boot into a registry service. Each template takes a few inputs (language, lemma, concept-id) and emits a URL.
@@ -130,6 +140,48 @@ Tatoeba provides a nightly dump at `https://downloads.tatoeba.org/exports/senten
 
 Attribution: every Tatoeba sentence carries a CC-BY attribution. Render it in the UI on the card: "Example from Tatoeba, contributor `username`."
 
+### OpenSubtitles for media-aligned examples
+
+Tatoeba sentences are linguistically clean but emotionally inert. Film and TV dialogue is the opposite — the register learners actually want to understand, anchored to scenes they remember. We ingest subtitle-derived examples so review cards can surface "this is how that word was used in *Amélie*" rather than another generic example.
+
+Source — **not** OpenSubtitles.com directly (restrictive redistribution terms, murky per-file user-uploaded licensing). We use the **OPUS OpenSubtitles parallel corpus** at `https://opus.nlpl.eu/OpenSubtitles.php` — same underlying data, but re-released by Helsinki NLP under clean terms (sentence-level, per-language and per-pair dumps). Where OPUS coverage is thin we fall back to the OpenSubtitles REST API (`https://api.opensubtitles.com/api/v1`, free tier 200 req/day) for *metadata only* — IMDb id, title, year, scene timestamps — and re-fetch sentences from OPUS.
+
+Pipeline:
+
+```
+bun scripts/ingest-opensubtitles.ts
+  --language=fr --pair=en
+  --min-imdb-rating=6.5
+  --output=seed_data/media_examples.jsonl
+```
+
+Schema: `media_examples(language, imdb_id, title, year, timestamp_ms, sentence, sentence_l1, lemmas[], concepts[])`. Sentences parsed through the same UD pipeline (`docs/PARSING.md`) so they're searchable by lemma and concept-id, same as Tatoeba.
+
+Where it shows up:
+
+1. **Review cards.** When a vocab item has both a Tatoeba and a media example, prefer the media one if its register matches learner goals (conversational > literary > formal). Render as "From *Title* (year), scene 00:42:13."
+2. **"Heard in the wild" linkage.** The ambient listening feature (see `docs/ROADMAP.md` Phase 2 item 5) captures lemmas the user is hearing. If a captured lemma matches a `media_examples` row tagged with a title the user has told us they're watching, we promote that example into their next review card. "You heard *fauché* in *Les Intouchables* last night — here's the line."
+3. **Personalization, opt-in.** Users can list films/shows/podcasts they're working through (manually, or via Trakt/Last.fm integration later). Their example pool gets filtered/ranked toward those titles.
+
+Attribution: OPUS asks for citation of *Lison & Tiedemann 2016*; the about page carries it. Per-line on-card attribution is "Subtitle from *Title* (year), via OPUS OpenSubtitles corpus."
+
+## Indexed instructional content
+
+URL templates point at known pages for known concepts. They don't help when the relevant explanation lives on page 87 of a textbook, in a blog post, or in a YouTube lesson description that no template predicts. To cover the long tail of pool 1 (explicit instructional content), we run a search index over external sources that teach the language — textbooks where rights allow, grammar reference sites, university course pages, open courseware (MIT OCW, OpenLearn), language-learning blogs, YouTube lesson transcripts (auto-captioned or community), and the better Reddit / StackExchange threads.
+
+The model is a search index, not a content store. We crawl what's allowed (`robots.txt` and per-source ToS respected), extract canonical text + per-section anchors, embed at the section level, and store `(source, url, section_anchor, embedding, language, concepts[], lemmas[])`. A query takes a `Correction` or a vocab item and returns ranked deeplinks into the source — "section 4.2 of *Schaum's French Grammar*", "the [imperfect vs. passé composé] segment of *Français Authentique* lesson 32".
+
+Scope rules:
+
+1. **Index, don't host.** We store URLs, anchors, and short search-result snippets only. Fair-use snippet length capped at ~25 words per result.
+2. **Per-source ingest adapters.** One adapter per site type — generic HTML/Readability for blogs and reference sites, RSS/sitemap for structured publishers, YouTube Data API + transcript fetch for video lessons, ePub/PDF extractors for openly licensed textbooks. Adapters live in `scripts/ingest/sources/`.
+3. **Per-section indexing.** Whole-document embeddings lose precision. We split on headings (HTML `h2`/`h3`, ePub TOC, video chapter markers) and embed each section independently so a hit can deeplink to the exact part.
+4. **Concept + lemma tagging at ingest.** Each section runs through the same UD parser as user messages (`docs/PARSING.md`) to extract lemmas and a coarse concept-id set. Stored alongside the embedding so we can filter retrieval ("only sections about `fr:verb:passe-compose-etre`") instead of relying on semantic match alone.
+5. **L1- and CEFR-aware ranking.** Final ranking boosts sections in the user's L1 (English-language explanation of French grammar for an EN learner) and matching their current band, demotes sections far above their level.
+6. **Source allowlist + quality score.** A curated allowlist seeds the crawler. Each source gets a `quality` weight (Kwiziq > random blog) tuned by hand and adjusted by click-through in the UI.
+
+Surface area: the reference-links service consults this index as a third resolution tier — after curated concept maps and after Wiktionary/conjugator templates, but before the Tatoeba fallback. The "Learn more" chips can include indexed results when no curated entry exists, labelled with source ("From *Schaum's French Grammar*, §4.2") so the learner knows what they're clicking into.
+
 ## The reference-links service
 
 Tiny, stateless module that takes a `Correction` and returns up to three link chips.
@@ -153,9 +205,11 @@ Resolution order:
 
 1. If `correction.concept_id` resolves to an entry in `concepts.reference_urls`, use those (up to 2).
 2. If the correction's lemma is a verb, append a Cooljugator / Reverso conjugator link.
-3. Otherwise append a Wiktionary entry link.
-4. Always append a Tatoeba example-search link as the third slot.
-5. Healthcheck-cached 404s are skipped silently.
+3. For a single-word lemma in a supported bilingual pair, append a WordReference link (`/{l1}{l2}/{term}`) — cleaner translations and richer usage notes than Wiktionary for most learners, and the URL pattern is rock-stable.
+4. If a concept hit exists in the instructional-content index (above), append the top-ranked indexed section.
+5. Otherwise append a Wiktionary entry link as the dictionary fallback.
+6. Always append a Tatoeba or `media_examples` example-search link as the final slot — prefer `media_examples` if the user has any opted-in titles overlapping the lemma.
+7. Healthcheck-cached 404s are skipped silently.
 
 Result is cached into `reference_links` table keyed by `correction_id` so the URLs don't recompute on every fetch and the healthcheck has a surface to scan.
 
@@ -188,4 +242,15 @@ The about page in the app lists every ingested source with license and link. Not
 
 ## Future: Langouste's own reference content
 
-Long-term, we generate per-concept reference pages that are multilingual-aware and L1-sensitive — the kind of explanation we want learners to see but no single source currently provides. Not v1. But the schema supports it: `concepts.reference_urls` can include `{source: "langouste", url: "/ref/fr:verb:passe-compose-etre"}` alongside the external ones. We'd just need to write the pages.
+Long-term, we generate per-concept reference pages that are multilingual-aware and L1-sensitive — the kind of explanation we want learners to see but no single source currently provides. Not v1. But the schema supports it: `concepts.reference_urls` can include `{source: "langouste", url: "/ref/fr:verb:passe-compose-etre"}` alongside the external ones.
+
+## Future: Langouste-generated media (pool 3)
+
+Beyond reference *pages*, we also generate the *consumable content* pool — reading passages, dialogues, podcast-style audio, and eventually short video — composed at the user's exact CEFR sublevel. Mechanism:
+
+1. Take the user's known-lemma set (>= 95% of content tokens drawn from it), pick 2–4 "stretch" target concepts from their current `grammar_gaps`, and pick a topic from their stated interests or recently-discussed conversation themes.
+2. A composer agent drafts text constrained to those vocabulary + concept budgets. A verifier agent re-parses through `docs/PARSING.md` and rejects any draft that breaches the budget — no LLM self-certification.
+3. Pipe through TTS for audio variants; through diffusion / image-gen for accompanying visuals; eventually through video composition.
+4. Cache to `generated_media` with the same `(language, lemmas[], concepts[], cefr_band)` schema as the other two pools, so the recommendation engine can rank generated alongside curated and wild content.
+
+The killer property: every gap a user has can be paired with content that hits 95–98% comprehensibility on it specifically. No textbook, podcast, or film does that for any individual learner.
