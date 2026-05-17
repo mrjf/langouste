@@ -20,6 +20,7 @@
  * public fields are reactive; components read them directly.
  */
 
+import { SvelteMap } from "svelte/reactivity";
 import { api } from "./api";
 import { subscribeToMessages } from "./supabase";
 import type { Conversation, Message, ConversationMember } from "./stores.svelte";
@@ -408,7 +409,9 @@ export class Chat {
  * here. There is exactly one Chat per conversation for the whole session.
  */
 class ChatStore {
-  #chats = new Map<string, Chat>();
+  // Reactive map: getters that read it (active/list/get) are tracked, so a
+  // mutation to any Chat — or to the membership — propagates to the views.
+  #chats = new SvelteMap<string, Chat>();
   /** Ordered conversation list for the sidebar (newest first from server). */
   order = $state<string[]>([]);
   /** The conversation currently shown in the main view. */

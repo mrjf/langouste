@@ -32,10 +32,14 @@
   let messagesEl = $state<HTMLElement>();
   let translating = $state(false);
 
+  // Read chat.messages unconditionally (no early return) so the
+  // dependency on the active chat's messages signal is always tracked —
+  // otherwise a reassignment (agent reply replacing the pending bubble)
+  // wouldn't re-render until a reload.
+  const allMessages = $derived(chat ? chat.messages : []);
   const uniqueMessages = $derived.by(() => {
-    if (!chat) return [];
     const seen = new Set<string>();
-    return chat.messages.filter((m) => {
+    return allMessages.filter((m) => {
       if (seen.has(m.message_id)) return false;
       seen.add(m.message_id);
       return true;
