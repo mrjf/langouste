@@ -14,12 +14,21 @@
     correctedMessage: string;
   }
   const draftCache = new Map<string, DraftSnapshot>();
+
+  // Conversations with a check/explain pipeline currently in flight. Used so
+  // that returning to a chat whose check is still running shows its progress
+  // instead of starting a duplicate run, and so an explicit cancel/resend
+  // can still abort it. The pipeline keeps running across conversation
+  // switches (it's pinned to its own convId) — results land in that
+  // conversation's draftCache regardless of which chat is open.
+  const runningChecks = new Map<string, AbortController>();
 </script>
 
 <script lang="ts">
   import { api } from "../lib/api";
   import { langTag, LANGUAGES } from "../lib/languages";
   import type { ConversationMember } from "../lib/stores.svelte";
+  import { setAgentWorking } from "../lib/stores.svelte";
   import { mdInline as renderMarkdown } from "../lib/md";
 
   interface TextError {
@@ -240,27 +249,61 @@
       if (editableEl) editableEl.innerText = text;
     });
 
-    // We aborted any in-flight check on the way out. If we left while
-    // still "checking" there are no results to show — kick it off again.
-    if (state === "checking" && text.trim()) {
+    // If a pipeline is still running for this conversation, leave it be —
+    // it will deliver results here via applyToConv. Only re-run when the
+    // draft says "checking" but nothing is actually in flight (e.g. a
+    // check that was interrupted by a reload).
+    if (state === "checking" && text.trim() && !runningChecks.has(convId)) {
       runCheckPipeline();
     }
   }
 
+  // Merge a partial draft into conversation `convId`: always update its
+  // cache entry (so a later switch restores it), and if that conversation
+  // is the one on screen, mirror it into the live editor state too. This
+  // is how a background pipeline delivers its results to the right chat
+  // whether or not the user is looking at it.
+  function applyToConv(convId: string, patch: Partial<DraftSnapshot>) {
+    const prev: DraftSnapshot =
+      draftCache.get(convId) ??
+      ({
+        text,
+        checkedText,
+        intentText,
+        detectedLang,
+        state: "idle",
+        errors: [],
+        explanations: [],
+        additionalErrors: [],
+        correctedMessage: "",
+      } as DraftSnapshot);
+    const merged = { ...prev, ...patch };
+    draftCache.set(convId, merged);
+
+    if (convId === conversationId) {
+      if (patch.text !== undefined) text = merged.text;
+      if (patch.checkedText !== undefined) checkedText = merged.checkedText;
+      if (patch.detectedLang !== undefined) detectedLang = merged.detectedLang;
+      if (patch.state !== undefined) state = merged.state;
+      if (patch.errors !== undefined) errors = merged.errors as TextError[];
+      if (patch.explanations !== undefined)
+        explanations = merged.explanations as ErrorExplanation[];
+      if (patch.additionalErrors !== undefined)
+        additionalErrors = merged.additionalErrors as typeof additionalErrors;
+      if (patch.correctedMessage !== undefined)
+        correctedMessage = merged.correctedMessage;
+    }
+  }
+
   // Save the outgoing draft and restore the incoming one when the
-  // conversation changes. Track only conversationId.
+  // conversation changes. Track only conversationId. The in-flight check
+  // (if any) is NOT aborted — it keeps running and writes its results into
+  // its own conversation's cache via applyToConv.
   let prevConvId = conversationId;
   $effect.pre(() => {
     if (conversationId === prevConvId) return;
     const leaving = prevConvId;
     prevConvId = conversationId;
-
-    // In-flight requests are conversation-specific; cancel them. A draft
-    // restored as "checking" re-runs the pipeline on return.
-    checkController?.abort();
-    explainController?.abort();
-    checkController = null;
-    explainController = null;
 
     captureDraft(leaving);
     restoreDraft(conversationId);
@@ -368,107 +411,139 @@
 
   function cancelProcessing() {
     console.log("[Pipeline] Cancelled");
+    const convId = conversationId;
+    runningChecks.get(convId)?.abort();
     checkController?.abort();
     explainController?.abort();
     checkController = null;
     explainController = null;
-    errors = [];
-    explanations = [];
-    additionalErrors = [];
-    state = "idle";
+    runningChecks.delete(convId);
+    setAgentWorking(convId, false);
+    // Reflect the cancel in both the live editor and the cache so a
+    // switch-away/return doesn't restore a stale "checking" state.
+    applyToConv(convId, {
+      errors: [],
+      explanations: [],
+      additionalErrors: [],
+      state: "idle",
+    });
+  }
+
+  // Background-safe submit: sends `convId`'s composed text via onSend and
+  // clears that conversation's draft, whether or not it's on screen.
+  function submitConv(
+    convId: string,
+    convText: string,
+    lang: string,
+    intent: string,
+  ) {
+    const trimmed = convText.trim();
+    if (!trimmed) return;
+    console.log(`[Send] Sending "${trimmed}" (lang: ${lang}) [conv ${convId.slice(0, 8)}]`);
+    onSend(convId, trimmed, lang, intent || undefined);
+    draftCache.delete(convId);
+    if (convId === conversationId) clearLiveState();
   }
 
   async function runCheckPipeline() {
-    // Pin this run to the conversation it started in. Every result is
-    // discarded if either this run was aborted OR the user has since
-    // switched conversations — otherwise an in-flight check for chat A
-    // would land its correction/errors in whatever chat is open now.
+    // Pin this run to the conversation + the draft it started with. The
+    // pipeline keeps running across conversation switches; results are
+    // delivered to `myConvId` via applyToConv (live if it's on screen,
+    // otherwise into its draftCache). Only an explicit cancel/resend
+    // (AbortController) stops it — switching chats does not.
     const myConvId = conversationId;
+    const myText = text;
+    const myIntent = intentText.trim();
+    let myLang = detectedLang;
     const myController = new AbortController();
     checkController = myController;
-    const stale = () => myController.signal.aborted || conversationId !== myConvId;
+    runningChecks.set(myConvId, myController);
+    setAgentWorking(myConvId, true);
+    const aborted = () => myController.signal.aborted;
 
-    state = "checking";
-    checkedText = text;
-    console.log(`[SpellCheck] Checking "${text}" (lang: ${detectedLang}) [conv ${myConvId.slice(0, 8)}]`);
+    applyToConv(myConvId, { state: "checking", checkedText: myText });
+    console.log(`[SpellCheck] Checking "${myText}" (lang: ${myLang}) [conv ${myConvId.slice(0, 8)}]`);
 
+    let handedOff = false; // submitConv took ownership — don't clear working
     try {
       // Step 1: deterministic spell check (may be noop)
-      const result = await api.checkMessage(myConvId, text, detectedLang);
-      if (stale()) return;
+      const result = await api.checkMessage(myConvId, myText, myLang);
+      if (aborted()) return;
 
-      detectedLang = result.language;
-      errors = result.errors;
-      console.log(`[SpellCheck] Result: clean=${result.clean}, errors=${result.errors.length}, detected=${result.language}`, result.errors);
-
-      if (result.errors.length > 0) {
-        state = "squiggled";
-      }
+      myLang = result.language;
+      applyToConv(myConvId, {
+        detectedLang: result.language,
+        errors: [...result.errors],
+        ...(result.errors.length > 0 ? { state: "squiggled" as const } : {}),
+      });
+      console.log(`[SpellCheck] Result: clean=${result.clean}, errors=${result.errors.length}, detected=${result.language}`);
 
       // Step 2: always call LLM for corrections/explanations
       const myExplain = new AbortController();
       explainController = myExplain;
-      const explainStale = () =>
-        myExplain.signal.aborted || conversationId !== myConvId;
-      console.log(`[Explain] Requesting Opus review (${result.errors.length} spell error(s) to explain)`);
       try {
         const explainResult = await api.explainErrors(myConvId, {
-          text,
+          text: myText,
           errors: result.errors,
           language: result.language,
-          intent: intentText.trim() || undefined,
+          intent: myIntent || undefined,
         });
 
-        if (explainStale()) return;
+        if (aborted() || myExplain.signal.aborted) return;
 
-        correctedMessage = explainResult.corrected_message ?? "";
-        explanations = explainResult.explanations ?? [];
-        additionalErrors = explainResult.additional_errors ?? [];
-        console.log(`[Explain] Corrected: "${correctedMessage}"`);
-        console.log(`[Explain] Got ${explanations.length} explanation(s), ${additionalErrors.length} additional grammar error(s)`, $state.snapshot(explanations), $state.snapshot(additionalErrors));
+        const corrected = explainResult.corrected_message ?? "";
+        const expl = explainResult.explanations ?? [];
+        const addl = explainResult.additional_errors ?? [];
+        const activeErrCount = (result.errors as TextError[]).length;
+        console.log(`[Explain] Corrected: "${corrected}" — ${expl.length} expl, ${addl.length} extra`);
 
-        // If LLM says the message is already correct, submit
-        if (correctedMessage && text.trim() === correctedMessage.trim() && activeErrors.length === 0 && additionalErrors.length === 0) {
-          console.log("[Explain] Message is correct — submitting");
-          submit();
+        // LLM says it's already correct → send.
+        if (corrected && myText.trim() === corrected.trim() && activeErrCount === 0 && addl.length === 0) {
+          handedOff = true;
+          submitConv(myConvId, myText, myLang, myIntent);
           return;
         }
 
-        // If LLM found issues, show them
-        if (explanations.length > 0 || additionalErrors.length > 0) {
-          state = "explained";
+        if (expl.length > 0 || addl.length > 0) {
+          applyToConv(myConvId, {
+            correctedMessage: corrected,
+            explanations: [...expl],
+            additionalErrors: [...addl],
+            state: "explained",
+          });
         } else {
-          // No issues found by anyone — submit
-          console.log("[Explain] No issues found — submitting");
-          submit();
+          // No issues found by anyone → send.
+          handedOff = true;
+          submitConv(myConvId, myText, myLang, myIntent);
         }
       } catch (err: any) {
-        if (err?.name === "AbortError" || explainStale()) return;
+        if (err?.name === "AbortError" || aborted() || myExplain.signal.aborted) return;
         console.error("[Explain] Failed:", err);
-        // LLM failed — if spell check was clean, submit anyway
         if (result.clean) {
-          submit();
+          handedOff = true;
+          submitConv(myConvId, myText, myLang, myIntent);
+        } else {
+          applyToConv(myConvId, { state: "squiggled" });
         }
       }
     } catch (err: any) {
-      if (err?.name === "AbortError" || stale()) return;
+      if (err?.name === "AbortError" || aborted()) return;
       console.error("Failed to check message:", err);
-      submit();
+      handedOff = true;
+      submitConv(myConvId, myText, myLang, myIntent);
+    } finally {
+      runningChecks.delete(myConvId);
+      if (checkController === myController) checkController = null;
+      // If we submitted, handleSend re-asserts "working" for the agent
+      // phase — keep it on for a seamless indicator. Otherwise the
+      // check/explain phase is over: stop the indicator.
+      if (!handedOff) setAgentWorking(myConvId, false);
     }
   }
 
-  function submit() {
-    const trimmed = text.trim();
-    if (!trimmed) return;
-
-    const convId = conversationId;
-    console.log(`[Send] Sending "${trimmed}" (lang: ${detectedLang}, intent: ${intentText.trim() || "none"}) [conv ${convId.slice(0, 8)}]`);
-    onSend(convId, trimmed, detectedLang, intentText.trim() || undefined);
-
-    // Sent — drop any saved draft for this conversation.
-    draftCache.delete(convId);
-
-    // Clear state
+  // Reset the live editor (only valid for whatever conversation is on
+  // screen). Does not touch the draftCache — callers handle that.
+  function clearLiveState() {
     text = "";
     checkedText = "";
     correctedMessage = "";
@@ -478,6 +553,13 @@
     additionalErrors = [];
     state = "idle";
     if (editableEl) editableEl.innerText = "";
+  }
+
+  // Synchronous submit of the on-screen draft (Shift+Enter / "send anyway"
+  // / matches-correction shortcut). Background pipeline sends go through
+  // submitConv directly.
+  function submit() {
+    submitConv(conversationId, text, detectedLang, intentText.trim());
   }
 
   function selectLanguage(lang: string) {
