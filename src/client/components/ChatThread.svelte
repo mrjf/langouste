@@ -32,14 +32,19 @@
   let messagesEl = $state<HTMLElement>();
   let translating = $state(false);
 
-  // Read chat.messages unconditionally (no early return) so the
-  // dependency on the active chat's messages signal is always tracked —
-  // otherwise a reassignment (agent reply replacing the pending bubble)
-  // wouldn't re-render until a reload.
-  const allMessages = $derived(chat ? chat.messages : []);
+  // Depend on the active chat's messages SIGNAL directly. `chat` is a
+  // stable Chat instance (chatStore.active returns the same object), so a
+  // chained $derived over `chat` memoises on that unchanging reference and
+  // does NOT propagate an invalidation when chat.messages is reassigned
+  // (the agent reply replacing the "…" bubble) — that was the
+  // "stuck until reload" bug. In sqlite mode the HTTP response in #send is
+  // the ONLY updater (no realtime), so this must react. Reading
+  // chatStore.active?.messages inside this single $derived.by makes the
+  // messages $state itself the tracked dependency.
   const uniqueMessages = $derived.by(() => {
+    const msgs = chatStore.active?.messages ?? [];
     const seen = new Set<string>();
-    return allMessages.filter((m) => {
+    return msgs.filter((m) => {
       if (seen.has(m.message_id)) return false;
       seen.add(m.message_id);
       return true;
