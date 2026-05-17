@@ -43,6 +43,7 @@ const JSON_COLUMNS = new Set([
   "evidence",
   "before_state",
   "after_state",
+  "phases",
 ]);
 
 function toStorage(row: Record<string, unknown>): Record<string, unknown> {
