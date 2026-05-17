@@ -1,0 +1,27 @@
+# Exact-output evals for Hungarian (hu).
+#
+# Dead-simple format: each case sends `text` (+ optional `intent`) through the
+# real spell-checker and the real Opus error-explainer, then asserts the
+# returned corrected_message equals `corrected` EXACTLY (after trim only — no
+# case folding, no punctuation stripping).
+#
+# One file per language. Add a case: copy a block, fill in text/intent/
+# corrected. `name` is just for the test report. `intent` is optional (omit
+# for "no guidance given").
+#
+# Run: ANTHROPIC_API_KEY=sk-... npm run test:evals
+
+language: hu
+
+defaults:
+  base_languages: [en]
+  cefr_level: A1
+
+cases:
+  - name: "greeting + intent: stray 'ki vanok' becomes 'kívánok', greeting kept"
+    text: "jo reggelt ki vanok"
+    intent: "I'm saying good morning"
+    # Exact model output (lowercase j, no period) — recorded from a real run,
+    # not hand-written. Update this only when an intentional prompt/model
+    # change shifts the output; a surprise diff here is a regression signal.
+    corrected: "jó reggelt kívánok"

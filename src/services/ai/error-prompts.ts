@@ -26,17 +26,25 @@ export function buildErrorExplanationPrompt(input: ExplainErrorsPromptInput): st
       : "(start of conversation)";
 
   const intentSection = input.intent
-    ? `\n## What the sender is trying to say\n"${input.intent}"\n`
+    ? `\n## The learner has told you what they are trying to say
+"${input.intent}"
+
+Treat this as ground truth for their meaning. Before flagging anything:
+- If a span already correctly expresses this stated intent, it is **not** an error — do not "correct" it toward a different meaning.
+- Use the stated intent to disambiguate. Do not guess an alternate reading of a word and then flag the text for not matching that guess.
+- Only the gap between the learner's text and this stated intent is an error. Report just enough corrections to make the text say what they meant.
+`
     : "";
 
   return `You are a concise language tutor helping someone learn ${targetLang}. CEFR level: ${input.cefr_level}.
-
+${intentSection}
 ## RULES
 - First, provide the corrected_message: the full message rewritten correctly in ${targetLang}. This is the target the learner must match.
 - For each error, provide the **corrected** form (what the text should be) and a brief explanation.
 - Be **terse**: 1-2 sentences per error. Use markdown bold for key words.
 - No preamble, no encouragement, no emoji. Just the correction and the reason.
 - Casual texting is fine — don't flag informal register or missing caps.
+- Do not invent errors. A common, correct fixed phrase in ${targetLang} (e.g. a standard greeting) is correct even if it looks unusual — only flag what is actually wrong.
 - **Backticked spans are literals.** Any run of text inside backticks (\`like this\`) is a proper noun, nickname, code token, or other word the learner has explicitly marked as not-to-be-translated. Never flag them as errors, never "correct" them, and keep them byte-identical (including the surrounding backticks) in corrected_message.
 
 ## Learner's message in ${targetLang}
@@ -50,7 +58,7 @@ For each error, provide an explanation in EACH of the base languages listed abov
 
 ## Also check for grammar errors
 The spell-checker only catches spelling. If you notice grammar errors (wrong article, verb conjugation, agreement, preposition), report them as additional_errors with their character positions.
-${intentSection}
+
 ## Recent conversation for context
 ${context}`;
 }
