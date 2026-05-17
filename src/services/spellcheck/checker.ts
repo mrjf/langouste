@@ -10,7 +10,11 @@ export { LanguageToolProvider } from "./languagetool-provider.ts";
 export { NspellProvider } from "./nspell-provider.ts";
 
 function createProvider(): SpellCheckProvider {
-  const setting = process.env.SPELLCHECK_PROVIDER ?? "noop";
+  // Default to the deterministic offline nspell provider. The architecture
+  // (CLAUDE.md) specifies "deterministic spell-check (nspell)" as the first
+  // pass; "noop" disables it entirely and makes correction non-deterministic
+  // (LLM-only). Override with SPELLCHECK_PROVIDER=languagetool|noop.
+  const setting = process.env.SPELLCHECK_PROVIDER ?? "nspell";
   switch (setting) {
     case "languagetool":
       return new LanguageToolProvider();
