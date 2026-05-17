@@ -106,20 +106,46 @@
       : message.healed_text
   );
 
-  // Only show the skeleton when there is genuinely nothing readable yet
-  // (no healed_text at all). When the target-language translation is
-  // missing but we DO have source/English text, show that immediately —
-  // the translation fills in shortly. Never leave the bubble as an
-  // indefinite skeleton ("straight lines that never become a message").
-  let loading = $derived(
-    !!viewerLang && !hasTargetTranslation && !message._pending && !message.healed_text,
-  );
+  // Awaiting the viewer-language (e.g. hu) translation while we already
+  // have source/English text. We hold the skeleton during this window
+  // rather than flashing the English text and hard-swapping a moment
+  // later. A timeout guards against it ever sticking: if the translation
+  // hasn't arrived in TRANSLATION_GRACE_MS we fall back to the readable
+  // text (never an indefinite skeleton — that was the original bug).
+  const TRANSLATION_GRACE_MS = 5000;
+  let translationTimedOut = $state(false);
 
-  // Subtle hint that the viewer-language translation is still loading,
-  // shown alongside the readable fallback text rather than instead of it.
-  let translationPending = $derived(
+  let awaitingTranslation = $derived(
     !!viewerLang && !hasTargetTranslation && !message._pending && !!message.healed_text,
   );
+
+  // Restart the grace timer whenever we (re)enter the awaiting state for
+  // this message; clear the timed-out flag once a translation arrives.
+  $effect(() => {
+    if (!awaitingTranslation) {
+      translationTimedOut = false;
+      return;
+    }
+    translationTimedOut = false;
+    const id = setTimeout(() => {
+      translationTimedOut = true;
+    }, TRANSLATION_GRACE_MS);
+    return () => clearTimeout(id);
+  });
+
+  // Show the skeleton when there's nothing readable yet (no healed_text)
+  // OR while we're waiting for the target translation within the grace
+  // window. After the grace timeout we stop showing the skeleton and the
+  // English fallback text renders instead.
+  let loading = $derived(
+    !message._pending &&
+      ((!!viewerLang && !hasTargetTranslation && !message.healed_text) ||
+        (awaitingTranslation && !translationTimedOut)),
+  );
+
+  // Subtle "translating…" badge, shown only once we've fallen back to the
+  // readable text (translation was slow) — not during the skeleton phase.
+  let translationPending = $derived(awaitingTranslation && translationTimedOut);
 
   // A pending agent bubble with no text yet = "agent is typing".
   let agentTyping = $derived(
