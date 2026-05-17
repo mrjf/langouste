@@ -1,66 +1,37 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "../../lib/db/index.ts";
 import type { ConversationMember } from "../../types/index.ts";
 
 export async function addMember(
-  supabase: SupabaseClient,
-  member: Pick<ConversationMember, "conversation_id" | "user_id" | "target_languages" | "base_languages">,
+  db: Database,
+  member: Pick<
+    ConversationMember,
+    "conversation_id" | "user_id" | "target_languages" | "base_languages"
+  >,
 ): Promise<ConversationMember> {
-  const { data, error } = await supabase
-    .from("conversation_members")
-    .insert(member)
-    .select()
-    .single();
-
-  if (error) throw error;
-  return data;
+  return db.insert<ConversationMember>("conversation_members", member);
 }
 
 export async function getMember(
-  supabase: SupabaseClient,
+  db: Database,
   conversationId: string,
   userId: string,
 ): Promise<ConversationMember | null> {
-  const { data, error } = await supabase
-    .from("conversation_members")
-    .select("*")
-    .eq("conversation_id", conversationId)
-    .eq("user_id", userId)
-    .single();
-
-  if (error) {
-    if (error.code === "PGRST116") return null;
-    throw error;
-  }
-  return data;
-}
-
-export async function getMembers(
-  supabase: SupabaseClient,
-  conversationId: string,
-): Promise<ConversationMember[]> {
-  const { data, error } = await supabase
-    .from("conversation_members")
-    .select("*")
-    .eq("conversation_id", conversationId);
-
-  if (error) throw error;
-  return data ?? [];
+  return db.selectOne<ConversationMember>("conversation_members", {
+    filters: [
+      { op: "eq", column: "conversation_id", value: conversationId },
+      { op: "eq", column: "user_id", value: userId },
+    ],
+  });
 }
 
 export async function updateMemberLanguages(
-  supabase: SupabaseClient,
+  db: Database,
   conversationId: string,
   userId: string,
   updates: Partial<Pick<ConversationMember, "target_languages" | "base_languages">>,
 ): Promise<ConversationMember> {
-  const { data, error } = await supabase
-    .from("conversation_members")
-    .update(updates)
-    .eq("conversation_id", conversationId)
-    .eq("user_id", userId)
-    .select()
-    .single();
-
-  if (error) throw error;
-  return data;
+  return db.updateOne<ConversationMember>("conversation_members", updates, [
+    { op: "eq", column: "conversation_id", value: conversationId },
+    { op: "eq", column: "user_id", value: userId },
+  ]);
 }

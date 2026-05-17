@@ -24,20 +24,41 @@
   const myLang = $derived(myLangs[0] ?? "");
   const myBaseLang = $derived(myBaseLangs[0] ?? "");
 
-  // Agent or human chat?
-  const isAgentChat = $derived(!!conv?.agent_connector_id);
   const agentName = $derived(conv?.agent_connector?.name ?? "Agent");
+  const partnerName = $derived(`🤖 ${agentName}`);
+  const isOrphan = $derived(conv != null && !conv.agent_connector_id);
 
-  // Other members
-  const otherMembers = $derived(conv?.members?.filter((m) => m.user_id !== userId) ?? []);
-  const needsPartner = $derived(!isAgentChat && otherMembers.length === 0);
-  const partnerName = $derived.by(() => {
-    if (isAgentChat) return `🤖 ${agentName}`;
-    if (needsPartner) return "Waiting for partner...";
-    return otherMembers.map((m) => m.profile?.display_name ?? "Partner").join(", ");
+  // Available connections to reattach to when this conversation is orphaned.
+  let availableConnections: Array<{ connector_id: string; name: string; type: string }> = $state([]);
+  let reattaching = $state(false);
+  let reattachTargetId = $state("");
+
+  $effect(() => {
+    if (isOrphan) {
+      api.getAgentConnectors().then((list) => {
+        availableConnections = list;
+        if (list.length > 0 && !reattachTargetId) {
+          reattachTargetId = list[0].connector_id;
+        }
+      }).catch(() => { availableConnections = []; });
+    }
   });
 
-  const joinUrl = $derived(conv ? `${location.origin}/#join/${conv.invite_code}` : "");
+  async function reattachConnector() {
+    if (!conv || !reattachTargetId) return;
+    reattaching = true;
+    try {
+      const updated = await api.setConversationConnector(conv.conversation_id, reattachTargetId);
+      // Refresh store + active conversation.
+      conversations.value = await api.getConversations();
+      activeConversation.value = updated;
+    } catch (err) {
+      console.error("Reattach failed:", err);
+      alert("Reattach failed: " + (err instanceof Error ? err.message : String(err)));
+    } finally {
+      reattaching = false;
+    }
+  }
 
   // Deduplicated messages for rendering
   const uniqueMessages = $derived.by(() => {
@@ -47,16 +68,6 @@
       seen.add(m.message_id);
       return true;
     });
-  });
-
-  // Participant name lookup
-  const participants = $derived.by(() => {
-    if (!conv?.members) return {};
-    const map: Record<string, string> = {};
-    for (const m of conv.members) {
-      if (m.profile) map[m.user_id] = m.profile.display_name;
-    }
-    return map;
   });
 
   // Subscribe to realtime when conversation changes
@@ -171,6 +182,8 @@
           messages = [...messages, result.agent_message];
         }
         fillMissingTranslations(conv.conversation_id);
+      } else if (result.agent_error) {
+        agentError = result.agent_error;
       }
       messageCache.set(conv.conversation_id, messages);
     } catch (err) {
@@ -180,6 +193,8 @@
       sending = false;
     }
   }
+
+  let agentError: string | null = $state(null);
 
   async function fillMissingTranslations(convId: string) {
     const langs = [...new Set([...myLangs, ...myBaseLangs].filter(Boolean))];
@@ -207,24 +222,6 @@
     requestAnimationFrame(() => {
       if (messagesEl) messagesEl.scrollTop = messagesEl.scrollHeight;
     });
-  }
-
-  let copyLabel = $state("Copy invite link");
-  let copyLabelInline = $state("Copy");
-
-  async function copyInviteLink(inline = false) {
-    try {
-      await navigator.clipboard.writeText(joinUrl);
-      if (inline) {
-        copyLabelInline = "Copied!";
-        setTimeout(() => copyLabelInline = "Copy", 2000);
-      } else {
-        copyLabel = "Copied!";
-        setTimeout(() => copyLabel = "Copy invite link", 2000);
-      }
-    } catch {
-      // Fallback
-    }
   }
 
   let translating = $state(false);
@@ -271,9 +268,32 @@
 {#if !conv}
   <div class="empty-state">Select a conversation to start chatting</div>
 {:else}
+  {#if isOrphan}
+    <div class="orphan-banner">
+      <div class="orphan-msg">
+        <strong>This chat's connection was deleted.</strong>
+        Pick a connection to keep talking:
+      </div>
+      <div class="orphan-actions">
+        {#if availableConnections.length > 0}
+          <select bind:value={reattachTargetId} disabled={reattaching}>
+            {#each availableConnections as c}
+              <option value={c.connector_id}>{c.name} ({c.type})</option>
+            {/each}
+          </select>
+          <button class="btn-attach" onclick={reattachConnector} disabled={reattaching || !reattachTargetId}>
+            {reattaching ? "Attaching…" : "Attach"}
+          </button>
+        {:else}
+          <a class="btn-attach" href="#/connections">Create a connection</a>
+        {/if}
+      </div>
+    </div>
+  {/if}
+
   <div class="thread-header">
     <div class="header-info">
-      <span class="partner-name">{partnerName}</span>
+      <span class="partner-name">{isOrphan ? "⚠ No connection" : partnerName}</span>
       <div class="lang-selectors">
         <label class="lang-selector" title="Target language — the language you're practicing">
           <span class="lang-label">🎯</span>
@@ -299,18 +319,7 @@
         </label>
       </div>
     </div>
-    {#if needsPartner}
-      <button class="btn-copy-link" onclick={() => copyInviteLink(false)}>{copyLabel}</button>
-    {/if}
   </div>
-
-  {#if needsPartner}
-    <div class="invite-banner">
-      Waiting for a partner to join. Share this link:
-      <span class="invite-url">{joinUrl}</span>
-      <button class="btn-copy-link-inline" onclick={() => copyInviteLink(true)}>{copyLabelInline}</button>
-    </div>
-  {/if}
 
   <div class="messages" bind:this={messagesEl}>
     {#each uniqueMessages as msg (msg.message_id)}
@@ -318,10 +327,11 @@
       <MessageBubble
         message={msg}
         sent={isSent}
-        senderName={msg.is_agent ? `🤖 ${agentName}` : (participants[msg.sender_id] ?? null)}
+        senderName={msg.is_agent ? `🤖 ${agentName}` : null}
         viewerLangs={myLangs}
         baseLangs={myBaseLangs}
         challenge={msg.next_challenge ?? null}
+        conversationId={conv?.conversation_id}
       />
     {/each}
   </div>
@@ -330,12 +340,19 @@
     <div class="translating">Translating messages...</div>
   {/if}
 
+  {#if agentError}
+    <div class="agent-error">
+      <strong>Agent error:</strong> {agentError}
+      <button class="dismiss-btn" onclick={() => agentError = null}>×</button>
+    </div>
+  {/if}
+
   <div class="input-area">
     {#if myMember}
       <MessageInput
         conversationId={conv.conversation_id}
         member={myMember}
-        disabled={sending}
+        disabled={sending || isOrphan}
         onSend={handleSend}
       />
     {/if}
@@ -350,6 +367,27 @@
     justify-content: center;
     color: var(--color-text-light);
     font-size: 1.1rem;
+  }
+
+  .agent-error {
+    padding: 0.6rem 1rem;
+    background: #fdecea;
+    color: #b71c1c;
+    border-top: 1px solid #f5c6cb;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .dismiss-btn {
+    margin-left: auto;
+    background: none;
+    border: none;
+    color: #b71c1c;
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 0 0.25rem;
   }
 
   .translating {
@@ -412,51 +450,6 @@
     color: var(--color-text);
   }
 
-  .btn-copy-link {
-    margin-left: auto;
-    background: var(--color-challenge);
-    color: #1565c0;
-    border: 1px solid #90caf9;
-    border-radius: var(--radius-sm);
-    padding: 0.35rem 0.75rem;
-    font-size: 0.8rem;
-    font-weight: 500;
-    flex-shrink: 0;
-  }
-
-  .invite-banner {
-    padding: 0.75rem 1.25rem;
-    background: var(--color-challenge);
-    border-bottom: 1px solid #90caf9;
-    font-size: 0.85rem;
-    color: #1565c0;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-  }
-
-  .invite-url {
-    font-family: var(--font-mono);
-    font-size: 0.8rem;
-    background: white;
-    padding: 0.2rem 0.5rem;
-    border-radius: 4px;
-    word-break: break-all;
-    user-select: all;
-  }
-
-  .btn-copy-link-inline {
-    background: #1565c0;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    padding: 0.25rem 0.6rem;
-    font-size: 0.8rem;
-    font-weight: 500;
-    flex-shrink: 0;
-  }
-
   .messages {
     flex: 1;
     overflow-y: auto;
@@ -471,4 +464,49 @@
     border-top: 1px solid var(--color-border);
     background: var(--color-surface);
   }
+
+  .orphan-banner {
+    padding: 0.75rem 1.25rem;
+    background: #fff4e1;
+    border-bottom: 1px solid #f0d294;
+    color: #5d4100;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .orphan-msg strong {
+    display: block;
+    margin-bottom: 0.15rem;
+  }
+
+  .orphan-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  .orphan-actions select {
+    flex: 1;
+    padding: 0.35rem 0.5rem;
+    border: 1px solid #d8b870;
+    border-radius: var(--radius-sm);
+    background: white;
+    font-size: 0.85rem;
+  }
+
+  .btn-attach {
+    padding: 0.4rem 0.9rem;
+    background: #b88528;
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .btn-attach:disabled { opacity: 0.5; cursor: default; }
 </style>

@@ -1,15 +1,15 @@
 # Langouste
 
-AI-mediated language learning chat app. People chat in their target languages; AI checks spelling, explains errors, translates across participants, tracks errors, and tailors learning with spaced repetition. See VISION.md for the full product vision and docs/message-processing.md for the message pipeline spec.
+Language-learning chat with AI agents. The user writes in their target language to a configured agent (Claude, OpenClaw, or any HTTP endpoint); Langouste checks spelling, explains errors, translates both sides, tracks vocabulary/grammar, and schedules review with SM-2 spaced repetition. See VISION.md for the full product vision and docs/message-processing.md for the message pipeline spec.
 
 ## Stack
 
 - **Runtime**: Bun
 - **HTTP**: Hono
-- **Database/Auth/Realtime**: Supabase (Postgres + RLS + Realtime)
+- **Database**: pluggable via `DATABASE_MODE` — `sqlite` (default, local file) or `supabase` (Postgres + RLS + Realtime + Auth). See `docs/MODES.md`.
 - **AI**: Claude API via @anthropic-ai/sdk
 - **Frontend**: Svelte 5 (runes) + Vite
-- **Deploy**: Supabase managed
+- **Deploy**: local single-file (sqlite) or managed/self-hosted Supabase
 
 ## Commands
 
@@ -26,7 +26,8 @@ AI-mediated language learning chat app. People chat in their target languages; A
 
 - `src/client/` — Svelte frontend (components, stores, lib)
 - `src/routes/` — Hono API routes
-- `src/services/` — backend services (AI, database, spaced repetition)
+- `src/services/` — backend services (AI, agents, database, spaced repetition)
+- `src/services/agents/` — agent connectors (Claude, OpenClaw, HTTP) implementing the `AgentConnection` interface
 - `src/lib/` — backend config and Supabase clients
 - `src/types/` — shared TypeScript types
 - `supabase/` — migrations and config
@@ -37,7 +38,10 @@ AI-mediated language learning chat app. People chat in their target languages; A
 - Svelte 5 runes (`$state`, `$derived`, `$effect`, `$props`) — no legacy Svelte 4 syntax
 - CSS scoped in Svelte components — no separate CSS files for components
 - All AI calls go through src/services/ai/ — never call Anthropic SDK directly from routes
-- Database access only through src/services/database/ modules
+- Agent traffic goes through src/services/agents/ connectors — never call the WebSocket/HTTP agent directly from routes
+- Every conversation has exactly one `agent_connector_id` — there is no person-to-person chat in this build
+- Database access only through the `Database` interface from src/lib/db/. Never import `@supabase/supabase-js` outside src/lib/db/, src/routes/middleware.ts, and src/routes/api/auth.ts.
+- The 7 modules in src/services/database/ are the only place tables are named. Routes call those; they don't call the DB directly.
 - Server env variables via src/lib/config.ts — never read process.env directly elsewhere
 - Client env variables via Vite's import.meta.env (VITE_ prefix)
 - Corrections stored as JSONB, not separate rows

@@ -1,4 +1,4 @@
-import { supabaseAdmin } from "../../lib/supabase-client.ts";
+import { adminDb } from "../../lib/db/index.ts";
 import { getPhoneticProvider } from "./phonetic/index.ts";
 import type { Message } from "../../types/index.ts";
 
@@ -52,10 +52,9 @@ export async function ensurePhonetics(
         const msg = missing[i];
         const updated = { ...(msg.phonetics ?? {}), [key]: results[i] };
         msg.phonetics = updated;
-        await supabaseAdmin
-          .from("messages")
-          .update({ phonetics: updated })
-          .eq("message_id", msg.message_id);
+        await adminDb().update("messages", { phonetics: updated }, [
+          { op: "eq", column: "message_id", value: msg.message_id },
+        ]);
       }
     }
   }

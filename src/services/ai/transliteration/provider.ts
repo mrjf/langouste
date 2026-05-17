@@ -14,11 +14,7 @@ export interface TransliterationProvider {
    *                     romanization conventions
    * @returns Transliterated texts in the same order
    */
-  transliterate(
-    texts: string[],
-    sourceLang: string,
-    targetLang: string,
-  ): Promise<string[]>;
+  transliterate(texts: string[], sourceLang: string, targetLang: string): Promise<string[]>;
 
   /**
    * Whether this provider can handle the given language pair.

@@ -11,27 +11,13 @@
     return conv.members?.find((m) => m.user_id === profile.value?.user_id);
   }
 
-  function otherMembers(conv: Conversation) {
-    return conv.members?.filter((m) => m.user_id !== profile.value?.user_id) ?? [];
-  }
-
   function displayName(conv: Conversation): string {
-    if (conv.agent_connector_id) {
-      return conv.agent_connector?.name ?? "Agent";
-    }
-    const others = otherMembers(conv);
-    if (others.length === 0) return "Waiting for partner...";
-    return others.map((m) => m.profile?.display_name ?? "Partner").join(", ");
-  }
-
-  function isAgent(conv: Conversation): boolean {
-    return !!conv.agent_connector_id;
+    return conv.agent_connector?.name ?? "Agent";
   }
 
   function myLang(conv: Conversation): string {
     return myMember(conv)?.target_languages?.[0]?.lang ?? "?";
   }
-
 </script>
 
 <div class="conv-list">
@@ -45,7 +31,7 @@
         onclick={() => selectConversation(conv)}
       >
         <span class="conv-lang">{langTag(myLang(conv))}</span>
-        <span class="conv-partner">{isAgent(conv) ? "🤖 " : ""}{displayName(conv)}</span>
+        <span class="conv-partner">🤖 {displayName(conv)}</span>
       </button>
     {/each}
   {/if}

@@ -1,13 +1,13 @@
 import { getAnthropicClient } from "./client.ts";
+import { config } from "../../lib/config.ts";
+import { testRegistry } from "../../lib/test-registry.ts";
 import { languageName } from "../../lib/languages.ts";
-import type {
-  VocabularyExtractionInput,
-  VocabularyExtractionOutput,
-} from "./types.ts";
+import type { VocabularyExtractionInput, VocabularyExtractionOutput } from "./types.ts";
 
 const VOCABULARY_EXTRACTION_TOOL = {
   name: "extract_vocabulary" as const,
-  description: "Extract new vocabulary, detect grammar gaps, and generate a learning challenge from a sent message.",
+  description:
+    "Extract new vocabulary, detect grammar gaps, and generate a learning challenge from a sent message.",
   input_schema: {
     type: "object" as const,
     properties: {
@@ -17,7 +17,10 @@ const VOCABULARY_EXTRACTION_TOOL = {
           type: "object",
           properties: {
             term: { type: "string", description: "The word in target language" },
-            translation: { type: "string", description: "Translation to the learner's primary base language" },
+            translation: {
+              type: "string",
+              description: "Translation to the learner's primary base language",
+            },
             context_sentence: { type: "string", description: "The sentence containing this word" },
             cefr_level: { type: ["string", "null"] as const, description: "Estimated CEFR level" },
           },
@@ -29,7 +32,10 @@ const VOCABULARY_EXTRACTION_TOOL = {
         items: {
           type: "object",
           properties: {
-            category: { type: "string", description: 'Grammar category, e.g. "verb:passé_composé"' },
+            category: {
+              type: "string",
+              description: 'Grammar category, e.g. "verb:passé_composé"',
+            },
             description: { type: "string", description: "Brief description of the gap" },
           },
           required: ["category", "description"],
@@ -47,13 +53,23 @@ const VOCABULARY_EXTRACTION_TOOL = {
 export async function extractVocabulary(
   input: VocabularyExtractionInput,
 ): Promise<VocabularyExtractionOutput> {
+  if (config.stubAi) {
+    const stub = testRegistry.getVocabResponse(input.text);
+    return {
+      new_vocabulary: stub.new_vocabulary ?? [],
+      grammar_gaps_detected: stub.grammar_gaps_detected ?? [],
+      next_challenge: stub.next_challenge ?? "",
+    };
+  }
+
   const client = getAnthropicClient();
   const targetLang = languageName(input.language);
   const baseLang = languageName(input.base_languages[0] ?? "en");
 
-  const context = input.conversation_context.length > 0
-    ? input.conversation_context.join("\n")
-    : "(start of conversation)";
+  const context =
+    input.conversation_context.length > 0
+      ? input.conversation_context.join("\n")
+      : "(start of conversation)";
 
   const intentSection = input.intent
     ? `\nThe sender described their intent as: "${input.intent}"\n`
@@ -73,7 +89,10 @@ ${context}
 
 2. **Detect grammar gaps**: If you notice grammar patterns the sender struggles with (from this message or the conversation context), categorize them (e.g., "verb:passé_composé", "gender:articles", "prepositions:à_vs_de"). Only include categories where actual issues are evident.
 
-3. **Generate a challenge**: Suggest something specific for their next message. Prioritize practicing weak areas. Be encouraging. One sentence.`;
+3. **Generate a challenge**: Suggest something specific for their next message. Prioritize practicing weak areas. Be encouraging. One sentence.
+
+## Backtick convention
+Any text inside backticks (\`like this\`) is a literal the user marked as not-to-be-translated — a proper noun, nickname, brand, code token, or similar. Do NOT extract it as vocabulary and do NOT treat it as a grammar gap. Ignore it entirely for learning purposes.`;
 
   const response = await client.messages.create({
     model: "claude-sonnet-4-6",

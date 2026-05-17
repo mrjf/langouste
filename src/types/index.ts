@@ -21,13 +21,12 @@ export interface Profile {
 
 export interface Conversation {
   conversation_id: string;
-  invite_code: string;
   created_by: string;
-  agent_connector_id: string | null;
+  agent_connector_id: string;
   created_at: string;
 }
 
-export type AgentType = "openclaw" | "claude" | "http";
+export type AgentType = "openclaw" | "claude" | "claude-code" | "http" | "stub";
 
 export interface AgentConnector {
   connector_id: string;

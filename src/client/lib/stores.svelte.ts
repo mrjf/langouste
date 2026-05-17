@@ -31,15 +31,14 @@ export interface ConversationMember {
 export interface AgentConnector {
   connector_id: string;
   name: string;
-  type: "openclaw" | "claude" | "http";
+  type: "openclaw" | "claude" | "claude-code" | "http" | "stub";
   config: Record<string, unknown>;
 }
 
 export interface Conversation {
   conversation_id: string;
-  invite_code: string;
   created_by: string;
-  agent_connector_id: string | null;
+  agent_connector_id: string;
   agent_connector?: AgentConnector | null;
   created_at: string;
   members: ConversationMember[];

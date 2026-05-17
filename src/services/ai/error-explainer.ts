@@ -1,15 +1,8 @@
 import { getAnthropicClient } from "./client.ts";
-import {
-  buildErrorExplanationPrompt,
-  ERROR_EXPLANATION_TOOL,
-  type ExplainErrorsPromptInput,
-} from "./error-prompts.ts";
-import type {
-  LanguageCode,
-  CefrLevel,
-  TextError,
-  ErrorExplanation,
-} from "../../types/index.ts";
+import { config } from "../../lib/config.ts";
+import { testRegistry } from "../../lib/test-registry.ts";
+import { buildErrorExplanationPrompt, ERROR_EXPLANATION_TOOL } from "./error-prompts.ts";
+import type { LanguageCode, CefrLevel, TextError, ErrorExplanation } from "../../types/index.ts";
 
 export interface ExplainErrorsInput {
   text: string;
@@ -24,12 +17,33 @@ export interface ExplainErrorsInput {
 export interface ExplainErrorsOutput {
   corrected_message: string;
   explanations: ErrorExplanation[];
-  additional_errors: Array<TextError & { corrected: string; explanations: Record<LanguageCode, string> }>;
+  additional_errors: Array<
+    TextError & { corrected: string; explanations: Record<LanguageCode, string> }
+  >;
 }
 
-export async function explainErrors(
-  input: ExplainErrorsInput,
-): Promise<ExplainErrorsOutput> {
+export async function explainErrors(input: ExplainErrorsInput): Promise<ExplainErrorsOutput> {
+  if (config.stubAi) {
+    const stub = testRegistry.getExplainResponse(input.text);
+    const explanations: ErrorExplanation[] = (stub.explanations ?? []).map((e) => ({
+      error: input.errors[e.error_index],
+      corrected: e.corrected,
+      explanations: e.explanations,
+    }));
+    return {
+      corrected_message: stub.corrected_message,
+      explanations,
+      additional_errors: (stub.additional_errors ?? []).map((e) => ({
+        start: e.start,
+        end: e.end,
+        text: e.text,
+        corrected: e.corrected,
+        kind: "grammar" as const,
+        explanations: e.explanations,
+      })),
+    };
+  }
+
   const client = getAnthropicClient();
   const prompt = buildErrorExplanationPrompt(input);
 

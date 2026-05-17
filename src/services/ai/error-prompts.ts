@@ -20,9 +20,10 @@ export function buildErrorExplanationPrompt(input: ExplainErrorsPromptInput): st
     .map((e, i) => `  ${i}. "${e.text}" (position ${e.start}-${e.end}, ${e.kind})`)
     .join("\n");
 
-  const context = input.conversation_context.length > 0
-    ? input.conversation_context.join("\n")
-    : "(start of conversation)";
+  const context =
+    input.conversation_context.length > 0
+      ? input.conversation_context.join("\n")
+      : "(start of conversation)";
 
   const intentSection = input.intent
     ? `\n## What the sender is trying to say\n"${input.intent}"\n`
@@ -36,6 +37,7 @@ export function buildErrorExplanationPrompt(input: ExplainErrorsPromptInput): st
 - Be **terse**: 1-2 sentences per error. Use markdown bold for key words.
 - No preamble, no encouragement, no emoji. Just the correction and the reason.
 - Casual texting is fine — don't flag informal register or missing caps.
+- **Backticked spans are literals.** Any run of text inside backticks (\`like this\`) is a proper noun, nickname, code token, or other word the learner has explicitly marked as not-to-be-translated. Never flag them as errors, never "correct" them, and keep them byte-identical (including the surrounding backticks) in corrected_message.
 
 ## Learner's message in ${targetLang}
 "${input.text}"
@@ -61,7 +63,8 @@ export const ERROR_EXPLANATION_TOOL = {
     properties: {
       corrected_message: {
         type: "string",
-        description: "The full message rewritten correctly in the target language. This is what the learner's text should match when all errors are fixed.",
+        description:
+          "The full message rewritten correctly in the target language. This is what the learner's text should match when all errors are fixed.",
       },
       explanations: {
         type: "array",
@@ -74,11 +77,13 @@ export const ERROR_EXPLANATION_TOOL = {
             },
             corrected: {
               type: "string",
-              description: "The correct form of the erroneous text (what the user should type instead)",
+              description:
+                "The correct form of the erroneous text (what the user should type instead)",
             },
             explanations: {
               type: "object",
-              description: "Explanation in each base language, keyed by language code (e.g. {\"en\": \"...\", \"es\": \"...\"})",
+              description:
+                'Explanation in each base language, keyed by language code (e.g. {"en": "...", "es": "..."})',
               additionalProperties: { type: "string" },
             },
             rule: {
@@ -99,7 +104,11 @@ export const ERROR_EXPLANATION_TOOL = {
             end: { type: "number", description: "Character offset end (exclusive)" },
             text: { type: "string", description: "The erroneous text" },
             corrected: { type: "string", description: "The correct form" },
-            kind: { type: "string", enum: ["grammar"], description: "Always 'grammar' for LLM-detected errors" },
+            kind: {
+              type: "string",
+              enum: ["grammar"],
+              description: "Always 'grammar' for LLM-detected errors",
+            },
             explanations: {
               type: "object",
               description: "Explanation in each base language, keyed by language code",

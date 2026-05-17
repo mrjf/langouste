@@ -1,15 +1,17 @@
 /**
- * Run SQL migrations against the Supabase project via the Management API.
+ * Apply Langouste database migrations.
+ *
+ * Mode is selected by DATABASE_MODE in .env (default "supabase").
+ *
+ *   supabase  — runs incremental migrations from supabase/migrations/*.sql
+ *               against the remote Supabase project via the Management API.
+ *               Requires Supabase CLI login (token in macOS keychain).
+ *
+ *   sqlite    — applies sqlite/schema.sql to the local SQLite database.
+ *               CREATE TABLE IF NOT EXISTS statements make it idempotent.
  *
  * Usage:
  *   bun scripts/migrate.ts
- *
- * Requires:
- *   - SUPABASE_URL in .env (to extract project ref)
- *   - Supabase CLI logged in (access token in macOS keychain)
- *
- * Tracks applied migrations in a `_migrations` table so each migration
- * only runs once. Re-run safely — already-applied migrations are skipped.
  */
 
 import { readFileSync, readdirSync } from "node:fs";
@@ -29,108 +31,123 @@ for (const line of envText.split("\n")) {
   const eq = trimmed.indexOf("=");
   if (eq === -1) continue;
   env[trimmed.slice(0, eq)] = trimmed.slice(eq + 1);
-}
-
-const supabaseUrl = env.SUPABASE_URL;
-if (!supabaseUrl) {
-  console.error("Missing SUPABASE_URL in .env");
-  process.exit(1);
-}
-
-const projectRef = supabaseUrl
-  .replace("https://", "")
-  .replace(".supabase.co", "");
-
-// --- Get access token from macOS keychain (where Supabase CLI stores it) ---
-function getAccessToken(): string {
-  const raw = execSync(
-    'security find-generic-password -s "Supabase CLI" -a "access-token" -w',
-    { encoding: "utf-8" },
-  ).trim();
-
-  // The CLI stores it as "go-keyring-base64:<base64>"
-  if (raw.startsWith("go-keyring-base64:")) {
-    const b64 = raw.replace("go-keyring-base64:", "");
-    return Buffer.from(b64, "base64").toString("utf-8");
+  // Also populate process.env so lib/data-dir.ts sees any LANGOUSTE_DATA_DIR.
+  if (!process.env[trimmed.slice(0, eq)]) {
+    process.env[trimmed.slice(0, eq)] = trimmed.slice(eq + 1);
   }
-  return raw;
 }
 
-const accessToken = getAccessToken();
-if (!accessToken) {
-  console.error("Could not find Supabase access token. Run: npx supabase login");
-  process.exit(1);
+const mode = (process.env.DATABASE_MODE ?? env.DATABASE_MODE ?? "supabase") as
+  | "supabase"
+  | "sqlite";
+
+if (mode === "sqlite") {
+  await runSqliteMigrations();
+} else {
+  await runSupabaseMigrations();
 }
 
-// --- API helper ---
-const API_BASE = "https://api.supabase.com/v1";
+// ---------- SQLite path ----------
+async function runSqliteMigrations() {
+  const { Database } = await import("bun:sqlite");
+  const { dataPath } = await import("../src/lib/data-dir.ts");
 
-async function runSQL(sql: string): Promise<unknown> {
-  const res = await fetch(
-    `${API_BASE}/projects/${projectRef}/database/query`,
-    {
+  const schemaPath = resolve(projectDir, "sqlite/schema.sql");
+  const schema = readFileSync(schemaPath, "utf-8");
+
+  const dbPath = dataPath("langouste.db");
+  console.log(`Applying SQLite schema to ${dbPath}`);
+
+  const db = new Database(dbPath, { create: true });
+  db.exec("PRAGMA journal_mode = WAL");
+  db.exec("PRAGMA foreign_keys = ON");
+  db.exec(schema);
+  db.close();
+
+  console.log("OK — SQLite schema applied.");
+}
+
+// ---------- Supabase path (original behaviour) ----------
+async function runSupabaseMigrations() {
+  const supabaseUrl = env.SUPABASE_URL;
+  if (!supabaseUrl) {
+    console.error("Missing SUPABASE_URL in .env");
+    process.exit(1);
+  }
+
+  const projectRef = supabaseUrl.replace("https://", "").replace(".supabase.co", "");
+
+  const accessToken = getSupabaseAccessToken();
+  if (!accessToken) {
+    console.error("Could not find Supabase access token. Run: npx supabase login");
+    process.exit(1);
+  }
+
+  const API_BASE = "https://api.supabase.com/v1";
+
+  async function runSQL(sql: string): Promise<unknown> {
+    const res = await fetch(`${API_BASE}/projects/${projectRef}/database/query`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${accessToken}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ query: sql }),
-    },
-  );
-
-  if (!res.ok) {
-    const body = await res.text();
-    throw new Error(`SQL query failed (${res.status}): ${body}`);
+    });
+    if (!res.ok) {
+      const body = await res.text();
+      throw new Error(`SQL query failed (${res.status}): ${body}`);
+    }
+    return res.json();
   }
 
-  return res.json();
-}
-
-// --- Run migrations ---
-try {
-  console.log(`Running migrations against project: ${projectRef}\n`);
-
-  // Create tracking table
-  await runSQL(`
-    CREATE TABLE IF NOT EXISTS _migrations (
-      name TEXT PRIMARY KEY,
-      applied_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  try {
+    console.log(`Running migrations against project: ${projectRef}\n`);
+    await runSQL(
+      `CREATE TABLE IF NOT EXISTS _migrations (
+         name TEXT PRIMARY KEY,
+         applied_at TIMESTAMPTZ NOT NULL DEFAULT now()
+       );`,
     );
-  `);
 
-  // Get already-applied migrations
-  const appliedRows = (await runSQL(
-    "SELECT name FROM _migrations ORDER BY name",
-  )) as Array<{ name: string }>;
-  const applied = new Set(appliedRows.map((r) => r.name));
+    const appliedRows = (await runSQL("SELECT name FROM _migrations ORDER BY name")) as Array<{
+      name: string;
+    }>;
+    const applied = new Set(appliedRows.map((r) => r.name));
 
-  // Find migration files
-  const migrationsDir = resolve(projectDir, "supabase/migrations");
-  const files = readdirSync(migrationsDir)
-    .filter((f) => f.endsWith(".sql"))
-    .sort();
+    const migrationsDir = resolve(projectDir, "supabase/migrations");
+    const files = readdirSync(migrationsDir)
+      .filter((f) => f.endsWith(".sql"))
+      .sort();
 
-  let count = 0;
-  for (const file of files) {
-    if (applied.has(file)) {
-      console.log(`  Skip ${file} (already applied)`);
-      continue;
+    let count = 0;
+    for (const file of files) {
+      if (applied.has(file)) {
+        console.log(`  Skip ${file} (already applied)`);
+        continue;
+      }
+      console.log(`  Applying ${file}...`);
+      const sql = readFileSync(resolve(migrationsDir, file), "utf-8");
+      await runSQL(sql);
+      await runSQL(`INSERT INTO _migrations (name) VALUES ('${file.replace(/'/g, "''")}')`);
+      console.log(`  OK`);
+      count++;
     }
 
-    console.log(`  Applying ${file}...`);
-    const sql = readFileSync(resolve(migrationsDir, file), "utf-8");
-    await runSQL(sql);
-    await runSQL(
-      `INSERT INTO _migrations (name) VALUES ('${file.replace(/'/g, "''")}')`,
-    );
-    console.log(`  OK`);
-    count++;
+    console.log(count > 0 ? `\nApplied ${count} migration(s).` : "\nNo new migrations.");
+  } catch (err) {
+    console.error("Migration failed:", err);
+    process.exit(1);
   }
+}
 
-  console.log(
-    count > 0 ? `\nApplied ${count} migration(s).` : "\nNo new migrations.",
-  );
-} catch (err) {
-  console.error("Migration failed:", err);
-  process.exit(1);
+function getSupabaseAccessToken(): string {
+  const raw = execSync('security find-generic-password -s "Supabase CLI" -a "access-token" -w', {
+    encoding: "utf-8",
+  }).trim();
+  if (raw.startsWith("go-keyring-base64:")) {
+    const b64 = raw.replace("go-keyring-base64:", "");
+    return Buffer.from(b64, "base64").toString("utf-8");
+  }
+  return raw;
 }

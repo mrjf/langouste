@@ -1,8 +1,17 @@
-import { createClient, type SupabaseClient, type RealtimeChannel } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+
+/**
+ * In sqlite mode the client has no Supabase backend at all, so the helpers
+ * below become no-ops. The database mode is surfaced to the browser via
+ * VITE_DATABASE_MODE (Vite inlines this at build time).
+ */
+const MODE = (import.meta.env.VITE_DATABASE_MODE as string | undefined) ?? "supabase";
+export const isSupabaseMode = MODE === "supabase";
 
 let supabase: SupabaseClient | null = null;
 
-export function initSupabase(url: string, anonKey: string): SupabaseClient {
+export function initSupabase(url: string, anonKey: string): SupabaseClient | null {
+  if (!isSupabaseMode) return null;
   if (supabase) return supabase;
   supabase = createClient(url, anonKey, {
     realtime: {
@@ -17,8 +26,8 @@ export function getSupabase(): SupabaseClient | null {
 }
 
 /**
- * Set the auth session on the Supabase client so realtime
- * subscriptions pass through RLS.
+ * Set the auth session on the Supabase client so realtime subscriptions pass
+ * through RLS. No-op in sqlite mode.
  */
 export async function setRealtimeAuth(accessToken: string, refreshToken: string) {
   if (!supabase) return;
@@ -32,10 +41,7 @@ export function subscribeToMessages(
   conversationId: string,
   onMessage: (msg: Record<string, unknown>) => void,
 ): () => void {
-  if (!supabase) {
-    console.warn("Supabase not initialized, skipping realtime subscription");
-    return () => {};
-  }
+  if (!supabase) return () => {};
 
   const channel = supabase
     .channel(`messages:${conversationId}`)
@@ -60,10 +66,7 @@ export function subscribeToConversation(
   conversationId: string,
   onUpdate: (conv: Record<string, unknown>) => void,
 ): () => void {
-  if (!supabase) {
-    console.warn("Supabase not initialized, skipping conversation subscription");
-    return () => {};
-  }
+  if (!supabase) return () => {};
 
   const channel = supabase
     .channel(`conversation:${conversationId}`)

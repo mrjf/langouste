@@ -1,18 +1,9 @@
 <script lang="ts">
   import type { Message, Correction } from "../lib/stores.svelte";
   import { langTag } from "../lib/languages";
-
-  /** Simple markdown → HTML: bold, italic, code, line breaks */
-  function md(text: string): string {
-    return text
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-      .replace(/\*(.+?)\*/g, "<em>$1</em>")
-      .replace(/`(.+?)`/g, "<code>$1</code>")
-      .replace(/\n/g, "<br>");
-  }
+  import { md } from "../lib/md";
+  import { api } from "../lib/api";
+  import { playExclusive, stopCurrent, isCurrent } from "../lib/audio-player";
 
   interface Props {
     message: Message;
@@ -21,6 +12,7 @@
     viewerLangs?: string[];
     baseLangs?: string[];
     challenge?: string | null;
+    conversationId?: string;
   }
 
   let {
@@ -30,7 +22,68 @@
     viewerLangs = [],
     baseLangs = [],
     challenge = null,
+    conversationId,
   }: Props = $props();
+
+  // Lazy per-language audio cache: lang → { url, audio element, status }.
+  // Only one bubble plays at a time across the whole app — see lib/audio-player.
+  type AudioState = {
+    url?: string;
+    audio?: HTMLAudioElement;
+    loading: boolean;
+    error?: string;
+    playing: boolean;
+  };
+  let audioByLang = $state<Record<string, AudioState>>({});
+
+  function markStopped(lang: string) {
+    const cur = audioByLang[lang];
+    if (!cur) return;
+    audioByLang = { ...audioByLang, [lang]: { ...cur, playing: false } };
+  }
+
+  async function playLang(lang: string) {
+    if (!conversationId || !message.message_id) return;
+    const cur = audioByLang[lang];
+    if (cur?.loading) return;
+
+    // Toggle off if this lang is already playing.
+    if (cur?.playing && cur.audio && isCurrent(cur.audio)) {
+      stopCurrent();
+      return;
+    }
+
+    audioByLang = { ...audioByLang, [lang]: { ...cur, loading: true, error: undefined, playing: false } };
+    try {
+      let url = cur?.url;
+      if (!url) {
+        url = await api.fetchMessageAudio(conversationId, message.message_id, lang);
+      }
+      const audio = cur?.audio ?? new Audio(url);
+      // Always start from the beginning when (re)triggered.
+      audio.currentTime = 0;
+      await playExclusive(audio, () => markStopped(lang));
+      audioByLang = { ...audioByLang, [lang]: { url, audio, loading: false, playing: true } };
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      audioByLang = { ...audioByLang, [lang]: { ...cur, loading: false, playing: false, error: msg } };
+    }
+  }
+
+  $effect(() => {
+    return () => {
+      // If this bubble's track is the active one, stop it.
+      for (const v of Object.values(audioByLang)) {
+        if (v.audio && isCurrent(v.audio)) {
+          stopCurrent();
+          break;
+        }
+      }
+      for (const v of Object.values(audioByLang)) {
+        if (v.url) URL.revokeObjectURL(v.url);
+      }
+    };
+  });
 
   // Primary viewer language (first target language)
   const viewerLang = $derived(viewerLangs[0] ?? "");
@@ -110,6 +163,18 @@
 
   {#if !loading && !message._pending}
     <div class="actions">
+      {#if conversationId && viewerLang && (message.translations?.[viewerLang] || !message.language || message.language === viewerLang)}
+        <button
+          class="action-btn speaker-btn"
+          class:active={audioByLang[viewerLang]?.playing}
+          class:loading={audioByLang[viewerLang]?.loading}
+          aria-label="Play audio"
+          title={audioByLang[viewerLang]?.error ?? "Play audio"}
+          onclick={() => playLang(viewerLang)}
+        >
+          {audioByLang[viewerLang]?.loading ? "…" : audioByLang[viewerLang]?.playing ? "⏸" : "🔊"}
+        </button>
+      {/if}
       {#if baseText}
         <button class="action-btn" class:active={showBase} onclick={() => showBase = !showBase}>
           {langTag(baseLang)}
@@ -143,7 +208,19 @@
         {#if showBase && baseText}
           <div class="detail-row base-row">
             <span class="detail-label">{langTag(baseLang)}</span>
-            <span class="detail-text">{baseText}</span>
+            {#if conversationId}
+              <button
+                class="detail-speaker"
+                class:active={audioByLang[baseLang]?.playing}
+                class:loading={audioByLang[baseLang]?.loading}
+                aria-label="Play audio"
+                title={audioByLang[baseLang]?.error ?? "Play audio"}
+                onclick={() => playLang(baseLang)}
+              >
+                {audioByLang[baseLang]?.loading ? "…" : audioByLang[baseLang]?.playing ? "⏸" : "🔊"}
+              </button>
+            {/if}
+            <div class="detail-text">{@html md(baseText)}</div>
           </div>
         {/if}
 
@@ -151,7 +228,19 @@
           {#if shownLangs.has(lang) && message.translations?.[lang]}
             <div class="detail-row">
               <span class="detail-label">{langTag(lang)}</span>
-              <span class="detail-text">{message.translations[lang]}</span>
+              {#if conversationId}
+                <button
+                  class="detail-speaker"
+                  class:active={audioByLang[lang]?.playing}
+                  class:loading={audioByLang[lang]?.loading}
+                  aria-label="Play audio"
+                  title={audioByLang[lang]?.error ?? "Play audio"}
+                  onclick={() => playLang(lang)}
+                >
+                  {audioByLang[lang]?.loading ? "…" : audioByLang[lang]?.playing ? "⏸" : "🔊"}
+                </button>
+              {/if}
+              <div class="detail-text">{@html md(message.translations[lang])}</div>
             </div>
           {/if}
         {/each}
@@ -159,7 +248,7 @@
         {#if showOriginal && hasOriginal}
           <div class="detail-row original-row">
             <span class="detail-label">original</span>
-            <span class="detail-text">{message.raw_text}</span>
+            <div class="detail-text">{@html md(message.raw_text)}</div>
           </div>
         {/if}
 
@@ -301,6 +390,47 @@
     color: #f39c12;
   }
 
+  .speaker-btn {
+    font-size: 0.85rem;
+    padding: 0.05rem 0.3rem;
+    line-height: 1;
+  }
+
+  .speaker-btn.loading {
+    opacity: 0.6;
+    cursor: progress;
+  }
+
+  .detail-speaker {
+    background: none;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    font-size: 0.85rem;
+    line-height: 1;
+    padding: 0.05rem 0.25rem;
+    margin-right: 0.3rem;
+    color: var(--color-text-light);
+    opacity: 0.55;
+    cursor: pointer;
+    transition: opacity 0.15s, background 0.15s;
+    vertical-align: middle;
+  }
+
+  .detail-speaker:hover {
+    opacity: 1;
+    background: var(--color-bg-alt, rgba(0,0,0,0.05));
+  }
+
+  .detail-speaker.active {
+    opacity: 1;
+    border-color: var(--color-border);
+  }
+
+  .detail-speaker.loading {
+    opacity: 0.5;
+    cursor: progress;
+  }
+
   .challenge-btn {
     color: #1565c0;
   }
@@ -340,6 +470,74 @@
 
   .detail-text {
     color: var(--color-text);
+  }
+
+  /* Compact markdown blocks inside message content. User-agent defaults on
+     <p>/<ul>/<ol>/<h1-3>/<hr> add too much vertical margin for a chat bubble. */
+  .healed-text :global(p),
+  .detail-text :global(p) {
+    margin: 0 0 0.35rem;
+  }
+
+  .healed-text :global(p:last-child),
+  .detail-text :global(p:last-child) {
+    margin-bottom: 0;
+  }
+
+  .healed-text :global(ul),
+  .healed-text :global(ol),
+  .detail-text :global(ul),
+  .detail-text :global(ol) {
+    margin: 0.25rem 0 0.35rem;
+    padding-left: 1.2rem;
+  }
+
+  .healed-text :global(li),
+  .detail-text :global(li) {
+    margin: 0.1rem 0;
+  }
+
+  .healed-text :global(h1),
+  .healed-text :global(h2),
+  .healed-text :global(h3),
+  .detail-text :global(h1),
+  .detail-text :global(h2),
+  .detail-text :global(h3) {
+    margin: 0.5rem 0 0.25rem;
+    font-size: 1em;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .healed-text :global(h1:first-child),
+  .healed-text :global(h2:first-child),
+  .healed-text :global(h3:first-child),
+  .detail-text :global(h1:first-child),
+  .detail-text :global(h2:first-child),
+  .detail-text :global(h3:first-child) {
+    margin-top: 0;
+  }
+
+  .healed-text :global(hr),
+  .detail-text :global(hr) {
+    border: none;
+    border-top: 1px solid var(--color-border);
+    margin: 0.5rem 0;
+  }
+
+  .healed-text :global(code),
+  .detail-text :global(code) {
+    font-family: var(--font-mono);
+    font-size: 0.88em;
+    background: rgba(0, 0, 0, 0.06);
+    padding: 0.05em 0.3em;
+    border-radius: 3px;
+  }
+
+  .healed-text :global(a),
+  .detail-text :global(a) {
+    color: var(--color-primary);
+    text-decoration: underline;
   }
 
   .base-row {

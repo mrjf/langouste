@@ -38,9 +38,7 @@ export class RuleBasedIpaProvider implements PhoneticProvider {
     // Sort rules by pattern length descending for greedy longest-match
     const sorted: IpaRuleSet = {
       language: original.language,
-      rules: [...original.rules].sort(
-        (a, b) => b.pattern.length - a.pattern.length,
-      ),
+      rules: [...original.rules].sort((a, b) => b.pattern.length - a.pattern.length),
     };
     this.sortedRules.set(language, sorted);
     return sorted;

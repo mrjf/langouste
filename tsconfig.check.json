@@ -1,0 +1,21 @@
+{
+  "//": "Type-check-only config for svelte-check / CI. The root tsconfig.json",
+  "//2": "is tuned for Bun's runtime resolver; this one adds the DOM libs and",
+  "//3": "extension/bundler settings tsc needs to understand the client + tests.",
+  "compilerOptions": {
+    "strict": true,
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": false,
+    "noEmit": true,
+    "isolatedModules": true,
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "types": ["bun-types", "svelte", "vite/client"]
+  },
+  "include": ["src/**/*.ts", "src/**/*.svelte"],
+  "exclude": ["node_modules", "dist", "tests"]
+}

@@ -1,0 +1,84 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Cancel in-progress runs for the same branch/PR when new commits land.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint & format (Biome)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Biome check (lint + format)
+        run: bun run check
+
+  test:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    # tests/services imports src/lib/config.ts at module load. Run in sqlite
+    # mode so no Supabase creds are needed; ANTHROPIC_API_KEY is always
+    # required by config but unit tests never make real API calls, so a dummy
+    # value is fine. LANGOUSTE_JWT_SECRET is required in sqlite mode.
+    env:
+      DATABASE_MODE: sqlite
+      ANTHROPIC_API_KEY: ci-dummy-key-not-used
+      LANGOUSTE_JWT_SECRET: ci-dummy-jwt-secret
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Run unit tests
+        run: bun run test
+
+  build:
+    name: Build frontend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Install dependencies
+        # The Linux rollup native binary (@rollup/rollup-linux-x64-gnu) is
+        # pinned in optionalDependencies so --frozen-lockfile resolves it on
+        # CI. Fallback re-installs without the frozen lock if a platform/arch
+        # mismatch ever leaves a rollup optional dep missing (npm bug #4828).
+        run: bun install --frozen-lockfile || bun install
+      - name: Build
+        run: bun run build
+
+  typecheck:
+    name: Type check (svelte-check)
+    runs-on: ubuntu-latest
+    # NON-BLOCKING: the codebase has a known backlog of pre-existing type
+    # errors (mostly Svelte 4-style $state-as-store usage in legacy
+    # components). This job surfaces type regressions in PR logs without
+    # blocking merges until that backlog is cleared in a dedicated pass.
+    # The svelte-check step swallows its exit code (`|| true`) so the job
+    # reports success; remove the `|| true` once `bun run typecheck` is
+    # clean to make type errors blocking.
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: svelte-check (report-only)
+        run: bun run typecheck || true

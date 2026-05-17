@@ -1,7 +1,12 @@
 import { Hono } from "hono";
 import { requireAuth } from "../middleware.ts";
-import { getMessages, getRecentMessageTexts, insertMessage } from "../../services/database/messages.ts";
-import { getMember, getMembers } from "../../services/database/members.ts";
+import {
+  getMessageById,
+  getMessages,
+  getRecentMessageTexts,
+  insertMessage,
+} from "../../services/database/messages.ts";
+import { getMember } from "../../services/database/members.ts";
 import { getConversation } from "../../services/database/conversations.ts";
 import { getConnector } from "../../services/database/agent-connectors.ts";
 import { checkSpelling } from "../../services/spellcheck/checker.ts";
@@ -12,44 +17,33 @@ import { ensureTranslations, translateTexts } from "../../services/ai/translator
 import { ensureTransliterations } from "../../services/ai/transliterator.ts";
 import { ensurePhonetics } from "../../services/ai/phonetician.ts";
 import { getAgentConnection } from "../../services/agents/factory.ts";
-import { trackLearningProgress, getDueReviewItems } from "../../services/spaced-repetition/tracker.ts";
-import { supabaseAdmin } from "../../lib/supabase-client.ts";
-import type { AgentType } from "../../types/index.ts";
+import { getAudioProvider } from "../../services/ai/audio/index.ts";
+import { trackLearningProgress } from "../../services/spaced-repetition/tracker.ts";
+import { adminDb } from "../../lib/db/index.ts";
+import type { AgentType, ConversationMember, TextError } from "../../types/index.ts";
 
 export const messageRoutes = new Hono();
 
 messageRoutes.use("*", requireAuth);
 
-/**
- * Collect all unique languages that members of this conversation need.
- */
-async function allMemberLanguages(
-  supabase: any,
-  conversationId: string,
-): Promise<string[]> {
-  const members = await getMembers(supabase, conversationId);
-  const langs = new Set<string>();
-  for (const m of members) {
-    for (const t of m.target_languages) langs.add(t.lang);
-    for (const b of m.base_languages) langs.add(b);
-  }
-  return [...langs];
+function memberLanguages(member: ConversationMember): string[] {
+  return [...new Set([...member.target_languages.map((t) => t.lang), ...member.base_languages])];
 }
 
 // Get messages for a conversation
 messageRoutes.get("/:conversationId", async (c) => {
-  const supabase = c.get("supabase");
+  const db = c.get("db");
   const conversationId = c.req.param("conversationId");
   const before = c.req.query("before");
   const limit = parseInt(c.req.query("limit") ?? "50", 10);
 
-  const messages = await getMessages(supabase, conversationId, limit, before);
+  const messages = await getMessages(db, conversationId, limit, before);
   return c.json(messages);
 });
 
 // Deterministic spell-check (instant, no LLM)
 messageRoutes.post("/:conversationId/check", async (c) => {
-  const supabase = c.get("supabase");
+  const db = c.get("db");
   const userId = c.get("userId");
   const conversationId = c.req.param("conversationId");
   const checkBody = await c.req.json();
@@ -61,7 +55,7 @@ messageRoutes.post("/:conversationId/check", async (c) => {
     return c.json({ error: "Text cannot be empty" }, 400);
   }
 
-  const senderMember = await getMember(supabase, conversationId, userId);
+  const senderMember = await getMember(db, conversationId, userId);
   if (!senderMember) {
     return c.json({ error: "Not a member of this conversation" }, 403);
   }
@@ -69,12 +63,13 @@ messageRoutes.post("/:conversationId/check", async (c) => {
   const targetLangCodes = senderMember.target_languages.map((t) => t.lang);
 
   // Detect or validate language
-  const language = providedLanguage && targetLangCodes.includes(providedLanguage)
-    ? providedLanguage
-    : detectLanguage(text, targetLangCodes);
+  const language =
+    providedLanguage && targetLangCodes.includes(providedLanguage)
+      ? providedLanguage
+      : detectLanguage(text, targetLangCodes);
 
   // Run spell/grammar check
-  let errors;
+  let errors: TextError[];
   try {
     errors = await checkSpelling(text, language);
   } catch (err) {
@@ -91,7 +86,7 @@ messageRoutes.post("/:conversationId/check", async (c) => {
 
 // Opus error explanation (slow, rich)
 messageRoutes.post("/:conversationId/explain", async (c) => {
-  const supabase = c.get("supabase");
+  const db = c.get("db");
   const userId = c.get("userId");
   const conversationId = c.req.param("conversationId");
   const { text, errors, language, intent } = await c.req.json();
@@ -100,7 +95,7 @@ messageRoutes.post("/:conversationId/explain", async (c) => {
     return c.json({ error: "text and language are required" }, 400);
   }
 
-  const senderMember = await getMember(supabase, conversationId, userId);
+  const senderMember = await getMember(db, conversationId, userId);
   if (!senderMember) {
     return c.json({ error: "Not a member of this conversation" }, 403);
   }
@@ -108,7 +103,7 @@ messageRoutes.post("/:conversationId/explain", async (c) => {
   const targetLang = senderMember.target_languages.find((t) => t.lang === language);
   const cefrLevel = targetLang?.cefr_level ?? "A1";
 
-  const context = await getRecentMessageTexts(supabase, conversationId);
+  const context = await getRecentMessageTexts(db, conversationId);
 
   const result = await explainErrors({
     text,
@@ -129,7 +124,7 @@ messageRoutes.post("/:conversationId/explain", async (c) => {
 
 // Send a message (no rewriting — user's text goes through as-is)
 messageRoutes.post("/:conversationId", async (c) => {
-  const supabase = c.get("supabase");
+  const db = c.get("db");
   const userId = c.get("userId");
   const conversationId = c.req.param("conversationId");
   const body = await c.req.json();
@@ -141,23 +136,24 @@ messageRoutes.post("/:conversationId", async (c) => {
     return c.json({ error: "Message cannot be empty" }, 400);
   }
 
-  const senderMember = await getMember(supabase, conversationId, userId);
+  const senderMember = await getMember(db, conversationId, userId);
   if (!senderMember) {
     return c.json({ error: "Not a member of this conversation" }, 403);
   }
 
   // Detect language if not provided
   const targetLangCodes = senderMember.target_languages.map((t) => t.lang);
-  const msgLanguage = language && targetLangCodes.includes(language)
-    ? language
-    : detectLanguage(text, targetLangCodes);
+  const msgLanguage =
+    language && targetLangCodes.includes(language)
+      ? language
+      : detectLanguage(text, targetLangCodes);
 
   // Seed translations with the original text in its language
   const translations: Record<string, string> = {
     [msgLanguage]: text,
   };
 
-  const message = await insertMessage(supabase, {
+  const message = await insertMessage(db, {
     conversation_id: conversationId,
     sender_id: userId,
     raw_text: text,
@@ -169,17 +165,16 @@ messageRoutes.post("/:conversationId", async (c) => {
     next_challenge: null,
   });
 
-  // Async post-send processing (does not block the response)
-  const memberLangs = await allMemberLanguages(supabase, conversationId);
+  const userLangs = memberLanguages(senderMember);
 
-  ensureTranslations([message], memberLangs).catch(
-    (err) => console.error("Failed to pre-translate message:", err),
+  ensureTranslations([message], userLangs).catch((err) =>
+    console.error("Failed to pre-translate message:", err),
   );
-  ensureTransliterations([message], msgLanguage, memberLangs).catch(
-    (err) => console.error("Failed to transliterate message:", err),
+  ensureTransliterations([message], msgLanguage, userLangs).catch((err) =>
+    console.error("Failed to transliterate message:", err),
   );
-  ensurePhonetics([message], ["ipa"], memberLangs).catch(
-    (err) => console.error("Failed to generate phonetics:", err),
+  ensurePhonetics([message], ["ipa"], userLangs).catch((err) =>
+    console.error("Failed to generate phonetics:", err),
   );
 
   // Vocabulary extraction + learning tracking (async Sonnet call)
@@ -188,7 +183,7 @@ messageRoutes.post("/:conversationId", async (c) => {
 
   (async () => {
     try {
-      const context = await getRecentMessageTexts(supabase, conversationId);
+      const context = await getRecentMessageTexts(db, conversationId);
       const vocabResult = await extractVocabulary({
         text,
         language: msgLanguage,
@@ -198,96 +193,132 @@ messageRoutes.post("/:conversationId", async (c) => {
         conversation_context: context,
       });
 
-      await trackLearningProgress(supabase, userId, msgLanguage, vocabResult);
+      await trackLearningProgress(db, userId, msgLanguage, vocabResult, message.message_id);
 
       // Update message with the challenge
       if (vocabResult.next_challenge) {
-        await supabaseAdmin
-          .from("messages")
-          .update({ next_challenge: vocabResult.next_challenge })
-          .eq("message_id", message.message_id);
+        await adminDb().update("messages", { next_challenge: vocabResult.next_challenge }, [
+          { op: "eq", column: "message_id", value: message.message_id },
+        ]);
       }
     } catch (err) {
       console.error("Failed to extract vocabulary:", err);
     }
   })();
 
-  // If this is an agent chat, forward to the agent and store its reply
-  const conversation = await getConversation(supabase, conversationId);
-  if (conversation?.agent_connector_id) {
-    try {
-      const connector = await getConnector(supabase, conversation.agent_connector_id);
-      if (connector) {
-        const agent = getAgentConnection(
-          connector.connector_id,
-          connector.type as AgentType,
-          connector.config,
-        );
-
-        // Translate user's message to English for the agent
-        const [englishText] = await translateTexts([text], "en");
-
-        // Build conversation history for context
-        const recentMsgs = await getMessages(supabase, conversationId, 20);
-        const history = recentMsgs
-          .filter((m) => m.message_id !== message.message_id)
-          .map((m) => ({
-            role: m.sender_id === userId ? "user" : "assistant",
-            content: m.translations?.["en"] ?? m.healed_text,
-          }));
-
-        const agentResponse = await agent.sendMessage(englishText, history);
-
-        const agentTranslations: Record<string, string> = { en: agentResponse };
-        const { data: agentMsg } = await supabaseAdmin
-          .from("messages")
-          .insert({
-            conversation_id: conversationId,
-            sender_id: conversation.created_by,
-            raw_text: agentResponse,
-            healed_text: agentResponse,
-            language: "en",
-            translation: null,
-            translations: agentTranslations,
-            corrections: [],
-            next_challenge: null,
-            is_agent: true,
-          })
-          .select()
-          .single();
-
-        if (agentMsg) {
-          const langs = [...new Set([
-            ...senderMember.target_languages.map((t) => t.lang),
-            ...senderMember.base_languages,
-          ])];
-          ensureTranslations([agentMsg], langs).catch(
-            (err) => console.error("Failed to translate agent response:", err),
-          );
-          ensureTransliterations([agentMsg], "en", langs).catch(
-            (err) => console.error("Failed to transliterate agent response:", err),
-          );
-          ensurePhonetics([agentMsg], ["ipa"], langs).catch(
-            (err) => console.error("Failed to generate agent phonetics:", err),
-          );
-        }
-
-        return c.json({
-          message,
-          agent_message: agentMsg,
-        }, 201);
-      }
-    } catch (err) {
-      console.error("Agent communication failed:", err);
-    }
+  // Forward to the agent and store its reply
+  const conversation = await getConversation(db, conversationId);
+  if (!conversation?.agent_connector_id) {
+    return c.json({ error: "Conversation has no agent connector" }, 500);
   }
 
-  return c.json({ message }, 201);
+  try {
+    const connector = await getConnector(db, conversation.agent_connector_id);
+    if (!connector) {
+      return c.json({ message, agent_message: null }, 201);
+    }
+
+    const agent = getAgentConnection(
+      connector.connector_id,
+      connector.type as AgentType,
+      connector.config,
+    );
+
+    const [englishText] = await translateTexts([text], "en");
+
+    const recentMsgs = await getMessages(db, conversationId, 20);
+    const history = recentMsgs
+      .filter((m) => m.message_id !== message.message_id)
+      .map((m) => ({
+        role: m.sender_id === userId ? "user" : "assistant",
+        content: m.translations?.en ?? m.healed_text,
+      }));
+
+    const agentResponse = await agent.sendMessage(englishText, history);
+
+    const agentMsg = await adminDb().insert<typeof message>("messages", {
+      conversation_id: conversationId,
+      sender_id: conversation.created_by,
+      raw_text: agentResponse,
+      healed_text: agentResponse,
+      language: "en",
+      translation: null,
+      translations: { en: agentResponse },
+      corrections: [],
+      next_challenge: null,
+      is_agent: true,
+    });
+
+    if (agentMsg) {
+      ensureTranslations([agentMsg], userLangs).catch((err) =>
+        console.error("Failed to translate agent response:", err),
+      );
+      ensureTransliterations([agentMsg], "en", userLangs).catch((err) =>
+        console.error("Failed to transliterate agent response:", err),
+      );
+      ensurePhonetics([agentMsg], ["ipa"], userLangs).catch((err) =>
+        console.error("Failed to generate agent phonetics:", err),
+      );
+    }
+
+    return c.json({ message, agent_message: agentMsg }, 201);
+  } catch (err) {
+    const detail = err instanceof Error ? err.message : String(err);
+    console.error("Agent communication failed:", err);
+    return c.json({ message, agent_message: null, agent_error: detail }, 201);
+  }
+});
+
+// Synthesise audio for a single message in a chosen language. Returns the
+// audio bytes directly (audio/mpeg from ElevenLabs). 404 when the provider
+// is unconfigured or the requested language isn't translated yet.
+messageRoutes.get("/:conversationId/:messageId/audio", async (c) => {
+  const db = c.get("db");
+  const userId = c.get("userId");
+  const conversationId = c.req.param("conversationId");
+  const messageId = c.req.param("messageId");
+  const lang = (c.req.query("lang") || "").trim();
+
+  const member = await getMember(db, conversationId, userId);
+  if (!member) return c.json({ error: "Not a member of this conversation" }, 403);
+
+  const provider = getAudioProvider();
+  if (!provider.isAvailable()) {
+    return c.json({ error: "Audio provider not configured" }, 503);
+  }
+
+  const message = await getMessageById(db, messageId);
+  if (!message || message.conversation_id !== conversationId) {
+    return c.json({ error: "Message not found" }, 404);
+  }
+
+  const targetLang = lang || message.language;
+  const text =
+    (lang && message.translations?.[lang]) ||
+    (targetLang === message.language ? message.healed_text : message.translations?.[targetLang]) ||
+    message.healed_text;
+  if (!text?.trim()) return c.json({ error: "Nothing to synthesise" }, 400);
+
+  try {
+    const result = await provider.synthesize(text, { language: targetLang });
+    return new Response(result.audio, {
+      status: 200,
+      headers: {
+        "Content-Type": result.contentType,
+        "Cache-Control": "private, max-age=86400",
+        "Content-Length": String(result.audio.byteLength),
+      },
+    });
+  } catch (err) {
+    const detail = err instanceof Error ? err.message : String(err);
+    console.error("[Audio] synthesize failed:", detail);
+    return c.json({ error: detail }, 502);
+  }
 });
 
 // Translate all messages in a conversation into the requested languages
 messageRoutes.post("/:conversationId/translate", async (c) => {
-  const supabase = c.get("supabase");
+  const db = c.get("db");
   const userId = c.get("userId");
   const conversationId = c.req.param("conversationId");
   const { languages } = await c.req.json();
@@ -296,12 +327,12 @@ messageRoutes.post("/:conversationId/translate", async (c) => {
     return c.json({ error: "languages array required" }, 400);
   }
 
-  const member = await getMember(supabase, conversationId, userId);
+  const member = await getMember(db, conversationId, userId);
   if (!member) {
     return c.json({ error: "Not a member of this conversation" }, 403);
   }
 
-  const messages = await getMessages(supabase, conversationId, 500);
+  const messages = await getMessages(db, conversationId, 500);
   await ensureTranslations(messages, languages as string[]);
   return c.json(messages);
 });

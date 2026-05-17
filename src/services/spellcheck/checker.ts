@@ -12,9 +12,12 @@ export { NspellProvider } from "./nspell-provider.ts";
 function createProvider(): SpellCheckProvider {
   const setting = process.env.SPELLCHECK_PROVIDER ?? "noop";
   switch (setting) {
-    case "languagetool": return new LanguageToolProvider();
-    case "nspell": return new NspellProvider();
-    case "noop": return new NoopProvider();
+    case "languagetool":
+      return new LanguageToolProvider();
+    case "nspell":
+      return new NspellProvider();
+    case "noop":
+      return new NoopProvider();
     default:
       console.warn(`[SpellCheck] Unknown provider "${setting}", using noop`);
       return new NoopProvider();
@@ -38,10 +41,7 @@ export function getSpellCheckProvider(): SpellCheckProvider {
  * Run spell-checking on text using the active provider.
  * Returns empty array if provider doesn't support the language.
  */
-export async function checkSpelling(
-  text: string,
-  language: LanguageCode,
-): Promise<TextError[]> {
+export async function checkSpelling(text: string, language: LanguageCode): Promise<TextError[]> {
   if (!_provider.supportsLanguage(language)) return [];
   return _provider.check(text, language);
 }
