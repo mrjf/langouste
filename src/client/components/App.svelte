@@ -204,9 +204,10 @@
           🔌 Connections
         </button>
       </nav>
-      {#if view === "chat"}
-        <ConversationList />
-      {/if}
+      <!-- Sidebar list is always mounted: working/unread indicators must
+           stay visible no matter which main view (chat/profile/connections)
+           is open. -->
+      <ConversationList />
       <div class="sidebar-footer">
         <span>{profile.value?.display_name}</span>
         {#if !SINGLE_USER}

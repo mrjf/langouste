@@ -108,6 +108,11 @@
 
   let loading = $derived(viewerLang && !hasTargetTranslation && !message._pending);
 
+  // A pending agent bubble with no text yet = "agent is typing".
+  let agentTyping = $derived(
+    !!message._pending && !!message.is_agent && !message.healed_text,
+  );
+
   let baseText = $derived.by(() => {
     if (!baseLang || baseLang === viewerLang) return null;
     const t = message.translations?.[baseLang];
@@ -149,8 +154,12 @@
     <div class="sender-name">{senderName}</div>
   {/if}
 
-  <div class="bubble" class:pending={message._pending} class:loading>
-    {#if loading}
+  <div class="bubble" class:pending={message._pending} class:loading class:typing={agentTyping}>
+    {#if agentTyping}
+      <div class="typing-dots" aria-label="Agent is responding">
+        <span></span><span></span><span></span>
+      </div>
+    {:else if loading}
       <div class="loading-bar"></div>
       <div class="loading-bar short"></div>
     {:else}
@@ -330,6 +339,35 @@
   @keyframes shimmer {
     0%, 100% { opacity: 0.3; }
     50% { opacity: 0.7; }
+  }
+
+  /* Pending agent reply — animated "typing" dots. */
+  .bubble.typing {
+    min-height: 1.6rem;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .typing-dots {
+    display: inline-flex;
+    gap: 0.25rem;
+    align-items: center;
+  }
+
+  .typing-dots span {
+    width: 0.4rem;
+    height: 0.4rem;
+    border-radius: 50%;
+    background: var(--color-text-light, #888);
+    animation: typing-bounce 1.2s ease-in-out infinite;
+  }
+
+  .typing-dots span:nth-child(2) { animation-delay: 0.15s; }
+  .typing-dots span:nth-child(3) { animation-delay: 0.3s; }
+
+  @keyframes typing-bounce {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+    30% { transform: translateY(-0.2rem); opacity: 1; }
   }
 
   .sender-name {

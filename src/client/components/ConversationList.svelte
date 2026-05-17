@@ -4,7 +4,12 @@
 
   // Pure renderer of the ChatStore. Each row is a Chat; its draft, unread,
   // and working state all live on the Chat object itself.
-  const chats = $derived(chatStore.list);
+  //
+  // NOTE: do NOT wrap chatStore.list in $derived. That memoises on the
+  // list's own dependencies (order + the chats Map) and would NOT re-run
+  // when an individual chat's reactive fields (working/unread) change, so
+  // the indicator would never update. Reading chatStore.list inline in the
+  // template lets the {#each} + {#if chat.working} subscribe per-field.
 
   function select(chat: Chat) {
     chatStore.setActive(chat.id);
@@ -32,10 +37,10 @@
 </script>
 
 <div class="conv-list">
-  {#if chats.length === 0}
+  {#if chatStore.list.length === 0}
     <div class="conv-empty">No conversations yet</div>
   {:else}
-    {#each chats as chat (chat.id)}
+    {#each chatStore.list as chat (chat.id)}
       <button
         class="conv-item"
         class:active={chatStore.activeId === chat.id}

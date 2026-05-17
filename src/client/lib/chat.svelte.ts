@@ -155,8 +155,11 @@ export class Chat {
 
   #ingestMessage(msg: Message): void {
     if (this.messages.some((m) => m.message_id === msg.message_id)) return;
-    // Replace a matching optimistic message rather than duplicating.
-    const pendingIdx = this.messages.findIndex((m) => m._pending && m.sender_id === msg.sender_id);
+    // Replace the matching optimistic placeholder rather than duplicating:
+    // agent reply → the pending agent bubble; user echo → pending user msg.
+    const pendingIdx = this.messages.findIndex(
+      (m) => m._pending && (msg.is_agent ? !!m.is_agent : m.sender_id === msg.sender_id),
+    );
     if (pendingIdx !== -1) {
       const next = this.messages.slice();
       next[pendingIdx] = msg;
@@ -298,15 +301,21 @@ export class Chat {
     this.#send(text, this.draft.lang, this.draft.intent.trim());
   }
 
-  /** Internal: perform the send, optimistic message, agent round-trip.
-   *  Everything here is scoped to THIS chat. */
+  /** Internal: perform the send. Both the user's message AND a pending
+   *  agent-reply bubble appear immediately (optimistic), before the
+   *  blocking agent round-trip — so the UI responds the instant the user
+   *  commits to sending. Everything here is scoped to THIS chat. */
   async #send(text: string, lang: string, intent: string): Promise<void> {
     this.#clearDraft();
     this.agentError = null;
     this.working = true;
 
-    const pending: Message = {
-      message_id: `pending-${Date.now()}`,
+    const stamp = Date.now();
+    const userPendingId = `pending-user-${stamp}`;
+    const agentPendingId = `pending-agent-${stamp}`;
+
+    const userPending: Message = {
+      message_id: userPendingId,
       conversation_id: this.id,
       sender_id: this.member?.user_id ?? "me",
       raw_text: text,
@@ -319,7 +328,30 @@ export class Chat {
       created_at: new Date().toISOString(),
       _pending: true,
     };
-    this.messages = [...this.messages, pending];
+    // Pending agent bubble — shows the "…" placeholder immediately while
+    // the agent thinks. Replaced (or removed) when the reply resolves.
+    const agentPending: Message = {
+      message_id: agentPendingId,
+      conversation_id: this.id,
+      sender_id: "agent",
+      raw_text: "",
+      healed_text: "",
+      language: lang,
+      translation: null,
+      translations: {},
+      corrections: [],
+      next_challenge: null,
+      is_agent: true,
+      created_at: new Date(stamp + 1).toISOString(),
+      _pending: true,
+    };
+    this.messages = [...this.messages, userPending, agentPending];
+
+    const resolveAgent = (msg: Message | null) => {
+      this.messages = msg
+        ? this.messages.map((m) => (m.message_id === agentPendingId ? msg : m))
+        : this.messages.filter((m) => m.message_id !== agentPendingId);
+    };
 
     try {
       const result = (await api.sendMessage(this.id, text, lang, intent || undefined)) as {
@@ -327,15 +359,27 @@ export class Chat {
         agent_message?: Message;
         agent_error?: string;
       };
-      // Swap the optimistic message for the stored one.
+      // Swap the optimistic user message for the stored one.
       this.messages = this.messages.map((m) =>
-        m.message_id === pending.message_id ? result.message : m,
+        m.message_id === userPendingId ? result.message : m,
       );
-      if (result.agent_message) this.#ingestMessage(result.agent_message);
-      else if (result.agent_error) this.agentError = result.agent_error;
+      if (result.agent_message) {
+        // Realtime may already have ingested it — dedupe, then drop the
+        // placeholder.
+        if (this.messages.some((m) => m.message_id === result.agent_message!.message_id)) {
+          resolveAgent(null);
+        } else {
+          resolveAgent(result.agent_message);
+        }
+      } else {
+        resolveAgent(null);
+        if (result.agent_error) this.agentError = result.agent_error;
+      }
     } catch (err) {
       console.error(`[Chat ${this.id.slice(0, 8)}] send failed:`, err);
-      this.messages = this.messages.filter((m) => m.message_id !== pending.message_id);
+      this.messages = this.messages.filter(
+        (m) => m.message_id !== userPendingId && m.message_id !== agentPendingId,
+      );
     } finally {
       this.working = false;
     }
