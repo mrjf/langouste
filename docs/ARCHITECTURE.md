@@ -35,7 +35,7 @@ How Langouste is put together, where the seams are, and what the interesting bit
 │    http.ts                ──────── any HTTP API     │            │
 │                                                     │            │
 │  services/spellcheck/     local nspell              │            │
-│  services/spaced-rep/     pure SM-2 fn              │            │
+│  services/spaced-rep/     FSRS concept scheduler    │            │
 │  services/database/       Supabase client           │            │
 │                                                     │            │
 │  mcp/                     expose tools to any host  │            │
@@ -99,9 +99,11 @@ Provider pattern, fully local.
 
 ### `services/spaced-repetition/`
 
-- `sm2.ts` — pure function, fully tested. The only SRS we ship today.
-- `tracker.ts` — takes a vocab-extraction result and upserts vocabulary + grammar-gap rows.
-- `fsrs.ts` — not yet. When we migrate (see `docs/LEARNING-MODEL.md`), this module replaces `sm2.ts` behind the same interface.
+- `fsrs.ts` — pure FSRS-6 scheduler over atomic concept state.
+- `config.ts` — per-user/per-language FSRS parameters and interaction signal weights.
+- `interactions.ts` — single write boundary for `review_log`, item roll-ups, and `concept_srs`.
+- `tracker.ts` — records chat productions and target-language encounters; see `docs/LEARNING-TRACKING.md` for the event/state contract.
+- `sm2.ts` — legacy pure scheduler kept for continuity/tests, not the active default.
 
 ### `services/database/`
 

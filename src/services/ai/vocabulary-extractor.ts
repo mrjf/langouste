@@ -2,12 +2,13 @@ import { getAnthropicClient } from "./client.ts";
 import { config } from "../../lib/config.ts";
 import { testRegistry } from "../../lib/test-registry.ts";
 import { languageName } from "../../lib/languages.ts";
+import { ALLOWED_GRAMMAR_CATEGORIES } from "../profile/grammar-ontology.ts";
 import type { VocabularyExtractionInput, VocabularyExtractionOutput } from "./types.ts";
 
 const VOCABULARY_EXTRACTION_TOOL = {
   name: "extract_vocabulary" as const,
   description:
-    "Extract new vocabulary, detect grammar gaps, and generate a learning challenge from a sent message.",
+    "Extract vocabulary, detect grammar gaps, and generate a learning challenge from language-learning text.",
   input_schema: {
     type: "object" as const,
     properties: {
@@ -34,9 +35,14 @@ const VOCABULARY_EXTRACTION_TOOL = {
           properties: {
             category: {
               type: "string",
-              description: 'Grammar category, e.g. "verb:passé_composé"',
+              description:
+                "Closed ontology category only; never invent general or ad-hoc categories.",
             },
-            description: { type: "string", description: "Brief description of the gap" },
+            description: {
+              type: "string",
+              description:
+                "Brief explanation of this specific production instance; not the category definition.",
+            },
           },
           required: ["category", "description"],
         },
@@ -74,8 +80,9 @@ export async function extractVocabulary(
   const intentSection = input.intent
     ? `\nThe sender described their intent as: "${input.intent}"\n`
     : "";
+  const allowedGrammarCategories = ALLOWED_GRAMMAR_CATEGORIES.join(", ");
 
-  const prompt = `You are a language learning assistant analyzing a message that was just sent in ${targetLang} by a learner at CEFR level ${input.cefr_level}.
+  const prompt = `You are a language learning assistant analyzing text in ${targetLang} for a learner at CEFR level ${input.cefr_level}.
 
 ## The message
 "${input.text}"
@@ -85,9 +92,9 @@ ${context}
 
 ## Tasks
 
-1. **Extract new vocabulary**: Identify words the sender used that they likely don't know well yet (based on CEFR level). For each word, provide the term, its translation to ${baseLang}, the sentence it appeared in, and estimated CEFR level.
+1. **Extract new vocabulary**: Identify words or short lexical chunks present in the text that the learner likely doesn't know well yet (based on CEFR level). For each item, provide the term, its translation to ${baseLang}, the sentence it appeared in, and estimated CEFR level.
 
-2. **Detect grammar gaps**: If you notice grammar patterns the sender struggles with (from this message or the conversation context), categorize them (e.g., "verb:passé_composé", "gender:articles", "prepositions:à_vs_de"). Only include categories where actual issues are evident.
+2. **Detect grammar gaps**: If the text is learner-produced and you notice grammar patterns the sender struggles with (from this message or the conversation context), use only one of these exact generic categories: ${allowedGrammarCategories}. The category must be generic, not a description of this one message. Put the message-specific explanation in the description field. Only include categories where actual issues are evident. If the issue is general communication, random keystrokes, no recognizable target-language output, low effort, or otherwise outside this closed ontology, return no grammar gap rather than inventing a category.
 
 3. **Generate a challenge**: Suggest something specific for their next message. Prioritize practicing weak areas. Be encouraging. One sentence.
 

@@ -43,7 +43,7 @@ You can keep separate `.env` files and `cp` between them, or toggle with `DATABA
 ## Invariants the abstraction preserves
 
 - **Identical API surface.** Routes, types, and client JSON shapes are the same in both modes.
-- **Identical pedagogy.** SM-2, Opus explanation, Sonnet vocabulary extraction all run the same way.
+- **Identical pedagogy.** FSRS concept scheduling, Opus explanation, Sonnet vocabulary extraction all run the same way.
 - **Per-request scoping.** In supabase mode, `c.get("db")` is scoped to the authenticated user's JWT (RLS respected). In sqlite mode, it's the admin DB (single-user context, no RLS exists).
 
 ## What sqlite mode intentionally drops

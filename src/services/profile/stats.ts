@@ -1,5 +1,6 @@
 import type { Database } from "../../lib/db/index.ts";
-import { ALL_DIMENSIONS, dimensionForCategory, type Dimension } from "./dimensions.ts";
+import { ALL_DIMENSIONS, type Dimension } from "./dimensions.ts";
+import { grammarDimensionForCategory } from "./grammar-ontology.ts";
 
 export interface DimensionStat {
   dimension: Dimension;
@@ -17,8 +18,10 @@ export interface LanguageStats {
   vocab_by_cefr: Record<string, number>;
   vocab_mastered: number; // repetitions >= 3 AND correct recent
   vocab_struggling: number; // correct_productions / productions < 0.5, productions >= 2
+  vocab_self_corrected: number;
   grammar_gap_total: number;
   grammar_gap_active: number; // error_count > correct_productions
+  grammar_self_corrected: number;
   corrections_count: number;
   activity_30d: Array<{ date: string; messages: number }>;
   dimensions: DimensionStat[];
@@ -65,10 +68,12 @@ export async function languageStats(
   const vocab_by_cefr: Record<string, number> = {};
   let vocab_mastered = 0;
   let vocab_struggling = 0;
+  let vocab_self_corrected = 0;
   for (const v of vocab) {
     const band = v.cefr_level ?? "unknown";
     vocab_by_cefr[band] = (vocab_by_cefr[band] ?? 0) + 1;
     if (v.repetitions >= 3) vocab_mastered++;
+    vocab_self_corrected += v.self_corrected_productions ?? 0;
     if (v.productions >= 2 && v.correct_productions / v.productions < 0.5) {
       vocab_struggling++;
     }
@@ -79,11 +84,18 @@ export async function languageStats(
     if (Array.isArray(m.corrections)) corrections_count += m.corrections.length;
   }
 
-  const gap_active = gaps.filter((g) => g.error_count > (g.correct_productions ?? 0)).length;
+  const ontologyGaps = gaps.filter((g) => grammarDimensionForCategory(g.category, language));
+  const gap_active = ontologyGaps.filter(
+    (g) => g.error_count > (g.correct_productions ?? 0),
+  ).length;
+  const grammar_self_corrected = ontologyGaps.reduce(
+    (sum, g) => sum + (g.self_corrected_productions ?? 0),
+    0,
+  );
 
   const activity_30d = bucketBy30Days(activity.map((a) => a.created_at));
 
-  const dimensions = buildDimensions(vocab, gaps);
+  const dimensions = buildDimensions(vocab, ontologyGaps);
 
   return {
     language,
@@ -92,8 +104,10 @@ export async function languageStats(
     vocab_by_cefr,
     vocab_mastered,
     vocab_struggling,
-    grammar_gap_total: gaps.length,
+    vocab_self_corrected,
+    grammar_gap_total: ontologyGaps.length,
     grammar_gap_active: gap_active,
+    grammar_self_corrected,
     corrections_count,
     activity_30d,
     dimensions,
@@ -107,14 +121,17 @@ interface VocabRow {
   repetitions: number;
   productions: number;
   correct_productions: number;
+  self_corrected_productions: number;
   encounters: number;
 }
 
 interface GapRow {
   gap_id: string;
+  language?: string;
   category: string;
   error_count: number;
   correct_productions: number;
+  self_corrected_productions: number;
   repetitions: number;
 }
 
@@ -146,7 +163,8 @@ function buildDimensions(vocab: VocabRow[], gaps: GapRow[]): DimensionStat[] {
   };
 
   for (const g of gaps) {
-    const d = dimensionForCategory(g.category);
+    const d = grammarDimensionForCategory(g.category, g.language);
+    if (!d) continue;
     evidence[d] = (evidence[d] ?? 0) + 1;
   }
 

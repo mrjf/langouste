@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { Database as BunDatabase } from "bun:sqlite";
 import { dataPath } from "../data-dir.ts";
 import type { Database, DatabaseSet, Filter, Scalar, SelectOptions } from "./types.ts";
@@ -27,6 +29,8 @@ const AUTO_ID_COLUMNS: Record<string, string> = {
   messages: "message_id",
   vocabulary: "vocab_id",
   grammar_gaps: "gap_id",
+  concept_srs: "concept_state_id",
+  fsrs_configs: "config_id",
   assessments: "assessment_id",
   review_log: "log_id",
 };
@@ -44,6 +48,8 @@ const JSON_COLUMNS = new Set([
   "before_state",
   "after_state",
   "phases",
+  "parameters",
+  "quality_weights",
 ]);
 
 function toStorage(row: Record<string, unknown>): Record<string, unknown> {
@@ -175,8 +181,9 @@ export class SqliteDatabase implements Database {
     const cols = Object.keys(prepared);
     const placeholders = cols.map((_, i) => `?${i + 1}`).join(", ");
     const quoted = cols.map((c) => `"${c}"`).join(", ");
+    const idCol = AUTO_ID_COLUMNS[table];
     const updateCols = cols
-      .filter((c) => !conflictColumns.includes(c))
+      .filter((c) => !conflictColumns.includes(c) && c !== idCol)
       .map((c) => `"${c}" = excluded."${c}"`)
       .join(", ");
     const conflict = conflictColumns.map((c) => `"${c}"`).join(", ");
@@ -253,6 +260,7 @@ export function createSqliteDatabaseSet(): DatabaseSet {
   const bun = new BunDatabase(path, { create: true });
   bun.exec("PRAGMA journal_mode = WAL");
   bun.exec("PRAGMA foreign_keys = ON");
+  applySqliteSchema(bun);
   const db = new SqliteDatabase(bun);
 
   // SQLite has no row-level security; admin and per-user clients are the same.
@@ -263,4 +271,69 @@ export function createSqliteDatabaseSet(): DatabaseSet {
       bun.close();
     },
   };
+}
+
+function applySqliteSchema(db: BunDatabase): void {
+  const schemaPath = resolve(import.meta.dir, "../../../sqlite/schema.sql");
+  db.exec(readFileSync(schemaPath, "utf-8"));
+
+  sqliteAddColumnIfMissing(db, "conversation_members", "last_read_at", "TEXT", () => {
+    db.exec(
+      "UPDATE conversation_members SET last_read_at = datetime('now') WHERE last_read_at IS NULL",
+    );
+  });
+
+  for (const table of ["vocabulary", "grammar_gaps"]) {
+    sqliteAddColumnIfMissing(db, table, "concept_id", "TEXT");
+    sqliteAddColumnIfMissing(db, table, "encounters", "INTEGER NOT NULL DEFAULT 0");
+    sqliteAddColumnIfMissing(db, table, "productions", "INTEGER NOT NULL DEFAULT 0");
+    sqliteAddColumnIfMissing(db, table, "correct_productions", "INTEGER NOT NULL DEFAULT 0");
+    sqliteAddColumnIfMissing(db, table, "self_corrected_productions", "INTEGER NOT NULL DEFAULT 0");
+    sqliteAddColumnIfMissing(db, table, "last_encounter_at", "TEXT");
+    sqliteAddColumnIfMissing(db, table, "last_produced_at", "TEXT");
+  }
+
+  cleanupPartialLearningRows(db);
+}
+
+function sqliteAddColumnIfMissing(
+  db: BunDatabase,
+  table: string,
+  column: string,
+  definition: string,
+  backfill?: () => void,
+): void {
+  const columns = db.query(`PRAGMA table_info(${table})`).all() as Array<{ name: string }>;
+  if (columns.some((c) => c.name === column)) return;
+  db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`);
+  backfill?.();
+}
+
+function cleanupPartialLearningRows(db: BunDatabase): void {
+  db.exec(`
+    DELETE FROM vocabulary
+    WHERE encounters = 0
+      AND productions = 0
+      AND correct_productions = 0
+      AND self_corrected_productions = 0
+      AND repetitions = 0
+      AND NOT EXISTS (
+        SELECT 1 FROM review_log
+        WHERE review_log.item_type = 'vocabulary'
+          AND review_log.item_id = vocabulary.vocab_id
+      )
+  `);
+  db.exec(`
+    DELETE FROM grammar_gaps
+    WHERE encounters = 0
+      AND productions = 0
+      AND correct_productions = 0
+      AND self_corrected_productions = 0
+      AND repetitions = 0
+      AND NOT EXISTS (
+        SELECT 1 FROM review_log
+        WHERE review_log.item_type = 'grammar'
+          AND review_log.item_id = grammar_gaps.gap_id
+      )
+  `);
 }

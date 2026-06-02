@@ -13,7 +13,9 @@ export const LANGUAGE_NAMES: Record<string, string> = {
   ja: "Japanese",
   ko: "Korean",
   ar: "Arabic",
+  he: "Hebrew",
   tr: "Turkish",
+  da: "Danish",
   pl: "Polish",
 };
 

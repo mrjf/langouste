@@ -89,6 +89,18 @@ async function runSqliteMigrations() {
       "UPDATE conversation_members SET last_read_at = datetime('now') WHERE last_read_at IS NULL",
     );
   });
+  sqliteAddColumnIfMissing(
+    db,
+    "vocabulary",
+    "self_corrected_productions",
+    "INTEGER NOT NULL DEFAULT 0",
+  );
+  sqliteAddColumnIfMissing(
+    db,
+    "grammar_gaps",
+    "self_corrected_productions",
+    "INTEGER NOT NULL DEFAULT 0",
+  );
 
   db.close();
 
