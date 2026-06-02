@@ -234,9 +234,19 @@ export const api = {
   },
   getProfileItem: (itemType: "vocabulary" | "grammar", itemId: string, language?: string) =>
     request(`/profile/item/${itemType}/${encodeURIComponent(itemId)}${profileItemQuery(language)}`),
-  getProfileItemReference: (itemType: "vocabulary" | "grammar", itemId: string, language?: string) =>
-    request(`/profile/item/${itemType}/${encodeURIComponent(itemId)}/reference${profileItemQuery(language)}`),
-  fetchProfileItemAudio: async (itemType: "vocabulary" | "grammar", itemId: string, language?: string) => {
+  getProfileItemReference: (
+    itemType: "vocabulary" | "grammar",
+    itemId: string,
+    language?: string,
+  ) =>
+    request(
+      `/profile/item/${itemType}/${encodeURIComponent(itemId)}/reference${profileItemQuery(language)}`,
+    ),
+  fetchProfileItemAudio: async (
+    itemType: "vocabulary" | "grammar",
+    itemId: string,
+    language?: string,
+  ) => {
     const sess = session.value;
     const headers: Record<string, string> = sess
       ? { Authorization: `Bearer ${sess.access_token}` }

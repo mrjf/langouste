@@ -28,7 +28,7 @@ describe("lookupDictionary", () => {
 
   test("preserves the inflected-form description when resolving to a lemma", async () => {
     mockWiktionary({
-      "tudnád": page("tudnád", "Hungarian", [
+      tudnád: page("tudnád", "Hungarian", [
         'second-person singular conditional present definite of <a href="/wiki/tud#Hungarian">tud</a>',
       ]),
       tud: page("tud", "Hungarian", ["to know"]),
@@ -37,7 +37,9 @@ describe("lookupDictionary", () => {
     const lookup = await lookupDictionary("tudnád", "hu");
 
     expect(lookup.source_term).toBe("tud");
-    expect(lookup.form_description).toBe("second-person singular conditional present definite of tud");
+    expect(lookup.form_description).toBe(
+      "second-person singular conditional present definite of tud",
+    );
     expect(lookup.definitions).toEqual(["to know"]);
   });
 
@@ -79,8 +81,8 @@ describe("lookupDictionary", () => {
 
   test("tries conservative Hungarian verb-stem candidates when no form page exists", async () => {
     mockWiktionary({
-      "megtalálom": null,
-      "megtalál": page("megtalál", "Hungarian", ["to find after searching"]),
+      megtalálom: null,
+      megtalál: page("megtalál", "Hungarian", ["to find after searching"]),
     });
 
     const lookup = await lookupDictionary("megtalálom", "hu");
@@ -93,9 +95,9 @@ describe("lookupDictionary", () => {
 
   test("lemmatizes capitalized Hungarian inflected words through lowercase candidates", async () => {
     mockWiktionary({
-      "Megtalálom": null,
-      "megtalálom": null,
-      "megtalál": page("megtalál", "Hungarian", ["to find after searching"]),
+      Megtalálom: null,
+      megtalálom: null,
+      megtalál: page("megtalál", "Hungarian", ["to find after searching"]),
     });
 
     const lookup = await lookupDictionary("Megtalálom", "hu");
@@ -107,7 +109,9 @@ describe("lookupDictionary", () => {
 
   test("decodes named, decimal, and hex HTML entities in definitions", async () => {
     mockWiktionary({
-      "kíván": page("kíván", "Hungarian", ["to wish somebody something &mdash; Sok szerencs&eacute;t&#33; &#x1F44D;"]),
+      kíván: page("kíván", "Hungarian", [
+        "to wish somebody something &mdash; Sok szerencs&eacute;t&#33; &#x1F44D;",
+      ]),
     });
 
     const lookup = await lookupDictionary("kíván", "hu");
@@ -117,7 +121,7 @@ describe("lookupDictionary", () => {
 
   test("separates examples from definition text", async () => {
     mockWiktionary({
-      "kíván": `
+      kíván: `
         <div class="mw-heading mw-heading2"><h2 id="Hungarian">Hungarian</h2></div>
         <div class="mw-heading mw-heading3"><h3 id="Verb">Verb</h3></div>
         <ol>
@@ -142,7 +146,7 @@ describe("lookupDictionary", () => {
 
   test("skips etymology lists and reads part-of-speech definitions", async () => {
     mockWiktionary({
-      "egy": `
+      egy: `
         <div class="mw-heading mw-heading2"><h2 id="Hungarian">Hungarian</h2></div>
         <div class="mw-heading mw-heading3"><h3 id="Etymology_2">Etymology</h3></div>
         <ol><li>Lexicalization of <a href="/wiki/e#Hungarian">e</a>/ez plus suffixes.</li></ol>
@@ -153,7 +157,7 @@ describe("lookupDictionary", () => {
         <div class="mw-heading mw-heading3"><h3 id="Article">Article</h3></div>
         <ol><li>a; an</li></ol>
       `,
-      "e": `
+      e: `
         <div class="mw-heading mw-heading2"><h2 id="Hungarian">Hungarian</h2></div>
         <div class="mw-heading mw-heading3"><h3 id="Pronoun">Pronoun</h3></div>
         <ol><li>this</li></ol>

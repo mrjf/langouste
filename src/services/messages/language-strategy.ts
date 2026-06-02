@@ -104,7 +104,9 @@ function targetLanguagePrompt(text: string, targetLanguage: string): string {
 }
 
 function memberLanguages(member: ConversationMember): string[] {
-  return [...new Set([...member.target_languages.map((target) => target.lang), ...member.base_languages])];
+  return [
+    ...new Set([...member.target_languages.map((target) => target.lang), ...member.base_languages]),
+  ];
 }
 
 function visibleTextForLanguage(message: Message, language: string): string {

@@ -59,24 +59,27 @@ test.describe("Profile dashboard", () => {
       grammar_gaps_detected: [],
       next_challenge: "",
     });
-    await page.route(/\/api\/profile\/item\/vocabulary\/[^/]+\/reference(?:\?.*)?$/, async (route) => {
-      await route.fulfill({
-        contentType: "application/json",
-        body: JSON.stringify({
-          term: "manger",
-          language: "fr",
-          source_term: "manger",
-          source: "wiktionary",
-          source_url: "https://en.wiktionary.org/wiki/manger",
-          part_of_speech: "Verb",
-          pronunciations: [],
-          conjugation_html:
-            '<h4 id="Conjugation">Conjugation</h4><table class="inflection-table vsSwitcher"><tbody><tr><th>Present</th><td>je mange</td></tr></tbody></table>',
-          links: [],
-          notes: [],
-        }),
-      });
-    });
+    await page.route(
+      /\/api\/profile\/item\/vocabulary\/[^/]+\/reference(?:\?.*)?$/,
+      async (route) => {
+        await route.fulfill({
+          contentType: "application/json",
+          body: JSON.stringify({
+            term: "manger",
+            language: "fr",
+            source_term: "manger",
+            source: "wiktionary",
+            source_url: "https://en.wiktionary.org/wiki/manger",
+            part_of_speech: "Verb",
+            pronunciations: [],
+            conjugation_html:
+              '<h4 id="Conjugation">Conjugation</h4><table class="inflection-table vsSwitcher"><tbody><tr><th>Present</th><td>je mange</td></tr></tbody></table>',
+            links: [],
+            notes: [],
+          }),
+        });
+      },
+    );
     await seedConnector(request, "stub");
 
     await page.goto("/");
@@ -221,8 +224,12 @@ test.describe("Profile dashboard", () => {
     await page.getByRole("button", { name: /Your progress/ }).click();
     await page.getByRole("button", { name: /Syntax/ }).click();
     await expect(page).toHaveURL(/#\/profile\/fr\/syntax$/);
-    await expect(page.getByRole("cell", { name: /Definite vs\. Indefinite Articles/ })).toBeVisible();
-    await expect(page.getByRole("cell", { name: /Definite vs\. indefinite article usage/ })).toBeVisible();
+    await expect(
+      page.getByRole("cell", { name: /Definite vs\. Indefinite Articles/ }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("cell", { name: /Definite vs\. indefinite article usage/ }),
+    ).toBeVisible();
     await expect(page.getByText("articles:definite_vs_indefinite")).toHaveCount(0);
     await expect(page.getByText("u:syntax:determiner.definiteness")).toHaveCount(0);
     await expect(page.getByText("The learner used 'egy'")).toHaveCount(0);

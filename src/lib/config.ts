@@ -14,9 +14,9 @@ if (databaseMode !== "supabase" && databaseMode !== "sqlite") {
   throw new Error(`DATABASE_MODE must be 'supabase' or 'sqlite', got: ${databaseMode}`);
 }
 
-const agentLanguageStrategy = (
-  process.env.LANGOUSTE_AGENT_LANGUAGE_STRATEGY ?? "target-first"
-) as "target-first" | "english-mediated";
+const agentLanguageStrategy = (process.env.LANGOUSTE_AGENT_LANGUAGE_STRATEGY ?? "target-first") as
+  | "target-first"
+  | "english-mediated";
 if (agentLanguageStrategy !== "target-first" && agentLanguageStrategy !== "english-mediated") {
   throw new Error(
     `LANGOUSTE_AGENT_LANGUAGE_STRATEGY must be 'target-first' or 'english-mediated', got: ${agentLanguageStrategy}`,

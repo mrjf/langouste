@@ -533,7 +533,10 @@ export class Chat {
     if (spans.length === 0) return this.#pendingSelfCorrections;
     const byKey = new Map<string, SelfCorrectedSpan>();
     for (const span of [...this.#pendingSelfCorrections, ...spans]) {
-      byKey.set(`${span.kind}:${span.original.toLowerCase()}=>${span.corrected.toLowerCase()}`, span);
+      byKey.set(
+        `${span.kind}:${span.original.toLowerCase()}=>${span.corrected.toLowerCase()}`,
+        span,
+      );
     }
     this.#pendingSelfCorrections = [...byKey.values()];
     return this.#pendingSelfCorrections;

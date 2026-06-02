@@ -1,10 +1,7 @@
 import { Hono } from "hono";
 import { requireAuth } from "../middleware.ts";
 import { languageStats } from "../../services/profile/stats.ts";
-import {
-  ALL_DIMENSIONS,
-  type Dimension,
-} from "../../services/profile/dimensions.ts";
+import { ALL_DIMENSIONS, type Dimension } from "../../services/profile/dimensions.ts";
 import { grammarDimensionForCategory } from "../../services/profile/grammar-ontology.ts";
 import { getItemReference } from "../../services/references/item-reference.ts";
 import { translateTexts } from "../../services/ai/translator.ts";
@@ -171,7 +168,9 @@ profileStatsRoutes.get("/dimension/:language/:dimension", async (c) => {
       ],
       limit: 500,
     });
-    const filtered = gaps.filter((g) => grammarDimensionForCategory(g.category, language) === dimension);
+    const filtered = gaps.filter(
+      (g) => grammarDimensionForCategory(g.category, language) === dimension,
+    );
     return c.json({
       dimension,
       items: sortItems(
@@ -416,7 +415,9 @@ async function resolveProfileItem(
     { op: "eq", column: "user_id", value: userId },
     { op: "eq", column: "term", value: term },
   ];
-  const filters = language ? [...baseFilters, { op: "eq" as const, column: "language", value: language }] : baseFilters;
+  const filters = language
+    ? [...baseFilters, { op: "eq" as const, column: "language", value: language }]
+    : baseFilters;
   const item = await db.selectOne<Record<string, unknown>>("vocabulary", { filters });
   const canonicalId = typeof item?.vocab_id === "string" ? item.vocab_id : "";
   const itemTerm = typeof item?.term === "string" ? item.term : term;

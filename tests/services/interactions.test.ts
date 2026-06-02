@@ -160,8 +160,7 @@ describe("recordInteraction", () => {
         },
         {
           category: "articles:definite_vs_indefinite",
-          description:
-            "The learner used 'egy' where 'a' would be more natural for a known item.",
+          description: "The learner used 'egy' where 'a' would be more natural for a known item.",
         },
       ],
       next_challenge: "",

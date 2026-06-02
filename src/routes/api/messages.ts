@@ -278,8 +278,16 @@ async function processAgentReply(args: {
   inputText: string;
   inputLanguage: string;
 }) {
-  const { connector, conversationId, userId, senderMember, userMessage, agentMessage, inputText, inputLanguage } =
-    args;
+  const {
+    connector,
+    conversationId,
+    userId,
+    senderMember,
+    userMessage,
+    agentMessage,
+    inputText,
+    inputLanguage,
+  } = args;
   const userLangs = memberLanguages(senderMember);
 
   try {
@@ -339,9 +347,11 @@ async function processAgentReply(args: {
         cefrLevel: target.cefr_level,
       })),
     );
-    ensureTransliterations([completedAgentMessage], agentLanguagePlan.responseLanguage, userLangs).catch((err) =>
-      console.error("Failed to transliterate agent response:", err),
-    );
+    ensureTransliterations(
+      [completedAgentMessage],
+      agentLanguagePlan.responseLanguage,
+      userLangs,
+    ).catch((err) => console.error("Failed to transliterate agent response:", err));
     ensurePhonetics([completedAgentMessage], ["ipa"], userLangs).catch((err) =>
       console.error("Failed to generate agent phonetics:", err),
     );

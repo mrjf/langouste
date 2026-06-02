@@ -59,8 +59,12 @@ async function buildLookup(term: string, language: string): Promise<DictionaryLo
     if (!page) continue;
     const senses = extractSenses(page.html, language);
     const definitions = senses.map((sense) => sense.definition);
-    const firstDefinitionIsInflection = definitions[0] ? isInflectionDefinition(definitions[0]) : false;
-    const formDescription = firstDefinitionIsInflection ? definitions[0] : candidate.formDescription;
+    const firstDefinitionIsInflection = definitions[0]
+      ? isInflectionDefinition(definitions[0])
+      : false;
+    const formDescription = firstDefinitionIsInflection
+      ? definitions[0]
+      : candidate.formDescription;
     if (definitions.length > 0 && !firstDefinitionIsInflection) {
       return resultFromPage(term, language, page, senses, formDescription);
     }
@@ -126,7 +130,9 @@ function emptyLookup(term: string, language: string): DictionaryLookup {
   };
 }
 
-async function fetchWiktionaryPage(term: string): Promise<{ title: string; html: string; url: string } | null> {
+async function fetchWiktionaryPage(
+  term: string,
+): Promise<{ title: string; html: string; url: string } | null> {
   const url = `https://en.wiktionary.org/w/api.php?action=parse&page=${encodeURIComponent(term)}&prop=text&format=json&origin=*`;
   const response = await fetch(url, {
     headers: { "User-Agent": "Langouste/0.1 (language-learning dictionary lookup)" },
@@ -169,7 +175,10 @@ function extractDefinitionLists(section: string): DefinitionList[] {
     const start = (heading.index ?? 0) + heading[0].length;
     const next = headings.find((candidate, candidateIndex) => {
       if (candidateIndex <= index) return false;
-      return Number(candidate[1]) <= level || DICTIONARY_POS_HEADINGS.has(normalizeHeadingId(candidate[2]).toLowerCase());
+      return (
+        Number(candidate[1]) <= level ||
+        DICTIONARY_POS_HEADINGS.has(normalizeHeadingId(candidate[2]).toLowerCase())
+      );
     });
     const block = section.slice(start, next?.index ?? section.length);
     const list = /<ol\b[^>]*>([\s\S]*?)<\/ol>/i.exec(block)?.[1];
@@ -184,7 +193,12 @@ function addSenseItems(definitionList: DefinitionList, senses: DictionarySense[]
     const itemHtml = item[1];
     const definition = cleanDefinitionText(itemHtml);
     if (!definition || definition.includes("quotations ▼")) continue;
-    if (!senses.some((sense) => sense.definition === definition && sense.part_of_speech === definitionList.partOfSpeech)) {
+    if (
+      !senses.some(
+        (sense) =>
+          sense.definition === definition && sense.part_of_speech === definitionList.partOfSpeech,
+      )
+    ) {
       senses.push({
         part_of_speech: definitionList.partOfSpeech,
         definition,
@@ -267,7 +281,10 @@ function firstUsefulLink(html: string, linkRe: RegExp, currentTitle: string): st
 }
 
 function normalizeHeadingId(value: string): string {
-  return decodeHtml(value).replace(/_/g, " ").replace(/\s+\d+$/u, "").trim();
+  return decodeHtml(value)
+    .replace(/_/g, " ")
+    .replace(/\s+\d+$/u, "")
+    .trim();
 }
 
 function isInflectionDefinition(definition: string): boolean {
@@ -347,7 +364,10 @@ function decodeHtml(value: string): string {
 }
 
 function normalizeTerm(term: string): string {
-  return term.trim().replace(/[“”"']/g, "").replace(/\s+/g, " ");
+  return term
+    .trim()
+    .replace(/[“”"']/g, "")
+    .replace(/\s+/g, " ");
 }
 
 function localeForLanguage(language: string): string {
