@@ -68,6 +68,8 @@ testRoutes.post("/reset-db", async (c) => {
   // Order matters for FKs even with ON DELETE CASCADE: empty the leaves first.
   const tables = [
     "review_log",
+    "concept_srs",
+    "fsrs_configs",
     "messages",
     "conversation_members",
     "conversations",
@@ -110,6 +112,8 @@ testRoutes.get("/db/:table", async (c) => {
     "messages",
     "vocabulary",
     "grammar_gaps",
+    "concept_srs",
+    "fsrs_configs",
     "assessments",
     "review_log",
   ]);

@@ -99,6 +99,49 @@ This is radically cheaper than the current pipeline, which calls Opus on every m
 - Messages with only deterministically-detected errors can short-circuit to a cached/templated explanation for the same concept_id, saving Opus calls.
 - Opus only runs when genuinely novel explanation is required (new concept_id, unusual combination, user-confusion signal).
 
+## Annotation output model
+
+The parser should emit an annotation graph over the source text, not a single nested tree. Chat messages, transcript segments, lesson passages, and future classroom assignments all share the same primitive: immutable text plus labeled spans anchored by character offsets.
+
+```typescript
+interface TextAnnotation {
+  annotation_id: string;
+  source_type: "message" | "content_segment" | "reference_example" | "assignment";
+  source_id: string;
+  language: string;
+  layer:
+    | "word"
+    | "phrase"
+    | "sentence"
+    | "translation"
+    | "grammar"
+    | "vocabulary"
+    | "pronunciation"
+    | "timestamp"
+    | "assignment"
+    | "other";
+  start_offset: number; // inclusive Unicode code-point offset in normalized source text
+  end_offset: number;   // exclusive Unicode code-point offset in normalized source text
+  label: string;
+  payload: Record<string, unknown>;
+}
+```
+
+Offsets are the contract between parsing, translation, correction rendering, media transcript alignment, and learning-state updates. An offset range can have many labels at once: a word boundary, a phrase boundary, a translation span, a grammar concept, a pronunciation note, and a vocabulary encounter. These annotations may overlap, nest, or cross; code should not assume one clean hierarchy such as DOM nodes or a constituency parse.
+
+Required layers for the first annotation-backed reader/player:
+
+- **Word boundaries** from tokenizer output, with lemma, UPOS, morphology, and vocabulary concept IDs where known.
+- **Phrase boundaries** from chunking, dependency subtrees, idiom/collocation detection, and translation alignment.
+- **Sentence boundaries** from the parser, with aggregate features used by CEFR estimation.
+- **Translation spans** for word-level glosses and phrase-level translations.
+- **Grammar annotations** for concept usage, violations, and explanation anchors.
+- **Vocabulary metadata** for known/unknown state, frequency band, encounters, and due-review status.
+- **Pronunciation notes** for IPA, audio anchors, liaison/elision, stress, or phoneme contrasts.
+- **Media anchors** for transcript timestamps and source-provider references.
+
+This model directly supports the planned hover/tap translation UX: word-level help can bind to `layer="word"` spans, phrase-level help can bind to `layer="phrase"` or `layer="translation"` spans, and the UI can choose whether to show word help above, phrase help below, or both together.
+
 ## Rule-based violation detection
 
 Per-language rules live in `assets/rules/<lang>.yaml`. Each rule is a minimal condition → concept_id mapping:
@@ -179,10 +222,10 @@ Every parse produces a diff applied to `learner_concept_state`:
 |---|---|---|
 | `encounter` | concept's feature pattern appears in input (even in agent replies) | `encounters++` |
 | `production` | user produces the feature | `productions++` |
-| `correct_production` | user produces it without violation | `correct_productions++`, `ease_factor` bumped |
+| `correct_production` | user produces it without violation | `correct_productions++`, FSRS concept update |
 | `error_production` | rule-based violation fires | `error_count++`, `last_error_at`, bumps into SRS |
-| `recall` | user reviews it explicitly (review UI) | `recalls++`, SM-2 update |
-| `correct_recall` | recall quality ≥ 3 | `correct_recalls++`, SM-2 with positive quality |
+| `recall` | user reviews it explicitly (review UI) | `recalls++`, FSRS concept update |
+| `correct_recall` | recall quality ≥ 3 | `correct_recalls++`, FSRS positive rating |
 
 Error-production signals are the heaviest — they force the concept into the SRS schedule. Correct-production is the lightest — a bump but no immediate review.
 

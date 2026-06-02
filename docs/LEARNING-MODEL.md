@@ -4,7 +4,7 @@ How Langouste tracks, explains, and advances a user's language ability. The desi
 
 This is not a product description. It's the source of truth for *why* the system behaves the way it does. When in doubt during implementation, come back here.
 
-**Read `docs/ONTOLOGY.md` first.** This doc describes *how we teach and track*; ONTOLOGY describes *the structured map of the language skill itself* — the seven dimensions, the concept taxonomy, the per-dimension band vector. This doc's CEFR estimator, SRS, and error-handling sit on top of that ontology.
+**Read `docs/ONTOLOGY.md` first.** This doc describes *how we teach and track*; ONTOLOGY describes *the structured map of the language skill itself* — the seven dimensions, the concept taxonomy, the per-dimension band vector. This doc's CEFR estimator, SRS, and error-handling sit on top of that ontology. For the concrete seen/produced/error/quiz event contract, read `docs/LEARNING-TRACKING.md`.
 
 ## First principles
 
@@ -53,9 +53,9 @@ review_log                 -- NEW: every review event, append-only
   log_id, user_id, language
   item_type                -- "vocabulary" | "grammar"
   item_id                  -- FK to vocabulary.vocab_id or grammar_gaps.gap_id
-  quality                  -- 0–5 SM-2 quality
+  quality                  -- 0–5 recall/production quality, mapped to FSRS Again/Hard/Good/Easy
   reviewed_at
-  before_state, after_state -- jsonb snapshot of SRS fields before/after
+  before_state, after_state -- jsonb snapshot of item roll-ups + FSRS state before/after
 ```
 
 The `review_log` is critical. FSRS (Free Spaced Repetition Scheduler — Jarrett Ye, used by Anki) needs review history to fit its three-component memory model. We're not migrating now, but capturing the log from day one means migration is a schema-only change later. Ignore this and you'll need to start cold when the evidence for FSRS becomes overwhelming.
@@ -139,12 +139,15 @@ There's also a qualitative win: FSRS models difficulty with **mean reversion** �
 
 Implementation:
 
-1. **`scheduleNextReview(item, quality)`** is the single service boundary. New users route to `fsrs.ts`. Per-card state stored as `{difficulty, stability, retrievability_target}` (FSRS's three-parameter memory model) instead of SM-2's single `ease_factor`.
-2. **Per-user parameter fitting** runs as a nightly job once that user has ≥ 200 review events in `review_log`. Below that, the default parameter set from open-spaced-repetition's pooled fit is used — already better than SM-2 cold.
-3. **SM-2 retained behind `scheduler_legacy_sm2`** feature flag for one release cycle, for existing users to opt in if they want continuity. Pure-function constraint applies to both implementations; both live under `src/services/spaced-repetition/`.
-4. **`review_log` is non-negotiable** — without it, per-user FSRS fitting can't happen and we're stuck on default parameters forever.
+1. **`recordInteraction(input)`** is the single write boundary. It appends to `review_log`, updates vocabulary/grammar roll-ups, and schedules the atomic concept through `fsrs.ts`.
+2. **Concept state is authoritative.** `concept_srs` is keyed by `(user_id, language, concept_id)` and stores `{difficulty, stability, retrievability, interval_days, lapses, next_review_at}`. Vocabulary and grammar rows mirror the next-review fields only for UI/API compatibility.
+3. **FSRS and signal weights are tunable.** `fsrs_configs` is keyed by `(user_id, language)` and stores the 21 FSRS parameters, target retention, maximum interval, failure retry delay, and `quality_weights` for interaction signals. Example keys: `production:correct`, `production:incorrect`, `chat_self_correct:production:incorrect`, `exercise:production:partial`. Values are scheduler quality scores `0–5`; `null` means "observe but do not schedule."
+4. **Per-user parameter fitting** runs as a nightly job once that user has ≥ 200 review events in `review_log`. Below that, the default parameter set from open-spaced-repetition's pooled fit is used — already better than SM-2 cold.
+5. **`review_log` is non-negotiable** — without it, per-user FSRS fitting can't happen and we're stuck on default parameters forever.
 
-The principle from the SM-2 era still holds: the scheduler is a pure function over `(card_state, quality, now) → next_state`. Testable, deterministic, swappable. The CLAUDE.md rule referencing `sm2.ts` should be updated to reference the schedulers directory, not the SM-2 file.
+The principle from the SM-2 era still holds: the scheduler is a pure function over `(concept_state, quality, now) → next_state`. Testable, deterministic, swappable.
+
+For the full implementation contract — encounter vs production vs recall events, self-correction as failed production, quiz result scoring, due-review selection, and database-sync invariants — see `docs/LEARNING-TRACKING.md`.
 
 ## Comprehensible input across surfaces
 

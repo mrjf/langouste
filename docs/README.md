@@ -11,8 +11,10 @@ Start here. The docs are layered — read in order if you're new, jump to the re
 ## Pedagogy
 
 - [ONTOLOGY.md](./ONTOLOGY.md) — **read this first for anything pedagogy-related.** The seven-dimension map, the concept taxonomy built on Universal Dependencies / UniMorph / Concepticon / PHOIBLE, and the per-dimension band vector.
+- [LANGUAGE-REFERENCE.md](./LANGUAGE-REFERENCE.md) — the language-side projection of the same ontology: reference pages for how each language realizes each universal feature, with dense links to grammars, papers, typological databases, corpora, and pedagogical resources.
 - [PARSING.md](./PARSING.md) — the deterministic parsing pipeline that extracts UD features from every message. Feeds the ontology.
 - [LEARNING-MODEL.md](./LEARNING-MODEL.md) — how we measure, explain, and schedule. SRS, CEFR estimation, L1 priors, self-correction flow. Sits on top of the ontology and parsing.
+- [LEARNING-TRACKING.md](./LEARNING-TRACKING.md) — implementation contract for seen/produced/error/quiz events, `review_log`, concept-level FSRS state, due-review selection, and profile sync.
 - [REFERENCES.md](./REFERENCES.md) — external URL templates, ingestion sources, and the reference-links service.
 
 ## Engineering
@@ -29,8 +31,8 @@ Start here. The docs are layered — read in order if you're new, jump to the re
 
 ## If you're trying to…
 
-- **Contribute a new language** → `ONTOLOGY.md` (concept catalog, applicability rows), `PARSING.md` (per-language rules + parser availability), `REFERENCES.md` (URL templates), `LEARNING-MODEL.md` (L1 priors).
+- **Contribute a new language** → `LANGUAGE-REFERENCE.md` (language overview + concept realizations), `ONTOLOGY.md` (concept catalog, applicability rows), `PARSING.md` (per-language rules + parser availability), `REFERENCES.md` (URL templates), `LEARNING-MODEL.md` (L1 priors).
 - **Add a new agent connector** → `ARCHITECTURE.md` (connector pattern), `src/services/agents/` (existing examples).
-- **Change pedagogy** → `LEARNING-MODEL.md` (the why), `ONTOLOGY.md` (the what), `TESTING.md` (prove you didn't break it).
+- **Change pedagogy** → `LEARNING-MODEL.md` (the why), `ONTOLOGY.md` (the what), `LEARNING-TRACKING.md` (the event/state contract), `TESTING.md` (prove you didn't break it).
 - **Ship a release** → `RELEASE.md`.
 - **Talk about Langouste publicly** → `MARKETING.md`.

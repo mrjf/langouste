@@ -19,17 +19,17 @@
   let routed = $state(false);
   let showNewChat = $state(false);
   let view: "chat" | "profile" | "connections" = $state("chat");
-  // Active profile dimension when view === "profile". "" = dashboard,
-  // otherwise a DIMENSION key (e.g. "morphology"). Mirrors #/profile/<dim>.
-  let profileSection = $state("");
+  // Profile route after #/profile. Examples:
+  //   fr
+  //   fr/lexis
+  //   fr/lexis/vocabulary/<id>
+  let profileRoute = $state("");
   const loggedIn = $derived(!!user.value && !!profile.value);
   let updatingHash = false;
 
-  // Parse the dimension slug out of a #/profile[/<dim>] hash. Returns ""
-  // for the bare dashboard.
-  function profileSectionFromHash(hash: string): string {
-    const m = hash.match(/^#\/profile\/([^/]+)/);
-    return m ? decodeURIComponent(m[1]) : "";
+  function profileRouteFromHash(hash: string): string {
+    const m = hash.match(/^#\/profile(?:\/(.+))?$/);
+    return m?.[1] ?? "";
   }
 
   function shortId(id: string): string {
@@ -47,9 +47,7 @@
     if (!routed) return;
     let target = "";
     if (view === "profile") {
-      target = profileSection
-        ? `#/profile/${encodeURIComponent(profileSection)}`
-        : "#/profile";
+      target = profileRoute ? `#/profile/${profileRoute}` : "#/profile";
     } else if (view === "connections") {
       target = "#/connections";
     } else {
@@ -93,7 +91,7 @@
       if (updatingHash) return;
       if (location.hash.startsWith("#/profile")) {
         view = "profile";
-        profileSection = profileSectionFromHash(location.hash);
+        profileRoute = profileRouteFromHash(location.hash);
         return;
       }
       if (location.hash.startsWith("#/connections")) {
@@ -115,7 +113,7 @@
   function routeFromHash() {
     if (location.hash.startsWith("#/profile")) {
       view = "profile";
-      profileSection = profileSectionFromHash(location.hash);
+      profileRoute = profileRouteFromHash(location.hash);
       return;
     }
     if (location.hash.startsWith("#/connections")) {
@@ -207,7 +205,7 @@
       <!-- Sidebar list is always mounted: working/unread indicators must
            stay visible no matter which main view (chat/profile/connections)
            is open. -->
-      <ConversationList />
+      <ConversationList onSelect={() => { view = "chat"; }} />
       <div class="sidebar-footer">
         <span>{profile.value?.display_name}</span>
         {#if !SINGLE_USER}
@@ -218,8 +216,8 @@
     <div class="main-panel">
       {#if view === "profile"}
         <ProfilePanel
-          section={profileSection}
-          onSectionChange={(s) => (profileSection = s)}
+          route={profileRoute}
+          onRouteChange={(route) => (profileRoute = route)}
         />
       {:else if view === "connections"}
         <ConnectionsPanel />

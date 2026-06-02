@@ -2,7 +2,7 @@
 
 ## What it is
 
-A chat app where conversations with AI agents become language lessons. You chat with Claude — or any connected agent — in the language you're learning. The app quietly turns every exchange into a learning opportunity: your messages get checked, your errors get explained, and every word and grammar pattern you encounter feeds a spaced-repetition system that tailors what you learn next.
+A language-learning product where real communication and real content become lessons. The v1 surface is chat: you chat with Claude — or any connected agent — in the language you're learning, and the app quietly turns every exchange into a learning opportunity. The broader product direction is the same loop applied to real media: podcasts, YouTube videos, tutorial platforms, partner lessons, and other native-language content where every word and phrase can be explained in context.
 
 Think of it as WhatsApp with an AI on the other side that happens to be fluent in every language, and a learning coach watching over your shoulder.
 
@@ -23,6 +23,14 @@ The agent's replies are translated into the language you're learning. You see th
 ### Every message exists in multiple languages
 
 Each message — yours and the agent's — is stored as parallel text in your target and base languages. Audio, IPA, and transliteration layers are generated alongside. You pick what you see; everything else is there when you want it.
+
+### You learn from real content
+
+Chat is the first surface, not the whole product. Langouste should also become an annotated media reader/player for content learners already want to understand: podcast episodes, YouTube videos, specialized tutorial platforms, course clips, and later other media providers. The strategic version is partnership-led by language: find the best native or instructional content providers for French, Spanish, Hungarian, Japanese, and so on, then make their material deeply learnable rather than replacing it with generated filler.
+
+### Every word and phrase is explainable
+
+The reading/listening surface should support inline help without forcing the learner out of context. A learner can hover or tap a word for a word-level gloss, a phrase for a phrase-level translation, or see both together: word translation above the text and phrase translation below it. Another possible interaction is positional hover: hovering near the top of a text span shows the word-level translation; hovering near the bottom shows the phrase-level translation.
 
 ## The learning loop
 
@@ -57,6 +65,8 @@ For every language you're learning, Langouste maintains a profile:
 
 - **Overall CEFR level** (assessed and updated over time)
 - **Concept mastery map**: for each grammar rule, vocabulary item, and pronunciation pattern — how well you know it, when you last practiced it, when it's due for review
+- **Encounter history**: words, phrases, grammar patterns, and pronunciation features you've seen in chat, media transcripts, lessons, and references
+- **Content progress**: episodes, videos, tutorials, passages, or assigned materials started, completed, and revisited
 - **Error patterns**: recurring mistakes (e.g., "consistently confuses ser/estar")
 - **Strengths**: what you reliably get right
 - **Pace and trajectory**: how quickly you're progressing
@@ -74,9 +84,9 @@ Based on your profile and SM-2 spaced-repetition scheduling, Langouste surfaces 
 
 Activity forms include translation challenges, listening comprehension, fill-in-the-blank, error correction, and free composition prompts.
 
-## Parallel text model
+## Parallel text and annotation model
 
-Every message in a conversation has the following representations:
+Every message in a conversation, transcript segment, tutorial passage, or classroom assignment has the following representations:
 
 1. **Raw text**: what the sender actually typed (or the agent generated)
 2. **Translations**: one per language relevant to the user (target + base)
@@ -85,6 +95,24 @@ Every message in a conversation has the following representations:
 5. **Transliterations**: for non-Latin scripts
 6. **Phonetics (IPA)**: for pronunciation reference
 7. **Audio**: TTS in the target language
+8. **Source anchors**: message IDs, transcript timestamps, lesson offsets, or external content references
+
+The core technical primitive is not a single parse tree. It is annotated text: a source string plus many labeled spans anchored by character offsets. Spans can overlap, nest, or cross because natural language layers do not form one clean hierarchy.
+
+Possible layers:
+
+- word boundaries
+- phrase boundaries
+- sentence boundaries
+- translation spans
+- grammar annotations
+- vocabulary metadata
+- pronunciation notes
+- transcript timestamps
+- classroom assignment markers
+- other linguistic features
+
+That span model is what powers hover translation, correction squiggles, phrase explanations, vocabulary tracking, grammar tracking, transcript alignment, and later content-player/classroom views.
 
 ## Agent connectors
 
@@ -98,8 +126,10 @@ Adding a new connector is a small amount of code — implement the `AgentConnect
 
 ## What makes this different
 
-Most language apps create artificial contexts. Duolingo gives you "the cat is on the table." Langouste gives you real conversations with agents that can talk about anything — your commute, your hobbies, a thing you read yesterday. The content is whatever you want it to be, the motivation is genuine curiosity, and the learning is anchored in communication.
+Most language apps create artificial contexts. Duolingo gives you "the cat is on the table." Langouste gives you real conversations with agents that can talk about anything — your commute, your hobbies, a thing you read yesterday — and grows toward real media from excellent content providers. The content is whatever you want it to be, the motivation is genuine curiosity, and the learning is anchored in communication and comprehension.
 
 The comprehension gate on received messages turns passive reading into active learning. You can't just glance at a translation — you have to engage with the target language first. Uncomfortable at first, transformative over time.
 
 The learner profile means the AI adapts. Early on, explanations are generous and challenges are small. As you progress, the training wheels come off. The corrections get more nuanced. The quizzes get harder. The review activities target your actual weak points, not a generic curriculum.
+
+Long-term, the product sits between a language-learning app, annotated media player, linguistic analysis tool, classroom adjunct, and content-partnership platform. The useful framing is: learn languages from real media, with every word and phrase explainable in context.

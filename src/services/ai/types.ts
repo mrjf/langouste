@@ -53,7 +53,7 @@ export interface ExplainErrorsOutput {
   corrected_message: string;
   explanations: ErrorExplanation[];
   additional_errors: Array<
-    TextError & { corrected: string; explanations: Record<LanguageCode, string> }
+    TextError & { corrected: string; explanations: Record<LanguageCode, string>; rule?: string }
   >;
 }
 

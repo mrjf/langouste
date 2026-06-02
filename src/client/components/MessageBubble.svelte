@@ -4,6 +4,7 @@
   import { md } from "../lib/md";
   import { api } from "../lib/api";
   import { playExclusive, stopCurrent, isCurrent } from "../lib/audio-player";
+  import DictionaryText from "./DictionaryText.svelte";
 
   interface Props {
     message: Message;
@@ -106,6 +107,11 @@
       : message.healed_text
   );
 
+  let displayLang = $derived(
+    viewerLang && message.translations?.[viewerLang] ? viewerLang : (message.language ?? ""),
+  );
+  let displayIsTargetLanguage = $derived(!!viewerLang && displayLang === viewerLang);
+
   // Awaiting the viewer-language (e.g. hu) translation while we already
   // have source/English text. We hold the skeleton during this window
   // rather than flashing the English text and hard-swapping a moment
@@ -135,12 +141,12 @@
 
   // Show the skeleton when there's nothing readable yet (no healed_text)
   // OR while we're waiting for the target translation within the grace
-  // window. After the grace timeout we stop showing the skeleton and the
-  // English fallback text renders instead.
+  // window. Agent messages stay in the skeleton instead of flashing the
+  // English source text into a target-language chat.
   let loading = $derived(
     !message._pending &&
       ((!!viewerLang && !hasTargetTranslation && !message.healed_text) ||
-        (awaitingTranslation && !translationTimedOut)),
+        (awaitingTranslation && (!translationTimedOut || !!message.is_agent))),
   );
 
   // Subtle "translating…" badge, shown only once we've fallen back to the
@@ -207,7 +213,13 @@
           {translationPending ? "…" : langTag(viewerLang)}
         </span>
       {/if}
-      <div class="healed-text">{@html md(displayText)}</div>
+      <div class="healed-text">
+        {#if displayIsTargetLanguage}
+          <DictionaryText text={displayText} language={viewerLang} />
+        {:else}
+          {@html md(displayText)}
+        {/if}
+      </div>
     {/if}
   </div>
 
@@ -290,7 +302,13 @@
                   {audioByLang[lang]?.loading ? "…" : audioByLang[lang]?.playing ? "⏸" : "🔊"}
                 </button>
               {/if}
-              <div class="detail-text">{@html md(message.translations[lang])}</div>
+            <div class="detail-text">
+              {#if viewerLangs.includes(lang)}
+                <DictionaryText text={message.translations[lang]} language={lang} />
+              {:else}
+                {@html md(message.translations[lang])}
+              {/if}
+            </div>
             </div>
           {/if}
         {/each}
@@ -298,7 +316,13 @@
         {#if showOriginal && hasOriginal}
           <div class="detail-row original-row">
             <span class="detail-label">original</span>
-            <div class="detail-text">{@html md(message.raw_text)}</div>
+            <div class="detail-text">
+              {#if message.language && viewerLangs.includes(message.language)}
+                <DictionaryText text={message.raw_text} language={message.language} />
+              {:else}
+                {@html md(message.raw_text)}
+              {/if}
+            </div>
           </div>
         {/if}
 
@@ -308,7 +332,13 @@
               <div class="correction-item">
                 <span class="original-text">{c.original}</span>
                 <span class="arrow">&rarr;</span>
-                <span class="corrected-text">{c.corrected}</span>
+                <span class="corrected-text">
+                  {#if message.language && viewerLangs.includes(message.language)}
+                    <DictionaryText text={c.corrected} language={message.language} />
+                  {:else}
+                    {c.corrected}
+                  {/if}
+                </span>
                 <span class="explanation">{c.explanation}</span>
               </div>
             {/each}

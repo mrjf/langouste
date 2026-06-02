@@ -1,0 +1,453 @@
+import { decode as decodeEntities } from "html-entities";
+import { languageName } from "../../lib/languages.ts";
+
+export interface DictionaryLookup {
+  term: string;
+  language: string;
+  source: "wiktionary" | null;
+  source_term: string | null;
+  source_url: string | null;
+  target_source_url: string | null;
+  form_description: string | null;
+  definitions: string[];
+  senses: DictionarySense[];
+}
+
+export interface DictionarySense {
+  part_of_speech: string;
+  definition: string;
+  examples: string[];
+}
+
+interface LookupCandidate {
+  term: string;
+  formDescription: string | null;
+}
+
+interface DefinitionList {
+  partOfSpeech: string;
+  html: string;
+}
+
+const cache = new Map<string, Promise<DictionaryLookup>>();
+
+export function clearDictionaryLookupCache(): void {
+  cache.clear();
+}
+
+export function lookupDictionary(term: string, language: string): Promise<DictionaryLookup> {
+  const cleanTerm = normalizeTerm(term);
+  const key = `${language}:${cleanTerm}`;
+  const existing = cache.get(key);
+  if (existing) return existing;
+
+  const promise = buildLookup(cleanTerm, language).catch((err) => {
+    cache.delete(key);
+    throw err;
+  });
+  cache.set(key, promise);
+  return promise;
+}
+
+async function buildLookup(term: string, language: string): Promise<DictionaryLookup> {
+  if (!term) return emptyLookup(term, language);
+  const candidates = lookupCandidates(term, language);
+  let formLookup: DictionaryLookup | null = null;
+
+  for (const candidate of candidates) {
+    const page = await fetchWiktionaryPage(candidate.term);
+    if (!page) continue;
+    const senses = extractSenses(page.html, language);
+    const definitions = senses.map((sense) => sense.definition);
+    const firstDefinitionIsInflection = definitions[0]
+      ? isInflectionDefinition(definitions[0])
+      : false;
+    const formDescription = firstDefinitionIsInflection
+      ? definitions[0]
+      : candidate.formDescription;
+    if (definitions.length > 0 && !firstDefinitionIsInflection) {
+      return resultFromPage(term, language, page, senses, formDescription);
+    }
+
+    const lemmaLookup = await lookupLemma(term, language, page, formDescription);
+    if (lemmaLookup) return lemmaLookup;
+
+    if (definitions.length > 0 && !formLookup) {
+      formLookup = resultFromPage(term, language, page, senses);
+    }
+  }
+
+  if (formLookup) return formLookup;
+  return emptyLookup(term, language);
+}
+
+function resultFromPage(
+  term: string,
+  language: string,
+  page: { title: string; url: string },
+  senses: DictionarySense[],
+  formDescription: string | null = null,
+): DictionaryLookup {
+  return {
+    term,
+    language,
+    source: "wiktionary",
+    source_term: page.title,
+    source_url: englishWiktionarySectionUrl(page.title, language),
+    target_source_url: targetLanguageWiktionaryUrl(page.title, language),
+    form_description: formDescription,
+    definitions: senses.map((sense) => sense.definition),
+    senses,
+  };
+}
+
+async function lookupLemma(
+  term: string,
+  language: string,
+  page: { title: string; html: string; url: string },
+  formDescription: string | null,
+): Promise<DictionaryLookup | null> {
+  const lemma = findLikelyLemma(page.html, language, page.title);
+  if (!lemma) return null;
+  const lemmaPage = await fetchWiktionaryPage(lemma);
+  const lemmaSenses = lemmaPage ? extractSenses(lemmaPage.html, language) : [];
+  return lemmaPage && lemmaSenses.length > 0
+    ? resultFromPage(term, language, lemmaPage, lemmaSenses, formDescription)
+    : null;
+}
+
+function emptyLookup(term: string, language: string): DictionaryLookup {
+  return {
+    term,
+    language,
+    source: null,
+    source_term: null,
+    source_url: null,
+    target_source_url: null,
+    form_description: null,
+    definitions: [],
+    senses: [],
+  };
+}
+
+async function fetchWiktionaryPage(
+  term: string,
+): Promise<{ title: string; html: string; url: string } | null> {
+  const url = `https://en.wiktionary.org/w/api.php?action=parse&page=${encodeURIComponent(term)}&prop=text&format=json&origin=*`;
+  const response = await fetch(url, {
+    headers: { "User-Agent": "Langouste/0.1 (language-learning dictionary lookup)" },
+    signal: AbortSignal.timeout(7000),
+  });
+  if (!response.ok) return null;
+
+  const payload = (await response.json()) as {
+    error?: { code?: string };
+    parse?: { title?: string; text?: { "*": string } };
+  };
+  const html = payload.parse?.text?.["*"];
+  const title = payload.parse?.title;
+  if (payload.error || !html || !title) return null;
+  return { title, html, url: `https://en.wiktionary.org/wiki/${encodeURIComponent(title)}` };
+}
+
+function extractSenses(html: string, language: string): DictionarySense[] {
+  const section = extractLanguageSection(html, language);
+  if (!section) return [];
+  const senses: DictionarySense[] = [];
+  for (const definitionHtml of extractDefinitionLists(section)) {
+    addSenseItems(definitionHtml, senses);
+    if (senses.length >= 3) return senses;
+  }
+  return senses;
+}
+
+function extractDefinitionLists(section: string): DefinitionList[] {
+  const lists: DefinitionList[] = [];
+  const headingRe = /<div class="mw-heading mw-heading([2-6])"><h[2-6] id="([^"]+)"/gi;
+  const headings = [...section.matchAll(headingRe)];
+
+  for (let index = 0; index < headings.length; index++) {
+    const heading = headings[index];
+    const level = Number(heading[1]);
+    const title = normalizeHeadingId(heading[2]);
+    if (!DICTIONARY_POS_HEADINGS.has(title.toLowerCase())) continue;
+
+    const start = (heading.index ?? 0) + heading[0].length;
+    const next = headings.find((candidate, candidateIndex) => {
+      if (candidateIndex <= index) return false;
+      return (
+        Number(candidate[1]) <= level ||
+        DICTIONARY_POS_HEADINGS.has(normalizeHeadingId(candidate[2]).toLowerCase())
+      );
+    });
+    const block = section.slice(start, next?.index ?? section.length);
+    const list = /<ol\b[^>]*>([\s\S]*?)<\/ol>/i.exec(block)?.[1];
+    if (list) lists.push({ partOfSpeech: title, html: list });
+  }
+
+  return lists;
+}
+
+function addSenseItems(definitionList: DefinitionList, senses: DictionarySense[]) {
+  for (const item of definitionList.html.matchAll(/<li\b[^>]*>([\s\S]*?)(?=<\/li>)/gi)) {
+    const itemHtml = item[1];
+    const definition = cleanDefinitionText(itemHtml);
+    if (!definition || definition.includes("quotations ▼")) continue;
+    if (
+      !senses.some(
+        (sense) =>
+          sense.definition === definition && sense.part_of_speech === definitionList.partOfSpeech,
+      )
+    ) {
+      senses.push({
+        part_of_speech: definitionList.partOfSpeech,
+        definition,
+        examples: extractExamples(itemHtml),
+      });
+    }
+    if (senses.length >= 3) return;
+  }
+}
+
+function cleanDefinitionText(value: string): string {
+  return cleanText(removeNestedBlocks(value, ["ul", "ol", "dl"]));
+}
+
+function extractExamples(value: string): string[] {
+  const examples: string[] = [];
+  for (const match of value.matchAll(/<dd\b[^>]*>([\s\S]*?)(?=<\/dd>)/gi)) {
+    const example = cleanText(removeNestedBlocks(match[1], ["ul", "ol", "dl"]));
+    if (!example || example.includes("quotations ▼")) continue;
+    if (!examples.includes(example)) examples.push(example);
+    if (examples.length >= 3) break;
+  }
+  return examples;
+}
+
+function cleanText(value: string): string {
+  return decodeHtml(stripTags(value))
+    .replace(/\s+/g, " ")
+    .replace(/\s+([,.;:!?])/g, "$1")
+    .trim();
+}
+
+function extractLanguageSection(html: string, language: string): string | null {
+  const id = escapeRegExp(languageName(language).replace(/\s+/g, "_"));
+  const match = new RegExp(`<div class="mw-heading mw-heading2"><h2 id="${id}"`).exec(html);
+  if (!match) return null;
+  const rest = html.slice(match.index);
+  const next = rest.slice(match[0].length).search(/<div class="mw-heading mw-heading2"><h2 id="/);
+  return next >= 0 ? rest.slice(0, match[0].length + next) : rest;
+}
+
+function findLikelyLemma(html: string, language: string, currentTitle: string): string | null {
+  const section = extractLanguageSection(html, language);
+  if (!section) return null;
+  const langName = escapeRegExp(languageName(language).replace(/\s+/g, "_"));
+  const definitionHtml = firstPosDefinitionHtml(section);
+  if (!definitionHtml) return null;
+  const definitionText = decodeHtml(stripTags(definitionHtml));
+  const textLemma = lemmaFromDefinitionText(definitionText, currentTitle);
+  if (textLemma) return textLemma;
+
+  const languageAnchorRe = new RegExp(
+    `<a\\s+[^>]*href="/wiki/([^"#?]+)#${langName}"[^>]*>([\\s\\S]*?)<\\/a>`,
+    "gi",
+  );
+  const anchored = firstUsefulLink(definitionHtml, languageAnchorRe, currentTitle);
+  if (anchored) return anchored;
+
+  if (!isInflectionDefinition(definitionText)) return null;
+  const anyWikiLinkRe = /<a\s+[^>]*href="\/wiki\/([^"#?]+)(?:#[^"]*)?"[^>]*>([\s\S]*?)<\/a>/gi;
+  return firstUsefulLink(definitionHtml, anyWikiLinkRe, currentTitle);
+}
+
+function firstPosDefinitionHtml(section: string): string | null {
+  const list = extractDefinitionLists(section)[0];
+  if (!list) return null;
+  return /<li\b[^>]*>([\s\S]*?)(?=<\/li>)/i.exec(list.html)?.[1] ?? null;
+}
+
+function firstUsefulLink(html: string, linkRe: RegExp, currentTitle: string): string | null {
+  for (const match of html.matchAll(linkRe)) {
+    const hrefTerm = decodeURIComponent(match[1]).replace(/_/g, " ").trim();
+    const label = decodeHtml(stripTags(match[2])).trim();
+    const candidate = hrefTerm || label;
+    if (!candidate || candidate.toLowerCase() === currentTitle.toLowerCase()) continue;
+    if (candidate.includes(":")) continue;
+    return candidate;
+  }
+  return null;
+}
+
+function normalizeHeadingId(value: string): string {
+  return decodeHtml(value)
+    .replace(/_/g, " ")
+    .replace(/\s+\d+$/u, "")
+    .trim();
+}
+
+function isInflectionDefinition(definition: string): boolean {
+  return /\b(form|inflection|conjugation|declension|participle|plural|singular|comparative|superlative)\b[\s\S]*\bof\b/iu.test(
+    definition,
+  );
+}
+
+function lemmaFromDefinitionText(definition: string, currentTitle: string): string | null {
+  const match =
+    /\b(?:inflection|conjugation|declension|participle|plural|singular|comparative|superlative)\s+of\s+([\p{Letter}\p{Mark}'’.-]+)/iu.exec(
+      definition,
+    ) ??
+    /\bform\s+of\s+([\p{Letter}\p{Mark}'’.-]+)/iu.exec(definition) ??
+    (isInflectionDefinition(definition)
+      ? /\bof\s+([\p{Letter}\p{Mark}'’.-]+)(?:\b|[:.;,])/iu.exec(definition)
+      : null);
+  const lemma = match?.[1]?.trim();
+  if (!lemma || lemma.toLowerCase() === currentTitle.toLowerCase()) return null;
+  return lemma;
+}
+
+function lookupCandidates(term: string, language: string): LookupCandidate[] {
+  const candidates: LookupCandidate[] = [];
+  for (const surface of surfaceFormCandidates(term, language)) {
+    candidates.push({ term: surface, formDescription: null });
+    candidates.push(...heuristicLemmaCandidates(surface, language));
+  }
+
+  const seen = new Set<string>();
+  return candidates.filter((candidate) => {
+    const key = candidate.term;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function surfaceFormCandidates(term: string, language: string): string[] {
+  const locale = localeForLanguage(language);
+  const lower = term.toLocaleLowerCase(locale);
+  const candidates = [term];
+  if (lower !== term) candidates.push(lower);
+  return candidates;
+}
+
+function heuristicLemmaCandidates(term: string, language: string): LookupCandidate[] {
+  if (language !== "hu") return [];
+  return hungarianLemmaCandidates(term);
+}
+
+function hungarianLemmaCandidates(term: string): LookupCandidate[] {
+  const lower = term.toLocaleLowerCase("hu");
+  const candidates: LookupCandidate[] = [];
+  for (const rule of HUNGARIAN_VERB_SUFFIXES) {
+    if (lower.length <= rule.suffix.length + 2 || !lower.endsWith(rule.suffix)) continue;
+    const lemma = lower.slice(0, -rule.suffix.length);
+    candidates.push({
+      term: lemma,
+      formDescription: `${rule.description} of ${lemma}`,
+    });
+  }
+  return candidates;
+}
+
+function removeNestedBlocks(value: string, tags: string[]): string {
+  const tagPattern = tags.map(escapeRegExp).join("|");
+  return value.replace(new RegExp(`<(${tagPattern})\\b[\\s\\S]*?<\\/\\1>`, "gi"), "");
+}
+
+function stripTags(value: string): string {
+  return value.replace(/<[^>]+>/g, "");
+}
+
+function decodeHtml(value: string): string {
+  return decodeEntities(value);
+}
+
+function normalizeTerm(term: string): string {
+  return term
+    .trim()
+    .replace(/[“”"']/g, "")
+    .replace(/\s+/g, " ");
+}
+
+function localeForLanguage(language: string): string {
+  return language || "und";
+}
+
+function targetLanguageWiktionaryUrl(term: string, language: string): string {
+  return `https://${language}.wiktionary.org/wiki/${encodeURIComponent(term)}`;
+}
+
+function englishWiktionarySectionUrl(term: string, language: string): string {
+  const section = languageName(language).replace(/\s+/g, "_");
+  return `https://en.wiktionary.org/wiki/${encodeURIComponent(term)}#${encodeURIComponent(section)}`;
+}
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+const HUNGARIAN_VERB_SUFFIXES = [
+  { suffix: "lak", description: "first-person singular present object agreement" },
+  { suffix: "lek", description: "first-person singular present object agreement" },
+  { suffix: "juk", description: "first-person plural present definite" },
+  { suffix: "jük", description: "first-person plural present definite" },
+  { suffix: "tok", description: "second-person plural present indefinite" },
+  { suffix: "tek", description: "second-person plural present indefinite" },
+  { suffix: "tök", description: "second-person plural present indefinite" },
+  { suffix: "nak", description: "third-person plural present indefinite" },
+  { suffix: "nek", description: "third-person plural present indefinite" },
+  { suffix: "om", description: "first-person singular present definite" },
+  { suffix: "em", description: "first-person singular present definite" },
+  { suffix: "öm", description: "first-person singular present definite" },
+  { suffix: "od", description: "second-person singular present definite" },
+  { suffix: "ed", description: "second-person singular present definite" },
+  { suffix: "öd", description: "second-person singular present definite" },
+  { suffix: "ja", description: "third-person singular present definite" },
+  { suffix: "je", description: "third-person singular present definite" },
+  { suffix: "ok", description: "first-person singular present indefinite" },
+  { suffix: "ek", description: "first-person singular present indefinite" },
+  { suffix: "ök", description: "first-person singular present indefinite" },
+  { suffix: "sz", description: "second-person singular present indefinite" },
+];
+
+const DICTIONARY_POS_HEADINGS = new Set([
+  "abbreviation",
+  "acronym",
+  "adjective",
+  "adverb",
+  "affix",
+  "article",
+  "character",
+  "circumfix",
+  "classifier",
+  "combining form",
+  "conjunction",
+  "contraction",
+  "determiner",
+  "expression",
+  "ideophone",
+  "idiom",
+  "infix",
+  "initialism",
+  "interfix",
+  "interjection",
+  "letter",
+  "noun",
+  "number",
+  "numeral",
+  "particle",
+  "participle",
+  "phrase",
+  "postposition",
+  "prefix",
+  "preposition",
+  "prepositional phrase",
+  "pronoun",
+  "proper noun",
+  "proverb",
+  "root",
+  "suffix",
+  "symbol",
+  "verb",
+]);

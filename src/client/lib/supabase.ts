@@ -55,6 +55,16 @@ export function subscribeToMessages(
       },
       (payload) => onMessage(payload.new as Record<string, unknown>),
     )
+    .on(
+      "postgres_changes",
+      {
+        event: "UPDATE",
+        schema: "public",
+        table: "messages",
+        filter: `conversation_id=eq.${conversationId}`,
+      },
+      (payload) => onMessage(payload.new as Record<string, unknown>),
+    )
     .subscribe();
 
   return () => {

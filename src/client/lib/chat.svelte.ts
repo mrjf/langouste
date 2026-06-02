@@ -37,12 +37,22 @@ export interface ErrorExplanation {
   error: TextError;
   corrected: string;
   explanations: Record<string, string>;
+  rule?: string;
 }
 
 export type AdditionalError = TextError & {
   corrected: string;
   explanations: Record<string, string>;
+  rule?: string;
 };
+
+export interface SelfCorrectedSpan {
+  original: string;
+  corrected: string;
+  kind: "spelling" | "grammar";
+  category?: string;
+  explanation?: string;
+}
 
 /** idle: nothing pending. checking: pipeline in flight. reviewing: results
  *  shown, user is fixing. The agent phase is tracked by `working`. */
@@ -68,6 +78,10 @@ function emptyReview(): Review {
     additionalErrors: [],
     correctedMessage: "",
   };
+}
+
+function firstExplanation(explanations: Record<string, string>): string | undefined {
+  return Object.values(explanations).find((value) => value.trim().length > 0);
 }
 
 export class Chat {
@@ -102,6 +116,7 @@ export class Chat {
   // --- private ---
   #messagesLoaded = false;
   #unsub: (() => void) | null = null;
+  #pendingSelfCorrections: SelfCorrectedSpan[] = [];
   // Monotonic token: bumping it invalidates any in-flight pipeline so a
   // stale response can never write into this chat. Cancel/resend bumps it.
   #reviewToken = 0;
@@ -132,7 +147,7 @@ export class Chat {
   /** Fetch messages once (cached on the instance) + start realtime. */
   async load(): Promise<void> {
     this.ensureRealtime();
-    if (this.#messagesLoaded) return;
+    if (this.#messagesLoaded && !this.#hasUnfinishedAgentMessage()) return;
     try {
       const loaded = (await api.getMessages(this.id)) as Message[];
       // Don't clobber optimistic/pending messages added meanwhile.
@@ -144,6 +159,10 @@ export class Chat {
     } catch (err) {
       console.error(`[Chat ${this.id.slice(0, 8)}] load failed:`, err);
     }
+  }
+
+  #hasUnfinishedAgentMessage(): boolean {
+    return this.messages.some((message) => !!message.is_agent && !message.healed_text?.trim());
   }
 
   /**
@@ -162,34 +181,42 @@ export class Chat {
   }
 
   #translating = false;
+  #translationQueued = false;
 
   /** If any non-pending message is missing a viewer-language translation,
    *  fetch translations and merge them in. Idempotent + self-throttling. */
   async #ensureTranslations(): Promise<void> {
-    if (this.#translating) return;
+    if (this.#translating) {
+      this.#translationQueued = true;
+      return;
+    }
     const langs = this.#viewerLangs();
     if (langs.length === 0) return;
 
-    const needs = this.messages.some(
-      (msg) => !msg._pending && langs.some((l) => !msg.translations?.[l]),
-    );
-    if (!needs) return;
-
     this.#translating = true;
     try {
-      const translated = (await api.translateMessages(this.id, langs)) as Message[];
-      const byId = new Map(translated.map((m) => [m.message_id, m]));
-      // Merge: keep pending placeholders, swap in translated versions of
-      // anything the server returned, leave the rest untouched.
-      this.messages = this.messages.map((m) => (m._pending ? m : (byId.get(m.message_id) ?? m)));
+      do {
+        this.#translationQueued = false;
+        const needs = this.messages.some(
+          (msg) => !msg._pending && langs.some((l) => !msg.translations?.[l]),
+        );
+        if (!needs) continue;
+
+        const translated = (await api.translateMessages(this.id, langs)) as Message[];
+        const byId = new Map(translated.map((m) => [m.message_id, m]));
+        // Merge: keep pending placeholders, swap in translated versions of
+        // anything the server returned, leave the rest untouched.
+        this.messages = this.messages.map((m) => (m._pending ? m : (byId.get(m.message_id) ?? m)));
+      } while (this.#translationQueued);
     } catch (err) {
       console.error(`[Chat ${this.id.slice(0, 8)}] translate fill failed:`, err);
     } finally {
       this.#translating = false;
+      if (this.#translationQueued) void this.#ensureTranslations();
     }
   }
 
-  /** Subscribe to realtime INSERTs for this conversation (idempotent). */
+  /** Subscribe to realtime message inserts/updates for this conversation. */
   ensureRealtime(): void {
     if (this.#unsub) return;
     this.#unsub = subscribeToMessages(this.id, (raw) => {
@@ -199,7 +226,14 @@ export class Chat {
   }
 
   #ingestMessage(msg: Message): void {
-    if (this.messages.some((m) => m.message_id === msg.message_id)) return;
+    const existingIdx = this.messages.findIndex((m) => m.message_id === msg.message_id);
+    if (existingIdx !== -1) {
+      const next = this.messages.slice();
+      next[existingIdx] = { ...next[existingIdx], ...msg };
+      this.messages = next;
+      this.#ensureTranslations();
+      return;
+    }
     // Replace the matching optimistic placeholder rather than duplicating:
     // agent reply → the pending agent bubble; user echo → pending user msg.
     const pendingIdx = this.messages.findIndex(
@@ -237,6 +271,7 @@ export class Chat {
   #clearDraft(): void {
     this.draft = { text: "", intent: "", lang: this.#defaultLang() };
     this.review = emptyReview();
+    this.#pendingSelfCorrections = [];
   }
 
   // --- review pipeline --------------------------------------------------
@@ -245,6 +280,7 @@ export class Chat {
   cancelReview(): void {
     this.#reviewToken++;
     this.review = { ...emptyReview() };
+    this.#pendingSelfCorrections = [];
     this.working = false;
   }
 
@@ -262,6 +298,7 @@ export class Chat {
     const intent = this.draft.intent.trim();
     let lang = this.draft.lang;
     const stale = () => token !== this.#reviewToken;
+    this.#mergeSelfCorrections(this.#collectSelfCorrections(text));
 
     this.review = { ...emptyReview(), phase: "checking" };
     this.working = true;
@@ -299,7 +336,7 @@ export class Chat {
         console.error(`[Chat ${this.id.slice(0, 8)}] explain failed:`, err);
         // Explanation failed: if spelling was clean, just send it.
         if (result.clean) {
-          this.#send(text, lang, intent);
+          this.#send(text, lang, intent, this.#pendingSelfCorrections);
         } else {
           this.review = { ...this.review, phase: "reviewing" };
           this.working = false;
@@ -318,7 +355,7 @@ export class Chat {
         additionalErrors.length === 0 &&
         (!corrected || corrected.trim() === text)
       ) {
-        this.#send(text, lang, intent);
+        this.#send(text, lang, intent, this.#pendingSelfCorrections);
         return;
       }
 
@@ -335,7 +372,7 @@ export class Chat {
       if (stale() || (err as Error)?.name === "AbortError") return;
       console.error(`[Chat ${this.id.slice(0, 8)}] check failed:`, err);
       // Spell-check itself failed — fall back to sending verbatim.
-      this.#send(text, lang, intent);
+      this.#send(text, lang, intent, this.#pendingSelfCorrections);
     }
   }
 
@@ -345,15 +382,21 @@ export class Chat {
   sendNow(): void {
     const text = this.draft.text.trim();
     if (!text) return;
+    const selfCorrections = this.#mergeSelfCorrections(this.#collectSelfCorrections(text));
     this.cancelReview();
-    this.#send(text, this.draft.lang, this.draft.intent.trim());
+    this.#send(text, this.draft.lang, this.draft.intent.trim(), selfCorrections);
   }
 
   /** Internal: perform the send. Both the user's message AND a pending
    *  agent-reply bubble appear immediately (optimistic), before the
    *  blocking agent round-trip — so the UI responds the instant the user
    *  commits to sending. Everything here is scoped to THIS chat. */
-  async #send(text: string, lang: string, intent: string): Promise<void> {
+  async #send(
+    text: string,
+    lang: string,
+    intent: string,
+    selfCorrectedSpans: SelfCorrectedSpan[] = [],
+  ): Promise<void> {
     this.#clearDraft();
     this.agentError = null;
     this.working = true;
@@ -402,7 +445,13 @@ export class Chat {
     };
 
     try {
-      const result = (await api.sendMessage(this.id, text, lang, intent || undefined)) as {
+      const result = (await api.sendMessage(
+        this.id,
+        text,
+        lang,
+        intent || undefined,
+        selfCorrectedSpans,
+      )) as {
         message: Message;
         agent_message?: Message;
         agent_error?: string;
@@ -435,6 +484,62 @@ export class Chat {
       // in the loading skeleton.
       this.#ensureTranslations();
     }
+  }
+
+  #collectSelfCorrections(currentText: string): SelfCorrectedSpan[] {
+    const currentLower = currentText.toLowerCase();
+    const target = this.review.correctedMessage.trim().toLowerCase();
+    const fullyMatched =
+      !!target && currentLower.trim().replace(/\s+/g, " ") === target.replace(/\s+/g, " ");
+    const spans: SelfCorrectedSpan[] = [];
+
+    const push = (
+      error: TextError,
+      corrected: string,
+      explanations: Record<string, string>,
+      rule?: string,
+    ) => {
+      if (!corrected || corrected.trim().toLowerCase() === error.text.trim().toLowerCase()) return;
+      const originalLower = error.text.toLowerCase();
+      const correctedLower = corrected.toLowerCase();
+      const resolved =
+        fullyMatched ||
+        (!currentLower.includes(originalLower) && currentLower.includes(correctedLower));
+      if (!resolved) return;
+      spans.push({
+        original: error.text,
+        corrected,
+        kind: error.kind,
+        category: rule,
+        explanation: firstExplanation(explanations),
+      });
+    };
+
+    for (const explanation of this.review.explanations) {
+      push(explanation.error, explanation.corrected, explanation.explanations, explanation.rule);
+    }
+    for (const error of this.review.additionalErrors) {
+      push(
+        { start: error.start, end: error.end, text: error.text, kind: error.kind },
+        error.corrected,
+        error.explanations,
+        error.rule,
+      );
+    }
+    return spans;
+  }
+
+  #mergeSelfCorrections(spans: SelfCorrectedSpan[]): SelfCorrectedSpan[] {
+    if (spans.length === 0) return this.#pendingSelfCorrections;
+    const byKey = new Map<string, SelfCorrectedSpan>();
+    for (const span of [...this.#pendingSelfCorrections, ...spans]) {
+      byKey.set(
+        `${span.kind}:${span.original.toLowerCase()}=>${span.corrected.toLowerCase()}`,
+        span,
+      );
+    }
+    this.#pendingSelfCorrections = [...byKey.values()];
+    return this.#pendingSelfCorrections;
   }
 
   // --- unread -----------------------------------------------------------

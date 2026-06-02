@@ -16,6 +16,7 @@ export interface StubExplainResponse {
     error_index: number;
     corrected: string;
     explanations: Record<string, string>;
+    rule?: string;
   }>;
   additional_errors?: Array<{
     start: number;
@@ -24,6 +25,7 @@ export interface StubExplainResponse {
     corrected: string;
     kind: "grammar";
     explanations: Record<string, string>;
+    rule?: string;
   }>;
 }
 

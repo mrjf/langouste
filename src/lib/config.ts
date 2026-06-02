@@ -14,6 +14,15 @@ if (databaseMode !== "supabase" && databaseMode !== "sqlite") {
   throw new Error(`DATABASE_MODE must be 'supabase' or 'sqlite', got: ${databaseMode}`);
 }
 
+const agentLanguageStrategy = (process.env.LANGOUSTE_AGENT_LANGUAGE_STRATEGY ?? "target-first") as
+  | "target-first"
+  | "english-mediated";
+if (agentLanguageStrategy !== "target-first" && agentLanguageStrategy !== "english-mediated") {
+  throw new Error(
+    `LANGOUSTE_AGENT_LANGUAGE_STRATEGY must be 'target-first' or 'english-mediated', got: ${agentLanguageStrategy}`,
+  );
+}
+
 export const config = {
   databaseMode,
 
@@ -24,6 +33,7 @@ export const config = {
 
   anthropicApiKey: required("ANTHROPIC_API_KEY"),
   translationProvider: process.env.TRANSLATION_PROVIDER ?? "claude",
+  agentLanguageStrategy,
 
   // Text-to-speech provider. "none" (default) disables audio playback.
   // "elevenlabs" requires ELEVENLABS_API_KEY.

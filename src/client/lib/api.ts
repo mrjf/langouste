@@ -1,7 +1,12 @@
 import { session } from "./stores.svelte";
 import { getSupabase } from "./supabase";
+import type { SelfCorrectedSpan } from "../../types/index.ts";
 
 const BASE = "/api";
+
+function profileItemQuery(language?: string): string {
+  return language ? `?${new URLSearchParams({ language }).toString()}` : "";
+}
 
 const SINGLE_USER =
   (import.meta.env.VITE_SINGLE_USER as string | undefined)?.toLowerCase() === "true";
@@ -160,10 +165,16 @@ export const api = {
       method: "POST",
       body: JSON.stringify(body),
     }),
-  sendMessage: (conversationId: string, text: string, language: string, intent?: string) =>
+  sendMessage: (
+    conversationId: string,
+    text: string,
+    language: string,
+    intent?: string,
+    selfCorrectedSpans?: SelfCorrectedSpan[],
+  ) =>
     request(`/messages/${conversationId}`, {
       method: "POST",
-      body: JSON.stringify({ text, language, intent }),
+      body: JSON.stringify({ text, language, intent, self_corrected_spans: selfCorrectedSpans }),
     }),
   translateMessages: (conversationId: string, languages: string[]) =>
     request(`/messages/${conversationId}/translate`, {
@@ -215,16 +226,80 @@ export const api = {
     }),
 
   // Profile stats
+  getProfileLanguages: () => request("/profile/languages"),
   getLanguageStats: (language: string) => request(`/profile/stats/${language}`),
   getDimensionItems: (language: string, dimension: string, params?: Record<string, string>) => {
     const qs = params ? `?${new URLSearchParams(params).toString()}` : "";
     return request(`/profile/dimension/${language}/${dimension}${qs}`);
   },
-  getProfileItem: (itemType: "vocabulary" | "grammar", itemId: string) =>
-    request(`/profile/item/${itemType}/${itemId}`),
+  getProfileItem: (itemType: "vocabulary" | "grammar", itemId: string, language?: string) =>
+    request(`/profile/item/${itemType}/${encodeURIComponent(itemId)}${profileItemQuery(language)}`),
+  getProfileItemReference: (
+    itemType: "vocabulary" | "grammar",
+    itemId: string,
+    language?: string,
+  ) =>
+    request(
+      `/profile/item/${itemType}/${encodeURIComponent(itemId)}/reference${profileItemQuery(language)}`,
+    ),
+  fetchProfileItemAudio: async (
+    itemType: "vocabulary" | "grammar",
+    itemId: string,
+    language?: string,
+  ) => {
+    const sess = session.value;
+    const headers: Record<string, string> = sess
+      ? { Authorization: `Bearer ${sess.access_token}` }
+      : {};
+    const res = await fetch(
+      `${BASE}/profile/item/${itemType}/${encodeURIComponent(itemId)}/audio${profileItemQuery(language)}`,
+      { headers },
+    );
+    if (!res.ok) {
+      let msg = `${res.status} ${res.statusText}`;
+      try {
+        const body = await res.json();
+        if (body?.error) msg = body.error;
+      } catch {
+        // body wasn't JSON — keep the status line
+      }
+      throw new Error(msg);
+    }
+    const blob = await res.blob();
+    return URL.createObjectURL(blob);
+  },
+  lookupDictionary: (term: string, language: string) =>
+    request(`/dictionary?${new URLSearchParams({ term, language }).toString()}`),
+  fetchDictionaryAudio: async (term: string, language: string) => {
+    const sess = session.value;
+    const headers: Record<string, string> = sess
+      ? { Authorization: `Bearer ${sess.access_token}` }
+      : {};
+    const res = await fetch(
+      `${BASE}/dictionary/audio?${new URLSearchParams({ term, language }).toString()}`,
+      { headers },
+    );
+    if (!res.ok) {
+      let msg = `${res.status} ${res.statusText}`;
+      try {
+        const body = await res.json();
+        if (body?.error) msg = body.error;
+      } catch {
+        // body wasn't JSON — keep the status line
+      }
+      throw new Error(msg);
+    }
+    const blob = await res.blob();
+    return URL.createObjectURL(blob);
+  },
 
   // Review
   getDueReview: (language: string) => request(`/review/due/${language}`),
+  getFSRSConfig: (language: string) => request(`/review/fsrs/${language}`),
+  updateFSRSConfig: (language: string, body: Record<string, unknown>) =>
+    request(`/review/fsrs/${language}`, { method: "PATCH", body: JSON.stringify(body) }),
+  tuneFSRSConfig: (language: string, body: Record<string, unknown> = {}) =>
+    request(`/review/fsrs/${language}/tune`, { method: "POST", body: JSON.stringify(body) }),
   reviewVocabulary: (vocabId: string, quality: number) =>
     request(`/review/vocabulary/${vocabId}`, { method: "POST", body: JSON.stringify({ quality }) }),
   reviewGrammar: (gapId: string, quality: number) =>

@@ -41,7 +41,7 @@ Already using Claude Code daily. Curious about chat-with-Claude-Code as a patter
 - What they'll pay for: nothing. But their word-of-mouth and PRs are worth more than revenue at our scale.
 - Where they hang out: Hacker News, Anthropic's developer Discord, r/ClaudeAI, GitHub trending.
 
-Not our audience at v1: kids, classroom teachers, travellers needing a phrasebook, people who want the Duolingo feel, anyone who balks at running a CLI.
+Not our audience at v1: kids, classroom teachers, travellers needing a phrasebook, people who want the Duolingo feel, anyone who balks at running a CLI. Classroom use is a real post-v1 path, but not part of the initial self-hosted agent-chat launch.
 
 ## Differentiators
 
@@ -49,7 +49,7 @@ What's genuinely novel vs the field (from competitive research in `docs/LEARNING
 
 1. **Self-correction discipline.** Most apps either rewrite your message (Langua) or tell you what's wrong (Talkpal, Speak). We show you where and why, and you fix it. Pedagogically better (Lyster & Saito 2010), and it feels different.
 2. **Deterministic spell-check before LLM.** nspell runs locally in ms. Most competitors fire an LLM call per keystroke to "check" — slow and expensive. Our path is snappy and cheap.
-3. **Real spaced repetition.** Not streak-gamified fake SRS. SM-2 today, FSRS when review-log history supports it. Anki-grade seriousness.
+3. **Real spaced repetition.** Not streak-gamified fake SRS. FSRS-6 over atomic language concepts, backed by review-log history. Anki-grade seriousness.
 4. **Dimension band vector, not a single letter.** "Your lexis is B1 but your pragmatics is still A2." Honest, specific. Competitive apps handwave a single level they can't defend.
 5. **Agent-pluggable.** Claude Code, Claude API, OpenClaw, HTTP endpoint, your own MCP server. The agent is not the product — the pedagogy is. Swap the agent; the learning loop survives.
 6. **MCP server surface.** Any MCP-compatible host can drive Langouste's pedagogy. This is a unique claim no competitor makes; it also doesn't matter much to audience 1 or 2 but is catnip for audience 3.
@@ -61,7 +61,7 @@ What we are *not* better at:
 - **Voice UX** (Speak wins).
 - **Scale** (Duolingo has 80M monthly users; we have 5).
 - **Curriculum** (Pimsleur and structured courses beat us for learners who want a path).
-- **Content richness** (no stories, no podcasts, no human tutor fallback).
+- **Content richness today** (no stories, podcasts, partner media, or human tutor fallback in v1). The roadmap captures annotated real-media partnerships as a post-v1 bet.
 
 Don't overclaim. Every time we've been caught overselling, we lose a serious user for good.
 

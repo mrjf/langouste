@@ -41,6 +41,7 @@ ${intentSection}
 ## RULES
 - First, provide the corrected_message: the full message rewritten correctly in ${targetLang}. This is the target the learner must match.
 - For each error, provide the **corrected** form (what the text should be) and a brief explanation.
+- For each grammar error, provide a stable, concise rule label when possible, such as "article-noun agreement" or "past participle agreement".
 - Be **terse**: 1-2 sentences per error. Use markdown bold for key words.
 - No preamble, no encouragement, no emoji. Just the correction and the reason.
 - Casual texting is fine — don't flag informal register or missing caps.
@@ -121,6 +122,10 @@ export const ERROR_EXPLANATION_TOOL = {
               type: "object",
               description: "Explanation in each base language, keyed by language code",
               additionalProperties: { type: "string" },
+            },
+            rule: {
+              type: "string",
+              description: "Stable grammar rule identifier if applicable",
             },
           },
           required: ["start", "end", "text", "corrected", "kind", "explanations"],

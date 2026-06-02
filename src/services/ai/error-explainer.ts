@@ -29,6 +29,7 @@ export async function explainErrors(input: ExplainErrorsInput): Promise<ExplainE
       error: input.errors[e.error_index],
       corrected: e.corrected,
       explanations: e.explanations,
+      rule: e.rule,
     }));
     return {
       corrected_message: stub.corrected_message,
@@ -40,6 +41,7 @@ export async function explainErrors(input: ExplainErrorsInput): Promise<ExplainE
         corrected: e.corrected,
         kind: "grammar" as const,
         explanations: e.explanations,
+        rule: e.rule,
       })),
     };
   }
@@ -75,6 +77,7 @@ export async function explainErrors(input: ExplainErrorsInput): Promise<ExplainE
       corrected: string;
       kind: "grammar";
       explanations: Record<string, string>;
+      rule?: string;
     }>;
   };
 
@@ -83,6 +86,7 @@ export async function explainErrors(input: ExplainErrorsInput): Promise<ExplainE
     error: input.errors[e.error_index],
     corrected: e.corrected,
     explanations: e.explanations,
+    rule: e.rule,
   }));
 
   const additional_errors = (result.additional_errors ?? []).map((e) => ({
@@ -92,6 +96,7 @@ export async function explainErrors(input: ExplainErrorsInput): Promise<ExplainE
     corrected: e.corrected,
     kind: "grammar" as const,
     explanations: e.explanations,
+    rule: e.rule,
   }));
 
   return { corrected_message: result.corrected_message, explanations, additional_errors };

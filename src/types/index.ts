@@ -80,6 +80,38 @@ export interface SpacedRepetitionFields {
   last_reviewed_at: string | null;
 }
 
+export interface ConceptSrsState {
+  concept_state_id: string;
+  user_id: string;
+  language: LanguageCode;
+  concept_id: string;
+  item_type: "vocabulary" | "grammar" | "concept";
+  label: string;
+  difficulty: number;
+  stability: number;
+  retrievability: number;
+  interval_days: number;
+  repetitions: number;
+  lapses: number;
+  next_review_at: string;
+  last_reviewed_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface FSRSConfig {
+  config_id: string | null;
+  user_id: string;
+  language: LanguageCode;
+  parameters: number[];
+  request_retention: number;
+  maximum_interval_days: number;
+  failure_review_delay_minutes: number;
+  quality_weights: Record<string, number | null>;
+  created_at: string | null;
+  updated_at: string | null;
+}
+
 export interface VocabularyItem extends SpacedRepetitionFields {
   vocab_id: string;
   user_id: string;
@@ -88,6 +120,7 @@ export interface VocabularyItem extends SpacedRepetitionFields {
   translation: string;
   context_sentence: string | null;
   cefr_level: CefrLevel | null;
+  concept_id: string | null;
   created_at: string;
 }
 
@@ -97,6 +130,7 @@ export interface GrammarGap extends SpacedRepetitionFields {
   language: LanguageCode;
   category: string;
   description: string;
+  concept_id: string | null;
   error_count: number;
   last_error_at: string;
   created_at: string;
@@ -127,4 +161,13 @@ export interface ErrorExplanation {
   error: TextError;
   corrected: string;
   explanations: Record<LanguageCode, string>;
+  rule?: string;
+}
+
+export interface SelfCorrectedSpan {
+  original: string;
+  corrected: string;
+  kind: ErrorKind;
+  category?: string;
+  explanation?: string;
 }

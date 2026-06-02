@@ -82,6 +82,7 @@ CREATE TABLE IF NOT EXISTS vocabulary (
   encounters          INTEGER NOT NULL DEFAULT 0,
   productions         INTEGER NOT NULL DEFAULT 0,
   correct_productions INTEGER NOT NULL DEFAULT 0,
+  self_corrected_productions INTEGER NOT NULL DEFAULT 0,
   next_review_at      TEXT NOT NULL DEFAULT (datetime('now')),
   last_reviewed_at    TEXT,
   last_encounter_at   TEXT,
@@ -107,6 +108,7 @@ CREATE TABLE IF NOT EXISTS grammar_gaps (
   encounters          INTEGER NOT NULL DEFAULT 0,
   productions         INTEGER NOT NULL DEFAULT 0,
   correct_productions INTEGER NOT NULL DEFAULT 0,
+  self_corrected_productions INTEGER NOT NULL DEFAULT 0,
   next_review_at      TEXT NOT NULL DEFAULT (datetime('now')),
   last_reviewed_at    TEXT,
   last_encounter_at   TEXT,
@@ -116,6 +118,52 @@ CREATE TABLE IF NOT EXISTS grammar_gaps (
 );
 
 CREATE INDEX IF NOT EXISTS idx_grammar_gaps_review ON grammar_gaps(user_id, language, next_review_at);
+
+-- FSRS memory state lives at the atomic concept level, not the card/item level.
+-- vocabulary and grammar_gaps mirror the next-review fields only for existing UI
+-- and API compatibility; concept_srs is the scheduling source of truth.
+CREATE TABLE IF NOT EXISTS concept_srs (
+  concept_state_id TEXT PRIMARY KEY,
+  user_id          TEXT NOT NULL REFERENCES profiles(user_id) ON DELETE CASCADE,
+  language         TEXT NOT NULL,
+  concept_id       TEXT NOT NULL,
+  item_type        TEXT NOT NULL CHECK (item_type IN ('vocabulary','grammar','concept')),
+  label            TEXT NOT NULL,
+  difficulty       REAL NOT NULL DEFAULT 0,
+  stability        REAL NOT NULL DEFAULT 0,
+  retrievability   REAL NOT NULL DEFAULT 1,
+  interval_days    INTEGER NOT NULL DEFAULT 0,
+  repetitions      INTEGER NOT NULL DEFAULT 0,
+  lapses           INTEGER NOT NULL DEFAULT 0,
+  next_review_at   TEXT NOT NULL DEFAULT (datetime('now')),
+  last_reviewed_at TEXT,
+  created_at       TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at       TEXT NOT NULL DEFAULT (datetime('now')),
+  UNIQUE (user_id, language, concept_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_concept_srs_due ON concept_srs(user_id, language, next_review_at);
+CREATE INDEX IF NOT EXISTS idx_concept_srs_concept ON concept_srs(user_id, language, concept_id);
+
+-- Per-learner/per-language FSRS tuning. `parameters` are the 21 FSRS weights;
+-- `quality_weights` maps interaction signals such as
+-- "production:correct" or "chat_self_correct:production:incorrect" to a 0-5
+-- scheduler quality. Null means "observe but do not schedule".
+CREATE TABLE IF NOT EXISTS fsrs_configs (
+  config_id                    TEXT PRIMARY KEY,
+  user_id                      TEXT NOT NULL REFERENCES profiles(user_id) ON DELETE CASCADE,
+  language                     TEXT NOT NULL,
+  parameters                   TEXT NOT NULL DEFAULT '[]',
+  request_retention            REAL NOT NULL DEFAULT 0.9,
+  maximum_interval_days        INTEGER NOT NULL DEFAULT 36500,
+  failure_review_delay_minutes INTEGER NOT NULL DEFAULT 10,
+  quality_weights              TEXT NOT NULL DEFAULT '{}',
+  created_at                   TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at                   TEXT NOT NULL DEFAULT (datetime('now')),
+  UNIQUE (user_id, language)
+);
+
+CREATE INDEX IF NOT EXISTS idx_fsrs_configs_user_lang ON fsrs_configs(user_id, language);
 
 -- Append-only event stream; see docs/LEARNING-MODEL.md
 CREATE TABLE IF NOT EXISTS review_log (

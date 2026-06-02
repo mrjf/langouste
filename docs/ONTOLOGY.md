@@ -4,6 +4,8 @@
 
 This doc is the first-class ontology: the dimensions of language proficiency we track, what belongs in each, how we measure a user's state in each, and how the measurement drives behaviour. It's the source of truth for schema, for UI, for the `learner_profile` MCP tool, and for the system prompts we send to Claude.
 
+The same ontology also powers the language-reference surface described in `docs/LANGUAGE-REFERENCE.md`. The profile projection tracks a user's state against each concept; the language-reference projection describes how each language realizes that concept, with examples and authoritative links.
+
 **The ontology sits on top of established universal standards** rather than inventing its own. Concepts are expressed using Universal Dependencies (UD) + UniMorph feature inventories, Concepticon for lexis, and PHOIBLE + PanPhon for phonology. This is load-bearing — without a universal backbone, per-language silos can never aggregate or compare, and cross-language transfer becomes invisible. See `docs/PARSING.md` for the deterministic extraction pipeline.
 
 Grounded in: CEFR and Bachman & Palmer's communicative language ability model (1996) for the pedagogical frame; UD v2 (universaldependencies.org) for the syntactic/morphological feature backbone; UniMorph (unimorph.github.io) for paradigm data; Concepticon (concepticon.clld.org) for lexical concepts; PHOIBLE (phoible.org) for phonological inventories.
@@ -192,7 +194,7 @@ learner_concept_state
   correct_productions int             -- times correct
   recalls             int             -- SRS review count
   correct_recalls     int
-  ease_factor, interval_days, repetitions, next_review_at, last_reviewed_at   -- SM-2 fields
+  difficulty, stability, retrievability, lapses, interval_days, repetitions, next_review_at, last_reviewed_at   -- FSRS fields
   last_updated_at
   primary key (user_id, language, concept_id)
 ```

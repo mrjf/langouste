@@ -2,6 +2,12 @@
   import { chatStore, type Chat } from "../lib/chat.svelte";
   import { langTag } from "../lib/languages";
 
+  interface Props {
+    onSelect?: (chat: Chat) => void;
+  }
+
+  let { onSelect }: Props = $props();
+
   // Pure renderer of the ChatStore. Each row is a Chat; its draft, unread,
   // and working state all live on the Chat object itself.
   //
@@ -14,6 +20,7 @@
   function select(chat: Chat) {
     chatStore.setActive(chat.id);
     chat.markRead();
+    onSelect?.(chat);
   }
 
   /** Slack-style: show the number, cap the width at "99+". */
