@@ -8,6 +8,9 @@ import { messageRoutes } from "./api/messages.ts";
 import { reviewRoutes } from "./api/review.ts";
 import { agentConnectorRoutes } from "./api/agent-connectors.ts";
 import { dictionaryRoutes } from "./api/dictionary.ts";
+import { workbenchRoutes } from "./api/workbench.ts";
+import { exerciseRoutes } from "./api/exercises.ts";
+import { resourcesRoutes } from "./api/resources.ts";
 
 export const apiRoutes = new Hono();
 
@@ -19,6 +22,9 @@ apiRoutes.route("/messages", messageRoutes);
 apiRoutes.route("/review", reviewRoutes);
 apiRoutes.route("/agent-connectors", agentConnectorRoutes);
 apiRoutes.route("/dictionary", dictionaryRoutes);
+apiRoutes.route("/workbench", workbenchRoutes);
+apiRoutes.route("/exercises", exerciseRoutes);
+apiRoutes.route("/resources", resourcesRoutes);
 
 if (config.testMode) {
   // Loaded lazily so production builds don't ship test-only code.

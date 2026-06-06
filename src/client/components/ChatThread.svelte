@@ -5,6 +5,14 @@
   import { langOption, LANGUAGES } from "../lib/languages";
   import MessageBubble from "./MessageBubble.svelte";
   import MessageInput from "./MessageInput.svelte";
+  import type { LanguageUpdateField, UpdateLanguagesRequest } from "../lib/api-contracts";
+  import type { WorkbenchTextPayload } from "../lib/workbench";
+
+  interface Props {
+    onWorkbenchText?: (payload: WorkbenchTextPayload) => void;
+  }
+
+  let { onWorkbenchText }: Props = $props();
 
   // Pure renderer of the active Chat. No local message/sending/error state.
   const chat = $derived(chatStore.active);
@@ -26,7 +34,7 @@
   const myLang = $derived(myLangs[0] ?? "");
   const myBaseLang = $derived(myBaseLangs[0] ?? "");
   const agentName = $derived(conv?.agent_connector?.name ?? "Agent");
-  const partnerName = $derived(`🤖 ${agentName}`);
+  const partnerName = $derived(agentName);
   const isOrphan = $derived(conv != null && !conv.agent_connector_id);
 
   let messagesEl = $state<HTMLElement>();
@@ -95,7 +103,7 @@
 
   // --- language switch + (re)translation -------------------------------
   async function switchLanguage(
-    field: "target_languages" | "base_languages",
+    field: LanguageUpdateField,
     value: string,
   ) {
     if (!chat) return;
@@ -105,7 +113,7 @@
         field === "target_languages"
           ? { target_languages: [{ lang: value, cefr_level: "A1" }] }
           : { base_languages: [value] };
-      await api.updateLanguages(id, updates as Record<string, unknown>);
+      await api.updateLanguages(id, updates satisfies UpdateLanguagesRequest);
       const convs = await api.getConversations();
       chatStore.setConversations(convs);
 
@@ -167,10 +175,11 @@
       <span class="partner-name">{isOrphan ? "⚠ No connection" : partnerName}</span>
       <div class="lang-selectors">
         <label class="lang-selector" title="Target language — the language you're practicing">
-          <span class="lang-label">🎯</span>
+          <span class="lang-label">Target</span>
           <select
             value={myLang}
-            onchange={(e) => switchLanguage("target_languages", (e.target as HTMLSelectElement).value)}
+            onchange={(e) =>
+              switchLanguage("target_languages", (e.target as HTMLSelectElement).value)}
           >
             {#each langCodes as code}
               <option value={code}>{langOption(code)}</option>
@@ -178,10 +187,11 @@
           </select>
         </label>
         <label class="lang-selector" title="Base language — hints and explanations shown in this language">
-          <span class="lang-label">💡</span>
+          <span class="lang-label">Base</span>
           <select
             value={myBaseLang}
-            onchange={(e) => switchLanguage("base_languages", (e.target as HTMLSelectElement).value)}
+            onchange={(e) =>
+              switchLanguage("base_languages", (e.target as HTMLSelectElement).value)}
           >
             {#each langCodes as code}
               <option value={code}>{langOption(code)}</option>
@@ -198,11 +208,12 @@
       <MessageBubble
         message={msg}
         sent={isSent}
-        senderName={msg.is_agent ? `🤖 ${agentName}` : null}
+        senderName={msg.is_agent ? agentName : null}
         viewerLangs={myLangs}
         baseLangs={myBaseLangs}
         challenge={msg.next_challenge ?? null}
         conversationId={chat.id}
+        {onWorkbenchText}
       />
     {/each}
   </div>
@@ -231,114 +242,115 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--color-text-light);
-    font-size: 1.1rem;
+    color: var(--color-text-muted);
+    font-size: var(--text-md);
   }
 
   .agent-error {
-    padding: 0.6rem 1rem;
-    background: #fdecea;
-    color: #b71c1c;
-    border-top: 1px solid #f5c6cb;
-    font-size: 0.85rem;
+    padding: var(--space-3) var(--space-5);
+    background: color-mix(in srgb, var(--color-error) 8%, var(--color-panel));
+    color: var(--color-error);
+    border-top: 1px solid color-mix(in srgb, var(--color-error) 24%, transparent);
+    font-size: var(--text-sm);
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: var(--space-2);
   }
 
   .dismiss-btn {
     margin-left: auto;
     background: none;
     border: none;
-    color: #b71c1c;
-    font-size: 1.1rem;
+    color: var(--color-error);
+    font-size: var(--text-lg);
     cursor: pointer;
     padding: 0 0.25rem;
   }
 
   .translating {
-    padding: 0.5rem 1rem;
+    padding: var(--space-2) var(--space-5);
     text-align: center;
-    font-size: 0.85rem;
-    color: var(--color-text-light);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
     background: var(--color-challenge);
-    animation: pulse 1.5s ease-in-out infinite;
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 0.6; }
-    50% { opacity: 1; }
   }
 
   .thread-header {
-    padding: 0.75rem 1.25rem;
+    min-height: 5rem;
+    padding: var(--space-5) var(--space-6);
     border-bottom: 1px solid var(--color-border);
-    background: var(--color-surface);
+    background: var(--color-panel);
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: var(--space-4);
   }
 
   .header-info {
-    display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
+    display: grid;
+    gap: var(--space-2);
+    width: 100%;
   }
 
   .partner-name {
-    font-weight: 600;
+    color: var(--color-text);
+    font-size: var(--text-lg);
+    font-weight: var(--font-medium);
   }
 
   .lang-selectors {
     display: flex;
-    gap: 0.75rem;
+    flex-wrap: wrap;
+    gap: var(--space-3);
   }
 
   .lang-selector {
     display: flex;
     align-items: center;
-    gap: 0.3rem;
-    font-size: 0.8rem;
-    color: var(--color-text-light);
+    gap: var(--space-2);
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
   }
 
   .lang-label {
-    font-size: 0.75rem;
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
     white-space: nowrap;
   }
 
   .lang-selector select {
-    font-size: 0.8rem;
-    padding: 0.15rem 0.3rem;
+    min-height: 1.9rem;
+    font-size: var(--text-xs);
+    padding: 0 var(--space-2);
     border: 1px solid var(--color-border);
-    border-radius: 4px;
-    background: var(--color-bg);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
     color: var(--color-text);
   }
 
   .messages {
     flex: 1;
     overflow-y: auto;
-    padding: 1rem;
+    padding: var(--space-5) var(--space-6);
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: var(--space-3);
+    background: var(--color-panel);
   }
 
   .input-area {
-    padding: 0.75rem 1rem;
+    padding: var(--space-4) var(--space-6);
     border-top: 1px solid var(--color-border);
-    background: var(--color-surface);
+    background: var(--color-panel);
   }
 
   .orphan-banner {
-    padding: 0.75rem 1.25rem;
-    background: #fff4e1;
-    border-bottom: 1px solid #f0d294;
-    color: #5d4100;
+    padding: var(--space-4) var(--space-6);
+    background: color-mix(in srgb, var(--color-warning) 10%, var(--color-panel));
+    border-bottom: 1px solid color-mix(in srgb, var(--color-warning) 28%, transparent);
+    color: var(--color-warning);
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: var(--space-2);
   }
 
   .orphan-msg strong {
@@ -348,27 +360,28 @@
 
   .orphan-actions {
     display: flex;
-    gap: 0.5rem;
+    gap: var(--space-2);
     align-items: center;
   }
 
   .orphan-actions select {
     flex: 1;
-    padding: 0.35rem 0.5rem;
-    border: 1px solid #d8b870;
+    min-height: 2.1rem;
+    padding: 0 var(--space-2);
+    border: 1px solid color-mix(in srgb, var(--color-warning) 34%, transparent);
     border-radius: var(--radius-sm);
-    background: white;
-    font-size: 0.85rem;
+    background: var(--color-panel);
+    font-size: var(--text-sm);
   }
 
   .btn-attach {
-    padding: 0.4rem 0.9rem;
-    background: #b88528;
-    color: white;
+    padding: var(--space-2) var(--space-4);
+    background: var(--color-warning);
+    color: var(--color-accent-contrast);
     border: none;
     border-radius: var(--radius-sm);
-    font-size: 0.85rem;
-    font-weight: 600;
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
     cursor: pointer;
     text-decoration: none;
     display: inline-block;

@@ -3,9 +3,7 @@
   import { user, profile } from "../lib/stores.svelte";
   import { chatStore } from "../lib/chat.svelte";
   import { loadSession, clearSession, loadProfile, loadLocalSession } from "../lib/auth";
-
-  const SINGLE_USER =
-    (import.meta.env.VITE_SINGLE_USER as string | undefined)?.toLowerCase() === "true";
+  import { loadDisplaySettings } from "../lib/display-settings.svelte";
   import { initSupabase, subscribeToAllMessages } from "../lib/supabase";
   import { api } from "../lib/api";
   import LoginForm from "./LoginForm.svelte";
@@ -13,22 +11,54 @@
   import ChatThread from "./ChatThread.svelte";
   import ProfilePanel from "./ProfilePanel.svelte";
   import ConnectionsPanel from "./ConnectionsPanel.svelte";
+  import DictionaryPanel from "./DictionaryPanel.svelte";
+  import WorkbenchPanel from "./WorkbenchPanel.svelte";
+  import ExercisePanel from "./ExercisePanel.svelte";
+  import ResourcesPanel from "./ResourcesPanel.svelte";
   import NewChatDialog from "./NewChatDialog.svelte";
+  import IpaToggle from "./IpaToggle.svelte";
+  import FiloSourceInspector from "./FiloSourceInspector.svelte";
+  import FiloText from "./FiloText.svelte";
+  import Button from "./ui/Button.svelte";
+  import SidebarNavButton from "./navigation/SidebarNavButton.svelte";
+  import { routeForWorkbenchPayload, type WorkbenchTextPayload } from "../lib/workbench";
+
+  const SINGLE_USER =
+    (import.meta.env.VITE_SINGLE_USER as string | undefined)?.toLowerCase() === "true";
 
   let ready = $state(false);
   let routed = $state(false);
   let showNewChat = $state(false);
-  let view: "chat" | "profile" | "connections" = $state("chat");
+  let view:
+    | "chat"
+    | "profile"
+    | "connections"
+    | "dictionary"
+    | "workbench"
+    | "exercises"
+    | "resources" = $state("chat");
   // Profile route after #/profile. Examples:
   //   fr
   //   fr/lexis
   //   fr/lexis/vocabulary/<id>
   let profileRoute = $state("");
+  let dictionaryRoute = $state("");
+  let workbenchRoute = $state("");
   const loggedIn = $derived(!!user.value && !!profile.value);
   let updatingHash = false;
 
   function profileRouteFromHash(hash: string): string {
     const m = hash.match(/^#\/profile(?:\/(.+))?$/);
+    return m?.[1] ?? "";
+  }
+
+  function dictionaryRouteFromHash(hash: string): string {
+    const m = hash.match(/^#\/dictionary(?:\/(.+))?$/);
+    return m?.[1] ?? "";
+  }
+
+  function workbenchRouteFromHash(hash: string): string {
+    const m = hash.match(/^#\/workbench(?:\?(.*))?$/);
     return m?.[1] ?? "";
   }
 
@@ -50,6 +80,14 @@
       target = profileRoute ? `#/profile/${profileRoute}` : "#/profile";
     } else if (view === "connections") {
       target = "#/connections";
+    } else if (view === "dictionary") {
+      target = dictionaryRoute ? `#/dictionary/${dictionaryRoute}` : "#/dictionary";
+    } else if (view === "workbench") {
+      target = workbenchRoute ? `#/workbench?${workbenchRoute}` : "#/workbench";
+    } else if (view === "exercises") {
+      target = "#/exercises";
+    } else if (view === "resources") {
+      target = "#/resources";
     } else {
       const id = chatStore.activeId;
       target = id ? `#/c/${shortId(id)}` : "";
@@ -62,6 +100,7 @@
   });
 
   onMount(async () => {
+    loadDisplaySettings();
     initSupabase(
       import.meta.env.VITE_SUPABASE_URL,
       import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
@@ -98,6 +137,24 @@
         view = "connections";
         return;
       }
+      if (location.hash.startsWith("#/dictionary")) {
+        view = "dictionary";
+        dictionaryRoute = dictionaryRouteFromHash(location.hash);
+        return;
+      }
+      if (location.hash.startsWith("#/workbench")) {
+        view = "workbench";
+        workbenchRoute = workbenchRouteFromHash(location.hash);
+        return;
+      }
+      if (location.hash.startsWith("#/exercises")) {
+        view = "exercises";
+        return;
+      }
+      if (location.hash.startsWith("#/resources")) {
+        view = "resources";
+        return;
+      }
       const match = location.hash.match(/^#\/c\/(.+)$/);
       if (match) {
         view = "chat";
@@ -118,6 +175,24 @@
     }
     if (location.hash.startsWith("#/connections")) {
       view = "connections";
+      return;
+    }
+    if (location.hash.startsWith("#/dictionary")) {
+      view = "dictionary";
+      dictionaryRoute = dictionaryRouteFromHash(location.hash);
+      return;
+    }
+    if (location.hash.startsWith("#/workbench")) {
+      view = "workbench";
+      workbenchRoute = workbenchRouteFromHash(location.hash);
+      return;
+    }
+    if (location.hash.startsWith("#/exercises")) {
+      view = "exercises";
+      return;
+    }
+    if (location.hash.startsWith("#/resources")) {
+      view = "resources";
       return;
     }
     const convMatch = location.hash.match(/^#\/c\/(.+)$/);
@@ -166,6 +241,12 @@
     clearSession();
     history.replaceState(null, "", location.pathname);
   }
+
+  function openWorkbenchText(payload: WorkbenchTextPayload) {
+    workbenchRoute = routeForWorkbenchPayload({ ...payload, autoAnalyze: true });
+    view = "workbench";
+    chatStore.setActive(null);
+  }
 </script>
 
 {#if !ready}
@@ -176,40 +257,73 @@
   <div class="layout">
     <div class="sidebar">
       <div class="sidebar-header">
-        <h2>Langouste</h2>
-        <button class="btn-new" onclick={() => { view = "chat"; showNewChat = true; }}>+ New</button>
+        <div class="brand">
+          <span class="brand-index"><FiloText text="LG" role="brand-index" /></span>
+          <h2><FiloText text="Langouste" role="brand-name" /></h2>
+        </div>
+        <div class="sidebar-header-actions">
+          <IpaToggle />
+          <Button
+            label="New"
+            prefix="+"
+            variant="primary"
+            size="sm"
+            onclick={() => { view = "chat"; showNewChat = true; }}
+          />
+        </div>
       </div>
       <nav class="sidebar-nav">
-        <button
-          class="nav-item"
-          class:active={view === "chat" && !!chatStore.activeId}
+        <SidebarNavButton
+          index="01"
+          label="Chats"
+          active={view === "chat" && !!chatStore.activeId}
           onclick={() => { view = "chat"; }}
-        >
-          💬 Chats
-        </button>
-        <button
-          class="nav-item"
-          class:active={view === "profile"}
+        />
+        <SidebarNavButton
+          index="02"
+          label="Progress"
+          active={view === "profile"}
           onclick={() => { view = "profile"; chatStore.setActive(null); }}
-        >
-          📊 Your progress
-        </button>
-        <button
-          class="nav-item"
-          class:active={view === "connections"}
+        />
+        <SidebarNavButton
+          index="03"
+          label="Connections"
+          active={view === "connections"}
           onclick={() => { view = "connections"; chatStore.setActive(null); }}
-        >
-          🔌 Connections
-        </button>
+        />
+        <SidebarNavButton
+          index="04"
+          label="Dictionary"
+          active={view === "dictionary"}
+          onclick={() => { view = "dictionary"; chatStore.setActive(null); }}
+        />
+        <SidebarNavButton
+          index="05"
+          label="Workbench"
+          active={view === "workbench"}
+          onclick={() => { view = "workbench"; workbenchRoute = ""; chatStore.setActive(null); }}
+        />
+        <SidebarNavButton
+          index="06"
+          label="Exercises"
+          active={view === "exercises"}
+          onclick={() => { view = "exercises"; chatStore.setActive(null); }}
+        />
+        <SidebarNavButton
+          index="07"
+          label="Resources"
+          active={view === "resources"}
+          onclick={() => { view = "resources"; chatStore.setActive(null); }}
+        />
       </nav>
       <!-- Sidebar list is always mounted: working/unread indicators must
            stay visible no matter which main view (chat/profile/connections)
            is open. -->
       <ConversationList onSelect={() => { view = "chat"; }} />
       <div class="sidebar-footer">
-        <span>{profile.value?.display_name}</span>
+        <span class="footer-name"><FiloText text={profile.value?.display_name} role="profile-display-name" /></span>
         {#if !SINGLE_USER}
-          <button class="btn-logout" onclick={logout}>Logout</button>
+          <Button label="Logout" variant="ghost" size="sm" onclick={logout} />
         {/if}
       </div>
     </div>
@@ -218,11 +332,23 @@
         <ProfilePanel
           route={profileRoute}
           onRouteChange={(route) => (profileRoute = route)}
+          onWorkbenchText={openWorkbenchText}
         />
       {:else if view === "connections"}
         <ConnectionsPanel />
+      {:else if view === "dictionary"}
+        <DictionaryPanel
+          route={dictionaryRoute}
+          onRouteChange={(route) => (dictionaryRoute = route)}
+        />
+      {:else if view === "workbench"}
+        <WorkbenchPanel route={workbenchRoute} onRouteChange={(route) => (workbenchRoute = route)} />
+      {:else if view === "exercises"}
+        <ExercisePanel />
+      {:else if view === "resources"}
+        <ResourcesPanel />
       {:else}
-        <ChatThread />
+        <ChatThread onWorkbenchText={openWorkbenchText} />
       {/if}
     </div>
   </div>
@@ -230,117 +356,112 @@
     <NewChatDialog onclose={() => showNewChat = false} />
   {/if}
 {/if}
+<FiloSourceInspector />
 
 <style>
   .layout {
-    display: flex;
-    height: 100vh;
+    display: grid;
+    grid-template-columns: minmax(17.5rem, 20rem) minmax(0, 1fr);
+    height: 100dvh;
     overflow: hidden;
+    background: var(--color-bg);
   }
 
   .sidebar {
-    width: 300px;
     background: var(--color-surface);
     border-right: 1px solid var(--color-border);
     display: flex;
     flex-direction: column;
-    flex-shrink: 0;
+    min-height: 0;
   }
 
   .sidebar-header {
-    padding: 1rem 1.25rem;
+    min-height: 5rem;
+    padding: var(--space-5);
     border-bottom: 1px solid var(--color-border);
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: var(--space-4);
   }
 
-  .sidebar-header h2 {
-    font-size: 1.1rem;
-    color: var(--color-primary);
-  }
-
-  .btn-new {
-    background: var(--color-primary);
-    color: white;
-    border: none;
-    border-radius: var(--radius-sm);
-    padding: 0.4rem 0.75rem;
-    font-size: 0.8rem;
-    font-weight: 600;
-  }
-
-  .sidebar-nav {
-    display: flex;
-    flex-direction: column;
-    padding: 0.5rem;
-    gap: 0.1rem;
-    border-bottom: 1px solid var(--color-border);
-  }
-
-  .nav-item {
-    text-align: left;
-    padding: 0.5rem 0.75rem;
-    border: none;
-    background: none;
-    border-radius: var(--radius-sm);
-    font-size: 0.9rem;
-    cursor: pointer;
-    color: var(--color-text);
-  }
-
-  .nav-item:hover { background: var(--color-bg); }
-
-  .nav-item.active {
-    background: var(--color-primary-light);
-    color: var(--color-primary);
-    font-weight: 600;
-  }
-
-  .sidebar-footer {
-    padding: 0.75rem 1.25rem;
-    border-top: 1px solid var(--color-border);
-    font-size: 0.8rem;
-    color: var(--color-text-light);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .btn-logout {
-    background: none;
-    border: none;
-    color: var(--color-text-light);
-    font-size: 0.8rem;
-    text-decoration: underline;
-  }
-
-  .main-panel {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
+  .brand {
+    display: grid;
+    grid-template-columns: 2rem minmax(0, 1fr);
+    align-items: baseline;
     min-width: 0;
   }
 
-  @media (max-width: 640px) {
-    .sidebar {
-      position: fixed;
-      z-index: 10;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      width: 280px;
-      transform: translateX(-100%);
-      transition: transform 0.2s ease;
+  .brand-index {
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    color: var(--color-accent);
+  }
+
+  .sidebar-header h2 {
+    overflow: hidden;
+    color: var(--color-text);
+    font-size: var(--text-lg);
+    font-weight: var(--font-medium);
+    letter-spacing: 0;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .sidebar-header-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex: 0 0 auto;
+  }
+
+  .sidebar-nav {
+    display: block;
+  }
+
+  .sidebar-footer {
+    padding: var(--space-4) var(--space-5);
+    border-top: 1px solid var(--color-border);
+    color: var(--color-text-muted);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .footer-name {
+    min-width: 0;
+    overflow: hidden;
+    font-size: var(--text-xs);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .main-panel {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    background: var(--color-panel);
+  }
+
+  @media (max-width: 760px) {
+    .layout {
+      display: flex;
+      flex-direction: column;
+      overflow: auto;
     }
 
-    .sidebar.open {
-      transform: translateX(0);
-      box-shadow: var(--shadow-lg);
+    .sidebar {
+      width: 100%;
+      max-height: 42dvh;
+      border-right: 0;
+      border-bottom: 1px solid var(--color-border);
     }
 
     .main-panel {
       width: 100%;
+      min-height: 58dvh;
     }
   }
 </style>

@@ -499,7 +499,7 @@ Required invariants:
 6. Roll-up counters must be derivable from `review_log`.
 7. Reprocessing a message must not double-count the same seen item for the same message.
 8. The profile UI must read persisted state; it must not invent transient counters from currently loaded chat messages.
-9. Supabase Realtime should propagate changed rows to the UI; no custom websocket learning-state channel.
+9. In Supabase mode, Supabase Realtime should propagate changed rows to the UI; no custom websocket learning-state channel. In SQLite mode, the UI refreshes through request/response APIs.
 10. Offline or failed async extraction should be visible as missing/pending processing, not silently treated as zero knowledge.
 
 ## Known current limitations

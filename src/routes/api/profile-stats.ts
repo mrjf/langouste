@@ -4,11 +4,35 @@ import { languageStats } from "../../services/profile/stats.ts";
 import { ALL_DIMENSIONS, type Dimension } from "../../services/profile/dimensions.ts";
 import { grammarDimensionForCategory } from "../../services/profile/grammar-ontology.ts";
 import { getItemReference } from "../../services/references/item-reference.ts";
+import { lookupDictionary } from "../../services/references/dictionary.ts";
 import { translateTexts } from "../../services/ai/translator.ts";
 import { getAudioProvider } from "../../services/ai/audio/index.ts";
+import {
+  findAudioAssetForRequest,
+  storeAudioAsset,
+  type CachedAudioAsset,
+} from "../../services/corpus/audio-assets.ts";
+import { recordInteraction } from "../../services/spaced-repetition/interactions.ts";
+import {
+  getExerciseProgressForTarget,
+  getExerciseProgressLookup,
+} from "../../services/profile/exercise-progress.ts";
+import {
+  canonicalizeVocabularyRow,
+  normalizeVocabularyTerm,
+} from "../../services/spaced-repetition/vocabulary-normalizer.ts";
 import type { Database } from "../../lib/db/index.ts";
+import { adminDb } from "../../lib/db/index.ts";
+import type { LanguageCode } from "../../types/index.ts";
 
-export const profileStatsRoutes = new Hono();
+type ProfileStatsRouteBindings = {
+  Variables: {
+    db: Database;
+    userId: string;
+  };
+};
+
+export const profileStatsRoutes = new Hono<ProfileStatsRouteBindings>();
 
 profileStatsRoutes.use("*", requireAuth);
 
@@ -126,13 +150,23 @@ profileStatsRoutes.get("/dimension/:language/:dimension", async (c) => {
   }
 
   if (dimension === "lexis") {
-    const vocab = await db.select<VocabItem>("vocabulary", {
+    let vocab = await db.select<VocabItem>("vocabulary", {
       filters: [
         { op: "eq", column: "user_id", value: userId },
         { op: "eq", column: "language", value: language },
       ],
       limit: 500,
     });
+    if (await canonicalizeVocabularyRows(db, userId, language, vocab)) {
+      vocab = await db.select<VocabItem>("vocabulary", {
+        filters: [
+          { op: "eq", column: "user_id", value: userId },
+          { op: "eq", column: "language", value: language },
+        ],
+        limit: 500,
+      });
+    }
+    const exerciseProgress = await getExerciseProgressLookup(db, userId, language);
     return c.json({
       dimension,
       items: sortItems(
@@ -147,12 +181,35 @@ profileStatsRoutes.get("/dimension/:language/:dimension", async (c) => {
           productions: v.productions ?? 0,
           correct_productions: v.correct_productions ?? 0,
           self_corrected_productions: v.self_corrected_productions ?? 0,
+          heard: v.heard ?? 0,
+          spoken: v.spoken ?? 0,
           error_count: 0,
           ease_factor: v.ease_factor,
           interval_days: v.interval_days,
           repetitions: v.repetitions,
           next_review_at: v.next_review_at,
-          last_activity_at: mostRecent(v.last_produced_at, v.last_reviewed_at, v.last_encounter_at),
+          last_activity_at: mostRecent(
+            getExerciseProgressForTarget(exerciseProgress, {
+              itemType: "vocabulary",
+              itemId: v.vocab_id,
+              conceptId: v.concept_id,
+            }).last_scored_at,
+            getExerciseProgressForTarget(exerciseProgress, {
+              itemType: "vocabulary",
+              itemId: v.vocab_id,
+              conceptId: v.concept_id,
+            }).last_exercised_at,
+            v.last_spoken_at,
+            v.last_heard_at,
+            v.last_produced_at,
+            v.last_reviewed_at,
+            v.last_encounter_at,
+          ),
+          ...getExerciseProgressForTarget(exerciseProgress, {
+            itemType: "vocabulary",
+            itemId: v.vocab_id,
+            conceptId: v.concept_id,
+          }),
         })),
         sort,
       ).slice(0, limit),
@@ -171,6 +228,7 @@ profileStatsRoutes.get("/dimension/:language/:dimension", async (c) => {
     const filtered = gaps.filter(
       (g) => grammarDimensionForCategory(g.category, language) === dimension,
     );
+    const exerciseProgress = await getExerciseProgressLookup(db, userId, language);
     return c.json({
       dimension,
       items: sortItems(
@@ -185,12 +243,33 @@ profileStatsRoutes.get("/dimension/:language/:dimension", async (c) => {
           productions: g.productions ?? 0,
           correct_productions: g.correct_productions ?? 0,
           self_corrected_productions: g.self_corrected_productions ?? 0,
+          heard: 0,
+          spoken: 0,
           error_count: g.error_count ?? 0,
           ease_factor: g.ease_factor,
           interval_days: g.interval_days,
           repetitions: g.repetitions,
           next_review_at: g.next_review_at,
-          last_activity_at: mostRecent(g.last_produced_at, g.last_reviewed_at, g.last_error_at),
+          last_activity_at: mostRecent(
+            getExerciseProgressForTarget(exerciseProgress, {
+              itemType: "grammar",
+              itemId: g.gap_id,
+              conceptId: g.concept_id,
+            }).last_scored_at,
+            getExerciseProgressForTarget(exerciseProgress, {
+              itemType: "grammar",
+              itemId: g.gap_id,
+              conceptId: g.concept_id,
+            }).last_exercised_at,
+            g.last_produced_at,
+            g.last_reviewed_at,
+            g.last_error_at,
+          ),
+          ...getExerciseProgressForTarget(exerciseProgress, {
+            itemType: "grammar",
+            itemId: g.gap_id,
+            conceptId: g.concept_id,
+          }),
         })),
         sort,
       ).slice(0, limit),
@@ -214,29 +293,65 @@ profileStatsRoutes.get("/item/:itemType/:itemId", async (c) => {
     return c.json({ error: `Unknown item type: ${itemType}` }, 400);
   }
 
-  const resolved = await resolveProfileItem(db, userId, itemType, itemId, language);
+  let resolved = await resolveProfileItem(db, userId, itemType, itemId, language);
   if (!resolved) return c.json({ error: "Not found" }, 404);
+  if (itemType === "vocabulary" && !resolved.virtual) {
+    const itemLanguage =
+      typeof resolved.item.language === "string" ? resolved.item.language : (language ?? "");
+    const itemTerm = typeof resolved.item.term === "string" ? resolved.item.term : "";
+    if (itemLanguage && itemTerm) {
+      const normalized = await canonicalizeVocabularyRow(db, userId, itemLanguage, itemTerm);
+      if (normalized.term !== itemTerm) {
+        resolved =
+          (await resolveProfileItem(db, userId, itemType, normalized.term, language)) ?? resolved;
+      }
+    }
+  }
   const { item } = resolved;
-  const contextTranslation = await translateExampleToBaseLanguage(db, userId, item);
+  const [contextTranslation, dictionary] = await Promise.all([
+    translateExampleToBaseLanguage(db, userId, item),
+    lookupProfileItemDictionary(itemType, item),
+  ]);
+  let responseItem = item;
+  if (itemType === "vocabulary" && !resolved.virtual) {
+    await recordProfileVocabularySeen(db, userId, resolved).catch((err) => {
+      console.error("profile item vocabulary tracking failed:", err);
+    });
+    responseItem =
+      (await db.selectOne<Record<string, unknown>>("vocabulary", {
+        filters: [{ op: "eq", column: "vocab_id", value: resolved.canonicalId }],
+      })) ?? item;
+  }
+  const exerciseProgress = getExerciseProgressForTarget(
+    await getExerciseProgressLookup(db, userId, String(responseItem.language ?? language ?? "")),
+    {
+      itemType,
+      itemId: resolved.virtual ? null : resolved.canonicalId,
+      conceptId: typeof responseItem.concept_id === "string" ? responseItem.concept_id : null,
+    },
+  );
 
-  const logRows = await db.select<{
-    log_id: string;
-    message_id: string | null;
-    event_type: string;
-    outcome: string | null;
-    quality: number | null;
-    source: string;
-    after_state: Record<string, unknown> | null;
-    observed_at: string;
-  }>("review_log", {
-    columns: "log_id, message_id, event_type, outcome, quality, source, after_state, observed_at",
-    filters: [
-      { op: "eq", column: "user_id", value: userId },
-      { op: "eq", column: "item_id", value: resolved.canonicalId },
-    ],
-    order: [{ column: "observed_at", ascending: false }],
-    limit: 50,
-  });
+  const logRows = resolved.virtual
+    ? []
+    : await db.select<{
+        log_id: string;
+        message_id: string | null;
+        event_type: string;
+        outcome: string | null;
+        quality: number | null;
+        source: string;
+        after_state: Record<string, unknown> | null;
+        observed_at: string;
+      }>("review_log", {
+        columns:
+          "log_id, message_id, event_type, outcome, quality, source, after_state, observed_at",
+        filters: [
+          { op: "eq", column: "user_id", value: userId },
+          { op: "eq", column: "item_id", value: resolved.canonicalId },
+        ],
+        order: [{ column: "observed_at", ascending: false }],
+        limit: 50,
+      });
 
   const messageIds = [
     ...new Set(logRows.map((l) => l.message_id).filter((x): x is string => !!x)),
@@ -285,9 +400,11 @@ profileStatsRoutes.get("/item/:itemType/:itemId", async (c) => {
 
   return c.json({
     item_type: itemType,
-    item: { ...item, route_key: resolved.routeKey },
+    item: { ...responseItem, route_key: resolved.routeKey, ...exerciseProgress },
     route_key: resolved.routeKey,
+    has_profile_data: !resolved.virtual,
     context_translation: contextTranslation,
+    dictionary,
     events: logRows,
     messages: messagesWithLearningEvents,
   });
@@ -345,6 +462,9 @@ profileStatsRoutes.get("/item/:itemType/:itemId/audio", async (c) => {
   const reference = await getItemReference(text, language).catch(() => null);
   const wiktionaryAudio = reference?.pronunciations.find((p) => p.kind === "audio" && p.url)?.url;
   if (wiktionaryAudio) {
+    await recordProfileVocabularyHeard(db, userId, resolved).catch((err) => {
+      console.error("profile item audio tracking failed:", err);
+    });
     return c.redirect(wiktionaryAudio, 302);
   }
 
@@ -354,20 +474,49 @@ profileStatsRoutes.get("/item/:itemType/:itemId/audio", async (c) => {
   }
 
   try {
+    const assetDb = adminDb();
+    const cached = await findAudioAssetForRequest(assetDb, {
+      provider: provider.name,
+      language,
+      text,
+    }).catch(() => null);
+    if (cached) {
+      await recordProfileVocabularyHeard(db, userId, resolved).catch((err) => {
+        console.error("profile item audio tracking failed:", err);
+      });
+      return audioAssetResponse(cached);
+    }
     const result = await provider.synthesize(text, { language, userId });
-    return new Response(result.audio, {
-      status: 200,
-      headers: {
-        "Content-Type": result.contentType,
-        "Cache-Control": "private, max-age=86400",
-        "Content-Length": String(result.audio.byteLength),
-      },
+    const asset = await storeAudioAsset(assetDb, {
+      provider: provider.name,
+      language,
+      text,
+      audio: result.audio,
+      contentType: result.contentType,
     });
+    await recordProfileVocabularyHeard(db, userId, resolved).catch((err) => {
+      console.error("profile item audio tracking failed:", err);
+    });
+    return audioAssetResponse(asset);
   } catch (err) {
     const detail = err instanceof Error ? err.message : String(err);
     return c.json({ error: detail }, 502);
   }
 });
+
+function audioAssetResponse(asset: CachedAudioAsset): Response {
+  const audioBody = new ArrayBuffer(asset.audio.byteLength);
+  new Uint8Array(audioBody).set(asset.audio);
+  return new Response(audioBody, {
+    status: 200,
+    headers: {
+      "Content-Type": asset.contentType,
+      "Cache-Control": "private, max-age=86400",
+      "Content-Length": String(asset.audio.byteLength),
+      "X-Langouste-Audio-Id": asset.audioId,
+    },
+  });
+}
 
 // --- helpers ---
 
@@ -377,6 +526,7 @@ interface ResolvedProfileItem {
   item: Record<string, unknown>;
   canonicalId: string;
   routeKey: string;
+  virtual?: boolean;
 }
 
 async function resolveProfileItem(
@@ -421,7 +571,63 @@ async function resolveProfileItem(
   const item = await db.selectOne<Record<string, unknown>>("vocabulary", { filters });
   const canonicalId = typeof item?.vocab_id === "string" ? item.vocab_id : "";
   const itemTerm = typeof item?.term === "string" ? item.term : term;
-  return item && canonicalId ? { item, canonicalId, routeKey: wiktionarySlug(itemTerm) } : null;
+  if (item && canonicalId) return { item, canonicalId, routeKey: wiktionarySlug(itemTerm) };
+
+  if (!language) return null;
+  const normalized = await normalizeVocabularyTerm(term, language);
+  if (normalized.term && normalized.term !== term) {
+    const normalizedItem = await db.selectOne<Record<string, unknown>>("vocabulary", {
+      filters: [
+        { op: "eq", column: "user_id", value: userId },
+        { op: "eq", column: "term", value: normalized.term },
+        { op: "eq", column: "language", value: language },
+      ],
+    });
+    const normalizedId =
+      typeof normalizedItem?.vocab_id === "string" ? normalizedItem.vocab_id : "";
+    if (normalizedItem && normalizedId) {
+      return {
+        item: normalizedItem,
+        canonicalId: normalizedId,
+        routeKey: wiktionarySlug(normalized.term),
+      };
+    }
+  }
+
+  const virtualTerm = normalized.term || term;
+  return {
+    item: virtualVocabularyItem(language, virtualTerm),
+    canonicalId: `virtual:${language}:${wiktionarySlug(virtualTerm)}`,
+    routeKey: wiktionarySlug(virtualTerm),
+    virtual: true,
+  };
+}
+
+function virtualVocabularyItem(language: string, term: string): Record<string, unknown> {
+  return {
+    vocab_id: null,
+    language,
+    term,
+    translation: "",
+    context_sentence: null,
+    cefr_level: null,
+    concept_id: null,
+    ease_factor: 0,
+    interval_days: 0,
+    repetitions: 0,
+    encounters: 0,
+    productions: 0,
+    correct_productions: 0,
+    self_corrected_productions: 0,
+    heard: 0,
+    spoken: 0,
+    next_review_at: null,
+    last_reviewed_at: null,
+    last_encounter_at: null,
+    last_produced_at: null,
+    last_heard_at: null,
+    last_spoken_at: null,
+  };
 }
 
 function wiktionarySlug(term: string): string {
@@ -434,6 +640,120 @@ function wiktionarySlugToTerm(slug: string): string {
 
 function isUuidLike(value: string): boolean {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/iu.test(value);
+}
+
+async function canonicalizeVocabularyRows(
+  db: Database,
+  userId: string,
+  language: string,
+  rows: VocabItem[],
+): Promise<boolean> {
+  let changed = false;
+  await Promise.all(
+    rows.map(async (row) => {
+      const normalized = await canonicalizeVocabularyRow(db, userId, language, row.term);
+      if (normalized.term !== row.term) changed = true;
+    }),
+  );
+  return changed;
+}
+
+async function recordProfileVocabularySeen(
+  db: Database,
+  userId: string,
+  resolved: ResolvedProfileItem,
+): Promise<void> {
+  await recordProfileVocabularyInteraction(db, userId, resolved, "encounter", "profile_item");
+}
+
+async function recordProfileVocabularyHeard(
+  db: Database,
+  userId: string,
+  resolved: ResolvedProfileItem,
+): Promise<void> {
+  await recordProfileVocabularyInteraction(db, userId, resolved, "heard", "profile_audio");
+}
+
+async function recordProfileVocabularyInteraction(
+  db: Database,
+  userId: string,
+  resolved: ResolvedProfileItem,
+  eventType: "encounter" | "heard",
+  source: "profile_item" | "profile_audio",
+): Promise<void> {
+  if (typeof resolved.item.term !== "string") return;
+  const language = typeof resolved.item.language === "string" ? resolved.item.language.trim() : "";
+  if (!language) return;
+  const lookupKey = typeof resolved.item.term === "string" ? resolved.item.term.trim() : "";
+  if (resolved.virtual && !lookupKey) return;
+  await recordInteraction(db, {
+    userId,
+    language: language as LanguageCode,
+    itemType: "vocabulary",
+    ...(resolved.virtual ? { lookupKey } : { itemId: resolved.canonicalId }),
+    eventType,
+    source,
+  });
+}
+
+async function lookupProfileItemDictionary(
+  itemType: ProfileItemType,
+  item: Record<string, unknown>,
+): Promise<Record<string, unknown> | null> {
+  if (itemType !== "vocabulary") return null;
+  const term = typeof item.term === "string" ? item.term.trim() : "";
+  const language = typeof item.language === "string" ? item.language.trim() : "";
+  if (!term || !language) return null;
+
+  try {
+    const lookup = await lookupDictionary(term, language);
+    const lemma =
+      lemmaFromFormDescription(lookup.form_description, term) ??
+      (usesSourceTermAsLemma(lookup.form_description)
+        ? distinctLemma(lookup.source_term, term, language)
+        : null);
+
+    return {
+      term: lookup.term,
+      language: lookup.language,
+      lemma,
+      source_term: lookup.source_term,
+      form_description: lookup.form_description,
+      definitions: lookup.definitions.slice(0, 5),
+      senses: lookup.senses.slice(0, 5),
+      source_url: lookup.source_url,
+      target_source_url: lookup.target_source_url,
+    };
+  } catch (err) {
+    console.error("profile item dictionary lookup failed:", err);
+    return null;
+  }
+}
+
+function lemmaFromFormDescription(
+  formDescription: string | null | undefined,
+  term: string,
+): string | null {
+  if (!formDescription) return null;
+  if (!usesSourceTermAsLemma(formDescription)) return null;
+  const match = /\bof\s+([\p{Letter}\p{Mark}'’.-]+)(?:\b|[:.;,])/iu.exec(formDescription);
+  return distinctLemma(match?.[1], term, "");
+}
+
+function usesSourceTermAsLemma(formDescription: string | null | undefined): boolean {
+  return !formDescription || !/\bprefixed verb\b|\bbase\b/iu.test(formDescription);
+}
+
+function distinctLemma(
+  lemma: string | null | undefined,
+  term: string,
+  language: string,
+): string | null {
+  const cleanLemma = typeof lemma === "string" ? lemma.trim() : "";
+  if (!cleanLemma) return null;
+  const locale = language || undefined;
+  if (cleanLemma.toLocaleLowerCase(locale) === term.toLocaleLowerCase(locale)) return null;
+  return cleanLemma;
 }
 
 async function translateExampleToBaseLanguage(
@@ -470,6 +790,7 @@ function evidenceCommentary(afterState: Record<string, unknown> | null): string 
 
 interface VocabItem {
   vocab_id: string;
+  concept_id: string | null;
   term: string;
   translation: string;
   cefr_level: string | null;
@@ -477,6 +798,8 @@ interface VocabItem {
   productions: number | null;
   correct_productions: number | null;
   self_corrected_productions: number | null;
+  heard: number | null;
+  spoken: number | null;
   ease_factor: number;
   interval_days: number;
   repetitions: number;
@@ -484,10 +807,13 @@ interface VocabItem {
   last_produced_at: string | null;
   last_reviewed_at: string | null;
   last_encounter_at: string | null;
+  last_heard_at: string | null;
+  last_spoken_at: string | null;
 }
 
 interface GapItem {
   gap_id: string;
+  concept_id: string | null;
   category: string;
   description: string;
   encounters: number | null;
@@ -515,17 +841,33 @@ interface ListedItem {
   productions: number;
   correct_productions: number;
   self_corrected_productions: number;
+  heard: number;
+  spoken: number;
   error_count: number;
   ease_factor: number;
   interval_days: number;
   repetitions: number;
+  scored_attempts: number;
+  scored_correct: number;
+  scored_partial: number;
+  scored_incorrect: number;
+  accuracy_score: number | null;
+  last_scored_at: string | null;
+  exercise_attempts: number;
+  exercise_correct: number;
+  exercise_partial: number;
+  exercise_incorrect: number;
+  exercise_score: number | null;
+  last_exercised_at: string | null;
   next_review_at: string;
   last_activity_at: string | null;
 }
 
 function accuracy(item: ListedItem): number {
-  if (item.productions === 0) return 1;
-  return item.correct_productions / item.productions;
+  if (item.accuracy_score != null) return item.accuracy_score;
+  const attempts = item.productions;
+  if (attempts === 0) return 1;
+  return item.correct_productions / attempts;
 }
 
 function sortItems(items: ListedItem[], sort: string): ListedItem[] {

@@ -32,6 +32,7 @@ export async function getDueGrammarGaps(
       ],
     });
     return rows
+      .filter(isReviewableGrammarGap)
       .sort(
         (a, b) =>
           (conceptOrder.get(a.concept_id ?? "") ?? Number.MAX_SAFE_INTEGER) -
@@ -49,13 +50,22 @@ export async function getDueGrammarGaps(
   });
   if (hasConceptState) return [];
 
-  return db.select<GrammarGap>("grammar_gaps", {
+  const rows = await db.select<GrammarGap>("grammar_gaps", {
     filters: [
       { op: "eq", column: "user_id", value: userId },
       { op: "eq", column: "language", value: language },
       { op: "lte", column: "next_review_at", value: now },
     ],
     order: [{ column: "next_review_at", ascending: true }],
-    limit,
+    limit: Math.max(limit * 5, 50),
   });
+  return rows.filter(isReviewableGrammarGap).slice(0, limit);
+}
+
+function isReviewableGrammarGap(gap: GrammarGap): boolean {
+  return !isCefrCatalogKey(gap.category) && !isCefrCatalogKey(gap.concept_id);
+}
+
+function isCefrCatalogKey(value: string | null | undefined): boolean {
+  return value?.startsWith("cefr:") === true;
 }

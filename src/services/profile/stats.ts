@@ -19,6 +19,8 @@ export interface LanguageStats {
   vocab_mastered: number; // repetitions >= 3 AND correct recent
   vocab_struggling: number; // correct_productions / productions < 0.5, productions >= 2
   vocab_self_corrected: number;
+  vocab_heard: number;
+  vocab_spoken: number;
   grammar_gap_total: number;
   grammar_gap_active: number; // error_count > correct_productions
   grammar_self_corrected: number;
@@ -69,11 +71,15 @@ export async function languageStats(
   let vocab_mastered = 0;
   let vocab_struggling = 0;
   let vocab_self_corrected = 0;
+  let vocab_heard = 0;
+  let vocab_spoken = 0;
   for (const v of vocab) {
     const band = v.cefr_level ?? "unknown";
     vocab_by_cefr[band] = (vocab_by_cefr[band] ?? 0) + 1;
     if (v.repetitions >= 3) vocab_mastered++;
     vocab_self_corrected += v.self_corrected_productions ?? 0;
+    vocab_heard += v.heard ?? 0;
+    vocab_spoken += v.spoken ?? 0;
     if (v.productions >= 2 && v.correct_productions / v.productions < 0.5) {
       vocab_struggling++;
     }
@@ -105,6 +111,8 @@ export async function languageStats(
     vocab_mastered,
     vocab_struggling,
     vocab_self_corrected,
+    vocab_heard,
+    vocab_spoken,
     grammar_gap_total: ontologyGaps.length,
     grammar_gap_active: gap_active,
     grammar_self_corrected,
@@ -123,6 +131,8 @@ interface VocabRow {
   correct_productions: number;
   self_corrected_productions: number;
   encounters: number;
+  heard: number;
+  spoken: number;
 }
 
 interface GapRow {

@@ -3,8 +3,10 @@
   import { profile } from "../lib/stores.svelte";
   import { chatStore } from "../lib/chat.svelte";
   import { api } from "../lib/api";
-  import { langOption, langTag, LANGUAGES } from "../lib/languages";
+  import { langTag, LANGUAGES } from "../lib/languages";
   import { isCurrent, playExclusive, stopCurrent } from "../lib/audio-player";
+  import type { WorkbenchTextPayload } from "../lib/workbench";
+  import { ipaLayerPreference } from "../lib/display-settings.svelte";
   import MessageBubble from "./MessageBubble.svelte";
   import DictionaryText from "./DictionaryText.svelte";
 
@@ -74,13 +76,21 @@
     notes: string[];
   }
 
+  interface ExampleParts {
+    source: string;
+    separator: string | null;
+    translation: string | null;
+  }
+
   interface Props {
     /** Active route after #/profile. Owned by App's router. */
     route?: string;
     /** Notify the router when the active profile route changes. */
     onRouteChange?: (route: string) => void;
+    /** Open arbitrary text in the Filo workbench. */
+    onWorkbenchText?: (payload: WorkbenchTextPayload) => void;
   }
-  let { route = "", onRouteChange }: Props = $props();
+  let { route = "", onRouteChange, onWorkbenchText }: Props = $props();
 
   const profileLangs = $derived.by(() => {
     const profs = profile.value?.learning_languages ?? [];
@@ -294,6 +304,25 @@
     location.hash = `#/c/${short}`;
   }
 
+  function workbenchTargetFor(sourceLanguage: string): string {
+    const baseLanguage = profile.value?.base_language ?? "en";
+    if (baseLanguage !== sourceLanguage) return baseLanguage;
+    return "en";
+  }
+
+  function openWorkbench(value: string | null | undefined, sourceLanguage: string, title: string) {
+    const cleanText = value?.trim() ?? "";
+    const cleanSourceLanguage = sourceLanguage || selectedLang;
+    if (!onWorkbenchText || !cleanText || !cleanSourceLanguage) return;
+    onWorkbenchText({
+      text: cleanText,
+      sourceLanguage: cleanSourceLanguage,
+      targetLanguage: workbenchTargetFor(cleanSourceLanguage),
+      title,
+      autoAnalyze: true,
+    });
+  }
+
   function baseLangs(): string[] {
     return profile.value?.base_language ? [profile.value.base_language] : ["en"];
   }
@@ -352,8 +381,34 @@
   }
 
   function accuracyPct(item: any): string {
-    if (!item.productions) return "—";
-    return `${Math.round((item.correct_productions / item.productions) * 100)}%`;
+    if (typeof item.accuracy_score === "number") {
+      return `${Math.round(item.accuracy_score * 100)}%`;
+    }
+    const productions = item.productions ?? 0;
+    if (!productions) return "—";
+    return `${Math.round(((item.correct_productions ?? 0) / productions) * 100)}%`;
+  }
+
+  function scoredProgressLabel(item: any): string {
+    const attempts = item?.scored_attempts ?? 0;
+    if (!attempts) return "—";
+    return `${item.scored_correct ?? 0}/${item.scored_partial ?? 0}/${item.scored_incorrect ?? 0}`;
+  }
+
+  function masteryLabel(item: any): string {
+    if (typeof item.accuracy_score !== "number") return "—";
+    const score = item.accuracy_score;
+    const repetitions = item.repetitions ?? 0;
+    if (score >= 0.9 && repetitions >= 3) return "strong";
+    if (score >= 0.75) return "learning";
+    if (score >= 0.5) return "mixed";
+    return "needs work";
+  }
+
+  function exerciseProgressLabel(item: any): string {
+    const attempts = item?.exercise_attempts ?? 0;
+    if (!attempts) return "—";
+    return `${item.exercise_correct ?? 0}/${item.exercise_partial ?? 0}/${item.exercise_incorrect ?? 0}`;
   }
 
   function dataCount(lang: ProfileLanguage): number {
@@ -373,7 +428,55 @@
   function itemLabel(item: any): string {
     if (!item) return "Loading…";
     if (item.term) return item.term;
+    if (item.item_type === "vocabulary" && typeof item.label === "string") return item.label;
     return grammarCategoryLabel(item.category ?? item.label ?? "");
+  }
+
+  function itemDisplayLabel(data: any): string {
+    const lemma = itemLemma(data);
+    if (lemma) return lemma;
+    return itemLabel(data?.item);
+  }
+
+  function itemLemma(data: any): string | null {
+    const lemma = data?.dictionary?.lemma;
+    return typeof lemma === "string" && lemma.trim().length > 0 ? lemma.trim() : null;
+  }
+
+  function itemObservedForm(data: any): string | null {
+    const term = data?.item?.term;
+    const lemma = itemLemma(data);
+    if (typeof term !== "string" || !term.trim() || !lemma) return null;
+    return term.toLocaleLowerCase(data?.item?.language ?? selectedLang) ===
+      lemma.toLocaleLowerCase(data?.item?.language ?? selectedLang)
+      ? null
+      : term.trim();
+  }
+
+  function dictionaryRouteHref(data: any): string {
+    const dictionary = data?.dictionary;
+    const language =
+      typeof dictionary?.language === "string" && dictionary.language.trim()
+        ? dictionary.language.trim()
+        : selectedLang;
+    const term =
+      typeof dictionary?.term === "string" && dictionary.term.trim()
+        ? dictionary.term.trim()
+        : itemLabel(data?.item);
+    return `#/dictionary/${encodeURIComponent(language)}/${encodeURIComponent(term)}`;
+  }
+
+  function splitExample(value: string): ExampleParts {
+    const separatorMatch = /\s+([―–—])\s+/u.exec(value);
+    if (!separatorMatch || separatorMatch.index <= 0) {
+      return { source: value, separator: null, translation: null };
+    }
+
+    const translationStart = separatorMatch.index + separatorMatch[0].length;
+    const source = value.slice(0, separatorMatch.index).trim();
+    const translation = value.slice(translationStart).trim();
+    if (!source || !translation) return { source: value, separator: null, translation: null };
+    return { source, separator: separatorMatch[1] ?? "―", translation };
   }
 
   function vocabularyRouteKey(term: unknown): string {
@@ -475,7 +578,8 @@
           class:active={selectedLang === l.lang}
           onclick={() => selectLanguage(l.lang)}
         >
-          {langTag(l.lang)} {langOption(l.lang).split(" ").slice(1).join(" ")}
+          <span class="lang-code">{langTag(l.lang)}</span>
+          <span class="lang-name">{LANGUAGES[l.lang]?.name ?? l.lang.toUpperCase()}</span>
           {#if l.cefr_level}
             <span class="lang-level">{l.cefr_level}</span>
           {/if}
@@ -500,7 +604,7 @@
           <div class="tile">
             <span class="tile-label">Vocabulary items</span>
             <span class="tile-value">{stats.vocab_total}</span>
-            <span class="tile-sub">{stats.vocab_mastered} mastered · {stats.vocab_struggling} struggling</span>
+            <span class="tile-sub">{stats.vocab_mastered} mastered · {stats.vocab_heard ?? 0} heard · {stats.vocab_spoken ?? 0} spoken</span>
           </div>
           <div class="tile">
             <span class="tile-label">Grammar concepts</span>
@@ -586,6 +690,8 @@
       <nav class="breadcrumb">
         <button onclick={backToDashboard}>← Your progress</button>
         <span class="sep">/</span>
+        <span class="crumb-lang">{langTag(selectedLang)} {LANGUAGES[selectedLang]?.name ?? selectedLang}</span>
+        <span class="sep">/</span>
         <strong>{dimensionLabel(level.dimension)}</strong>
       </nav>
 
@@ -605,8 +711,13 @@
               <th>Item</th>
               <th>CEFR</th>
               <th>Seen</th>
+              <th>Heard</th>
               <th>Used</th>
+              <th>Spoken</th>
               <th>Accuracy</th>
+              <th>Mastery</th>
+              <th>Scored C/P/W</th>
+              <th>Exercises C/P/W</th>
               <th>Self-corrected</th>
               <th>Errors</th>
               <th>Reviews</th>
@@ -630,8 +741,13 @@
                 </td>
                 <td>{item.cefr_level ?? "—"}</td>
                 <td>{item.encounters}</td>
+                <td>{item.heard ?? 0}</td>
                 <td>{item.productions}</td>
+                <td>{item.spoken ?? 0}</td>
                 <td>{accuracyPct(item)}</td>
+                <td>{masteryLabel(item)}</td>
+                <td>{scoredProgressLabel(item)}</td>
+                <td>{exerciseProgressLabel(item)}</td>
                 <td>{item.self_corrected_productions || 0}</td>
                 <td>{item.error_count || 0}</td>
                 <td>{item.repetitions}</td>
@@ -647,22 +763,27 @@
       <nav class="breadcrumb">
         <button onclick={backToDashboard}>← Your progress</button>
         <span class="sep">/</span>
-        <button onclick={backToDimension}>{dimensionLabel(dimensionData?.dimension ?? "")}</button>
+        <span class="crumb-lang">{langTag(selectedLang)} {LANGUAGES[selectedLang]?.name ?? selectedLang}</span>
         <span class="sep">/</span>
-        <strong>{itemLabel(itemData?.item)}</strong>
+        <button onclick={backToDimension}>{dimensionLabel(level.dimension)}</button>
+        <span class="sep">/</span>
+        <strong>{itemDisplayLabel(itemData)}</strong>
       </nav>
 
       {#if loading && !itemData}
         <div class="empty">Loading…</div>
       {:else if itemData}
         {@const it = itemData.item}
+        {@const displayLabel = itemDisplayLabel(itemData)}
+        {@const observedForm = itemObservedForm(itemData)}
+        {@const dictionary = itemData.dictionary}
         <header class="item-hero">
           <div class="item-title-row">
             <h2>
               {#if it.term}
-                <DictionaryText text={itemLabel(it)} language={it.language ?? selectedLang} />
+                <DictionaryText text={displayLabel} language={it.language ?? selectedLang} />
               {:else}
-                {itemLabel(it)}
+                {displayLabel}
               {/if}
             </h2>
             {#if it.term}
@@ -677,22 +798,109 @@
                 {itemAudioLoading ? "…" : itemAudioPlaying ? "⏸" : "🔊"}
               </button>
             {/if}
+            {#if level.itemType === "vocabulary" && onWorkbenchText && displayLabel}
+              <button
+                class="workbench-link hero-workbench"
+                title="Analyze this word in the Filo workbench"
+                onclick={() => openWorkbench(displayLabel, it.language ?? selectedLang, `Vocabulary: ${displayLabel}`)}
+              >
+                workbench
+              </button>
+            {/if}
           </div>
-          {#if it.translation}
-            <p class="translation">{it.translation}</p>
-          {:else if it.description}
+          {#if observedForm}
+            <p class="observed-form">
+              form: <DictionaryText text={observedForm} language={it.language ?? selectedLang} />
+              {#if itemData.dictionary?.form_description}
+                <span>· {itemData.dictionary.form_description}</span>
+              {/if}
+            </p>
+          {/if}
+          {#if dictionary?.source_term && dictionary.source_term !== displayLabel}
+            <p class="headword-meta">
+              Wiktionary headword:
+              <DictionaryText text={dictionary.source_term} language={it.language ?? selectedLang} />
+            </p>
+          {/if}
+          {#if it.description && !it.translation}
             <p class="description">{it.description}</p>
           {/if}
-          {#if referenceData?.part_of_speech}
+          {#if dictionary?.senses?.length}
+            <div class="headword-definition">
+              {#each dictionary.senses as sense}
+                <section class="headword-sense">
+                  <span class="part-of-speech">{sense.part_of_speech}</span>
+                  <p>{sense.definition}</p>
+                  {#each sense.examples as example}
+                    {@const exampleParts = splitExample(example)}
+                    <div class="example-line">
+                      <blockquote>
+                        <DictionaryText text={exampleParts.source} language={it.language ?? selectedLang} />
+                        {#if exampleParts.translation}
+                          <span class="example-separator">{exampleParts.separator}</span>
+                          <DictionaryText text={exampleParts.translation} language={profile.value?.base_language ?? "en"} />
+                        {/if}
+                      </blockquote>
+                      {#if onWorkbenchText}
+                        <button
+                          class="workbench-link"
+                          title="Analyze this example in the Filo workbench"
+                          onclick={() => openWorkbench(exampleParts.source, it.language ?? selectedLang, `Example: ${displayLabel}`)}
+                        >
+                          workbench
+                        </button>
+                      {/if}
+                    </div>
+                  {/each}
+                </section>
+              {/each}
+            </div>
+          {:else if dictionary?.definitions?.length}
+            <ol class="headword-definitions">
+              {#each dictionary.definitions as definition}
+                <li>{definition}</li>
+              {/each}
+            </ol>
+          {:else if referenceData?.part_of_speech}
             <p class="part-of-speech">{referenceData.part_of_speech}</p>
           {/if}
-          {#if itemIpa}
+          {#if it.translation}
+            <p class="saved-translation">saved translation: {it.translation}</p>
+          {/if}
+          {#if itemData.has_profile_data === false}
+            <p class="headword-meta">
+              No profile data recorded for this word yet. Counts below start at zero.
+            </p>
+          {/if}
+          {#if itemIpa && ipaLayerPreference.enabled}
             <p class="ipa">IPA {itemIpa.value}</p>
           {/if}
+          {#if level.itemType === "vocabulary" && dictionary}
+            <div class="headword-links">
+              <a href={dictionaryRouteHref(itemData)}>Dictionary page</a>
+              {#if dictionary.source_url}
+                <a href={dictionary.source_url} target="_blank" rel="noreferrer">Definitions</a>
+              {/if}
+              {#if dictionary.target_source_url}
+                <a href={dictionary.target_source_url} target="_blank" rel="noreferrer">Target Wiktionary</a>
+              {/if}
+            </div>
+          {/if}
           {#if it.context_sentence}
-            <p class="context">
-              “<DictionaryText text={it.context_sentence} language={it.language ?? selectedLang} />”
-            </p>
+            <div class="context-row">
+              <p class="context">
+                “<DictionaryText text={it.context_sentence} language={it.language ?? selectedLang} />”
+              </p>
+              {#if onWorkbenchText}
+                <button
+                  class="workbench-link"
+                  title="Analyze this context sentence in the Filo workbench"
+                  onclick={() => openWorkbench(it.context_sentence, it.language ?? selectedLang, `Context: ${displayLabel}`)}
+                >
+                  workbench
+                </button>
+              {/if}
+            </div>
             {#if itemData.context_translation}
               <p class="context-translation">{itemData.context_translation}</p>
             {/if}
@@ -702,8 +910,15 @@
         <div class="stat-grid">
           <div><span>CEFR</span><strong>{it.cefr_level ?? "—"}</strong></div>
           <div><span>Seen</span><strong>{it.encounters ?? 0}</strong></div>
+          <div><span>Heard</span><strong>{it.heard ?? 0}</strong></div>
           <div><span>Produced</span><strong>{it.productions ?? 0}</strong></div>
+          <div><span>Spoken</span><strong>{it.spoken ?? 0}</strong></div>
+          <div><span>Accuracy</span><strong>{accuracyPct(it)}</strong></div>
+          <div><span>Mastery</span><strong>{masteryLabel(it)}</strong></div>
+          <div><span>Scored C/P/W</span><strong>{scoredProgressLabel(it)}</strong></div>
           <div><span>Correct</span><strong>{it.correct_productions ?? 0}</strong></div>
+          <div><span>Exercise C/P/W</span><strong>{exerciseProgressLabel(it)}</strong></div>
+          <div><span>Exercise score</span><strong>{it.exercise_score == null ? "—" : `${Math.round((it.exercise_score ?? 0) * 100)}%`}</strong></div>
           <div><span>Self-corrected</span><strong>{it.self_corrected_productions ?? 0}</strong></div>
           <div><span>Reviews</span><strong>{it.repetitions ?? 0}</strong></div>
           <div><span>Difficulty</span><strong>{(it.ease_factor ?? 0).toFixed(2)}</strong></div>
@@ -771,6 +986,7 @@
                     baseLangs={baseLangs()}
                     challenge={m.next_challenge ?? null}
                     conversationId={m.conversation_id}
+                    {onWorkbenchText}
                   />
                   {#each learningEventCommentaries(m) as commentary}
                     <div class="learning-event-note">
@@ -824,191 +1040,216 @@
   .profile {
     flex: 1;
     overflow-y: auto;
-    padding: 1.5rem 2rem;
-    background: var(--color-bg);
+    padding: var(--space-6) var(--space-8);
+    background: var(--color-panel);
   }
 
   .profile-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
+    display: grid;
+    grid-template-columns: minmax(8rem, 12rem) minmax(0, 1fr);
+    align-items: start;
+    gap: var(--space-6);
+    margin-bottom: var(--space-6);
   }
 
   .profile-header h1 {
-    font-size: 1.5rem;
+    font-size: var(--text-xl);
+    font-weight: var(--font-medium);
+    line-height: 1.1;
     margin: 0;
   }
 
   .lang-selector {
-    display: flex;
-    gap: 0.35rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
+    gap: var(--space-2);
   }
 
   .lang-chip {
     display: inline-flex;
     align-items: center;
-    gap: 0.35rem;
-    padding: 0.35rem 0.7rem;
+    justify-content: flex-start;
+    gap: var(--space-2);
+    min-height: 3.5rem;
+    padding: var(--space-2) var(--space-3);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-sm);
     background: var(--color-surface);
-    font-size: 0.85rem;
+    color: var(--color-text);
+    font-size: var(--text-sm);
+    text-align: left;
     cursor: pointer;
   }
 
   .lang-chip.active {
-    border-color: var(--color-primary);
-    background: var(--color-primary-light);
-    color: var(--color-primary);
+    border-color: var(--color-accent);
+    background: var(--color-surface);
+    color: var(--color-accent);
+    box-shadow: inset 0 -3px 0 var(--color-accent);
+  }
+
+  .lang-code {
+    white-space: nowrap;
+  }
+
+  .lang-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .lang-level {
-    font-size: 0.7rem;
-    color: var(--color-text-light);
-    background: var(--color-bg);
-    padding: 0.05rem 0.3rem;
-    border-radius: 3px;
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    color: var(--color-text-muted);
+    background: transparent;
+    padding: 0;
   }
 
   .lang-chip.active .lang-level {
-    background: white;
+    color: var(--color-accent);
   }
 
   .lang-data {
-    font-size: 0.7rem;
-    color: var(--color-text-light);
-    background: var(--color-bg);
-    padding: 0.05rem 0.3rem;
-    border-radius: 999px;
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    color: var(--color-text-muted);
+    background: transparent;
+    padding: 0;
   }
 
   .lang-chip.active .lang-data {
-    background: white;
+    color: var(--color-accent);
   }
 
   .tiles {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 0.75rem;
-    margin-bottom: 1.5rem;
+    gap: var(--space-3);
+    margin-bottom: var(--space-6);
   }
 
   .tile {
     background: var(--color-surface);
     border: 1px solid var(--color-border);
-    border-radius: var(--radius);
-    padding: 0.9rem 1rem;
+    border-radius: var(--radius-sm);
+    padding: var(--space-4);
     display: flex;
     flex-direction: column;
-    gap: 0.2rem;
+    gap: var(--space-1);
   }
 
   .tile-label {
-    font-size: 0.75rem;
-    color: var(--color-text-light);
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    color: var(--color-text-muted);
     text-transform: uppercase;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.04em;
   }
 
   .tile-value {
-    font-size: 1.6rem;
-    font-weight: 600;
+    font-size: var(--text-xl);
+    font-weight: var(--font-medium);
   }
 
   .tile-sub {
-    font-size: 0.75rem;
-    color: var(--color-text-light);
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
   }
 
   .section {
-    margin-bottom: 1.75rem;
+    margin-bottom: var(--space-8);
   }
 
   .section h2 {
-    font-size: 1rem;
-    margin-bottom: 0.5rem;
+    font-size: var(--text-md);
+    font-weight: var(--font-medium);
+    margin-bottom: var(--space-2);
   }
 
   .section-note {
-    font-size: 0.8rem;
-    color: var(--color-text-light);
-    margin-bottom: 0.75rem;
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-3);
   }
 
   .cefr-bars {
     background: var(--color-surface);
     border: 1px solid var(--color-border);
-    border-radius: var(--radius);
-    padding: 0.75rem 1rem;
+    border-radius: var(--radius-sm);
+    padding: var(--space-3) var(--space-4);
     display: flex;
     flex-direction: column;
-    gap: 0.4rem;
+    gap: var(--space-2);
   }
 
   .cefr-row {
     display: grid;
     grid-template-columns: 40px 1fr 40px;
     align-items: center;
-    gap: 0.5rem;
-    font-size: 0.8rem;
+    gap: var(--space-3);
+    font-size: var(--text-sm);
   }
 
   .cefr-label {
-    font-weight: 600;
-    color: var(--color-text-light);
+    font-family: var(--font-mono);
+    font-weight: var(--font-medium);
+    color: var(--color-text-muted);
   }
 
   .cefr-bar {
-    height: 14px;
+    height: 0.7rem;
     background: var(--color-bg);
-    border-radius: 7px;
+    border-radius: var(--radius-sm);
     overflow: hidden;
   }
 
   .cefr-fill {
     height: 100%;
-    background: var(--color-primary);
-    border-radius: 7px;
+    background: var(--color-accent);
+    border-radius: var(--radius-sm);
     min-width: 4px;
   }
 
   .cefr-fill.muted {
-    background: var(--color-text-light);
+    background: var(--color-text-muted);
     opacity: 0.4;
   }
 
   .cefr-count {
     text-align: right;
-    color: var(--color-text-light);
+    color: var(--color-text-muted);
   }
 
   .dimensions {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 0.6rem;
+    grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+    gap: var(--space-3);
   }
 
   .dim-card {
     display: flex;
     flex-direction: column;
-    gap: 0.15rem;
-    padding: 0.8rem 0.9rem;
+    gap: var(--space-1);
+    min-height: 6.5rem;
+    padding: var(--space-4);
     background: var(--color-surface);
     border: 1px solid var(--color-border);
-    border-radius: var(--radius);
+    border-radius: var(--radius-sm);
     cursor: pointer;
     text-align: left;
     transition: background 0.1s;
   }
 
-  .dim-card:hover { background: var(--color-bg); }
+  .dim-card:hover { background: var(--color-panel); border-color: var(--color-border-strong); }
   .dim-card.empty { opacity: 0.6; }
 
-  .dim-name { font-weight: 600; font-size: 0.9rem; }
-  .dim-sub { font-size: 0.75rem; color: var(--color-text-light); }
-  .dim-stat { font-size: 0.75rem; margin-top: 0.25rem; color: var(--color-primary); }
-  .dim-card.empty .dim-stat { color: var(--color-text-light); }
+  .dim-name { font-weight: var(--font-medium); font-size: var(--text-sm); }
+  .dim-sub { font-size: var(--text-xs); color: var(--color-text-muted); }
+  .dim-stat { font-size: var(--text-xs); margin-top: var(--space-1); color: var(--color-accent); }
+  .dim-card.empty .dim-stat { color: var(--color-text-muted); }
 
   .spark {
     display: flex;
@@ -1017,13 +1258,13 @@
     height: 60px;
     background: var(--color-surface);
     border: 1px solid var(--color-border);
-    border-radius: var(--radius);
-    padding: 0.5rem;
+    border-radius: var(--radius-sm);
+    padding: var(--space-3);
   }
 
   .spark-bar {
     flex: 1;
-    background: var(--color-primary);
+    background: var(--color-accent);
     border-radius: 2px;
     min-height: 1px;
     opacity: 0.85;
@@ -1034,43 +1275,47 @@
     align-items: center;
     gap: 0.5rem;
     margin-bottom: 1rem;
-    font-size: 0.85rem;
+    font-size: var(--text-sm);
   }
 
   .breadcrumb button {
     background: none;
     border: none;
-    color: var(--color-primary);
+    color: var(--color-accent);
     cursor: pointer;
     padding: 0;
     font-size: inherit;
   }
 
-  .breadcrumb .sep { color: var(--color-text-light); }
+  .breadcrumb .sep,
+  .breadcrumb .crumb-lang {
+    color: var(--color-text-muted);
+  }
 
   .items-table {
     width: 100%;
     border-collapse: collapse;
     background: var(--color-surface);
     border: 1px solid var(--color-border);
-    border-radius: var(--radius);
+    border-radius: var(--radius-sm);
     overflow: hidden;
   }
 
   .items-table th, .items-table td {
     text-align: left;
-    padding: 0.5rem 0.75rem;
-    font-size: 0.85rem;
+    padding: var(--space-3);
+    font-size: var(--text-sm);
     border-bottom: 1px solid var(--color-border);
   }
 
   .items-table th {
     background: var(--color-bg);
-    font-weight: 600;
-    color: var(--color-text-light);
-    font-size: 0.75rem;
+    font-family: var(--font-mono);
+    font-weight: var(--font-medium);
+    color: var(--color-text-muted);
+    font-size: var(--text-caption);
     text-transform: uppercase;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.04em;
   }
 
   .items-table tbody tr {
@@ -1081,29 +1326,29 @@
     background: var(--color-bg);
   }
 
-  .item-label { font-weight: 500; }
-  .item-sublabel { font-size: 0.75rem; color: var(--color-text-light); }
+  .item-label { font-weight: var(--font-medium); }
+  .item-sublabel { font-size: var(--text-xs); color: var(--color-text-muted); }
 
   .item-hero {
     background: var(--color-surface);
     border: 1px solid var(--color-border);
-    border-radius: var(--radius);
-    padding: 1rem 1.25rem;
-    margin-bottom: 1.25rem;
+    border-radius: var(--radius-sm);
+    padding: var(--space-5);
+    margin-bottom: var(--space-5);
   }
 
   .item-title-row {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0.25rem;
+    gap: var(--space-2);
+    margin-bottom: var(--space-1);
   }
 
-  .item-hero h2 { margin: 0; font-size: 1.3rem; }
+  .item-hero h2 { margin: 0; font-size: var(--text-lg); font-weight: var(--font-medium); }
 
   .pronunciation-btn {
     border: 1px solid var(--color-border);
-    border-radius: 999px;
+    border-radius: var(--radius-sm);
     background: var(--color-bg);
     cursor: pointer;
     width: 2rem;
@@ -1115,9 +1360,9 @@
 
   .pronunciation-btn:hover,
   .pronunciation-btn.active {
-    background: var(--color-primary);
-    color: white;
-    border-color: var(--color-primary);
+    background: var(--color-accent);
+    color: var(--color-accent-contrast);
+    border-color: var(--color-accent);
   }
 
   .pronunciation-btn.loading {
@@ -1125,44 +1370,148 @@
     cursor: wait;
   }
 
-  .translation { color: var(--color-text-light); margin: 0; }
+  .workbench-link {
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    line-height: 1;
+    padding: 0.12rem var(--space-2);
+  }
+
+  .workbench-link:hover {
+    background: var(--color-bg);
+    border-color: var(--color-border);
+    color: var(--color-accent);
+  }
+
+  .hero-workbench {
+    margin-left: var(--space-1);
+  }
+
   .description { margin: 0; }
+  .observed-form {
+    margin: 0 0 var(--space-2);
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+  }
+  .headword-meta,
+  .saved-translation {
+    margin: 0 0 var(--space-2);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .headword-definition {
+    display: grid;
+    gap: var(--space-3);
+    margin: var(--space-3) 0;
+  }
+
+  .headword-sense {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .headword-sense p {
+    margin: 0;
+    font-size: var(--text-md);
+  }
+
+  .headword-sense blockquote {
+    margin: 0;
+    border-left: 2px solid var(--color-border);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    padding-left: var(--space-3);
+  }
+
+  .example-line {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2);
+  }
+
+  .example-line blockquote {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .example-separator {
+    display: inline-block;
+    margin: 0 var(--space-2);
+  }
+
+  .headword-definitions {
+    margin: var(--space-3) 0;
+    padding-left: var(--space-5);
+  }
+
+  .headword-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-top: var(--space-3);
+  }
+
+  .headword-links a {
+    color: var(--color-accent);
+    font-size: var(--text-sm);
+    text-decoration: none;
+  }
+
   .part-of-speech {
     display: inline-flex;
     width: fit-content;
-    margin: 0.45rem 0 0;
-    padding: 0.18rem 0.45rem;
+    margin: var(--space-2) 0 0;
+    padding: 0.18rem var(--space-2);
     border: 1px solid var(--color-border);
-    border-radius: 999px;
+    border-radius: var(--radius-sm);
     background: var(--color-bg);
-    color: var(--color-text-light);
-    font-size: 0.78rem;
-    font-weight: 650;
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    font-weight: var(--font-medium);
     text-transform: uppercase;
-    letter-spacing: 0.035em;
+    letter-spacing: 0.04em;
   }
-  .ipa { margin: 0.25rem 0 0; font-size: 0.82rem; color: var(--color-text-light); }
-  .context { margin: 0.5rem 0 0; font-style: italic; color: var(--color-text-light); }
-  .context-translation { margin: 0.2rem 0 0; color: var(--color-text); font-size: 0.9rem; }
+  .ipa { margin: var(--space-1) 0 0; font-size: var(--text-xs); color: var(--color-text-muted); }
+  .context-row {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2);
+    margin-top: var(--space-2);
+  }
+  .context { flex: 1; min-width: 0; margin: 0; font-style: italic; color: var(--color-text-muted); }
+  .context-translation { margin: var(--space-1) 0 0; color: var(--color-text); font-size: var(--text-sm); }
 
   .stat-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-    gap: 0.5rem;
-    margin-bottom: 1.5rem;
+    gap: var(--space-2);
+    margin-bottom: var(--space-6);
   }
 
   .stat-grid > div {
     background: var(--color-surface);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-sm);
-    padding: 0.5rem 0.7rem;
+    padding: var(--space-3);
     display: flex;
     flex-direction: column;
   }
 
-  .stat-grid span { font-size: 0.7rem; color: var(--color-text-light); text-transform: uppercase; }
-  .stat-grid strong { font-size: 1rem; }
+  .stat-grid span {
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+  }
+  .stat-grid strong { font-size: var(--text-md); font-weight: var(--font-medium); }
 
   .reference-section {
     margin-bottom: 1rem;
@@ -1171,25 +1520,25 @@
   .reference-head {
     display: flex;
     justify-content: space-between;
-    gap: 1rem;
+    gap: var(--space-4);
     align-items: flex-start;
-    margin-bottom: 0.6rem;
+    margin-bottom: var(--space-3);
   }
 
   .reference-head > div {
     display: flex;
     flex-direction: column;
-    gap: 0.15rem;
+    gap: var(--space-1);
   }
 
   .reference-head span {
-    color: var(--color-text-light);
-    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
   }
 
   .reference-head a,
   .reference-links a {
-    color: var(--color-primary);
+    color: var(--color-accent);
     text-decoration: none;
   }
 
@@ -1199,9 +1548,9 @@
     overflow: auto;
     border: 1px solid var(--color-border);
     border-radius: var(--radius-sm);
-    background: white;
-    padding: 0.75rem;
-    font-size: 0.85rem;
+    background: var(--color-panel);
+    padding: var(--space-3);
+    font-size: var(--text-sm);
     line-height: 1.4;
   }
 
@@ -1232,11 +1581,11 @@
 
   :global(.reference-html th) {
     background: var(--color-bg);
-    font-weight: 650;
+    font-weight: var(--font-medium);
   }
 
   :global(.reference-html a) {
-    color: var(--color-primary);
+    color: var(--color-accent);
     text-decoration: none;
   }
 
@@ -1263,37 +1612,37 @@
   .reference-links {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-top: 0.75rem;
+    gap: var(--space-2);
+    margin-top: var(--space-3);
   }
 
   .reference-links a {
     display: inline-flex;
-    gap: 0.35rem;
+    gap: var(--space-1);
     align-items: center;
-    padding: 0.35rem 0.55rem;
+    padding: var(--space-2) var(--space-3);
     border: 1px solid var(--color-border);
-    border-radius: 999px;
+    border-radius: var(--radius-sm);
     background: var(--color-bg);
-    font-size: 0.82rem;
+    font-size: var(--text-sm);
   }
 
   .reference-links span {
-    color: var(--color-text-light);
-    font-size: 0.72rem;
+    color: var(--color-text-muted);
+    font-size: var(--text-caption);
   }
 
   .profile-message-list {
     margin: 0;
     display: flex;
     flex-direction: column;
-    gap: 0.8rem;
+    gap: var(--space-3);
   }
 
   .profile-message-row {
     display: flex;
     flex-direction: column;
-    gap: 0.3rem;
+    gap: var(--space-1);
     width: min(100%, 720px);
   }
 
@@ -1310,25 +1659,25 @@
   .open-chat-btn {
     border: 0;
     background: transparent;
-    color: var(--color-text-light);
+    color: var(--color-text-muted);
     cursor: pointer;
     font-size: 0.72rem;
     padding: 0 0.2rem;
   }
 
   .open-chat-btn:hover {
-    color: var(--color-primary);
+    color: var(--color-accent);
     text-decoration: underline;
   }
 
   .learning-event-note {
     max-width: min(100%, 720px);
-    padding: 0.45rem 0.65rem;
-    border-left: 3px solid var(--color-primary);
+    padding: var(--space-2) var(--space-3);
+    border-left: 3px solid var(--color-accent);
     border-radius: var(--radius-sm);
     background: var(--color-correction);
     color: var(--color-text);
-    font-size: 0.8rem;
+    font-size: var(--text-sm);
     line-height: 1.35;
   }
 
@@ -1338,51 +1687,61 @@
     margin: 0;
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: var(--space-1);
   }
 
   .events-list li {
     display: flex;
-    gap: 0.5rem;
+    gap: var(--space-2);
     align-items: center;
-    font-size: 0.8rem;
-    padding: 0.35rem 0.6rem;
+    font-size: var(--text-sm);
+    padding: var(--space-2) var(--space-3);
     background: var(--color-surface);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-sm);
   }
 
   .ev-type {
-    font-weight: 600;
-    color: var(--color-primary);
+    font-weight: var(--font-medium);
+    color: var(--color-accent);
     min-width: 80px;
   }
 
   .ev-outcome {
-    font-size: 0.75rem;
-    padding: 0.05rem 0.35rem;
-    border-radius: 3px;
+    font-size: var(--text-caption);
+    padding: 0.05rem var(--space-2);
+    border-radius: var(--radius-sm);
     background: var(--color-bg);
-    color: var(--color-text-light);
+    color: var(--color-text-muted);
   }
 
-  .ev-outcome.correct { background: #d4f1d4; color: #256a2b; }
-  .ev-outcome.partial { background: #fff0c2; color: #7a5200; }
-  .ev-outcome.incorrect { background: #fde2e2; color: #9a2b2b; }
+  .ev-outcome.correct { background: color-mix(in srgb, var(--color-success) 12%, transparent); color: var(--color-success); }
+  .ev-outcome.partial { background: color-mix(in srgb, var(--color-warning) 12%, transparent); color: var(--color-warning); }
+  .ev-outcome.incorrect { background: color-mix(in srgb, var(--color-error) 10%, transparent); color: var(--color-error); }
 
-  .ev-quality { font-family: var(--font-mono); color: var(--color-text-light); }
-  .ev-source { color: var(--color-text-light); }
-  .ev-date { margin-left: auto; color: var(--color-text-light); }
+  .ev-quality { font-family: var(--font-mono); color: var(--color-text-muted); }
+  .ev-source { color: var(--color-text-muted); }
+  .ev-date { margin-left: auto; color: var(--color-text-muted); }
 
   .empty {
-    padding: 3rem 1rem;
+    padding: var(--space-8) var(--space-4);
     text-align: center;
-    color: var(--color-text-light);
+    color: var(--color-text-muted);
   }
 
   .empty-sub {
-    color: var(--color-text-light);
-    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
     margin: 0;
+  }
+
+  @media (max-width: 900px) {
+    .profile {
+      padding: var(--space-5);
+    }
+
+    .profile-header {
+      grid-template-columns: 1fr;
+    }
   }
 </style>

@@ -79,6 +79,83 @@ describe("lookupDictionary", () => {
     expect(lowercase.definitions).toEqual(["project"]);
   });
 
+  test("does not keep empty lookups in cache", async () => {
+    let includePage = false;
+    globalThis.fetch = (async (input: RequestInfo | URL) => {
+      const url = new URL(String(input));
+      const title = url.searchParams.get("page") ?? "";
+      if (!includePage || title !== "számos") {
+        return Response.json({ error: { code: "missingtitle" } });
+      }
+      return Response.json({
+        parse: { title, text: { "*": page("számos", "Hungarian", ["numerous"]) } },
+      });
+    }) as typeof fetch;
+
+    const missing = await lookupDictionary("számos", "hu");
+    includePage = true;
+    const found = await lookupDictionary("számos", "hu");
+
+    expect(missing.definitions).toEqual([]);
+    expect(found.definitions).toEqual(["numerous"]);
+  });
+
+  test("retries transient Wiktionary HTTP failures before treating a page as missing", async () => {
+    let calls = 0;
+    globalThis.fetch = (async (input: RequestInfo | URL) => {
+      calls++;
+      const url = new URL(String(input));
+      const title = url.searchParams.get("page") ?? "";
+      if (calls === 1) {
+        return Response.json({ error: "upstream overloaded" }, { status: 503 });
+      }
+      return Response.json({
+        parse: { title, text: { "*": page("más", "Hungarian", ["other, else"]) } },
+      });
+    }) as typeof fetch;
+
+    const lookup = await lookupDictionary("más", "hu");
+
+    expect(calls).toBe(2);
+    expect(lookup.definitions).toEqual(["other, else"]);
+  });
+
+  test("does not cache transient incomplete Wiktionary parse responses", async () => {
+    let healthy = false;
+    globalThis.fetch = (async (input: RequestInfo | URL) => {
+      const url = new URL(String(input));
+      const title = url.searchParams.get("page") ?? "";
+      if (!healthy) {
+        return Response.json({ parse: { title, text: {} } });
+      }
+      return Response.json({
+        parse: { title, text: { "*": page("más", "Hungarian", ["other, else"]) } },
+      });
+    }) as typeof fetch;
+
+    await expect(lookupDictionary("más", "hu")).rejects.toThrow(/incomplete parse/i);
+    healthy = true;
+    const lookup = await lookupDictionary("más", "hu");
+
+    expect(lookup.definitions).toEqual(["other, else"]);
+  });
+
+  test("reads legacy Wiktionary heading markup", async () => {
+    mockWiktionary({
+      más: `
+        <h2><span class="mw-headline" id="Hungarian">Hungarian</span></h2>
+        <h3><span class="mw-headline" id="Pronoun">Pronoun</span></h3>
+        <ol><li>other, else</li></ol>
+        <h2><span class="mw-headline" id="Other">Other</span></h2>
+      `,
+    });
+
+    const lookup = await lookupDictionary("más", "hu");
+
+    expect(lookup.definitions).toEqual(["other, else"]);
+    expect(lookup.senses[0]?.part_of_speech).toBe("Pronoun");
+  });
+
   test("tries conservative Hungarian verb-stem candidates when no form page exists", async () => {
     mockWiktionary({
       megtalálom: null,
@@ -105,6 +182,66 @@ describe("lookupDictionary", () => {
     expect(lookup.source_term).toBe("megtalál");
     expect(lookup.form_description).toBe("first-person singular present definite of megtalál");
     expect(lookup.definitions).toEqual(["to find after searching"]);
+  });
+
+  test("tries Hungarian adverbial participle and prefix-base candidates", async () => {
+    mockWiktionary({
+      szétszórva: null,
+      szétszór: null,
+      szór: page("szór", "Hungarian", ["to scatter"]),
+    });
+
+    const lookup = await lookupDictionary("szétszórva", "hu");
+
+    expect(lookup.source_term).toBe("szór");
+    expect(lookup.form_description).toBe("adverbial participle of szétszór");
+    expect(lookup.definitions).toEqual(["to scatter"]);
+  });
+
+  test("uses Hungarian prefix-base lookup for prefixed lemmas", async () => {
+    mockWiktionary({
+      szétszór: null,
+      szór: page("szór", "Hungarian", ["to scatter"]),
+    });
+
+    const lookup = await lookupDictionary("szétszór", "hu");
+
+    expect(lookup.source_term).toBe("szór");
+    expect(lookup.form_description).toBe("prefixed verb szétszór; base szór");
+    expect(lookup.definitions).toEqual(["to scatter"]);
+  });
+
+  test("tries conservative Hungarian noun case and possessive candidates", async () => {
+    mockWiktionary({
+      szomszédjának: null,
+      szomszéd: page("szomszéd", "Hungarian", ["neighbor, neighbour"]),
+      újságot: null,
+      újság: page("újság", "Hungarian", ["newspaper"]),
+    });
+
+    const neighbor = await lookupDictionary("szomszédjának", "hu");
+    const newspaper = await lookupDictionary("újságot", "hu");
+
+    expect(neighbor.source_term).toBe("szomszéd");
+    expect(neighbor.form_description).toBe("third-person singular possessive dative of szomszéd");
+    expect(neighbor.definitions).toEqual(["neighbor, neighbour"]);
+    expect(newspaper.source_term).toBe("újság");
+    expect(newspaper.form_description).toBe("accusative singular of újság");
+    expect(newspaper.definitions).toEqual(["newspaper"]);
+  });
+
+  test("uses local Hungarian fallback for common demonstrative forms", async () => {
+    mockWiktionary({
+      ebben: null,
+      ez: null,
+    });
+
+    const lookup = await lookupDictionary("ebben", "hu");
+
+    expect(lookup.source_term).toBe("ez");
+    expect(lookup.form_description).toBe("inessive singular of ez");
+    expect(lookup.definitions).toEqual(["in this"]);
+    expect(lookup.senses[0]?.part_of_speech).toBe("Pronoun");
   });
 
   test("decodes named, decimal, and hex HTML entities in definitions", async () => {
@@ -142,6 +279,26 @@ describe("lookupDictionary", () => {
         examples: ["Sok szerencsét kívánok!"],
       },
     ]);
+  });
+
+  test("removes Wiktionary style and defdate markup from definitions", async () => {
+    mockWiktionary({
+      az: `
+        <div class="mw-heading mw-heading2"><h2 id="Hungarian">Hungarian</h2></div>
+        <div class="mw-heading mw-heading3"><h3 id="Article">Article</h3></div>
+        <ol>
+          <li>
+            the (for words beginning with a vowel)
+            <style>.mw-parser-output .defdate{font-size:smaller}</style>
+            <span class="defdate">[from 13th-14th c.]</span>
+          </li>
+        </ol>
+      `,
+    });
+
+    const lookup = await lookupDictionary("az", "hu");
+
+    expect(lookup.definitions).toEqual(["the (for words beginning with a vowel)"]);
   });
 
   test("skips etymology lists and reads part-of-speech definitions", async () => {

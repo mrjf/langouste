@@ -1,5 +1,5 @@
 import { adminDb } from "../../lib/db/index.ts";
-import { getPhoneticProvider } from "./phonetic/index.ts";
+import { transliterateTexts as litTransliterateTexts } from "../../../lit/src";
 import type { Message } from "../../types/index.ts";
 
 /** Build the storage key for a phonetic track. */
@@ -16,9 +16,17 @@ export async function transcribeTexts(
   system: string,
   language: string,
 ): Promise<string[] | null> {
-  const provider = getPhoneticProvider(system, language);
-  if (!provider) return null;
-  return provider.transcribe(texts, language);
+  if (system !== "ipa") return null;
+  try {
+    const results = await litTransliterateTexts(texts, {
+      from: { system: "orthography", language },
+      to: { system: "ipa", language },
+    });
+    return results.map((result) => result.text);
+  } catch (err) {
+    if (err instanceof Error && /No deterministic lit provider/i.test(err.message)) return null;
+    throw err;
+  }
 }
 
 /**

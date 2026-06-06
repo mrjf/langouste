@@ -24,16 +24,24 @@ import { fsrsSchedule, type FSRSConceptState, type FSRSResult } from "./fsrs.ts"
  *   production + incorrect -> quality 1 (failed recall, including self-corrected)
  *   recall (explicit)      -> quality 0..5 from the caller
  *   encounter              -> no scheduler signal, bumps encounters only
+ *   heard                  -> no scheduler signal, bumps heard only (vocabulary)
+ *   spoken                 -> no scheduler signal, bumps spoken only (vocabulary)
  */
 
 export type ItemType = "vocabulary" | "grammar";
-export type EventType = "encounter" | "production" | "recall";
+export type EventType = "encounter" | "production" | "recall" | "heard" | "spoken";
 export type Outcome = "correct" | "partial" | "incorrect";
 export type InteractionSource =
   | "chat_encounter"
   | "chat_produce"
   | "chat_correct"
   | "chat_self_correct"
+  | "dictionary_page"
+  | "dictionary_audio"
+  | "profile_item"
+  | "profile_audio"
+  | "workbench_definition"
+  | "workbench_audio"
   | "review"
   | "exercise";
 
@@ -77,6 +85,8 @@ interface ItemRow {
   productions: number;
   correct_productions: number;
   self_corrected_productions: number;
+  heard: number;
+  spoken: number;
   error_count?: number;
 }
 
@@ -116,6 +126,14 @@ export async function recordInteraction(db: Database, input: InteractionInput): 
   if (input.eventType === "encounter") {
     patch.encounters = row.encounters + 1;
     patch.last_encounter_at = now;
+  }
+  if (input.eventType === "heard" && input.itemType === "vocabulary") {
+    patch.heard = row.heard + 1;
+    patch.last_heard_at = now;
+  }
+  if (input.eventType === "spoken" && input.itemType === "vocabulary") {
+    patch.spoken = row.spoken + 1;
+    patch.last_spoken_at = now;
   }
   if (input.eventType === "production") {
     patch.productions = row.productions + 1;
@@ -188,6 +206,8 @@ function snapshot(row: ItemRow, concept: ConceptStateRow, config: FSRSConfig) {
     productions: row.productions,
     correct_productions: row.correct_productions,
     self_corrected_productions: row.self_corrected_productions,
+    heard: row.heard,
+    spoken: row.spoken,
     fsrs: {
       difficulty: concept.difficulty,
       stability: concept.stability,
@@ -277,6 +297,8 @@ function toItemRow(row: Record<string, unknown>, idColumn: string): ItemRow {
     productions: (row.productions as number) ?? 0,
     correct_productions: (row.correct_productions as number) ?? 0,
     self_corrected_productions: (row.self_corrected_productions as number) ?? 0,
+    heard: (row.heard as number) ?? 0,
+    spoken: (row.spoken as number) ?? 0,
     error_count: row.error_count as number | undefined,
   };
 }
