@@ -1,6 +1,16 @@
 <script lang="ts">
   import { chatStore, type Chat } from "../lib/chat.svelte";
   import { langTag } from "../lib/languages";
+  import Badge from "./ui/Badge.svelte";
+
+  interface ConversationListItem {
+    id: string;
+    language: string;
+    title: string;
+    working: boolean;
+    unread: number;
+    active: boolean;
+  }
 
   interface Props {
     onSelect?: (chat: Chat) => void;
@@ -41,6 +51,17 @@
   function myLang(chat: Chat): string {
     return chat.member?.target_languages?.[0]?.lang ?? "?";
   }
+
+  function toListItem(chat: Chat): ConversationListItem {
+    return {
+      id: chat.id,
+      language: myLang(chat),
+      title: displayName(chat),
+      working: chat.working,
+      unread: unreadFor(chat),
+      active: chatStore.activeId === chat.id,
+    };
+  }
 </script>
 
 <div class="conv-list">
@@ -48,24 +69,25 @@
     <div class="conv-empty">No conversations yet</div>
   {:else}
     {#each chatStore.list as chat (chat.id)}
+      {@const item = toListItem(chat)}
       <button
         class="conv-item"
-        class:active={chatStore.activeId === chat.id}
+        class:active={item.active}
         onclick={() => select(chat)}
       >
-        <span class="conv-lang">{langTag(myLang(chat))}</span>
+        <Badge label={langTag(item.language)} tone={item.active ? "accent" : "neutral"} />
         <span class="conv-main">
-          <span class="conv-partner">🤖 {displayName(chat)}</span>
-          {#if chat.working}
+          <span class="conv-partner">{item.title}</span>
+          {#if item.working}
             <span class="conv-working">working…</span>
           {/if}
         </span>
-        {#if unreadFor(chat) > 0}
+        {#if item.unread > 0}
           <span
             class="unread-badge"
-            aria-label={`${unreadFor(chat)} unread messages`}
+            aria-label={`${item.unread} unread messages`}
           >
-            {badgeLabel(unreadFor(chat))}
+            {badgeLabel(item.unread)}
           </span>
         {/if}
       </button>
@@ -77,58 +99,53 @@
   .conv-list {
     flex: 1;
     overflow-y: auto;
+    min-height: 0;
   }
 
   .conv-empty {
-    padding: 2rem 1rem;
+    padding: var(--space-8) var(--space-5);
     text-align: center;
-    color: var(--color-text-light);
-    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
   }
 
   .conv-item {
-    display: flex;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
     align-items: center;
-    gap: 0.75rem;
+    gap: var(--space-3);
     width: 100%;
-    padding: 0.75rem 1.25rem;
+    min-height: 3.4rem;
+    padding: var(--space-3) var(--space-5);
     border: none;
+    border-bottom: 1px solid var(--color-border);
     background: none;
     text-align: left;
-    font-size: 0.9rem;
-    border-bottom: 1px solid var(--color-border);
-    transition: background 0.1s;
+    color: var(--color-text);
+    transition: background-color 120ms ease;
   }
 
   .conv-item:hover {
-    background: var(--color-bg);
+    background: var(--color-panel);
   }
 
   .conv-item.active {
-    background: var(--color-primary-light);
-  }
-
-  .conv-lang {
-    font-weight: 600;
-    font-size: 0.8rem;
-    color: var(--color-primary);
-    background: var(--color-primary-light);
-    padding: 0.15rem 0.4rem;
-    border-radius: 4px;
-    flex-shrink: 0;
+    background: var(--color-panel);
+    box-shadow: inset 3px 0 0 var(--color-accent);
   }
 
   /* Name + optional working line, stacked. Takes the row's flex space. */
   .conv-main {
-    flex: 1;
     min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 0.1rem;
+    gap: var(--space-1);
   }
 
   .conv-partner {
     color: var(--color-text);
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -136,9 +153,8 @@
 
   /* Subtle, static "agent is working" hint. No animation by design. */
   .conv-working {
-    font-size: 0.72rem;
-    color: var(--color-text-light);
-    font-style: italic;
+    font-size: var(--text-caption);
+    color: var(--color-text-muted);
     line-height: 1;
   }
 
@@ -148,11 +164,12 @@
     min-width: 1.25rem;
     height: 1.25rem;
     padding: 0 0.4rem;
-    border-radius: 999px;
-    background: var(--color-primary, #e02f5b);
-    color: #fff;
-    font-size: 0.72rem;
-    font-weight: 700;
+    border-radius: var(--radius-sm);
+    background: var(--color-accent);
+    color: var(--color-accent-contrast);
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    font-weight: var(--font-medium);
     line-height: 1.25rem;
     text-align: center;
     box-sizing: border-box;

@@ -40,7 +40,7 @@ export class ClaudeTranslationProvider implements TranslationProvider {
   private async translateOne(
     text: string,
     targetLanguage: string,
-    _context?: string,
+    context?: string,
   ): Promise<string> {
     const client = getAnthropicClient();
     const response = await client.messages.create({
@@ -66,7 +66,7 @@ export class ClaudeTranslationProvider implements TranslationProvider {
       messages: [
         {
           role: "user",
-          content: `Translate this text into ${languageName(targetLanguage)} (language code: ${targetLanguage}). Translate accurately and naturally, matching the exact register of the original. Do not shift formality up or down. Keep any text in backticks (\`like this\`) byte-identical.\n\n${text}`,
+          content: `Translate this text into ${languageName(targetLanguage)} (language code: ${targetLanguage}). Translate accurately and naturally, matching the exact register of the original. Do not shift formality up or down. Keep any text in backticks (\`like this\`) byte-identical.${context ? `\n\nContext: ${context}` : ""}\n\n${text}`,
         },
       ],
     });
@@ -84,7 +84,7 @@ export class ClaudeTranslationProvider implements TranslationProvider {
   private async translateBatch(
     texts: string[],
     targetLanguage: string,
-    _context?: string,
+    context?: string,
   ): Promise<string[]> {
     const client = getAnthropicClient();
     const numbered = texts.map((t, i) => `[${i}] ${t}`).join("\n");
@@ -113,7 +113,7 @@ export class ClaudeTranslationProvider implements TranslationProvider {
       messages: [
         {
           role: "user",
-          content: `Translate each text into ${languageName(targetLanguage)} (language code: ${targetLanguage}). These are chat messages in a language learning app. Translate accurately and naturally, matching the exact register of the original. "Bonjour" = "Hello" (not "hey"). "Salut" = "Hi". Do not shift formality up or down. Return exactly ${texts.length} translations in the same order.
+          content: `Translate each text into ${languageName(targetLanguage)} (language code: ${targetLanguage}). These are chat messages in a language learning app. Translate accurately and naturally, matching the exact register of the original. "Bonjour" = "Hello" (not "hey"). "Salut" = "Hi". Do not shift formality up or down. Return exactly ${texts.length} translations in the same order.${context ? `\n\nContext: ${context}` : ""}
 
 IMPORTANT — backtick convention: Any text inside backticks (\`like this\`) is a literal the user marked as not-to-be-translated (proper noun, nickname, brand, code token). Keep it byte-identical in the output, including the surrounding backticks. Do not translate, transliterate, reorder, or alter it.
 

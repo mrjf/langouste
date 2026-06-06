@@ -15,6 +15,7 @@ Start here. The docs are layered — read in order if you're new, jump to the re
 - [PARSING.md](./PARSING.md) — the deterministic parsing pipeline that extracts UD features from every message. Feeds the ontology.
 - [LEARNING-MODEL.md](./LEARNING-MODEL.md) — how we measure, explain, and schedule. SRS, CEFR estimation, L1 priors, self-correction flow. Sits on top of the ontology and parsing.
 - [LEARNING-TRACKING.md](./LEARNING-TRACKING.md) — implementation contract for seen/produced/error/quiz events, `review_log`, concept-level FSRS state, due-review selection, and profile sync.
+- [EXERCISE-TYPES.md](./EXERCISE-TYPES.md) — typology and implementation contract for CEFR-targeted exercise generation.
 - [REFERENCES.md](./REFERENCES.md) — external URL templates, ingestion sources, and the reference-links service.
 
 ## Engineering

@@ -4,7 +4,10 @@
   import { md } from "../lib/md";
   import { api } from "../lib/api";
   import { playExclusive, stopCurrent, isCurrent } from "../lib/audio-player";
+  import { filoSource } from "../lib/filo-provenance";
+  import type { WorkbenchTextPayload } from "../lib/workbench";
   import DictionaryText from "./DictionaryText.svelte";
+  import IpaLayer from "./IpaLayer.svelte";
 
   interface Props {
     message: Message;
@@ -14,6 +17,7 @@
     baseLangs?: string[];
     challenge?: string | null;
     conversationId?: string;
+    onWorkbenchText?: (payload: WorkbenchTextPayload) => void;
   }
 
   let {
@@ -24,6 +28,7 @@
     baseLangs = [],
     challenge = null,
     conversationId,
+    onWorkbenchText,
   }: Props = $props();
 
   // Lazy per-language audio cache: lang → { url, audio element, status }.
@@ -189,6 +194,27 @@
     shownLangs = next;
   }
 
+  function workbenchTargetFor(sourceLanguage: string): string {
+    if (baseLang && baseLang !== sourceLanguage) return baseLang;
+    if (viewerLang && viewerLang !== sourceLanguage) return viewerLang;
+    return baseLang || viewerLang || "en";
+  }
+
+  function openWorkbench(value: string | null | undefined, sourceLanguage: string, title: string) {
+    const cleanText = value?.trim() ?? "";
+    const cleanSourceLanguage = sourceLanguage || viewerLang || message.language || "en";
+    if (!onWorkbenchText || !cleanText || !cleanSourceLanguage) return;
+    const filoDoc = message.filo_doc?.text.trim() === cleanText ? message.filo_doc : null;
+    onWorkbenchText({
+      text: cleanText,
+      sourceLanguage: cleanSourceLanguage,
+      targetLanguage: workbenchTargetFor(cleanSourceLanguage),
+      title,
+      autoAnalyze: true,
+      filoDoc,
+    });
+  }
+
   let hasDetails = $derived(
     showBase || showOriginal || showCorrections || showChallenge || shownLangs.size > 0
   );
@@ -213,9 +239,19 @@
           {translationPending ? "…" : langTag(viewerLang)}
         </span>
       {/if}
-      <div class="healed-text">
+      <div
+        class="healed-text"
+        use:filoSource={{
+          document: message.filo_doc,
+          text: displayText,
+          role: "message-visible-text",
+          language: displayLang,
+          includeDocument: false,
+        }}
+      >
         {#if displayIsTargetLanguage}
-          <DictionaryText text={displayText} language={viewerLang} />
+          <DictionaryText text={displayText} language={viewerLang} filoDoc={message.filo_doc} />
+          <IpaLayer text={displayText} language={viewerLang} filoDoc={message.filo_doc} />
         {:else}
           {@html md(displayText)}
         {/if}
@@ -234,7 +270,21 @@
           title={audioByLang[viewerLang]?.error ?? "Play audio"}
           onclick={() => playLang(viewerLang)}
         >
-          {audioByLang[viewerLang]?.loading ? "…" : audioByLang[viewerLang]?.playing ? "⏸" : "🔊"}
+          {audioByLang[viewerLang]?.loading ? "…" : audioByLang[viewerLang]?.playing ? "stop" : "audio"}
+        </button>
+      {/if}
+      {#if onWorkbenchText && displayText.trim()}
+        <button
+          class="action-btn"
+          title="Analyze this text in the Filo workbench"
+          onclick={() =>
+            openWorkbench(
+              displayText,
+              displayLang || viewerLang || message.language || "",
+              `${sent ? "Your" : senderName ?? "Agent"} message`,
+            )}
+        >
+          workbench
         </button>
       {/if}
       {#if baseText}
@@ -279,10 +329,28 @@
                 title={audioByLang[baseLang]?.error ?? "Play audio"}
                 onclick={() => playLang(baseLang)}
               >
-                {audioByLang[baseLang]?.loading ? "…" : audioByLang[baseLang]?.playing ? "⏸" : "🔊"}
+                  {audioByLang[baseLang]?.loading ? "…" : audioByLang[baseLang]?.playing ? "stop" : "audio"}
               </button>
             {/if}
-            <div class="detail-text">{@html md(baseText)}</div>
+            {#if onWorkbenchText}
+              <button
+                class="detail-action"
+                title="Analyze this translation in the Filo workbench"
+                onclick={() => openWorkbench(baseText, baseLang, `${langTag(baseLang)} translation`)}
+              >
+                workbench
+              </button>
+            {/if}
+            <div
+              class="detail-text"
+              use:filoSource={{
+                document: message.filo_doc,
+                text: baseText,
+                role: "message-base-translation",
+                language: baseLang,
+                includeDocument: false,
+              }}
+            >{@html md(baseText)}</div>
           </div>
         {/if}
 
@@ -299,12 +367,31 @@
                   title={audioByLang[lang]?.error ?? "Play audio"}
                   onclick={() => playLang(lang)}
                 >
-                  {audioByLang[lang]?.loading ? "…" : audioByLang[lang]?.playing ? "⏸" : "🔊"}
+                    {audioByLang[lang]?.loading ? "…" : audioByLang[lang]?.playing ? "stop" : "audio"}
                 </button>
               {/if}
-            <div class="detail-text">
+              {#if onWorkbenchText}
+                <button
+                  class="detail-action"
+                  title="Analyze this translation in the Filo workbench"
+                  onclick={() => openWorkbench(message.translations?.[lang], lang, `${langTag(lang)} translation`)}
+                >
+                  workbench
+                </button>
+              {/if}
+            <div
+              class="detail-text"
+              use:filoSource={{
+                document: message.filo_doc,
+                text: message.translations[lang],
+                role: "message-extra-translation",
+                language: lang,
+                includeDocument: false,
+              }}
+            >
               {#if viewerLangs.includes(lang)}
                 <DictionaryText text={message.translations[lang]} language={lang} />
+                <IpaLayer text={message.translations[lang]} language={lang} filoDoc={message.filo_doc} />
               {:else}
                 {@html md(message.translations[lang])}
               {/if}
@@ -316,9 +403,28 @@
         {#if showOriginal && hasOriginal}
           <div class="detail-row original-row">
             <span class="detail-label">original</span>
-            <div class="detail-text">
+            {#if onWorkbenchText}
+              <button
+                class="detail-action"
+                title="Analyze the original message in the Filo workbench"
+                onclick={() => openWorkbench(message.raw_text, message.language ?? "", "Original message")}
+              >
+                workbench
+              </button>
+            {/if}
+            <div
+              class="detail-text"
+              use:filoSource={{
+                document: message.filo_doc,
+                text: message.raw_text,
+                role: "message-original-text",
+                language: message.language ?? undefined,
+                includeDocument: false,
+              }}
+            >
               {#if message.language && viewerLangs.includes(message.language)}
-                <DictionaryText text={message.raw_text} language={message.language} />
+                <DictionaryText text={message.raw_text} language={message.language} filoDoc={message.filo_doc} />
+                <IpaLayer text={message.raw_text} language={message.language} filoDoc={message.filo_doc} />
               {:else}
                 {@html md(message.raw_text)}
               {/if}
@@ -329,12 +435,22 @@
         {#if showCorrections && hasCorrections}
           <div class="detail-row corrections-row">
             {#each message.corrections as c}
-              <div class="correction-item">
+              <div
+                class="correction-item"
+                use:filoSource={{
+                  document: message.filo_doc,
+                  text: `${c.original} -> ${c.corrected}. ${c.explanation}`,
+                  role: "message-correction",
+                  language: message.language ?? undefined,
+                  includeDocument: false,
+                }}
+              >
                 <span class="original-text">{c.original}</span>
                 <span class="arrow">&rarr;</span>
                 <span class="corrected-text">
                   {#if message.language && viewerLangs.includes(message.language)}
                     <DictionaryText text={c.corrected} language={message.language} />
+                    <IpaLayer text={c.corrected} language={message.language} filoDoc={message.filo_doc} />
                   {:else}
                     {c.corrected}
                   {/if}
@@ -347,7 +463,10 @@
 
         {#if showChallenge && challenge}
           <div class="detail-row challenge-row">
-            <span class="detail-text">{challenge}</span>
+            <span
+              class="detail-text"
+              use:filoSource={{ text: challenge, role: "message-challenge" }}
+            >{challenge}</span>
           </div>
         {/if}
       </div>
@@ -359,7 +478,7 @@
   .message-bubble {
     display: flex;
     flex-direction: column;
-    max-width: 80%;
+    max-width: min(44rem, 82%);
   }
 
   .sent {
@@ -371,23 +490,22 @@
   }
 
   .bubble {
-    padding: 0.6rem 0.9rem;
-    border-radius: var(--radius);
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-sm);
     line-height: 1.45;
-    font-size: 0.95rem;
+    font-size: var(--text-md);
     position: relative;
     min-width: 120px;
   }
 
   .sent .bubble {
     background: var(--color-sent);
-    border-bottom-right-radius: 4px;
+    border: 1px solid var(--color-border);
   }
 
   .received .bubble {
     background: var(--color-received);
     border: 1px solid var(--color-border);
-    border-bottom-left-radius: 4px;
   }
 
   .bubble.loading {
@@ -428,8 +546,8 @@
   .typing-dots span {
     width: 0.4rem;
     height: 0.4rem;
-    border-radius: 50%;
-    background: var(--color-text-light, #888);
+    border-radius: var(--radius-sm);
+    background: var(--color-text-muted);
     animation: typing-bounce 1.2s ease-in-out infinite;
   }
 
@@ -442,11 +560,11 @@
   }
 
   .sender-name {
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--color-primary);
-    margin-bottom: 0.15rem;
-    padding: 0 0.25rem;
+    font-size: var(--text-caption);
+    font-weight: var(--font-medium);
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-1);
+    padding: 0 var(--space-1);
   }
 
   .pending {
@@ -456,19 +574,20 @@
   /* Action buttons row */
   .actions {
     display: flex;
-    gap: 0.25rem;
+    gap: var(--space-1);
     flex-wrap: wrap;
     align-items: center;
-    margin-top: 0.2rem;
-    padding: 0 0.15rem;
+    margin-top: var(--space-1);
+    padding: 0 var(--space-1);
   }
 
   .target-badge {
     float: right;
-    font-size: 0.65rem;
-    color: var(--color-text-light);
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    color: var(--color-text-muted);
     opacity: 0.5;
-    margin-left: 0.5rem;
+    margin-left: var(--space-2);
     margin-top: -0.1rem;
     line-height: 1;
   }
@@ -481,32 +600,33 @@
   .action-btn {
     background: none;
     border: 1px solid transparent;
-    color: var(--color-text-light);
-    font-size: 0.7rem;
-    padding: 0.1rem 0.35rem;
-    border-radius: 3px;
-    opacity: 0.5;
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    padding: 0.12rem var(--space-2);
+    border-radius: var(--radius-sm);
+    opacity: 0.65;
     transition: opacity 0.15s, background 0.15s;
   }
 
   .action-btn:hover {
     opacity: 1;
-    background: var(--color-bg);
+    background: var(--color-surface);
   }
 
   .action-btn.active {
     opacity: 1;
-    background: var(--color-bg);
+    background: var(--color-surface);
     border-color: var(--color-border);
   }
 
   .corrections-btn {
-    color: #f39c12;
+    color: var(--color-warning);
   }
 
   .speaker-btn {
-    font-size: 0.85rem;
-    padding: 0.05rem 0.3rem;
+    font-size: var(--text-caption);
+    padding: 0.12rem var(--space-2);
     line-height: 1;
   }
 
@@ -515,29 +635,36 @@
     cursor: progress;
   }
 
-  .detail-speaker {
+  .detail-speaker,
+  .detail-action {
     background: none;
     border: 1px solid transparent;
-    border-radius: 3px;
-    font-size: 0.85rem;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
     line-height: 1;
-    padding: 0.05rem 0.25rem;
-    margin-right: 0.3rem;
-    color: var(--color-text-light);
+    padding: 0.12rem var(--space-2);
+    margin-right: var(--space-2);
+    color: var(--color-text-muted);
     opacity: 0.55;
     cursor: pointer;
     transition: opacity 0.15s, background 0.15s;
     vertical-align: middle;
   }
 
-  .detail-speaker:hover {
+  .detail-speaker:hover,
+  .detail-action:hover {
     opacity: 1;
-    background: var(--color-bg-alt, rgba(0,0,0,0.05));
+    background: var(--color-surface);
   }
 
   .detail-speaker.active {
     opacity: 1;
     border-color: var(--color-border);
+  }
+
+  .detail-action {
+    line-height: 1.1;
   }
 
   .detail-speaker.loading {
@@ -546,37 +673,39 @@
   }
 
   .challenge-btn {
-    color: #1565c0;
+    color: var(--color-accent);
   }
 
   .timestamp {
-    font-size: 0.65rem;
-    color: var(--color-text-light);
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    color: var(--color-text-muted);
     margin-left: auto;
     opacity: 0.6;
   }
 
   /* Expandable detail panels */
   .details {
-    margin-top: 0.25rem;
+    margin-top: var(--space-1);
     display: flex;
     flex-direction: column;
-    gap: 0.2rem;
+    gap: var(--space-1);
   }
 
   .detail-row {
-    padding: 0.4rem 0.6rem;
+    padding: var(--space-2) var(--space-3);
     border-radius: var(--radius-sm);
-    font-size: 0.82rem;
+    font-size: var(--text-sm);
     line-height: 1.4;
-    background: var(--color-bg);
+    background: var(--color-surface);
     border-left: 2px solid var(--color-border);
   }
 
   .detail-label {
-    font-size: 0.7rem;
-    font-weight: 600;
-    color: var(--color-text-light);
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    font-weight: var(--font-medium);
+    color: var(--color-text-muted);
     text-transform: lowercase;
     display: block;
     margin-bottom: 0.1rem;

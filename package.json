@@ -23,12 +23,15 @@
     "test:e2e:claude-code": "bunx playwright test --config playwright.config.real.ts tests/e2e-real/claude-code.spec.ts",
     "test:all": "bun run test && bun run test:e2e",
     "test:all:real": "bun run test && bun run test:e2e && bun run test:e2e:real",
-    "migrate": "bun scripts/migrate.ts"
+    "migrate": "bun scripts/migrate.ts",
+    "backfill:filo": "bun scripts/backfill-filo-docs.ts",
+    "build:pimsleur-tape": "bun scripts/build-pimsleur-tape.ts"
   },
   "dependencies": {
     "@anthropic-ai/claude-agent-sdk": "^0.2.112",
     "@anthropic-ai/sdk": "^0.39.0",
     "@google-cloud/translate": "^9.3.0",
+    "@piper-plus/g2p": "^0.4.0",
     "@supabase/supabase-js": "^2.49.0",
     "dictionary-de": "^3.0.0",
     "dictionary-es": "^4.0.0",
@@ -42,6 +45,7 @@
     "dictionary-tr": "^2.0.0",
     "hono": "^4.4.0",
     "nspell": "^2.1.5",
+    "phonemize": "^1.2.0",
     "tinyld": "^1.3.4",
     "transliteration": "^2.6.1"
   },

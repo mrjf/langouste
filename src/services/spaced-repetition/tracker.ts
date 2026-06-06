@@ -8,6 +8,7 @@ import {
   normalizeGrammarCategory,
 } from "../profile/grammar-ontology.ts";
 import { recordInteraction } from "./interactions.ts";
+import { normalizeVocabularyTerm } from "./vocabulary-normalizer.ts";
 
 /**
  * After processing a message, record each extracted vocabulary item (correct
@@ -23,12 +24,13 @@ export async function trackLearningProgress(
   messageId?: string,
   selfCorrectedSpans: SelfCorrectedSpan[] = [],
 ): Promise<void> {
-  const vocabPromises = aiResult.new_vocabulary.map((v) =>
-    recordInteraction(db, {
+  const vocabPromises = aiResult.new_vocabulary.map(async (v) => {
+    const normalized = await normalizeVocabularyTerm(v.term, language);
+    return recordInteraction(db, {
       userId,
       language,
       itemType: "vocabulary",
-      lookupKey: v.term,
+      lookupKey: normalized.term,
       seed: {
         translation: v.translation,
         context_sentence: v.context_sentence ?? undefined,
@@ -38,8 +40,8 @@ export async function trackLearningProgress(
       outcome: wasSelfCorrected(v.term, selfCorrectedSpans) ? "incorrect" : "correct",
       source: wasSelfCorrected(v.term, selfCorrectedSpans) ? "chat_self_correct" : "chat_produce",
       messageId,
-    }),
-  );
+    });
+  });
 
   const gapPromises = aiResult.grammar_gaps_detected.flatMap((g) => {
     const category = normalizeGrammarCategory(g.category, language);
@@ -111,14 +113,18 @@ export async function trackVocabularyEncounters(
 
   await Promise.all(
     [...unique.values()].map(async (v) => {
-      if (messageId && (await hasEncounterForMessage(db, userId, language, v.term, messageId))) {
+      const normalized = await normalizeVocabularyTerm(v.term, language);
+      if (
+        messageId &&
+        (await hasEncounterForMessage(db, userId, language, normalized.term, messageId))
+      ) {
         return;
       }
       await recordInteraction(db, {
         userId,
         language,
         itemType: "vocabulary",
-        lookupKey: v.term,
+        lookupKey: normalized.term,
         seed: {
           translation: v.translation,
           context_sentence: v.context_sentence ?? undefined,

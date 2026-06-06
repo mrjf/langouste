@@ -1,3 +1,5 @@
+import type { FiloDocumentJson } from "../../filo/src/types";
+
 // CEFR levels
 export type CefrLevel = "A1" | "A2" | "B1" | "B2" | "C1" | "C2";
 
@@ -65,6 +67,7 @@ export interface Message {
   translations: Record<string, string>;
   transliterations: Record<string, string>; // key: "sourceLang→targetLang" e.g. "ar→en"
   phonetics: Record<string, string>; // key: "system:lang" e.g. "ipa:fr"
+  filo_doc?: FiloDocumentJson | null;
   corrections: Correction[];
   next_challenge: string | null;
   is_agent: boolean;
@@ -121,6 +124,16 @@ export interface VocabularyItem extends SpacedRepetitionFields {
   context_sentence: string | null;
   cefr_level: CefrLevel | null;
   concept_id: string | null;
+  encounters: number;
+  productions: number;
+  correct_productions: number;
+  self_corrected_productions: number;
+  heard: number;
+  spoken: number;
+  last_encounter_at: string | null;
+  last_produced_at: string | null;
+  last_heard_at: string | null;
+  last_spoken_at: string | null;
   created_at: string;
 }
 
@@ -133,6 +146,12 @@ export interface GrammarGap extends SpacedRepetitionFields {
   concept_id: string | null;
   error_count: number;
   last_error_at: string;
+  encounters: number;
+  productions: number;
+  correct_productions: number;
+  self_corrected_productions: number;
+  last_encounter_at: string | null;
+  last_produced_at: string | null;
   created_at: string;
 }
 

@@ -19,9 +19,22 @@ import { ensurePhonetics } from "../../services/ai/phonetician.ts";
 import { getAgentConnection } from "../../services/agents/factory.ts";
 import { getAudioProvider } from "../../services/ai/audio/index.ts";
 import {
+  findAudioAsset,
+  findAudioAssetForRequest,
+  storeAudioAsset,
+  type CachedAudioAsset,
+} from "../../services/corpus/audio-assets.ts";
+import {
   trackLearningProgress,
   trackVocabularyEncounters,
 } from "../../services/spaced-repetition/tracker.ts";
+import {
+  appendMessageAudioTier,
+  enrichAndPersistMessageIpaLayers,
+  enrichAndPersistMessageFiloDoc,
+  findMessageAudioReferences,
+  persistBaseMessageFiloDoc,
+} from "../../services/corpus/filo-docs.ts";
 import {
   planAgentLanguageExchange,
   seedAgentResponseTranslations,
@@ -36,7 +49,14 @@ import type {
   TextError,
 } from "../../types/index.ts";
 
-export const messageRoutes = new Hono();
+type MessageRouteBindings = {
+  Variables: {
+    db: Database;
+    userId: string;
+  };
+};
+
+export const messageRoutes = new Hono<MessageRouteBindings>();
 
 messageRoutes.use("*", requireAuth);
 
@@ -179,12 +199,22 @@ messageRoutes.post("/:conversationId", async (c) => {
     corrections: [],
     next_challenge: null,
   });
+  await persistBaseMessageFiloDoc(db, message);
 
   const userLangs = memberLanguages(senderMember);
 
-  ensureTranslations([message], userLangs).catch((err) =>
-    console.error("Failed to pre-translate message:", err),
-  );
+  void (async () => {
+    try {
+      await ensureTranslations([message], userLangs);
+    } catch (err) {
+      console.error("Failed to pre-translate message:", err);
+    }
+    try {
+      await enrichAndPersistMessageFiloDoc(adminDb(), message);
+    } catch (err) {
+      console.error("Failed to enrich message Filo document:", err);
+    }
+  })();
   ensureTransliterations([message], msgLanguage, userLangs).catch((err) =>
     console.error("Failed to transliterate message:", err),
   );
@@ -252,6 +282,7 @@ messageRoutes.post("/:conversationId", async (c) => {
     corrections: [],
     next_challenge: null,
     is_agent: true,
+    filo_doc: null,
   });
 
   void processAgentReply({
@@ -336,6 +367,7 @@ async function processAgentReply(args: {
     );
 
     await ensureTranslations([completedAgentMessage], agentLanguagePlan.requiredLanguages);
+    await enrichAndPersistMessageFiloDoc(adminDb(), completedAgentMessage);
     await trackAgentVocabularyEncounters(
       adminDb(),
       userId,
@@ -359,6 +391,13 @@ async function processAgentReply(args: {
     const detail = err instanceof Error ? err.message : String(err);
     console.error("Agent communication failed:", err);
     const errorText = `Agent error: ${detail}`;
+    const erroredAgentMessage: Message = {
+      ...agentMessage,
+      raw_text: errorText,
+      healed_text: errorText,
+      language: inputLanguage,
+      translations: { [inputLanguage]: errorText },
+    };
     await adminDb().update(
       "messages",
       {
@@ -368,6 +407,9 @@ async function processAgentReply(args: {
         translations: { [inputLanguage]: errorText },
       },
       [{ op: "eq", column: "message_id", value: agentMessage.message_id }],
+    );
+    await persistBaseMessageFiloDoc(adminDb(), erroredAgentMessage).catch((filoErr) =>
+      console.error("Failed to persist errored agent Filo document:", filoErr),
     );
   }
 }
@@ -407,39 +449,86 @@ messageRoutes.get("/:conversationId/:messageId/audio", async (c) => {
   const member = await getMember(db, conversationId, userId);
   if (!member) return c.json({ error: "Not a member of this conversation" }, 403);
 
-  const provider = getAudioProvider();
-  if (!provider.isAvailable()) {
-    return c.json({ error: "Audio provider not configured" }, 503);
-  }
-
   const message = await getMessageById(db, messageId);
   if (!message || message.conversation_id !== conversationId) {
     return c.json({ error: "Message not found" }, 404);
   }
 
-  const targetLang = lang || message.language;
+  const targetLang = lang || message.language || undefined;
   const text =
     (lang && message.translations?.[lang]) ||
-    (targetLang === message.language ? message.healed_text : message.translations?.[targetLang]) ||
+    (targetLang && targetLang !== message.language ? message.translations?.[targetLang] : null) ||
     message.healed_text;
   if (!text?.trim()) return c.json({ error: "Nothing to synthesise" }, 400);
 
+  const assetDb = adminDb();
+  for (const reference of findMessageAudioReferences(message, targetLang)) {
+    const cached = await findAudioAsset(assetDb, reference.audioId).catch(() => null);
+    if (cached) return audioAssetResponse(cached);
+  }
+
+  const provider = getAudioProvider();
+  if (!provider.isAvailable()) {
+    return c.json({ error: "Audio provider not configured" }, 503);
+  }
+
+  const existingAsset = await findAudioAssetForRequest(assetDb, {
+    provider: provider.name,
+    language: targetLang ?? null,
+    text,
+  }).catch(() => null);
+  if (existingAsset) {
+    await appendMessageAudioTier(assetDb, message, {
+      language: targetLang ?? null,
+      audioId: existingAsset.audioId,
+      mimeType: existingAsset.contentType,
+      byteLength: existingAsset.byteLength,
+      source: existingAsset.provider,
+      textHash: existingAsset.textHash,
+      contentHash: existingAsset.contentHash,
+    }).catch((err) => console.error("[Audio] failed to persist cached Filo audio tier:", err));
+    return audioAssetResponse(existingAsset);
+  }
+
   try {
     const result = await provider.synthesize(text, { language: targetLang, userId });
-    return new Response(result.audio, {
-      status: 200,
-      headers: {
-        "Content-Type": result.contentType,
-        "Cache-Control": "private, max-age=86400",
-        "Content-Length": String(result.audio.byteLength),
-      },
+    const asset = await storeAudioAsset(assetDb, {
+      provider: provider.name,
+      language: targetLang ?? null,
+      text,
+      audio: result.audio,
+      contentType: result.contentType,
     });
+    await appendMessageAudioTier(assetDb, message, {
+      language: targetLang ?? null,
+      audioId: asset.audioId,
+      mimeType: asset.contentType,
+      byteLength: asset.byteLength,
+      source: asset.provider,
+      textHash: asset.textHash,
+      contentHash: asset.contentHash,
+    }).catch((err) => console.error("[Audio] failed to persist Filo audio tier:", err));
+    return audioAssetResponse(asset);
   } catch (err) {
     const detail = err instanceof Error ? err.message : String(err);
     console.error("[Audio] synthesize failed:", detail);
     return c.json({ error: detail }, 502);
   }
 });
+
+function audioAssetResponse(asset: CachedAudioAsset): Response {
+  const audioBody = new ArrayBuffer(asset.audio.byteLength);
+  new Uint8Array(audioBody).set(asset.audio);
+  return new Response(audioBody, {
+    status: 200,
+    headers: {
+      "Content-Type": asset.contentType,
+      "Cache-Control": "private, max-age=86400",
+      "Content-Length": String(asset.audio.byteLength),
+      "X-Langouste-Audio-Id": asset.audioId,
+    },
+  });
+}
 
 // Translate all messages in a conversation into the requested languages
 messageRoutes.post("/:conversationId/translate", async (c) => {
@@ -465,6 +554,7 @@ messageRoutes.post("/:conversationId/translate", async (c) => {
     requestedLanguages,
   );
   await ensureTranslations(messages, requestedLanguages);
+  await ensureMessageIpaLayers(messages, requestedLanguages);
   await trackAgentVocabularyEncounters(
     adminDb(),
     userId,
@@ -542,4 +632,42 @@ async function trackAgentVocabularyEncounters(
 function visibleTextForLanguage(message: Message, language: string): string | null {
   if (message.language === language) return message.healed_text;
   return message.translations?.[language] ?? null;
+}
+
+async function ensureMessageIpaLayers(messages: Message[], languages: string[]): Promise<void> {
+  const candidates = messages.filter((message) =>
+    languages.some((language) => {
+      const text = visibleTextForLanguage(message, language);
+      return !!text?.trim() && !hasStoredIpaLayer(message, language, text);
+    }),
+  );
+  if (candidates.length === 0) return;
+  await Promise.all(
+    candidates.map((message) =>
+      enrichAndPersistMessageIpaLayers(adminDb(), message).catch((err) => {
+        console.error("Failed to enrich message IPA layers:", err);
+      }),
+    ),
+  );
+}
+
+function hasStoredIpaLayer(message: Message, language: string, text: string): boolean {
+  const document = message.filo_doc;
+  if (!document) return false;
+  const cleanText = normalizeLayerText(text);
+  const tier = document.tiers.find((candidate) => candidate.id === `ipa:${language}`);
+  return (
+    tier?.annotations.some((annotation) => {
+      const payload = annotation.payload as Record<string, unknown>;
+      return (
+        typeof payload.text === "string" &&
+        payload.text.trim().length > 0 &&
+        normalizeLayerText(payload.sourceText) === cleanText
+      );
+    }) ?? false
+  );
+}
+
+function normalizeLayerText(value: unknown): string {
+  return typeof value === "string" ? value.trim().replace(/\s+/gu, " ") : "";
 }

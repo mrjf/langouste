@@ -33,6 +33,7 @@ const AUTO_ID_COLUMNS: Record<string, string> = {
   fsrs_configs: "config_id",
   assessments: "assessment_id",
   review_log: "log_id",
+  exercise_attempts: "attempt_id",
 };
 
 const JSON_COLUMNS = new Set([
@@ -43,10 +44,13 @@ const JSON_COLUMNS = new Set([
   "translations",
   "transliterations",
   "phonetics",
+  "filo_doc",
+  "source",
   "corrections",
   "evidence",
   "before_state",
   "after_state",
+  "payload",
   "phases",
   "parameters",
   "quality_weights",
@@ -276,6 +280,7 @@ export function createSqliteDatabaseSet(): DatabaseSet {
 function applySqliteSchema(db: BunDatabase): void {
   const schemaPath = resolve(import.meta.dir, "../../../sqlite/schema.sql");
   db.exec(readFileSync(schemaPath, "utf-8"));
+  migrateReviewLogEventTypes(db);
 
   sqliteAddColumnIfMissing(db, "conversation_members", "last_read_at", "TEXT", () => {
     db.exec(
@@ -292,8 +297,58 @@ function applySqliteSchema(db: BunDatabase): void {
     sqliteAddColumnIfMissing(db, table, "last_encounter_at", "TEXT");
     sqliteAddColumnIfMissing(db, table, "last_produced_at", "TEXT");
   }
+  sqliteAddColumnIfMissing(db, "vocabulary", "heard", "INTEGER NOT NULL DEFAULT 0");
+  sqliteAddColumnIfMissing(db, "vocabulary", "spoken", "INTEGER NOT NULL DEFAULT 0");
+  sqliteAddColumnIfMissing(db, "vocabulary", "last_heard_at", "TEXT");
+  sqliteAddColumnIfMissing(db, "vocabulary", "last_spoken_at", "TEXT");
+  sqliteAddColumnIfMissing(db, "messages", "filo_doc", "TEXT");
+  sqliteAddColumnIfMissing(db, "audio_assets", "source", "TEXT");
+  sqliteAddColumnIfMissing(db, "audio_assets", "filo_doc", "TEXT");
 
   cleanupPartialLearningRows(db);
+}
+
+function migrateReviewLogEventTypes(db: BunDatabase): void {
+  const row = db
+    .query("SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'review_log'")
+    .get() as { sql?: string } | undefined;
+  if (!row?.sql || row.sql.includes("'heard'")) return;
+
+  db.exec(`
+    ALTER TABLE review_log RENAME TO review_log_old_event_type;
+
+    CREATE TABLE review_log (
+      log_id         TEXT PRIMARY KEY,
+      user_id        TEXT NOT NULL REFERENCES profiles(user_id) ON DELETE CASCADE,
+      language       TEXT NOT NULL,
+      item_type      TEXT NOT NULL CHECK (item_type IN ('vocabulary','grammar','concept')),
+      item_id        TEXT,
+      concept_id     TEXT,
+      event_type     TEXT NOT NULL CHECK (event_type IN ('encounter','production','recall','heard','spoken')),
+      outcome        TEXT CHECK (outcome IN ('correct','partial','incorrect')),
+      quality        INTEGER CHECK (quality BETWEEN 0 AND 5),
+      source         TEXT NOT NULL,
+      message_id     TEXT,
+      before_state   TEXT,
+      after_state    TEXT,
+      observed_at    TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+
+    INSERT INTO review_log (
+      log_id, user_id, language, item_type, item_id, concept_id, event_type,
+      outcome, quality, source, message_id, before_state, after_state, observed_at
+    )
+    SELECT
+      log_id, user_id, language, item_type, item_id, concept_id, event_type,
+      outcome, quality, source, message_id, before_state, after_state, observed_at
+    FROM review_log_old_event_type;
+
+    DROP TABLE review_log_old_event_type;
+
+    CREATE INDEX IF NOT EXISTS idx_review_log_user_lang ON review_log(user_id, language, observed_at DESC);
+    CREATE INDEX IF NOT EXISTS idx_review_log_item      ON review_log(item_type, item_id);
+    CREATE INDEX IF NOT EXISTS idx_review_log_concept   ON review_log(concept_id);
+  `);
 }
 
 function sqliteAddColumnIfMissing(

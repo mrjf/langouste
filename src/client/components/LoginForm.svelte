@@ -2,10 +2,12 @@
   import { api } from "../lib/api";
   import { saveSession, loadProfile } from "../lib/auth";
   import LanguagePicker from "./LanguagePicker.svelte";
+  import Button from "./ui/Button.svelte";
 
-  const CEFR_LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"];
+  const CEFR_LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"] as const;
+  type AuthMode = "login" | "signup";
 
-  let mode: "login" | "signup" = $state("login");
+  let mode: AuthMode = $state("login");
   let error = $state("");
 
   // Form fields
@@ -89,7 +91,12 @@
         </select>
       </div>
     {/if}
-    <button type="submit" class="btn">{mode === "signup" ? "Sign Up" : "Log In"}</button>
+    <Button
+      type="submit"
+      label={mode === "signup" ? "Sign up" : "Log in"}
+      variant="primary"
+      class="submit-button"
+    />
     {#if error}
       <div class="error-msg">{error}</div>
     {/if}
@@ -114,88 +121,81 @@
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    background: var(--color-surface);
+    background: var(--color-panel);
+    border: 1px solid var(--color-border);
     border-radius: var(--radius);
-    box-shadow: var(--shadow-lg);
-    padding: 2.5rem;
+    padding: var(--space-8);
     width: 100%;
-    max-width: 400px;
+    max-width: 26rem;
     margin: auto;
   }
 
   h1 {
-    font-size: 1.75rem;
-    margin-bottom: 0.25rem;
-    color: var(--color-primary);
+    font-size: var(--text-xl);
+    font-weight: var(--font-medium);
+    margin-bottom: var(--space-1);
+    color: var(--color-text);
   }
 
   .subtitle {
-    color: var(--color-text-light);
-    margin-bottom: 2rem;
-    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
   }
 
   .field {
-    margin-bottom: 1rem;
+    margin-bottom: var(--space-4);
   }
 
   label {
     display: block;
-    font-size: 0.85rem;
-    font-weight: 500;
-    margin-bottom: 0.25rem;
-    color: var(--color-text-light);
+    font-size: var(--text-xs);
+    font-weight: var(--font-medium);
+    margin-bottom: var(--space-1);
+    color: var(--color-text-muted);
   }
 
   input, select, :global(.field select) {
     width: 100%;
-    padding: 0.75rem;
+    min-height: 2.6rem;
+    padding: 0 var(--space-3);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-sm);
-    font-size: 1rem;
+    background: var(--color-surface);
+    color: var(--color-text);
+    font-size: var(--text-md);
     outline: none;
     transition: border-color 0.15s;
   }
 
   input:focus, select:focus {
-    border-color: var(--color-primary);
+    border-color: var(--color-accent);
   }
 
-  .btn {
+  :global(.submit-button) {
     width: 100%;
-    padding: 0.75rem;
-    background: var(--color-primary);
-    color: white;
-    border: none;
-    border-radius: var(--radius-sm);
-    font-size: 1rem;
-    font-weight: 600;
-    margin-top: 0.5rem;
-  }
-
-  .btn:hover {
-    opacity: 0.9;
+    margin-top: var(--space-2);
   }
 
   .toggle {
     text-align: center;
-    margin-top: 1rem;
-    font-size: 0.85rem;
-    color: var(--color-text-light);
+    margin-top: var(--space-4);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
   }
 
   .toggle-link {
     background: none;
     border: none;
-    color: var(--color-primary);
-    font-size: 0.85rem;
+    color: var(--color-accent);
+    font-size: var(--text-sm);
     text-decoration: none;
     padding: 0;
   }
 
   .error-msg {
     color: var(--color-error);
-    font-size: 0.85rem;
-    margin-top: 0.5rem;
+    font-size: var(--text-sm);
+    margin-top: var(--space-2);
   }
 </style>

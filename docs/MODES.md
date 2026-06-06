@@ -2,6 +2,8 @@
 
 Langouste runs in one of two modes, chosen by the `DATABASE_MODE` environment variable. Same app, same features, different backing store.
 
+The current local/dev setup uses `DATABASE_MODE=sqlite` and `VITE_DATABASE_MODE=sqlite` from `.env.example`. Treat that as the intended contributor/default setup. If `DATABASE_MODE` is omitted entirely, `src/lib/config.ts` currently falls back to `supabase`, so keep the mode explicit in `.env`.
+
 | | `sqlite` (default) | `supabase` |
 |---|---|---|
 | **Stores data in** | a single `langouste.db` file in your OS data directory | a managed or self-hosted Supabase project |
@@ -14,7 +16,7 @@ Langouste runs in one of two modes, chosen by the `DATABASE_MODE` environment va
 
 ## Running in `sqlite` mode
 
-1. Copy `.env.example` to `.env`, leave `DATABASE_MODE=sqlite`, set `ANTHROPIC_API_KEY` and `LANGOUSTE_JWT_SECRET`.
+1. Copy `.env.example` to `.env`, leave `DATABASE_MODE=sqlite`, `VITE_DATABASE_MODE=sqlite`, and `VITE_SINGLE_USER=true`, then set `ANTHROPIC_API_KEY` and `LANGOUSTE_JWT_SECRET`.
 2. `bun install`
 3. `bun run migrate` — creates `langouste.db` in the data directory.
 4. `bun run dev` — Vite on `:5173`, Hono on `:8000`.
@@ -38,7 +40,7 @@ Override with `LANGOUSTE_DATA_DIR=/absolute/path`. Handy for dev: `LANGOUSTE_DAT
 
 ## Switching modes
 
-You can keep separate `.env` files and `cp` between them, or toggle with `DATABASE_MODE=sqlite bun run dev`. The two modes don't share data — switching means a fresh conversation history on the other side. (Data export/migration between modes is a future tool; ping the roadmap if you need it.)
+You can keep separate `.env` files and `cp` between them, or toggle with `DATABASE_MODE=sqlite VITE_DATABASE_MODE=sqlite bun run dev`. The two modes don't share data — switching means a fresh conversation history on the other side. (Data export/migration between modes is a future tool; ping the roadmap if you need it.)
 
 ## Invariants the abstraction preserves
 

@@ -51,6 +51,8 @@ export const DEFAULT_QUALITY_WEIGHTS: QualityWeights = Object.freeze({
   "exercise:production:partial": 3,
   "exercise:production:incorrect": 1,
   encounter: null,
+  heard: null,
+  spoken: null,
 });
 
 export async function getFSRSConfig(

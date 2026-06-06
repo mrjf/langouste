@@ -144,6 +144,33 @@ describe("recordInteraction", () => {
     expect((db.rows.review_log[0].after_state as any).fsrs_config.parameters[3]).toBe(20);
   });
 
+  test("tracks heard and spoken vocabulary without scheduling recall", async () => {
+    const db = new MemoryDatabase();
+
+    await recordInteraction(db, {
+      userId: "user-1",
+      language: "hu",
+      itemType: "vocabulary",
+      lookupKey: "szétszór",
+      eventType: "heard",
+      source: "dictionary_audio",
+    });
+    await recordInteraction(db, {
+      userId: "user-1",
+      language: "hu",
+      itemType: "vocabulary",
+      lookupKey: "szétszór",
+      eventType: "spoken",
+      source: "exercise",
+    });
+
+    expect(db.rows.vocabulary[0].heard).toBe(1);
+    expect(db.rows.vocabulary[0].spoken).toBe(1);
+    expect(db.rows.vocabulary[0].repetitions).toBe(0);
+    expect(db.rows.review_log.map((row) => row.event_type)).toEqual(["heard", "spoken"]);
+    expect(db.rows.review_log.map((row) => row.quality)).toEqual([null, null]);
+  });
+
   test("does not invent grammar gaps outside the closed ontology", async () => {
     const db = new MemoryDatabase();
 
@@ -256,6 +283,8 @@ function defaults(table: string): Record<string, unknown> {
       productions: 0,
       correct_productions: 0,
       self_corrected_productions: 0,
+      heard: 0,
+      spoken: 0,
       next_review_at: new Date("2026-01-01T00:00:00.000Z").toISOString(),
     };
   }

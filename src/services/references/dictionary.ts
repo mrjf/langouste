@@ -30,6 +30,7 @@ interface DefinitionList {
 }
 
 const cache = new Map<string, Promise<DictionaryLookup>>();
+const WIKTIONARY_FETCH_ATTEMPTS = 2;
 
 export function clearDictionaryLookupCache(): void {
   cache.clear();
@@ -41,10 +42,17 @@ export function lookupDictionary(term: string, language: string): Promise<Dictio
   const existing = cache.get(key);
   if (existing) return existing;
 
-  const promise = buildLookup(cleanTerm, language).catch((err) => {
-    cache.delete(key);
-    throw err;
-  });
+  const promise = buildLookup(cleanTerm, language)
+    .then((lookup) => {
+      if (lookup.definitions.length === 0 && !lookup.source_term) {
+        cache.delete(key);
+      }
+      return lookup;
+    })
+    .catch((err) => {
+      cache.delete(key);
+      throw err;
+    });
   cache.set(key, promise);
   return promise;
 }
@@ -78,6 +86,8 @@ async function buildLookup(term: string, language: string): Promise<DictionaryLo
   }
 
   if (formLookup) return formLookup;
+  const localLookup = localFallbackLookup(term, language);
+  if (localLookup) return localLookup;
   return emptyLookup(term, language);
 }
 
@@ -130,24 +140,67 @@ function emptyLookup(term: string, language: string): DictionaryLookup {
   };
 }
 
+function localFallbackLookup(term: string, language: string): DictionaryLookup | null {
+  if (language !== "hu") return null;
+  const entry = HUNGARIAN_LOCAL_FORMS[term.toLocaleLowerCase("hu")];
+  if (!entry) return null;
+  return {
+    term,
+    language,
+    source: null,
+    source_term: entry.sourceTerm,
+    source_url: null,
+    target_source_url: null,
+    form_description: entry.formDescription,
+    definitions: [entry.definition],
+    senses: [
+      {
+        part_of_speech: entry.partOfSpeech,
+        definition: entry.definition,
+        examples: [],
+      },
+    ],
+  };
+}
+
 async function fetchWiktionaryPage(
   term: string,
 ): Promise<{ title: string; html: string; url: string } | null> {
   const url = `https://en.wiktionary.org/w/api.php?action=parse&page=${encodeURIComponent(term)}&prop=text&format=json&origin=*`;
-  const response = await fetch(url, {
-    headers: { "User-Agent": "Langouste/0.1 (language-learning dictionary lookup)" },
-    signal: AbortSignal.timeout(7000),
-  });
-  if (!response.ok) return null;
+  let lastError: unknown = null;
+  for (let attempt = 1; attempt <= WIKTIONARY_FETCH_ATTEMPTS; attempt++) {
+    try {
+      const response = await fetch(url, {
+        headers: { "User-Agent": "Langouste/0.1 (language-learning dictionary lookup)" },
+        signal: AbortSignal.timeout(7000),
+      });
+      if (!response.ok) {
+        lastError = new Error(`Wiktionary returned HTTP ${response.status}`);
+        continue;
+      }
 
-  const payload = (await response.json()) as {
-    error?: { code?: string };
-    parse?: { title?: string; text?: { "*": string } };
-  };
-  const html = payload.parse?.text?.["*"];
-  const title = payload.parse?.title;
-  if (payload.error || !html || !title) return null;
-  return { title, html, url: `https://en.wiktionary.org/wiki/${encodeURIComponent(title)}` };
+      const payload = (await response.json()) as {
+        error?: { code?: string; info?: string };
+        parse?: { title?: string; text?: { "*": string } };
+      };
+      if (payload.error?.code === "missingtitle") return null;
+      if (payload.error) {
+        lastError = new Error(payload.error.info ?? `Wiktionary error: ${payload.error.code}`);
+        continue;
+      }
+
+      const html = payload.parse?.text?.["*"];
+      const title = payload.parse?.title;
+      if (!html || !title) {
+        lastError = new Error("Wiktionary returned an incomplete parse response");
+        continue;
+      }
+      return { title, html, url: `https://en.wiktionary.org/wiki/${encodeURIComponent(title)}` };
+    } catch (err) {
+      lastError = err;
+    }
+  }
+  throw lastError instanceof Error ? lastError : new Error("Wiktionary lookup failed");
 }
 
 function extractSenses(html: string, language: string): DictionarySense[] {
@@ -163,21 +216,22 @@ function extractSenses(html: string, language: string): DictionarySense[] {
 
 function extractDefinitionLists(section: string): DefinitionList[] {
   const lists: DefinitionList[] = [];
-  const headingRe = /<div class="mw-heading mw-heading([2-6])"><h[2-6] id="([^"]+)"/gi;
+  const headingRe =
+    /(?:<div class="mw-heading mw-heading([2-6])"><h[2-6]\s+id="([^"]+)"|<h([2-6])>\s*<span class="mw-headline"\s+id="([^"]+)")/gi;
   const headings = [...section.matchAll(headingRe)];
 
   for (let index = 0; index < headings.length; index++) {
     const heading = headings[index];
-    const level = Number(heading[1]);
-    const title = normalizeHeadingId(heading[2]);
+    const level = Number(heading[1] ?? heading[3]);
+    const title = normalizeHeadingId(heading[2] ?? heading[4]);
     if (!DICTIONARY_POS_HEADINGS.has(title.toLowerCase())) continue;
 
     const start = (heading.index ?? 0) + heading[0].length;
     const next = headings.find((candidate, candidateIndex) => {
       if (candidateIndex <= index) return false;
       return (
-        Number(candidate[1]) <= level ||
-        DICTIONARY_POS_HEADINGS.has(normalizeHeadingId(candidate[2]).toLowerCase())
+        Number(candidate[1] ?? candidate[3]) <= level ||
+        DICTIONARY_POS_HEADINGS.has(normalizeHeadingId(candidate[2] ?? candidate[4]).toLowerCase())
       );
     });
     const block = section.slice(start, next?.index ?? section.length);
@@ -210,7 +264,7 @@ function addSenseItems(definitionList: DefinitionList, senses: DictionarySense[]
 }
 
 function cleanDefinitionText(value: string): string {
-  return cleanText(removeNestedBlocks(value, ["ul", "ol", "dl"]));
+  return cleanText(removeDefinitionNoise(removeNestedBlocks(value, ["ul", "ol", "dl"])));
 }
 
 function extractExamples(value: string): string[] {
@@ -225,7 +279,7 @@ function extractExamples(value: string): string[] {
 }
 
 function cleanText(value: string): string {
-  return decodeHtml(stripTags(value))
+  return decodeHtml(stripTags(removeHtmlNoise(value)))
     .replace(/\s+/g, " ")
     .replace(/\s+([,.;:!?])/g, "$1")
     .trim();
@@ -233,10 +287,16 @@ function cleanText(value: string): string {
 
 function extractLanguageSection(html: string, language: string): string | null {
   const id = escapeRegExp(languageName(language).replace(/\s+/g, "_"));
-  const match = new RegExp(`<div class="mw-heading mw-heading2"><h2 id="${id}"`).exec(html);
+  const match = new RegExp(
+    `(?:<div class="mw-heading mw-heading2"><h2\\s+id="${id}"|<h2>\\s*<span class="mw-headline"\\s+id="${id}")`,
+  ).exec(html);
   if (!match) return null;
   const rest = html.slice(match.index);
-  const next = rest.slice(match[0].length).search(/<div class="mw-heading mw-heading2"><h2 id="/);
+  const next = rest
+    .slice(match[0].length)
+    .search(
+      /(?:<div class="mw-heading mw-heading2"><h2\s+id=|<h2>\s*<span class="mw-headline"\s+id=)/,
+    );
   return next >= 0 ? rest.slice(0, match[0].length + next) : rest;
 }
 
@@ -347,12 +407,69 @@ function hungarianLemmaCandidates(term: string): LookupCandidate[] {
       formDescription: `${rule.description} of ${lemma}`,
     });
   }
+  for (const rule of HUNGARIAN_PARTICIPLE_SUFFIXES) {
+    if (lower.length <= rule.suffix.length + 2 || !lower.endsWith(rule.suffix)) continue;
+    const lemma = lower.slice(0, -rule.suffix.length);
+    candidates.push({
+      term: lemma,
+      formDescription: `${rule.description} of ${lemma}`,
+    });
+    candidates.push(...hungarianPrefixBaseCandidates(lemma, rule.description));
+  }
+  for (const rule of HUNGARIAN_NOUN_SUFFIXES) {
+    if (lower.length <= rule.suffix.length + 2 || !lower.endsWith(rule.suffix)) continue;
+    const lemma = lower.slice(0, -rule.suffix.length);
+    candidates.push({
+      term: lemma,
+      formDescription: `${rule.description} of ${lemma}`,
+    });
+  }
+  candidates.push(...hungarianPrefixBaseCandidates(lower));
+  return candidates;
+}
+
+function hungarianPrefixBaseCandidates(term: string, description?: string): LookupCandidate[] {
+  const candidates: LookupCandidate[] = [];
+  for (const prefix of HUNGARIAN_VERBAL_PREFIXES) {
+    if (!term.startsWith(prefix) || term.length <= prefix.length + 2) continue;
+    const base = term.slice(prefix.length);
+    candidates.push({
+      term: base,
+      formDescription: description
+        ? `${description} of ${term}`
+        : `prefixed verb ${term}; base ${base}`,
+    });
+  }
   return candidates;
 }
 
 function removeNestedBlocks(value: string, tags: string[]): string {
   const tagPattern = tags.map(escapeRegExp).join("|");
   return value.replace(new RegExp(`<(${tagPattern})\\b[\\s\\S]*?<\\/\\1>`, "gi"), "");
+}
+
+function removeDefinitionNoise(value: string): string {
+  return removeElementsByClass(removeHtmlNoise(value), ["defdate"]);
+}
+
+function removeHtmlNoise(value: string): string {
+  return value.replace(/<(script|style|template)\b[\s\S]*?<\/\1>/gi, "");
+}
+
+function removeElementsByClass(value: string, classNames: string[]): string {
+  return classNames.reduce(
+    (html, className) =>
+      html.replace(
+        new RegExp(
+          `<([a-z][\\w:-]*)\\b(?=[^>]*\\bclass=["'][^"']*\\b${escapeRegExp(
+            className,
+          )}\\b)[^>]*>[\\s\\S]*?<\\/\\1>`,
+          "gi",
+        ),
+        "",
+      ),
+    value,
+  );
 }
 
 function stripTags(value: string): string {
@@ -410,6 +527,72 @@ const HUNGARIAN_VERB_SUFFIXES = [
   { suffix: "ök", description: "first-person singular present indefinite" },
   { suffix: "sz", description: "second-person singular present indefinite" },
 ];
+
+const HUNGARIAN_PARTICIPLE_SUFFIXES = [
+  { suffix: "va", description: "adverbial participle" },
+  { suffix: "ve", description: "adverbial participle" },
+];
+
+const HUNGARIAN_NOUN_SUFFIXES = [
+  { suffix: "jának", description: "third-person singular possessive dative" },
+  { suffix: "jének", description: "third-person singular possessive dative" },
+  { suffix: "ának", description: "third-person singular possessive dative" },
+  { suffix: "ének", description: "third-person singular possessive dative" },
+  { suffix: "nak", description: "dative singular" },
+  { suffix: "nek", description: "dative singular" },
+  { suffix: "ot", description: "accusative singular" },
+  { suffix: "et", description: "accusative singular" },
+  { suffix: "öt", description: "accusative singular" },
+  { suffix: "t", description: "accusative singular" },
+];
+
+const HUNGARIAN_VERBAL_PREFIXES = [
+  "agyon",
+  "alá",
+  "át",
+  "be",
+  "bele",
+  "el",
+  "ellen",
+  "fel",
+  "felül",
+  "félre",
+  "hátra",
+  "hozzá",
+  "ide",
+  "ki",
+  "körbe",
+  "közbe",
+  "le",
+  "meg",
+  "mellé",
+  "neki",
+  "oda",
+  "össze",
+  "rá",
+  "szét",
+  "tovább",
+  "túl",
+  "újra",
+  "vissza",
+];
+
+const HUNGARIAN_LOCAL_FORMS: Record<
+  string,
+  {
+    sourceTerm: string;
+    formDescription: string;
+    partOfSpeech: string;
+    definition: string;
+  }
+> = {
+  ebben: {
+    sourceTerm: "ez",
+    formDescription: "inessive singular of ez",
+    partOfSpeech: "Pronoun",
+    definition: "in this",
+  },
+};
 
 const DICTIONARY_POS_HEADINGS = new Set([
   "abbreviation",

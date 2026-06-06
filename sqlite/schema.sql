@@ -59,6 +59,7 @@ CREATE TABLE IF NOT EXISTS messages (
   translations      TEXT NOT NULL DEFAULT '{}',   -- JSON
   transliterations  TEXT NOT NULL DEFAULT '{}',   -- JSON
   phonetics         TEXT NOT NULL DEFAULT '{}',   -- JSON
+  filo_doc          TEXT,                          -- JSON: FiloDocumentJson
   corrections       TEXT NOT NULL DEFAULT '[]',   -- JSON
   next_challenge    TEXT,
   is_agent          INTEGER NOT NULL DEFAULT 0,   -- boolean 0/1
@@ -66,6 +67,23 @@ CREATE TABLE IF NOT EXISTS messages (
 );
 
 CREATE INDEX IF NOT EXISTS idx_messages_conversation ON messages(conversation_id, created_at);
+
+CREATE TABLE IF NOT EXISTS audio_assets (
+  audio_id      TEXT PRIMARY KEY,
+  provider      TEXT NOT NULL,
+  language      TEXT,
+  text_hash     TEXT NOT NULL,
+  content_hash  TEXT NOT NULL,
+  mime_type     TEXT NOT NULL,
+  byte_length   INTEGER NOT NULL,
+  audio_base64  TEXT NOT NULL,
+  source        TEXT,                          -- JSON: Source
+  filo_doc      TEXT,                          -- JSON: FiloDocumentJson
+  created_at    TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_audio_assets_text
+  ON audio_assets(provider, language, text_hash);
 
 CREATE TABLE IF NOT EXISTS vocabulary (
   vocab_id            TEXT PRIMARY KEY,
@@ -83,10 +101,14 @@ CREATE TABLE IF NOT EXISTS vocabulary (
   productions         INTEGER NOT NULL DEFAULT 0,
   correct_productions INTEGER NOT NULL DEFAULT 0,
   self_corrected_productions INTEGER NOT NULL DEFAULT 0,
+  heard               INTEGER NOT NULL DEFAULT 0,
+  spoken              INTEGER NOT NULL DEFAULT 0,
   next_review_at      TEXT NOT NULL DEFAULT (datetime('now')),
   last_reviewed_at    TEXT,
   last_encounter_at   TEXT,
   last_produced_at    TEXT,
+  last_heard_at       TEXT,
+  last_spoken_at      TEXT,
   created_at          TEXT NOT NULL DEFAULT (datetime('now')),
   UNIQUE (user_id, language, term)
 );
@@ -173,7 +195,7 @@ CREATE TABLE IF NOT EXISTS review_log (
   item_type      TEXT NOT NULL CHECK (item_type IN ('vocabulary','grammar','concept')),
   item_id        TEXT,
   concept_id     TEXT,
-  event_type     TEXT NOT NULL CHECK (event_type IN ('encounter','production','recall')),
+  event_type     TEXT NOT NULL CHECK (event_type IN ('encounter','production','recall','heard','spoken')),
   outcome        TEXT CHECK (outcome IN ('correct','partial','incorrect')),
   quality        INTEGER CHECK (quality BETWEEN 0 AND 5),
   source         TEXT NOT NULL,
@@ -186,6 +208,32 @@ CREATE TABLE IF NOT EXISTS review_log (
 CREATE INDEX IF NOT EXISTS idx_review_log_user_lang ON review_log(user_id, language, observed_at DESC);
 CREATE INDEX IF NOT EXISTS idx_review_log_item      ON review_log(item_type, item_id);
 CREATE INDEX IF NOT EXISTS idx_review_log_concept   ON review_log(concept_id);
+
+CREATE TABLE IF NOT EXISTS exercise_attempts (
+  attempt_id    TEXT PRIMARY KEY,
+  user_id       TEXT NOT NULL REFERENCES profiles(user_id) ON DELETE CASCADE,
+  language      TEXT NOT NULL,
+  exercise_id   TEXT NOT NULL,
+  item_type     TEXT NOT NULL CHECK (item_type IN ('vocabulary','grammar')),
+  item_id       TEXT,
+  concept_id    TEXT,
+  kind          TEXT NOT NULL,
+  prompt        TEXT NOT NULL,
+  instructions  TEXT NOT NULL,
+  expected      TEXT,
+  answer        TEXT,
+  correct       INTEGER,
+  quality       INTEGER CHECK (quality BETWEEN 0 AND 5),
+  feedback      TEXT,
+  payload       TEXT NOT NULL DEFAULT '{}',
+  created_at    TEXT NOT NULL DEFAULT (datetime('now')),
+  answered_at   TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_exercise_attempts_user_lang
+  ON exercise_attempts(user_id, language, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_exercise_attempts_exercise
+  ON exercise_attempts(user_id, language, exercise_id);
 
 CREATE TABLE IF NOT EXISTS assessments (
   assessment_id   TEXT PRIMARY KEY,

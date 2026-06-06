@@ -1,6 +1,17 @@
 import { session } from "./stores.svelte";
 import { getSupabase } from "./supabase";
 import type { SelfCorrectedSpan } from "../../types/index.ts";
+import type {
+  AgentConnectorPayload,
+  ApiClient,
+  CreateConversationRequest,
+  ExplainErrorsRequest,
+  ItemType,
+  JsonObject,
+  UpdateLanguagesRequest,
+  WorkbenchAnalyzeRequest,
+  WorkbenchInteractionRequest,
+} from "./api-contracts";
 
 const BASE = "/api";
 
@@ -81,7 +92,7 @@ async function refreshSession(): Promise<boolean> {
   return false;
 }
 
-async function request(path: string, options: RequestInit = {}) {
+async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const sess = session.value;
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
@@ -104,7 +115,7 @@ async function request(path: string, options: RequestInit = {}) {
     }
   }
 
-  let data: any;
+  let data: unknown;
   try {
     data = await res.json();
   } catch {
@@ -112,30 +123,34 @@ async function request(path: string, options: RequestInit = {}) {
   }
   if (!res.ok) {
     console.error(`[API] ${method} ${path} → ${res.status}`, data);
-    throw new Error(data.error || `Request failed: ${res.status}`);
+    const message =
+      typeof data === "object" && data !== null && "error" in data && typeof data.error === "string"
+        ? data.error
+        : `Request failed: ${res.status}`;
+    throw new Error(message);
   }
   console.log(`[API] ${method} ${path} → ${res.status}`);
-  return data;
+  return data as T;
 }
 
-export const api = {
+export const api: ApiClient = {
   // Auth
-  signup: (body: Record<string, unknown>) =>
+  signup: (body: JsonObject) =>
     request("/auth/signup", { method: "POST", body: JSON.stringify(body) }),
-  login: (body: Record<string, unknown>) =>
+  login: (body: JsonObject) =>
     request("/auth/login", { method: "POST", body: JSON.stringify(body) }),
   localSession: () => request("/auth/local", { method: "POST" }),
 
   // Profile
   getProfile: () => request("/profile"),
-  updateProfile: (body: Record<string, unknown>) =>
+  updateProfile: (body: JsonObject) =>
     request("/profile", { method: "PATCH", body: JSON.stringify(body) }),
 
   // Conversations
   getConversations: () => request("/conversations"),
-  createConversation: (body: Record<string, unknown>) =>
+  createConversation: (body: CreateConversationRequest) =>
     request("/conversations", { method: "POST", body: JSON.stringify(body) }),
-  updateLanguages: (conversationId: string, body: Record<string, unknown>) =>
+  updateLanguages: (conversationId: string, body: UpdateLanguagesRequest) =>
     request(`/conversations/${conversationId}/languages`, {
       method: "PATCH",
       body: JSON.stringify(body),
@@ -157,10 +172,7 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ text, language }),
     }),
-  explainErrors: (
-    conversationId: string,
-    body: { text: string; errors: any[]; language: string; intent?: string },
-  ) =>
+  explainErrors: (conversationId: string, body: ExplainErrorsRequest) =>
     request(`/messages/${conversationId}/explain`, {
       method: "POST",
       body: JSON.stringify(body),
@@ -211,9 +223,9 @@ export const api = {
 
   // Agent connectors
   getAgentConnectors: () => request("/agent-connectors"),
-  createAgentConnector: (body: Record<string, unknown>) =>
+  createAgentConnector: (body: AgentConnectorPayload) =>
     request("/agent-connectors", { method: "POST", body: JSON.stringify(body) }),
-  updateAgentConnector: (connectorId: string, body: Record<string, unknown>) =>
+  updateAgentConnector: (connectorId: string, body: Partial<AgentConnectorPayload>) =>
     request(`/agent-connectors/${connectorId}`, { method: "PATCH", body: JSON.stringify(body) }),
   deleteAgentConnector: (connectorId: string) =>
     request(`/agent-connectors/${connectorId}`, { method: "DELETE" }),
@@ -232,21 +244,13 @@ export const api = {
     const qs = params ? `?${new URLSearchParams(params).toString()}` : "";
     return request(`/profile/dimension/${language}/${dimension}${qs}`);
   },
-  getProfileItem: (itemType: "vocabulary" | "grammar", itemId: string, language?: string) =>
+  getProfileItem: (itemType: ItemType, itemId: string, language?: string) =>
     request(`/profile/item/${itemType}/${encodeURIComponent(itemId)}${profileItemQuery(language)}`),
-  getProfileItemReference: (
-    itemType: "vocabulary" | "grammar",
-    itemId: string,
-    language?: string,
-  ) =>
+  getProfileItemReference: (itemType: ItemType, itemId: string, language?: string) =>
     request(
       `/profile/item/${itemType}/${encodeURIComponent(itemId)}/reference${profileItemQuery(language)}`,
     ),
-  fetchProfileItemAudio: async (
-    itemType: "vocabulary" | "grammar",
-    itemId: string,
-    language?: string,
-  ) => {
+  fetchProfileItemAudio: async (itemType: ItemType, itemId: string, language?: string) => {
     const sess = session.value;
     const headers: Record<string, string> = sess
       ? { Authorization: `Bearer ${sess.access_token}` }
@@ -268,8 +272,19 @@ export const api = {
     const blob = await res.blob();
     return URL.createObjectURL(blob);
   },
-  lookupDictionary: (term: string, language: string) =>
-    request(`/dictionary?${new URLSearchParams({ term, language }).toString()}`),
+  lookupDictionary: (term: string, language: string, options?: { recordSeen?: boolean }) => {
+    const params = new URLSearchParams({ term, language });
+    if (options?.recordSeen) params.set("record_seen", "1");
+    return request(`/dictionary?${params.toString()}`);
+  },
+  translateDictionary: (term: string, sourceLanguage: string, targetLanguage: string) =>
+    request(
+      `/dictionary/translations?${new URLSearchParams({
+        term,
+        source_language: sourceLanguage,
+        target_language: targetLanguage,
+      }).toString()}`,
+    ),
   fetchDictionaryAudio: async (term: string, language: string) => {
     const sess = session.value;
     const headers: Record<string, string> = sess
@@ -293,12 +308,80 @@ export const api = {
     return URL.createObjectURL(blob);
   },
 
+  analyzeWorkbench: (body: WorkbenchAnalyzeRequest) =>
+    request("/workbench/analyze", { method: "POST", body: JSON.stringify(body) }),
+  fetchWorkbenchAudio: async (text: string, language?: string) => {
+    const sess = session.value;
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      ...(sess ? { Authorization: `Bearer ${sess.access_token}` } : {}),
+    };
+    const res = await fetch(`${BASE}/workbench/audio`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ text, language }),
+    });
+    if (!res.ok) {
+      let msg = `${res.status} ${res.statusText}`;
+      try {
+        const body = await res.json();
+        if (body?.error) msg = body.error;
+      } catch {
+        // body wasn't JSON — keep the status line
+      }
+      throw new Error(msg);
+    }
+    const blob = await res.blob();
+    return {
+      url: URL.createObjectURL(blob),
+      audioId: res.headers.get("X-Langouste-Audio-Id"),
+      contentType: blob.type || res.headers.get("Content-Type") || "audio/mpeg",
+      byteLength: blob.size,
+    };
+  },
+  recordWorkbenchInteraction: (body: WorkbenchInteractionRequest) =>
+    request("/workbench/interactions", { method: "POST", body: JSON.stringify(body) }),
+
+  // Exercises
+  getExerciseSession: (
+    language: string,
+    limit = 8,
+    options: {
+      targetLexemes?: string[];
+      targetConceptIds?: string[];
+      targetGrammarTags?: string[];
+      exerciseKinds?: string[];
+      deterministicOnly?: boolean;
+    } = {},
+  ) => {
+    const params = new URLSearchParams({ limit: String(limit) });
+    if (options.targetLexemes?.length) params.set("lexeme", options.targetLexemes.join(","));
+    if (options.targetConceptIds?.length) params.set("concept", options.targetConceptIds.join(","));
+    if (options.targetGrammarTags?.length)
+      params.set("grammar", options.targetGrammarTags.join(","));
+    if (options.exerciseKinds?.length) params.set("kind", options.exerciseKinds.join(","));
+    if (options.deterministicOnly != null) {
+      params.set("deterministic", options.deterministicOnly ? "1" : "0");
+    }
+    return request(`/exercises/session/${encodeURIComponent(language)}?${params}`);
+  },
+  submitExerciseAttempt: (attemptId: string, body: { answer: string }) =>
+    request(`/exercises/attempts/${encodeURIComponent(attemptId)}`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+  getExerciseHistory: (language: string, limit = 20) =>
+    request(`/exercises/history/${encodeURIComponent(language)}?limit=${limit}`),
+
+  // Resources
+  getLanguageResources: () => request("/resources"),
+
   // Review
   getDueReview: (language: string) => request(`/review/due/${language}`),
   getFSRSConfig: (language: string) => request(`/review/fsrs/${language}`),
-  updateFSRSConfig: (language: string, body: Record<string, unknown>) =>
+  updateFSRSConfig: (language: string, body: JsonObject) =>
     request(`/review/fsrs/${language}`, { method: "PATCH", body: JSON.stringify(body) }),
-  tuneFSRSConfig: (language: string, body: Record<string, unknown> = {}) =>
+  tuneFSRSConfig: (language: string, body: JsonObject = {}) =>
     request(`/review/fsrs/${language}/tune`, { method: "POST", body: JSON.stringify(body) }),
   reviewVocabulary: (vocabId: string, quality: number) =>
     request(`/review/vocabulary/${vocabId}`, { method: "POST", body: JSON.stringify({ quality }) }),

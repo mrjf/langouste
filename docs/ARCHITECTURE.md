@@ -10,7 +10,8 @@ How Langouste is put together, where the seams are, and what the interesting bit
 │                                                                  │
 │   ConversationList   ChatThread   MessageInput   Review   …     │
 │            │              │             │           │            │
-│            └──── Supabase Realtime ─────┘           │            │
+│            └──── Realtime subscription ─┘           │            │
+│                 (Supabase mode only)                │            │
 │                                                     │            │
 └──────────────────────────┬──────────────────────────┼────────────┘
                            │ /api                     │
@@ -36,7 +37,7 @@ How Langouste is put together, where the seams are, and what the interesting bit
 │                                                     │            │
 │  services/spellcheck/     local nspell              │            │
 │  services/spaced-rep/     FSRS concept scheduler    │            │
-│  services/database/       Supabase client           │            │
+│  services/database/       Database interface        │            │
 │                                                     │            │
 │  mcp/                     expose tools to any host  │            │
 │    server.ts              stdio or HTTP             │            │
@@ -49,7 +50,7 @@ How Langouste is put together, where the seams are, and what the interesting bit
       ~/.../Langouste/langouste.db            Postgres + RLS + Realtime + Auth
 ```
 
-The backend is stateless except for per-connector agent connections cached in memory (`services/agents/factory.ts`). Auth, persistence, and (optional) pub/sub are owned by whichever backend `DATABASE_MODE` selects.
+The backend is stateless except for per-connector agent connections cached in memory (`services/agents/factory.ts`). Auth, persistence, and optional pub/sub are owned by whichever backend `DATABASE_MODE` selects. The current local/dev `.env.example` uses `sqlite`; Supabase is the hosted/multi-user mode.
 
 The two modes are explained in [MODES.md](./MODES.md); this doc covers the shared architecture.
 
@@ -60,12 +61,12 @@ The two modes are explained in [MODES.md](./MODES.md); this doc covers the share
 - Authoritative on UI state only. Never mutates domain data directly — always via `/api`.
 - Uses runes (`$state`, `$derived`, `$effect`) consistently; no legacy Svelte 4 syntax.
 - Per-conversation message cache in memory so conversation switching is instant.
-- Subscribes to Supabase Realtime for incoming messages from the agent.
+- In Supabase mode, subscribes to Supabase Realtime for incoming messages from the agent. In SQLite mode, this is a no-op and the client refreshes through normal API reads.
 
 ### Hono backend
 
 - Thin route handlers delegating to service modules. No business logic in routes beyond auth/validation.
-- Middleware: `requireAuth` (verifies Supabase JWT, injects `userId` and a scoped `SupabaseClient`).
+- Middleware: `requireAuth` verifies either a Supabase JWT (`supabase` mode) or a local HS256 JWT (`sqlite` mode), then injects `userId` and a scoped `Database`.
 - Streaming endpoint (Phase 0) uses Server-Sent Events. Hono has first-class `streamSSE` — we use it.
 
 ### `services/ai/`
@@ -107,9 +108,9 @@ Provider pattern, fully local.
 
 ### `services/database/`
 
-Every database interaction goes through here. Routes never touch `SupabaseClient` directly (beyond the middleware-injected one).
+Every database interaction goes through here. Routes never touch `SupabaseClient` directly except for Supabase-mode auth/session handling in `routes/middleware.ts` and `routes/api/auth.ts`.
 
-Why: if we move off Supabase later, the surface of work is a handful of files instead of the whole app.
+Why: local SQLite and hosted Supabase share the same route/service layer. If we change backends later, the surface of work is a handful of files instead of the whole app.
 
 ### `mcp/` (Phase 3)
 
@@ -249,7 +250,8 @@ Dev:
 
 Infra:
 
-- Supabase (local via docker-compose, managed in prod).
+- SQLite for local/dev mode.
+- Supabase for hosted/multi-user mode (local via Supabase CLI or managed in prod).
 - Docker (Phase 4 sandbox).
 
 Removed from scope: ollama, langchain, any ORM. Keep the deps tight.
