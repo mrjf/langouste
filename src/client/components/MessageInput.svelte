@@ -209,13 +209,12 @@
           class="editable"
           contenteditable="true"
           spellcheck="false"
-          autocorrect="off"
-          autocapitalize="off"
           bind:this={editableEl}
           oninput={handleInput}
           onkeydown={handleKeydown}
           role="textbox"
           aria-multiline="true"
+          tabindex="0"
           data-placeholder="Write in {langTag(detectedLang)}..."
         ></div>
       </div>
@@ -604,11 +603,6 @@
     color: var(--color-success, #27ae60);
     font-size: 0.82rem;
     margin-left: 0.3rem;
-  }
-
-  .hint-suggestions {
-    color: var(--color-success, #27ae60);
-    font-size: 0.78rem;
   }
 
   .hint-explanation {

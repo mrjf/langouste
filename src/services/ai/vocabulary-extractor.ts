@@ -62,7 +62,11 @@ export async function extractVocabulary(
   if (config.stubAi) {
     const stub = testRegistry.getVocabResponse(input.text);
     return {
-      new_vocabulary: stub.new_vocabulary ?? [],
+      new_vocabulary: (stub.new_vocabulary ?? []).map((item) => ({
+        ...item,
+        context_sentence: item.context_sentence ?? input.text,
+        cefr_level: allowedCefrLevel(item.cefr_level),
+      })),
       grammar_gaps_detected: stub.grammar_gaps_detected ?? [],
       next_challenge: stub.next_challenge ?? "",
     };
@@ -121,4 +125,20 @@ Any text inside backticks (\`like this\`) is a literal the user marked as not-to
     grammar_gaps_detected: result.grammar_gaps_detected ?? [],
     next_challenge: result.next_challenge ?? "",
   };
+}
+
+function allowedCefrLevel(
+  value: string | null | undefined,
+): VocabularyExtractionOutput["new_vocabulary"][number]["cefr_level"] {
+  if (
+    value === "A1" ||
+    value === "A2" ||
+    value === "B1" ||
+    value === "B2" ||
+    value === "C1" ||
+    value === "C2"
+  ) {
+    return value;
+  }
+  return null;
 }

@@ -1,5 +1,8 @@
+import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { copyFile, rename, stat } from "node:fs/promises";
 import { basename, dirname, extname, join, resolve } from "node:path";
+import { dataPath } from "../../lib/data-dir.ts";
 import { adminDb } from "../../lib/db/index.ts";
 import type { AudioProvider } from "../ai/audio/index.ts";
 import { getAudioProvider } from "../ai/audio/index.ts";
@@ -18,9 +21,9 @@ import {
   ClaudeSourceSentenceExtractor,
   type SourceSentenceExtractor,
 } from "./sentence-extractor.ts";
-import type { PimsleurTapeDocuments } from "./types.ts";
+import type { AudioDrillTapeDocuments } from "./types.ts";
 
-export interface BuildPimsleurTapeInput {
+export interface BuildAudioDrillTapeInput {
   sourceUrl: string;
   outputDir: string;
   sourceLanguage: string;
@@ -30,16 +33,23 @@ export interface BuildPimsleurTapeInput {
   renderAudio?: boolean;
   maxItems?: number;
   pauseMs?: number;
+  wordPauseMs?: number;
   phraseMaxWords?: number;
   phrasePauseMs?: number;
+  normalizeAudio?: boolean;
+  targetLufs?: number;
+  truePeakDb?: number;
+  loudnessRange?: number;
+  shortClipThresholdMs?: number;
+  sourceClipPaddingMs?: number;
   transcriptionProvider?: TranscriptionProvider;
   translationProvider?: TranslationProvider;
   audioProvider?: AudioProvider;
   sentenceExtractor?: SourceSentenceExtractor;
 }
 
-export interface BuildPimsleurTapeResult {
-  documents: PimsleurTapeDocuments;
+export interface BuildAudioDrillTapeResult {
+  documents: AudioDrillTapeDocuments;
   sourceAudioPath: string;
   transcriptPath: string;
   sourceFiloPath: string;
@@ -47,9 +57,9 @@ export interface BuildPimsleurTapeResult {
   outputAudioPath?: string;
 }
 
-export async function buildPimsleurTape(
-  input: BuildPimsleurTapeInput,
-): Promise<BuildPimsleurTapeResult> {
+export async function buildAudioDrillTape(
+  input: BuildAudioDrillTapeInput,
+): Promise<BuildAudioDrillTapeResult> {
   const outputDir = resolve(input.outputDir);
   await mkdir(outputDir, { recursive: true });
 
@@ -102,6 +112,7 @@ export async function buildPimsleurTape(
     sourceAudioPath,
     maxItems: input.maxItems,
     pauseMs: input.pauseMs,
+    wordPauseMs: input.wordPauseMs,
   });
 
   let outputAudioPath: string | undefined;
@@ -111,6 +122,12 @@ export async function buildPimsleurTape(
       outputDir,
       audioProvider: input.audioProvider ?? getAudioProvider(),
       db: adminDb(),
+      normalizeAudio: input.normalizeAudio,
+      targetLufs: input.targetLufs,
+      truePeakDb: input.truePeakDb,
+      loudnessRange: input.loudnessRange,
+      shortClipThresholdMs: input.shortClipThresholdMs,
+      sourceClipPaddingMs: input.sourceClipPaddingMs,
     });
     lesson = rendered.lesson;
     outputAudioPath = rendered.outputPath;
@@ -130,12 +147,130 @@ export async function buildPimsleurTape(
 }
 
 export async function downloadAudioFile(url: string, outputPath: string): Promise<void> {
+  const resolvedOutputPath = resolve(outputPath);
+  if (await hasUsableFile(resolvedOutputPath)) {
+    await seedDownloadCache(url, resolvedOutputPath);
+    return;
+  }
+
+  const cached = await cachedDownloadPath(url);
+  if (cached) {
+    await mkdir(dirname(resolvedOutputPath), { recursive: true });
+    await copyFile(cached, resolvedOutputPath);
+    return;
+  }
+
   const res = await fetch(url);
   if (!res.ok) {
     throw new Error(`Failed to download ${url}: ${res.status} ${res.statusText}`);
   }
-  await mkdir(dirname(outputPath), { recursive: true });
-  await writeFile(outputPath, new Uint8Array(await res.arrayBuffer()));
+
+  const audio = new Uint8Array(await res.arrayBuffer());
+  const cachedPath = await storeDownloadedBytes(url, audio, res.headers.get("content-type"));
+  await mkdir(dirname(resolvedOutputPath), { recursive: true });
+  await copyFile(cachedPath, resolvedOutputPath);
+}
+
+async function cachedDownloadPath(url: string): Promise<string | null> {
+  const paths = downloadCachePaths(url);
+  return (await hasUsableFile(paths.filePath)) ? paths.filePath : null;
+}
+
+async function seedDownloadCache(url: string, sourcePath: string): Promise<void> {
+  const paths = downloadCachePaths(url);
+  if (await hasUsableFile(paths.filePath)) return;
+  await mkdir(paths.dir, { recursive: true });
+  const tempPath = `${paths.filePath}.${process.pid}.${Date.now()}.tmp`;
+  await copyFile(sourcePath, tempPath);
+  await renameOrIgnoreExisting(tempPath, paths.filePath);
+  const bytes = await readFile(paths.filePath);
+  await writeDownloadMetadata(url, paths.metadataPath, bytes, null);
+}
+
+async function storeDownloadedBytes(
+  url: string,
+  audio: Uint8Array,
+  contentType: string | null,
+): Promise<string> {
+  const paths = downloadCachePaths(url);
+  await mkdir(paths.dir, { recursive: true });
+  const tempPath = `${paths.filePath}.${process.pid}.${Date.now()}.tmp`;
+  await writeFile(tempPath, audio);
+  await renameOrIgnoreExisting(tempPath, paths.filePath);
+  const bytes = await readFile(paths.filePath);
+  await writeDownloadMetadata(url, paths.metadataPath, bytes, contentType);
+  return paths.filePath;
+}
+
+async function renameOrIgnoreExisting(tempPath: string, finalPath: string): Promise<void> {
+  try {
+    await rename(tempPath, finalPath);
+  } catch (err) {
+    if (errorCode(err) !== "EEXIST") throw err;
+  }
+}
+
+async function writeDownloadMetadata(
+  url: string,
+  metadataPath: string,
+  bytes: Uint8Array,
+  contentType: string | null,
+): Promise<void> {
+  await writeFile(
+    metadataPath,
+    `${JSON.stringify(
+      {
+        url,
+        contentType,
+        byteLength: bytes.byteLength,
+        contentHash: sha256Bytes(bytes),
+        cachedAt: new Date().toISOString(),
+      },
+      null,
+      2,
+    )}\n`,
+  );
+}
+
+function downloadCachePaths(url: string): { dir: string; filePath: string; metadataPath: string } {
+  const dir = dataPath("downloads");
+  const key = sha256Text(url);
+  const extension = extensionFromUrl(url);
+  return {
+    dir,
+    filePath: join(dir, `${key}${extension}`),
+    metadataPath: join(dir, `${key}.json`),
+  };
+}
+
+function extensionFromUrl(url: string): string {
+  const extension = extname(new URL(url).pathname)
+    .replace(/[^a-z0-9.]/gi, "")
+    .toLowerCase();
+  return extension || ".bin";
+}
+
+async function hasUsableFile(path: string): Promise<boolean> {
+  try {
+    return (await stat(path)).size > 0;
+  } catch (err) {
+    if (errorCode(err) === "ENOENT") return false;
+    throw err;
+  }
+}
+
+function errorCode(err: unknown): string | undefined {
+  return typeof err === "object" && err !== null && "code" in err
+    ? String((err as { code: unknown }).code)
+    : undefined;
+}
+
+function sha256Text(value: string): string {
+  return createHash("sha256").update(value, "utf8").digest("hex");
+}
+
+function sha256Bytes(value: Uint8Array): string {
+  return createHash("sha256").update(value).digest("hex");
 }
 
 async function readTranscript(path: string): Promise<TimedTranscript> {

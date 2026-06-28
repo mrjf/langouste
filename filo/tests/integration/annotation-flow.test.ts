@@ -11,7 +11,7 @@ import {
 
 const hungarianText = "Számos README található szétszórva ebben a könyvtárban.";
 
-describe("Langouste annotation flow", () => {
+describe("annotation flow", () => {
   test("layers words, dictionary lookups, phrase translations, and audio links", async () => {
     const document = FiloDocument.fromText(hungarianText, {
       id: "message-1",

@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import type { FiloDocumentJson } from "../../../filo/src/types";
+import type { FiloDocumentJson } from "filo";
 import type { Database } from "../../lib/db/index.ts";
 
 export interface Source {

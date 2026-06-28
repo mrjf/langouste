@@ -1,10 +1,9 @@
 import { createHash } from "node:crypto";
 import type { Database } from "../../lib/db/index.ts";
 import { languageName } from "../../lib/languages.ts";
-import type { CefrLevel, GrammarGap, LanguageCode, VocabularyItem } from "../../types/index.ts";
+import type { CefrLevel, LanguageCode, VocabularyItem } from "../../types/index.ts";
 import { getDueGrammarGaps } from "../database/grammar-gaps.ts";
 import { getDueVocabulary } from "../database/vocabulary.ts";
-import { grammarDescriptionForCategory } from "../profile/grammar-ontology.ts";
 import {
   recordInteraction,
   type EventType,
@@ -366,30 +365,6 @@ const EXERCISE_KINDS = new Set<ExerciseKind>([
   "grammar_focus",
   "level_target",
 ]);
-
-const GRAMMAR_CHOICE_DISTRACTORS = [
-  "u:syntax:agreement.subject-verb",
-  "u:syntax:determiner.definiteness",
-  "u:syntax:word-order.adjective",
-  "u:syntax:word-order.object",
-  "u:syntax:word-order.question",
-  "u:syntax:word-order.verb",
-  "u:syntax:adposition.selection",
-  "u:syntax:clause.relative",
-  "u:syntax:clause.subordination",
-  "u:syntax:relative-pronoun",
-  "u:syntax:negation.placement",
-  "verb:conjugation",
-  "verb:tense",
-  "noun:gender",
-  "noun:number",
-  "article:definiteness",
-  "article:gender",
-  "adjective:agreement",
-  "spelling:diacritics",
-  "address:formal_informal",
-  "discourse:connectors",
-];
 
 const CEFR_TRANSLATION_BLUEPRINTS: Record<CefrLevel, LevelTranslationBlueprint[]> = {
   A1: [
@@ -1012,152 +987,6 @@ function spellingRecallCandidate(
   };
 }
 
-function useTargetWordCandidate(
-  language: LanguageCode,
-  targetLanguage: string,
-  item: VocabularyItem,
-  reason: string,
-  priority: number,
-): Candidate {
-  return {
-    kind: "use_target_word",
-    itemType: "vocabulary",
-    itemId: item.vocab_id,
-    conceptId: item.concept_id,
-    language,
-    cefrLevel: item.cefr_level,
-    prompt: `Write one ${targetLanguage} sentence using this word or phrase: ${item.term}`,
-    instructions:
-      "Use the item naturally in a complete sentence. This is recorded as production practice.",
-    expected: null,
-    reason,
-    priority,
-    payload: {
-      kind: "use_target_word",
-      itemType: "vocabulary",
-      responseMode: "open",
-      eventType: "production",
-      lookupKey: item.term,
-      label: item.term,
-      expected: null,
-      alternatives: [],
-      targetInstructions: targetInstructionFor("use_target_word", language),
-      translation: item.translation,
-      conceptId: item.concept_id ?? undefined,
-      cefrLevel: item.cefr_level,
-      ...templateMetadata("production.use-target-word", {
-        cefrLevel: item.cefr_level,
-        lexicalItemIds: [item.vocab_id],
-        factors: ["production", "ungraded without parser or human review"],
-      }),
-      reason,
-    },
-  };
-}
-
-function grammarConceptChoiceCandidate(
-  language: LanguageCode,
-  targetLanguage: string,
-  gap: GrammarGap,
-  priority: number,
-): Candidate | null {
-  const expected = grammarLabel(gap, language);
-  const distractors = GRAMMAR_CHOICE_DISTRACTORS.filter((category) => category !== gap.category)
-    .map((category) => grammarDescriptionForCategory(category, language))
-    .filter(Boolean);
-  const options = stableOptions([expected, ...distractors], gap.gap_id, 4);
-  if (options.length < 2) return null;
-  const conceptId = gap.concept_id ?? `${language}:grammar:${gap.category}`;
-  const reason = `Due grammar: ${expected}`;
-
-  return {
-    kind: "grammar_concept_choice",
-    itemType: "grammar",
-    itemId: gap.gap_id,
-    conceptId,
-    language,
-    cefrLevel: null,
-    prompt: `Which grammar focus matches this ${targetLanguage} issue: ${gap.description}`,
-    instructions: "Choose the grammar category this practice should target.",
-    expected,
-    reason,
-    priority,
-    payload: {
-      kind: "grammar_concept_choice",
-      itemType: "grammar",
-      responseMode: "choice",
-      eventType: "recall",
-      lookupKey: gap.category,
-      label: expected,
-      expected,
-      alternatives: [expected],
-      options,
-      targetInstructions: targetInstructionFor("grammar_concept_choice", language),
-      description: gap.description,
-      conceptId,
-      grammarTags: [gap.category],
-      ...templateMetadata("grammar.category-choice", {
-        cefrLevel: null,
-        grammarTags: [gap.category],
-        typologyFeatures: [gap.category],
-        factors: ["recognition", "grammar category", "known weak spot"],
-      }),
-      reason,
-    },
-  };
-}
-
-function grammarGapProductionCandidate(
-  language: LanguageCode,
-  targetLanguage: string,
-  gap: GrammarGap,
-  kind: "error_repair" | "form_focus",
-  priority: number,
-): Candidate {
-  const label = grammarLabel(gap, language);
-  const conceptId = gap.concept_id ?? `${language}:grammar:${gap.category}`;
-  const isRepair = kind === "error_repair";
-  const templateId: TemplateId = isRepair ? "grammar.error-repair" : "grammar.form-focus";
-  return {
-    kind,
-    itemType: "grammar",
-    itemId: gap.gap_id,
-    conceptId,
-    language,
-    cefrLevel: null,
-    prompt: isRepair
-      ? `Write one natural ${targetLanguage} sentence that avoids this issue: ${gap.description}`
-      : `Write one ${targetLanguage} sentence focusing on: ${label}`,
-    instructions: isRepair
-      ? "Produce a short sentence and pay attention to the named grammar issue."
-      : "Keep the sentence simple so the target form is the main focus.",
-    expected: null,
-    reason: `Due grammar: ${label}`,
-    priority,
-    payload: {
-      kind,
-      itemType: "grammar",
-      responseMode: "open",
-      eventType: "production",
-      lookupKey: gap.category,
-      label,
-      expected: null,
-      alternatives: [],
-      targetInstructions: targetInstructionFor(kind, language),
-      description: gap.description,
-      conceptId,
-      grammarTags: [gap.category],
-      ...templateMetadata(templateId, {
-        cefrLevel: null,
-        grammarTags: [gap.category],
-        typologyFeatures: [gap.category],
-        factors: ["production", "ungraded without parser or human review", "known weak spot"],
-      }),
-      reason: `Due grammar: ${label}`,
-    },
-  };
-}
-
 function catalogTranslationCandidate(
   language: LanguageCode,
   targetLanguage: string,
@@ -1471,24 +1300,6 @@ function vocabularyMatchesOptions(
   return true;
 }
 
-function grammarGapMatchesOptions(
-  gap: GrammarGap,
-  options: NormalizedExerciseSessionOptions,
-): boolean {
-  if (options.targetLexemes.size > 0) return false;
-  if (
-    options.targetGrammarTags.size > 0 &&
-    !options.targetGrammarTags.has(normalizeAnswer(gap.category))
-  ) {
-    return false;
-  }
-  if (options.targetConceptIds.size > 0) {
-    const ids = stringValues([gap.gap_id, gap.concept_id, gap.category]);
-    if (!ids.some((id) => options.targetConceptIds.has(normalizeAnswer(id)))) return false;
-  }
-  return true;
-}
-
 function templateMetadata(
   templateId: TemplateId,
   input: {
@@ -1620,26 +1431,6 @@ function vocabularyPriority(
     (item.repetitions <= 1 ? 6 : 0) +
     (item.correct_productions === 0 ? 6 : 0);
   return 46 + (dueVocabIds.has(item.vocab_id) ? 18 : 0) + levelFit + weakScore;
-}
-
-function grammarGapPriority(gap: GrammarGap): number {
-  const weakScore =
-    Math.min(12, gap.error_count * 3) +
-    (gap.productions === 0 ? 6 : 0) +
-    (gap.correct_productions === 0 ? 6 : 0);
-  return 50 + weakScore;
-}
-
-function grammarLabel(gap: GrammarGap, language: LanguageCode): string {
-  return grammarDescriptionForCategory(gap.category, language) || humanizeKey(gap.category);
-}
-
-function humanizeKey(value: string): string {
-  return value
-    .split(/[:._\s-]+/u)
-    .filter(Boolean)
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
 }
 
 function wordShapeHint(value: string): string {

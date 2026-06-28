@@ -8,6 +8,9 @@ export interface NormalizedVocabularyTerm {
   source_term: string | null;
   form_description: string | null;
   definition: string | null;
+  lookup_source: "wiktionary" | "local" | null;
+  lookup_status: "found" | "not-found" | "error";
+  lookup_error: string | null;
 }
 
 interface VocabularyRow {
@@ -61,16 +64,45 @@ export async function normalizeVocabularyTerm(
       source_term: null,
       form_description: null,
       definition: null,
+      lookup_source: null,
+      lookup_status: "not-found",
+      lookup_error: null,
     };
   }
 
-  const lookup = await lookupDictionary(original, language).catch(() => null);
+  let lookup: Awaited<ReturnType<typeof lookupDictionary>> | null = null;
+  let lookupError: string | null = null;
+  try {
+    lookup = await lookupDictionary(original, language);
+  } catch (err) {
+    lookupError = err instanceof Error ? err.message : String(err);
+  }
+
+  if (lookupError) {
+    return {
+      original,
+      term: normalizeLemmaSurface(original, language),
+      language,
+      source_term: null,
+      form_description: null,
+      definition: null,
+      lookup_source: null,
+      lookup_status: "error",
+      lookup_error: lookupError,
+    };
+  }
+
   const lemma =
     lemmaFromFormDescription(lookup?.form_description, original) ??
     (usesSourceTermAsLemma(lookup?.form_description)
       ? distinctLemma(lookup?.source_term, original, language)
       : null) ??
     original;
+  const hasEntry = !!(
+    lookup?.definitions?.length ||
+    lookup?.source_term ||
+    lookup?.form_description
+  );
 
   return {
     original,
@@ -79,6 +111,9 @@ export async function normalizeVocabularyTerm(
     source_term: lookup?.source_term ?? null,
     form_description: lookup?.form_description ?? null,
     definition: lookup?.definitions?.[0] ?? null,
+    lookup_source: lookup?.source ?? (hasEntry ? "local" : null),
+    lookup_status: hasEntry ? "found" : "not-found",
+    lookup_error: null,
   };
 }
 

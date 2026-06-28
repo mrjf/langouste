@@ -1,6 +1,10 @@
-import { annotatePhonetic } from "../../../filo/src/annotators/phonetic";
-import type { FiloDocument } from "../../../filo/src/document";
-import type { ByteRange, FiloAnnotation, PhoneticPayload } from "../../../filo/src/types";
+import {
+  annotatePhonetic,
+  type ByteRange,
+  type FiloAnnotation,
+  type FiloDocument,
+  type PhoneticPayload,
+} from "filo";
 import { transliterateText } from "../../../lit/src";
 
 export interface IpaLayerInput extends ByteRange {

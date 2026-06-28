@@ -5,7 +5,7 @@ Langouste has two complementary views over the same universal language ontology:
 1. **Learner profile** — what a user has seen, produced, missed, reviewed, and mastered.
 2. **Language reference** — how a language itself works across the same dimensions.
 
-The learner profile answers: "What does Russ know about Hungarian definite conjugation?"
+The learner profile answers: "What does this learner know about Hungarian definite conjugation?"
 
 The language reference answers: "How does Hungarian definite conjugation work, where does it sit in the universal feature system, how is it expressed, what examples show it, and which high-quality sources explain it?"
 

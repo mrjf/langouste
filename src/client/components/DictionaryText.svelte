@@ -189,6 +189,7 @@
     const seededLookup = lookupFromFilo(segment);
     if (!lookups[key] && seededLookup) lookups = { ...lookups, [key]: seededLookup };
     if (loading[key] || hasFullDictionaryEntry(lookups[key])) return;
+    errors = { ...errors, [key]: "" };
     loading = { ...loading, [key]: true };
     try {
       const lookupKey = keyFor(lookupTerm);
@@ -199,8 +200,11 @@
       lookups = { ...lookups, [key]: result };
     } catch (err) {
       lookupCache.delete(keyFor(lookupTerm));
-      errors = { ...errors, [key]: err instanceof Error ? err.message : String(err) };
-      lookups = { ...lookups, [key]: null };
+      if (seededLookup || hasDictionaryEntry(lookups[key])) {
+        lookups = { ...lookups, [key]: lookups[key] ?? seededLookup };
+      } else {
+        lookups = { ...lookups, [key]: null };
+      }
     } finally {
       loading = { ...loading, [key]: false };
     }

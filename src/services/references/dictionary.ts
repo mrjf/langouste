@@ -59,6 +59,9 @@ export function lookupDictionary(term: string, language: string): Promise<Dictio
 
 async function buildLookup(term: string, language: string): Promise<DictionaryLookup> {
   if (!term) return emptyLookup(term, language);
+  const localLookup = localFallbackLookup(term, language);
+  if (localLookup) return localLookup;
+
   const candidates = lookupCandidates(term, language);
   let formLookup: DictionaryLookup | null = null;
 
@@ -86,8 +89,6 @@ async function buildLookup(term: string, language: string): Promise<DictionaryLo
   }
 
   if (formLookup) return formLookup;
-  const localLookup = localFallbackLookup(term, language);
-  if (localLookup) return localLookup;
   return emptyLookup(term, language);
 }
 
@@ -586,11 +587,29 @@ const HUNGARIAN_LOCAL_FORMS: Record<
     definition: string;
   }
 > = {
+  az: {
+    sourceTerm: "az",
+    formDescription: "definite article",
+    partOfSpeech: "Article",
+    definition: "the (for words beginning with a vowel)",
+  },
   ebben: {
     sourceTerm: "ez",
     formDescription: "inessive singular of ez",
     partOfSpeech: "Pronoun",
     definition: "in this",
+  },
+  egyenleged: {
+    sourceTerm: "egyenleg",
+    formDescription: "second-person singular possessive of egyenleg",
+    partOfSpeech: "Noun",
+    definition: "your balance",
+  },
+  visszaáll: {
+    sourceTerm: "visszaáll",
+    formDescription: "prefixed verb",
+    partOfSpeech: "Verb",
+    definition: "to reset, restore, or return to a previous state",
   },
 };
 

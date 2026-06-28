@@ -16,6 +16,9 @@ const GRAMMAR_CATEGORIES: GrammarCategory[] = [
   generic("verb:mood", "morphology"),
   generic("verb:passé_composé", "morphology", "Passé composé verb formation."),
   generic("verb:tense", "morphology"),
+  generic("person:first", "morphology", "First-person forms and reference."),
+  generic("person:second", "morphology", "Second-person forms and reference."),
+  generic("person:third", "morphology", "Third-person forms and reference."),
   generic("noun:case", "morphology"),
   generic("noun:gender", "morphology"),
   generic("noun:number", "morphology"),
@@ -38,6 +41,7 @@ const GRAMMAR_CATEGORIES: GrammarCategory[] = [
   universal("u:syntax:clause.subordination", "Subordinate clause formation."),
   universal("u:syntax:relative-pronoun", "Relative pronoun selection."),
   universal("u:syntax:negation.placement", "Negation placement."),
+  universal("sentence:mood.interrogative", "Interrogative sentence mood."),
   languageSpecific("fr:syntax:preposition.a-vs-de", ["fr"], "Choosing between à and de."),
 
   // Orthography
@@ -52,6 +56,8 @@ const GRAMMAR_CATEGORIES: GrammarCategory[] = [
   // Pragmatics
   generic("address:formal_informal", "pragmatics", "Formal vs. informal address."),
   generic("formality:register", "pragmatics"),
+  generic("pragmatics:greeting", "pragmatics", "Greeting formulae."),
+  generic("pragmatics:farewell", "pragmatics", "Farewell formulae."),
   generic("politeness:formula", "pragmatics"),
 
   // Discourse
@@ -74,6 +80,15 @@ const CATEGORY_ALIASES = new Map<string, string>([
   ["clause:subordination", "u:syntax:clause.subordination"],
   ["relative:pronoun", "u:syntax:relative-pronoun"],
   ["negation:placement", "u:syntax:negation.placement"],
+  ["negation", "u:syntax:negation.placement"],
+  ["question", "sentence:mood.interrogative"],
+  ["question:sentence", "sentence:mood.interrogative"],
+  ["interrogative", "sentence:mood.interrogative"],
+  ["sentence:interrogative", "sentence:mood.interrogative"],
+  ["first_person", "person:first"],
+  ["person:1", "person:first"],
+  ["greeting", "pragmatics:greeting"],
+  ["formal_language", "formality:register"],
 ]);
 
 export const ALLOWED_GRAMMAR_CATEGORIES = GRAMMAR_CATEGORIES.map((entry) => entry.category);

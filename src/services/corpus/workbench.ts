@@ -1,22 +1,23 @@
 import { randomUUID } from "node:crypto";
-import { annotatePhraseBoundaries } from "../../../filo/src/annotators/phrases";
-import { annotateSentences } from "../../../filo/src/annotators/sentences";
-import { annotateWords } from "../../../filo/src/annotators/tokenizer";
-import { annotateTranslation } from "../../../filo/src/annotators/translation";
-import { FiloDocument } from "../../../filo/src/document";
-import type {
-  ByteRange,
-  DictionaryLookupPayload,
-  FiloAnnotation,
-  FiloDocumentJson,
-  PhrasePayload,
-  SentencePayload,
-  TranslationPayload,
-  WordPayload,
-} from "../../../filo/src/types";
+import {
+  FiloDocument,
+  annotatePhraseBoundaries,
+  annotateSentences,
+  annotateTranslation,
+  annotateWords,
+  type ByteRange,
+  type DictionaryLookupPayload,
+  type FiloAnnotation,
+  type FiloDocumentJson,
+  type PhrasePayload,
+  type SentencePayload,
+  type TranslationPayload,
+  type WordPayload,
+} from "filo";
 import { translateTexts } from "../ai/translator.ts";
 import { annotateIpaLayer } from "./ipa-layers.ts";
 import { normalizeVocabularyTerm } from "../spaced-repetition/vocabulary-normalizer.ts";
+import { annotateGrammarProperties } from "./grammar-properties.ts";
 
 export interface WorkbenchAnalysisInput {
   text: string;
@@ -39,7 +40,7 @@ export interface WorkbenchAnalysisResult {
 
 const MAX_TRANSLATED_SPANS = 80;
 const MAX_LITERAL_FALLBACK_WORDS = 240;
-const WORKBENCH_ANALYSIS_VERSION = 2;
+const WORKBENCH_ANALYSIS_VERSION = 4;
 
 interface LiteralGloss {
   surface: string;
@@ -47,7 +48,8 @@ interface LiteralGloss {
   gloss: string;
   wordAnnotationId: string | null;
   dictionaryAnnotationId: string | null;
-  source: "dictionary" | "translation";
+  source: "dictionary" | "translation" | "not-found";
+  notFound: boolean;
 }
 
 export async function analyzeWorkbenchDocument(
@@ -102,6 +104,7 @@ export async function analyzeWorkbenchDocument(
     level: "phrase",
     includeProperTranslations,
   });
+  annotateGrammarProperties(document, sourceLanguage);
   await annotateWorkbenchIpa(document, sourceLanguage);
 
   const analyzed = markWorkbenchAnalysis(document.toJSON(), {
@@ -158,6 +161,8 @@ function prepareDocumentForWorkbench(
   targetLanguage: string,
 ): FiloDocumentJson {
   const staleTierIds = new Set([
+    "dictionary",
+    "grammar",
     `word.translation:${targetLanguage}:literal`,
     `sentence.translation:${targetLanguage}:literal`,
     `sentence.translation:${targetLanguage}:proper`,
@@ -197,7 +202,77 @@ function hasWorkbenchAnalysis(
   const metadata = document.metadata as Record<string, unknown>;
   const analyses = metadata.workbenchAnalyses as Record<string, unknown> | undefined;
   const analysis = analyses?.[analysisKey(options)] as Record<string, unknown> | undefined;
-  return analysis?.version === WORKBENCH_ANALYSIS_VERSION;
+  if (analysis?.version !== WORKBENCH_ANALYSIS_VERSION) return false;
+  return (
+    hasRequiredWorkbenchDictionaryCoverage(document) &&
+    hasRequiredWorkbenchGrammarCoverage(document) &&
+    hasRequiredWorkbenchTranslationCoverage(document, options)
+  );
+}
+
+function hasRequiredWorkbenchGrammarCoverage(document: FiloDocumentJson): boolean {
+  return !!tier(document, "grammar");
+}
+
+function hasRequiredWorkbenchDictionaryCoverage(document: FiloDocumentJson): boolean {
+  return !hasDictionaryLookupErrors(document);
+}
+
+function hasDictionaryLookupErrors(document: FiloDocumentJson): boolean {
+  return (
+    tier(document, "dictionary")?.annotations.some(
+      (annotation) =>
+        stringValue(annotation.payload?.lookupStatus) === "error" ||
+        !!stringValue(annotation.payload?.lookupError),
+    ) ?? false
+  );
+}
+
+function hasRequiredWorkbenchTranslationCoverage(
+  document: FiloDocumentJson,
+  options: {
+    sourceLanguage: string;
+    targetLanguage: string;
+    includeProperTranslations: boolean;
+  },
+): boolean {
+  if (!options.includeProperTranslations) return true;
+  return (
+    hasTranslationCoverage(
+      document,
+      "sentence",
+      `sentence.translation:${options.targetLanguage}:proper`,
+    ) &&
+    hasTranslationCoverage(
+      document,
+      "phrase",
+      `phrase.translation:${options.targetLanguage}:proper`,
+    )
+  );
+}
+
+function hasTranslationCoverage(
+  document: FiloDocumentJson,
+  sourceTierId: string,
+  translationTierId: string,
+): boolean {
+  const sourceAnnotations = tier(document, sourceTierId)?.annotations.slice(
+    0,
+    MAX_TRANSLATED_SPANS,
+  );
+  if (!sourceAnnotations || sourceAnnotations.length === 0) return true;
+  const translations = tier(document, translationTierId)?.annotations ?? [];
+  if (translations.length === 0) return false;
+  const translatedRanges = new Set(
+    translations
+      .filter((annotation) => stringValue(annotation.payload?.text))
+      .map((annotation) => rangeKey(annotation)),
+  );
+  return sourceAnnotations.every((annotation) => translatedRanges.has(rangeKey(annotation)));
+}
+
+function rangeKey(range: ByteRange): string {
+  return `${range.start}:${range.end}`;
 }
 
 function markWorkbenchAnalysis(
@@ -291,11 +366,18 @@ async function annotateWorkbenchDictionary(
     const surface = word.payload.surface;
     const normalized = await normalizeVocabularyTerm(surface, language);
     const lookup =
-      normalized.definition || normalized.source_term || normalized.term !== surface
+      normalized.lookup_status !== "error" &&
+      (normalized.definition ||
+        normalized.source_term ||
+        normalized.form_description ||
+        isMeaningfulLemmaChange(normalized.term, surface, language))
         ? {
             lemma: normalized.term || surface,
             definitions: normalized.definition ? [normalized.definition] : [],
-            source: normalized.source_term ? "wiktionary" : "langouste-normalizer",
+            source:
+              normalized.lookup_source === "wiktionary"
+                ? "wiktionary"
+                : "langouste-local-dictionary",
             sourceTerm: normalized.source_term,
             formDescription: normalized.form_description,
           }
@@ -309,7 +391,9 @@ async function annotateWorkbenchDictionary(
         language,
         wordAnnotationId: word.id,
         definitions: lookup?.definitions ?? [],
-        notFound: lookup === null,
+        notFound: normalized.lookup_status === "not-found",
+        lookupStatus: normalized.lookup_status,
+        lookupError: normalized.lookup_error,
       },
       source: "langouste.workbench.dictionary",
     });
@@ -355,6 +439,7 @@ async function annotateWordLiteralTranslations(
         wordAnnotationId: word.id,
         dictionaryAnnotationId: null,
         source: "translation",
+        notFound: false,
       });
       continue;
     }
@@ -376,9 +461,11 @@ async function annotateWordLiteralTranslations(
       sourceLanguage: options.sourceLanguage,
       text: gloss.gloss,
       source:
-        gloss.source === "dictionary"
-          ? "langouste.workbench.dictionary-gloss"
-          : "langouste.workbench.word-translation",
+        gloss.source === "translation"
+          ? "langouste.workbench.word-translation"
+          : gloss.source === "dictionary"
+            ? "langouste.workbench.dictionary-gloss"
+            : "langouste.workbench.not-found-gloss",
       payload: {
         level: "word",
         mode: "literal",
@@ -388,6 +475,7 @@ async function annotateWordLiteralTranslations(
         sourceWordAnnotationId: gloss.wordAnnotationId,
         dictionaryAnnotationId: gloss.dictionaryAnnotationId,
         glossSource: gloss.source,
+        notFound: gloss.notFound,
       },
     });
   }
@@ -578,7 +666,13 @@ function literalGlossFromTranslation(
     gloss: cleanLiteralGloss(payload.text),
     wordAnnotationId: stringValue(payload.sourceWordAnnotationId) || null,
     dictionaryAnnotationId: stringValue(payload.dictionaryAnnotationId) || null,
-    source: payload.glossSource === "translation" ? "translation" : "dictionary",
+    source:
+      payload.glossSource === "translation"
+        ? "translation"
+        : payload.glossSource === "not-found"
+          ? "not-found"
+          : "dictionary",
+    notFound: payload.notFound === true,
   };
 }
 
@@ -589,6 +683,18 @@ function dictionaryGloss(annotation: FiloAnnotation<DictionaryLookupPayload>): L
   const definition = Array.isArray(payload.definitions)
     ? bestLiteralDefinition(payload.definitions)
     : "";
+  const notFound = payload.notFound === true;
+  if (notFound && surface) {
+    return {
+      surface,
+      lemma,
+      gloss: surface,
+      wordAnnotationId: stringValue(payload.wordAnnotationId) || null,
+      dictionaryAnnotationId: annotation.id,
+      source: "not-found",
+      notFound: true,
+    };
+  }
   return {
     surface,
     lemma,
@@ -596,6 +702,7 @@ function dictionaryGloss(annotation: FiloAnnotation<DictionaryLookupPayload>): L
     wordAnnotationId: stringValue(payload.wordAnnotationId) || null,
     dictionaryAnnotationId: annotation.id,
     source: "dictionary",
+    notFound: false,
   };
 }
 
@@ -613,6 +720,14 @@ function isUsefulGloss(
     .map((candidate) => normalizeEquivalent(candidate, locale))
     .filter(Boolean);
   return !equivalentSources.includes(normalizedGloss);
+}
+
+function isMeaningfulLemmaChange(lemma: string, surface: string, language: string): boolean {
+  if (!lemma) return false;
+  return (
+    normalizeEquivalent(lemma, language || undefined) !==
+    normalizeEquivalent(surface, language || undefined)
+  );
 }
 
 function cleanLiteralGloss(value: string | null | undefined): string {

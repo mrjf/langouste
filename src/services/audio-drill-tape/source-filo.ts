@@ -1,7 +1,11 @@
-import { annotateAudio } from "../../../filo/src/annotators/audio";
-import { annotateTranslation } from "../../../filo/src/annotators/translation";
-import { FiloDocument } from "../../../filo/src/document";
-import type { FiloAnnotation, FiloDocumentJson, TranslationPayload } from "../../../filo/src/types";
+import {
+  FiloDocument,
+  annotateAudio,
+  annotateTranslation,
+  type FiloAnnotation,
+  type FiloDocumentJson,
+  type TranslationPayload,
+} from "filo";
 import type { TranslationProvider } from "../ai/translation/index.ts";
 import type { TimedTranscript, TranscriptWord } from "../ai/transcription/index.ts";
 import type {
@@ -39,7 +43,7 @@ export function buildSourceTranscriptFilo(
   const normalized = normalizeTranscriptText(transcript);
   const language = transcript.language === "und" ? options.sourceLanguage : transcript.language;
   const metadata: SourceTranscriptMetadata = {
-    corpus: "pimsleur-source-audio",
+    corpus: "audio-drill-source-audio",
     title: options.title,
     ...(options.sourceUrl ? { sourceUrl: options.sourceUrl } : {}),
     ...(options.sourceAudioPath ? { sourceAudioPath: options.sourceAudioPath } : {}),
@@ -52,7 +56,7 @@ export function buildSourceTranscriptFilo(
     createdAt: new Date().toISOString(),
   };
   const document = FiloDocument.fromText<SourceTranscriptMetadata>(normalized.text, {
-    id: `pimsleur-source:${slugId(options.title)}`,
+    id: `audio-drill-source:${slugId(options.title)}`,
     metadata,
   });
 
@@ -60,25 +64,25 @@ export function buildSourceTranscriptFilo(
     id: "word",
     kind: "word",
     description: "Word transcript aligned to source audio",
-    source: "langouste.pimsleur.transcript",
+    source: "langouste.audio-drill.transcript",
   });
   document.ensureTier<SourceSentencePayload>({
     id: "sentence",
     kind: "sentence",
     description: "Sentence transcript aligned to source audio",
-    source: "langouste.pimsleur.transcript",
+    source: "langouste.audio-drill.transcript",
   });
   document.ensureTier<SourcePhrasePayload>({
     id: "phrase",
     kind: "phrase",
     description: "Phrase chunks from transcript timing and pauses",
-    source: "langouste.pimsleur.transcript",
+    source: "langouste.audio-drill.transcript",
   });
   document.ensureTier<LanguagePayload>({
     id: "language",
     kind: "language",
     description: "Language used by each transcript segment",
-    source: "langouste.pimsleur.transcript",
+    source: "langouste.audio-drill.transcript",
   });
 
   if (document.byteLength > 0) {
@@ -88,7 +92,7 @@ export function buildSourceTranscriptFilo(
       tierId: "audio:source",
       url: options.sourceUrl ?? options.sourceAudioPath ?? "",
       mimeType: "audio/mpeg",
-      source: "langouste.pimsleur.source",
+      source: "langouste.audio-drill.source",
       payload: {
         level: "document",
         language,
@@ -148,7 +152,7 @@ export async function annotateSourceTranslations(
       language: targetLanguage,
       sourceLanguage,
       text: translation,
-      source: "langouste.pimsleur.translation",
+      source: "langouste.audio-drill.translation",
       payload: {
         level: candidate.level,
         sourceTierId: candidate.annotation.tierId,
@@ -173,7 +177,7 @@ export function annotateTrainingSentences(
     id: "training.sentence",
     kind: "sentence",
     description: "LLM-selected full sentences eligible for source-language training",
-    source: "langouste.pimsleur.sentence-extractor",
+    source: "langouste.audio-drill.sentence-extractor",
   });
 
   const sentenceMap = new Map(
@@ -214,7 +218,7 @@ export function annotateTrainingSentences(
       ...(extractedSentence.confidence !== undefined
         ? { confidence: extractedSentence.confidence }
         : {}),
-      source: "langouste.pimsleur.sentence-extractor",
+      source: "langouste.audio-drill.sentence-extractor",
     });
 
     addLanguageAnnotation(document, trainingSentence, extractedSentence.language, "sentence");
@@ -232,7 +236,7 @@ export function annotateTrainingSentences(
         language: bridgeLanguage,
         sourceLanguage: extractedSentence.language,
         text: extractedSentence.translation,
-        source: "langouste.pimsleur.sentence-extractor",
+        source: "langouste.audio-drill.sentence-extractor",
         payload: {
           level: "sentence",
           sourceTierId: sentence.tierId,
@@ -287,7 +291,7 @@ function addWordAnnotations(
         ...(span.token.logprob !== undefined ? { logprob: span.token.logprob } : {}),
       },
       ...(span.token.logprob !== undefined ? { confidence: Math.exp(span.token.logprob) } : {}),
-      source: "langouste.pimsleur.transcript",
+      source: "langouste.audio-drill.transcript",
     });
     annotations.push(annotation);
     addLanguageAnnotation(document, annotation, language, "word");
@@ -319,7 +323,7 @@ function addSentenceAnnotations(
         startMs: timing.startMs,
         endMs: timing.endMs,
       },
-      source: "langouste.pimsleur.transcript",
+      source: "langouste.audio-drill.transcript",
     });
     annotations.push(annotation);
     addLanguageAnnotation(document, annotation, language, "sentence");
@@ -399,7 +403,7 @@ function addPhrase(
       startMs: timing.startMs,
       endMs: timing.endMs,
     },
-    source: "langouste.pimsleur.transcript",
+    source: "langouste.audio-drill.transcript",
   });
   addLanguageAnnotation(document, annotation, language, "phrase");
   addSourceAudioAnnotation(document, annotation, language, "phrase", timing.startMs, timing.endMs);
@@ -421,7 +425,7 @@ function addLanguageAnnotation(
       sourceTierId: annotation.tierId,
       sourceAnnotationId: annotation.id,
     },
-    source: "langouste.pimsleur.language",
+    source: "langouste.audio-drill.language",
   });
 }
 
@@ -445,7 +449,7 @@ function addSourceAudioAnnotation(
     mimeType: "audio/mpeg",
     startMs,
     endMs,
-    source: "langouste.pimsleur.source",
+    source: "langouste.audio-drill.source",
     payload: {
       level,
       language,

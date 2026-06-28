@@ -23,7 +23,7 @@ export async function scrapeNyTimesArticle(url: string): Promise<ScrapedArticle>
   const response = await fetch(url, {
     headers: {
       Accept: "text/html,application/xhtml+xml",
-      "User-Agent": "FiloArticleScraper/0.1 (+https://github.com/mrjf/langouste)",
+      "User-Agent": "FiloArticleScraper/0.1",
     },
   });
   if (!response.ok) {

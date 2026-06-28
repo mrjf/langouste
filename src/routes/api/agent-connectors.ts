@@ -9,8 +9,9 @@ import {
 } from "../../services/database/agent-connectors.ts";
 import { getAgentConnection, disconnectAgent } from "../../services/agents/factory.ts";
 import type { AgentType } from "../../types/index.ts";
+import type { AuthenticatedRouteBindings } from "../types.ts";
 
-export const agentConnectorRoutes = new Hono();
+export const agentConnectorRoutes = new Hono<AuthenticatedRouteBindings>();
 
 agentConnectorRoutes.use("*", requireAuth);
 

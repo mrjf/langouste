@@ -18,7 +18,7 @@ export interface FiloExample {
 
 export async function buildExampleCatalog(): Promise<FiloExample[]> {
   return [
-    await buildLangousteHungarianExample(),
+    await buildHungarianDictionaryExample(),
     await buildEnglishSyntaxExample(),
     await buildArticleExample(),
     await buildTranscriptExample(),
@@ -81,15 +81,15 @@ export async function documentFromArticleHtml(html: string): Promise<FiloDocumen
   });
 }
 
-async function buildLangousteHungarianExample(): Promise<FiloExample> {
+async function buildHungarianDictionaryExample(): Promise<FiloExample> {
   const text =
     "Számos README található szétszórva ebben a könyvtárban. A dictionary view links every word to a durable lexical record.";
   const document = FiloDocument.fromText(text, {
-    id: "langouste-hu-readme",
+    id: "hungarian-dictionary-readme",
     metadata: {
-      title: "Langouste Hungarian dictionary flow",
+      title: "Hungarian dictionary flow",
       language: "hu",
-      source: "langouste",
+      source: "dictionary-demo",
     },
   });
   annotateWords(document, { language: "hu" });
@@ -110,7 +110,7 @@ async function buildLangousteHungarianExample(): Promise<FiloExample> {
     language: "en",
     sourceLanguage: "hu",
     text: "Numerous READMEs can be found scattered throughout this directory.",
-    source: "langouste-translation",
+    source: "demo-translation",
     payload: {
       links: [
         {
@@ -123,13 +123,15 @@ async function buildLangousteHungarianExample(): Promise<FiloExample> {
   annotateAudio(document, {
     start: 0,
     end: document.byteLength,
-    url: "https://media.example.test/langouste-hu-readme.mp3",
+    url: "https://media.example.test/hungarian-dictionary-readme.mp3",
     mimeType: "audio/mpeg",
     startMs: 0,
     endMs: 5400,
     source: "tts-demo",
     payload: {
-      links: [{ label: "Audio asset", url: "https://media.example.test/langouste-hu-readme.mp3" }],
+      links: [
+        { label: "Audio asset", url: "https://media.example.test/hungarian-dictionary-readme.mp3" },
+      ],
     },
   });
   addManualPhrase(document, "Számos", "könyvtárban", {
@@ -146,11 +148,11 @@ async function buildLangousteHungarianExample(): Promise<FiloExample> {
   });
 
   return {
-    id: "langouste-hu",
-    title: "Langouste Hungarian lookup",
+    id: "hungarian-dictionary",
+    title: "Hungarian dictionary lookup",
     language: "hu",
     description: "Word, dictionary, translation, audio, and durable lexical links over one text.",
-    tags: ["Langouste", "dictionary", "translation", "audio"],
+    tags: ["Hungarian", "dictionary", "translation", "audio"],
     document: document.toJSON(),
   };
 }
@@ -394,7 +396,7 @@ const HUNGARIAN_DEMO_DICTIONARY: Record<string, DictionaryLookupResult> = {
     lemma: "README",
     definitions: ["project documentation file"],
     partOfSpeech: "noun",
-    source: "Langouste fixture",
+    source: "demo fixture",
   },
   található: {
     lemma: "található",

@@ -1,18 +1,18 @@
 /**
- * Build a Pimsleur-style spaced-repetition tape from source audio.
+ * Build a guided audio-drill spaced-repetition tape from source audio.
  *
  * Usage:
- *   bun scripts/build-pimsleur-tape.ts \
+ *   bun scripts/build-audio-drill-tape.ts \
  *     --url "https://example.com/unit01.mp3" \
  *     --lang hu \
- *     --out data/pimsleur/hu-unit-01a \
+ *     --out data/audio-drills/hu-unit-01a \
  *     --render-audio
  *
  * Outputs:
  *   transcript.json   normalized word-timestamp transcript
  *   source.filo.json  original source transcript + word/phrase/sentence tiers
  *   lesson.filo.json  generated lesson script + spaced-repetition/audio tiers
- *   *.pimsleur.mp3    final rendered audio, only with --render-audio
+ *   *.audio-drill.mp3    final rendered audio, only with --render-audio
  */
 
 import { existsSync, readFileSync } from "node:fs";
@@ -23,14 +23,14 @@ loadDotenv();
 const args = parseArgs(process.argv.slice(2));
 if (!args.url || !args.lang || !args.out) {
   console.error(
-    "Usage: bun scripts/build-pimsleur-tape.ts --url <mp3-url> --lang <source-language> --out <dir> [--bridge en] [--title <title>] [--transcript <json>] [--max-items 48] [--render-audio]",
+    "Usage: bun scripts/build-audio-drill-tape.ts --url <mp3-url> --lang <source-language> --out <dir> [--bridge en] [--title <title>] [--transcript <json>] [--max-items 48] [--pause-ms 3000] [--word-pause-ms 750] [--render-audio] [--no-normalize-audio] [--target-lufs -18] [--true-peak-db -1.5] [--loudness-range 11] [--short-clip-threshold-ms 500] [--source-clip-padding-ms 80]",
   );
   process.exit(1);
 }
 
-const { buildPimsleurTape } = await import("../src/services/pimsleur-tape/pipeline.ts");
+const { buildAudioDrillTape } = await import("../src/services/audio-drill-tape/pipeline.ts");
 
-const result = await buildPimsleurTape({
+const result = await buildAudioDrillTape({
   sourceUrl: args.url,
   outputDir: args.out,
   sourceLanguage: args.lang,
@@ -40,6 +40,13 @@ const result = await buildPimsleurTape({
   renderAudio: args.renderAudio ?? false,
   maxItems: args.maxItems,
   pauseMs: args.pauseMs,
+  wordPauseMs: args.wordPauseMs,
+  normalizeAudio: args.normalizeAudio,
+  targetLufs: args.targetLufs,
+  truePeakDb: args.truePeakDb,
+  loudnessRange: args.loudnessRange,
+  shortClipThresholdMs: args.shortClipThresholdMs,
+  sourceClipPaddingMs: args.sourceClipPaddingMs,
 });
 
 console.log("Wrote:");
@@ -57,7 +64,14 @@ interface Args {
   transcript?: string;
   maxItems?: number;
   pauseMs?: number;
+  wordPauseMs?: number;
   renderAudio?: boolean;
+  normalizeAudio?: boolean;
+  targetLufs?: number;
+  truePeakDb?: number;
+  loudnessRange?: number;
+  shortClipThresholdMs?: number;
+  sourceClipPaddingMs?: number;
 }
 
 function parseArgs(argv: string[]): Args {
@@ -100,8 +114,35 @@ function parseArgs(argv: string[]): Args {
         index += 1;
         parsed.pauseMs = parsePositiveInt(requireValue(argv, index, arg), arg);
         break;
+      case "--word-pause-ms":
+        index += 1;
+        parsed.wordPauseMs = parsePositiveInt(requireValue(argv, index, arg), arg);
+        break;
       case "--render-audio":
         parsed.renderAudio = true;
+        break;
+      case "--no-normalize-audio":
+        parsed.normalizeAudio = false;
+        break;
+      case "--target-lufs":
+        index += 1;
+        parsed.targetLufs = parseFiniteNumber(requireValue(argv, index, arg), arg);
+        break;
+      case "--true-peak-db":
+        index += 1;
+        parsed.truePeakDb = parseFiniteNumber(requireValue(argv, index, arg), arg);
+        break;
+      case "--loudness-range":
+        index += 1;
+        parsed.loudnessRange = parseFiniteNumber(requireValue(argv, index, arg), arg);
+        break;
+      case "--short-clip-threshold-ms":
+        index += 1;
+        parsed.shortClipThresholdMs = parsePositiveInt(requireValue(argv, index, arg), arg);
+        break;
+      case "--source-clip-padding-ms":
+        index += 1;
+        parsed.sourceClipPaddingMs = parseNonNegativeInt(requireValue(argv, index, arg), arg);
         break;
       default:
         throw new Error(`Unknown argument: ${arg}`);
@@ -120,6 +161,19 @@ function parsePositiveInt(value: string, flag: string): number {
   const parsed = Number.parseInt(value, 10);
   if (!Number.isFinite(parsed) || parsed <= 0)
     throw new Error(`${flag} must be a positive integer`);
+  return parsed;
+}
+
+function parseNonNegativeInt(value: string, flag: string): number {
+  const parsed = Number.parseInt(value, 10);
+  if (!Number.isFinite(parsed) || parsed < 0)
+    throw new Error(`${flag} must be a non-negative integer`);
+  return parsed;
+}
+
+function parseFiniteNumber(value: string, flag: string): number {
+  const parsed = Number.parseFloat(value);
+  if (!Number.isFinite(parsed)) throw new Error(`${flag} must be a finite number`);
   return parsed;
 }
 

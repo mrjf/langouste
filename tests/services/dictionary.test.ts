@@ -244,6 +244,20 @@ describe("lookupDictionary", () => {
     expect(lookup.senses[0]?.part_of_speech).toBe("Pronoun");
   });
 
+  test("uses local Hungarian fallback before external lookup for common forms", async () => {
+    globalThis.fetch = (async () => {
+      throw new Error("dictionary service unavailable");
+    }) as typeof fetch;
+
+    const article = await lookupDictionary("az", "hu");
+    const balance = await lookupDictionary("egyenleged", "hu");
+    const reset = await lookupDictionary("visszaáll", "hu");
+
+    expect(article.definitions).toEqual(["the (for words beginning with a vowel)"]);
+    expect(balance.definitions).toEqual(["your balance"]);
+    expect(reset.definitions).toEqual(["to reset, restore, or return to a previous state"]);
+  });
+
   test("decodes named, decimal, and hex HTML entities in definitions", async () => {
     mockWiktionary({
       kíván: page("kíván", "Hungarian", [

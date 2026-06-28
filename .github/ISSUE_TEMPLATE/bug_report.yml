@@ -1,0 +1,43 @@
+name: Bug report
+description: Report a reproducible problem in Langouste.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What happened?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Start Langouste with ...
+        2. Open ...
+        3. Send ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: input
+    id: mode
+    attributes:
+      label: Database mode
+      placeholder: sqlite or supabase
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
+      placeholder: v0.0.0 or git SHA
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs
+      render: text

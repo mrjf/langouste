@@ -1,4 +1,4 @@
-import type { FiloAnnotation, FiloDocumentJson } from "../../../filo/src/types";
+import type { FiloAnnotation, FiloDocumentJson } from "filo";
 
 export type TapeSegmentLanguage = string;
 export type LessonItemLevel = "word" | "phrase" | "sentence";
@@ -15,7 +15,7 @@ export type LessonAudioSource = "tts" | "source" | "silence";
 
 export interface SourceTranscriptMetadata {
   [key: string]: unknown;
-  corpus: "pimsleur-source-audio";
+  corpus: "audio-drill-source-audio";
   title: string;
   sourceUrl?: string;
   sourceAudioPath?: string;
@@ -28,7 +28,7 @@ export interface SourceTranscriptMetadata {
 
 export interface LessonTapeMetadata {
   [key: string]: unknown;
-  corpus: "pimsleur-tape";
+  corpus: "audio-drill-tape";
   title: string;
   sourceDocumentId: string;
   sourceLanguage: string;
@@ -117,6 +117,7 @@ export interface LessonSegmentPayload {
   repetitionIndex?: number;
   promptTurn?: number;
   durationMs?: number;
+  pauseRole?: "padding" | "response";
 }
 
 export interface RenderedAudioPayload {
@@ -130,8 +131,20 @@ export interface RenderedAudioPayload {
   clipPath?: string;
   sourceStartMs?: number;
   sourceEndMs?: number;
+  clipStartMs?: number;
+  clipEndMs?: number;
+  sourceClipPaddingMs?: number;
   durationMs?: number;
+  normalization?: AudioNormalizationSettings;
   generatedAt: string;
+}
+
+export interface AudioNormalizationSettings {
+  enabled: boolean;
+  targetLufs: number;
+  truePeakDb: number;
+  loudnessRange: number;
+  shortClipThresholdMs: number;
 }
 
 export interface BuildSourceFiloOptions {
@@ -151,10 +164,11 @@ export interface BuildLessonFiloOptions {
   sourceAudioPath?: string;
   maxItems?: number;
   pauseMs?: number;
+  wordPauseMs?: number;
   reviewOffsets?: number[];
 }
 
-export interface PimsleurTapeDocuments {
+export interface AudioDrillTapeDocuments {
   source: FiloDocumentJson<SourceTranscriptMetadata>;
   lesson: FiloDocumentJson<LessonTapeMetadata>;
 }
