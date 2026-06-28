@@ -1,4 +1,5 @@
 import nspell from "nspell";
+import type { NSpell } from "nspell";
 import type { LanguageCode, TextError } from "../../types/index.ts";
 import type { SpellCheckProvider } from "./provider.ts";
 import { tokenize } from "./tokenizer.ts";
@@ -53,10 +54,10 @@ const DICTIONARY_LOADERS: Record<string, () => Promise<{ aff: Buffer; dic: Buffe
   tr: () => import("dictionary-tr").then((m) => m.default as any),
 };
 
-const cache = new Map<string, nspell>();
-const loading = new Map<string, Promise<nspell | null>>();
+const cache = new Map<string, NSpell>();
+const loading = new Map<string, Promise<NSpell | null>>();
 
-async function getDictionary(lang: LanguageCode): Promise<nspell | null> {
+async function getDictionary(lang: LanguageCode): Promise<NSpell | null> {
   const cached = cache.get(lang);
   if (cached) return cached;
 

@@ -10,8 +10,8 @@ The core model is deliberately small:
 - Each tier contains any number of annotations.
 - Every annotation is a byte range plus arbitrary typed payload data.
 
-This gives Langouste one common substrate for word boundaries, dictionary
-lookups, phrase translations, parse spans, audio links, and future transcript
+This gives applications one common substrate for word boundaries, dictionary
+lookups, phrase translations, parse spans, audio links, and transcript
 alignment.
 
 ```ts
@@ -19,7 +19,7 @@ import {
   FiloDocument,
   annotateDictionaryLookups,
   annotateWords,
-} from "@langouste/filo";
+} from "filo";
 
 const doc = FiloDocument.fromText("Számos README található szétszórva ebben.");
 annotateWords(doc, { language: "hu" });

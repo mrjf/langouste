@@ -13,6 +13,8 @@
   import type { WorkbenchAnalyzeResponse } from "../lib/api-contracts";
   import {
     clearSavedWorkbenchState,
+    loadRecentWorkbenchStates,
+    loadSavedWorkbenchStateById,
     loadSavedWorkbenchState,
     parseWorkbenchRoute,
     saveWorkbenchState,
@@ -36,11 +38,42 @@
     proper: string;
     literal: string;
     tokens: LiteralToken[];
+    properties: GrammarPropertyView[];
   }
 
   type LiteralToken =
     | { kind: "text"; id: string; text: string }
-    | { kind: "word"; id: string; start: number; end: number; text: string; literal: string };
+    | {
+        kind: "word";
+        id: string;
+        start: number;
+        end: number;
+        text: string;
+        literal: string;
+        notFound: boolean;
+        properties: GrammarPropertyView[];
+      };
+
+  interface GrammarReferenceView {
+    label: string;
+    url: string;
+    source: string;
+    kind: string;
+  }
+
+  interface GrammarPropertyView {
+    id: string;
+    start: number;
+    end: number;
+    text: string;
+    category: string;
+    conceptId: string;
+    label: string;
+    description: string;
+    dimension: string;
+    level: "word" | "phrase" | "sentence";
+    references: GrammarReferenceView[];
+  }
 
   interface WordView {
     id: string;
@@ -50,7 +83,10 @@
     lemma: string;
     definition: string;
     form: string;
+    lookupStatus: "found" | "not-found" | "error";
+    lookupError: string;
     href: string;
+    properties: GrammarPropertyView[];
   }
 
   type AudioState = {
@@ -65,6 +101,7 @@
   };
 
   const languageCodes = Object.keys(LANGUAGES);
+  const maxTranslatedSpans = 80;
   const sampleText =
     "Számos README található szétszórva ebben a könyvtárban. Meg tudnád pontosítani, melyik projektet keresed?";
   let { route = "", onRouteChange }: Props = $props();
@@ -80,6 +117,7 @@
   let activeLiteralWordId = $state<string | null>(null);
   let sourceFiloDoc = $state<FiloDocumentJson | null>(null);
   let audioByKey = $state<Record<string, AudioState>>({});
+  let recentWorkbenchStates = $state<SavedWorkbenchState[]>([]);
   let appliedRoute = "";
   let loadedSavedWorkbench = false;
   const trackedInteractionKeys = new Set<string>();
@@ -88,12 +126,37 @@
   const sentences = $derived.by(() => spanViews(document, "sentence", "sentence"));
   const phrases = $derived.by(() => spanViews(document, "phrase", "phrase"));
   const words = $derived.by(() => wordViews(document, sourceLanguage));
+  const grammarProperties = $derived.by(() => grammarPropertyViews(document));
+
+  $effect(() => {
+    refreshRecentWorkbenchStates();
+  });
 
   $effect(() => {
     if (!route || route === appliedRoute) return;
     appliedRoute = route;
+    const saved = loadSavedWorkbenchStateById(route);
+    if (saved) {
+      loadedSavedWorkbench = true;
+      applySavedWorkbenchState(saved);
+      saveWorkbenchState(saved);
+      refreshRecentWorkbenchStates();
+      if ((saved.autoAnalyze && !saved.result) || savedNeedsAnalysisRefresh(saved)) {
+        setTimeout(() => {
+          void analyze();
+        }, 0);
+      }
+      return;
+    }
+
     const payload = parseWorkbenchRoute(route);
-    if (!payload) return;
+    if (!payload) {
+      if (route.startsWith("w-")) {
+        loadedSavedWorkbench = true;
+        error = "Workbench document not found on this device.";
+      }
+      return;
+    }
 
     loadedSavedWorkbench = true;
     title = payload.title ?? "Workbench document";
@@ -122,6 +185,11 @@
     const saved = loadSavedWorkbenchState();
     if (!saved) return;
     applySavedWorkbenchState(saved);
+    if (savedNeedsAnalysisRefresh(saved)) {
+      setTimeout(() => {
+        void analyze();
+      }, 0);
+    }
   });
 
   async function analyze() {
@@ -167,6 +235,7 @@
     trackedInteractionKeys.clear();
     appliedRoute = "";
     loadedSavedWorkbench = true;
+    refreshRecentWorkbenchStates();
     onRouteChange?.("");
   }
 
@@ -189,7 +258,7 @@
   function saveCurrentWorkbenchState(nextResult: WorkbenchAnalyzeResponse | null = result) {
     const cleanText = text.trim();
     if (!cleanText) return;
-    saveWorkbenchState({
+    const saved = saveWorkbenchState({
       title,
       text: cleanText,
       sourceLanguage,
@@ -197,6 +266,188 @@
       filoDoc: nextResult?.document ?? sourceFiloDoc,
       result: nextResult,
     });
+    refreshRecentWorkbenchStates();
+    if (saved) {
+      appliedRoute = saved.workbenchId;
+      onRouteChange?.(saved.workbenchId);
+    }
+  }
+
+  function refreshRecentWorkbenchStates() {
+    recentWorkbenchStates = loadRecentWorkbenchStates();
+  }
+
+  function openRecentWorkbenchState(saved: SavedWorkbenchState) {
+    applySavedWorkbenchState(saved);
+    const opened = saveWorkbenchState(saved) ?? saved;
+    refreshRecentWorkbenchStates();
+    appliedRoute = opened.workbenchId;
+    loadedSavedWorkbench = true;
+    onRouteChange?.(opened.workbenchId);
+    if ((opened.autoAnalyze && !opened.result) || savedNeedsAnalysisRefresh(opened)) {
+      setTimeout(() => {
+        void analyze();
+      }, 0);
+    }
+  }
+
+  function workbenchHref(saved: SavedWorkbenchState): string {
+    return `#/workbench/${encodeURIComponent(saved.workbenchId)}`;
+  }
+
+  function shouldHandleLinkClick(event: MouseEvent): boolean {
+    return (
+      event.button === 0 &&
+      !event.metaKey &&
+      !event.ctrlKey &&
+      !event.shiftKey &&
+      !event.altKey
+    );
+  }
+
+  function recentDocumentKey(saved: SavedWorkbenchState): string {
+    return [saved.sourceLanguage, saved.targetLanguage ?? "", saved.text].join(
+      "\u0000",
+    );
+  }
+
+  function recentDocumentMeta(saved: SavedWorkbenchState): string {
+    const pieces = [
+      `${langTag(saved.sourceLanguage)} -> ${langTag(saved.targetLanguage ?? "")}`,
+      formatRecentDate(saved.savedAt),
+    ];
+    if (saved.result) pieces.splice(1, 0, `${saved.result.summary.words} words`);
+    return pieces.filter(Boolean).join(" · ");
+  }
+
+  function recentDocumentPreview(saved: SavedWorkbenchState): string {
+    const compact = saved.text.replace(/\s+/g, " ").trim();
+    return compact.length > 120 ? `${compact.slice(0, 117)}...` : compact;
+  }
+
+  function isCurrentRecentDocument(saved: SavedWorkbenchState): boolean {
+    return (
+      saved.text === text.trim() &&
+      saved.sourceLanguage === sourceLanguage &&
+      (saved.targetLanguage ?? "") === (targetLanguage ?? "")
+    );
+  }
+
+  function formatRecentDate(value: string): string {
+    const date = new Date(value);
+    if (!Number.isFinite(date.getTime())) return "";
+    return date.toLocaleString(undefined, {
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+    });
+  }
+
+  function savedNeedsAnalysisRefresh(saved: SavedWorkbenchState): boolean {
+    const savedTargetLanguage = saved.targetLanguage ?? saved.result?.summary.targetLanguage ?? "";
+    return (
+      !!saved.result &&
+      !!savedTargetLanguage &&
+      (hasDictionaryLookupErrors(saved.result.document) ||
+        !hasGrammarTier(saved.result.document) ||
+        !hasProperTranslationCoverage(saved.result.document, savedTargetLanguage) ||
+        hasMissingLiteralFallbacks(saved.result.document, savedTargetLanguage, saved.sourceLanguage))
+    );
+  }
+
+  function hasGrammarTier(doc: FiloDocumentJson): boolean {
+    return doc.tiers.some((candidate) => candidate.id === "grammar");
+  }
+
+  function hasDictionaryLookupErrors(doc: FiloDocumentJson): boolean {
+    return tier(doc, "dictionary").some(
+      (annotation) =>
+        stringValue(annotation.payload.lookupStatus) === "error" ||
+        !!stringValue(annotation.payload.lookupError),
+    );
+  }
+
+  function hasProperTranslationCoverage(doc: FiloDocumentJson, target: string): boolean {
+    return (
+      hasTranslationCoverage(doc, "sentence", `sentence.translation:${target}:proper`) &&
+      hasTranslationCoverage(doc, "phrase", `phrase.translation:${target}:proper`)
+    );
+  }
+
+  function hasTranslationCoverage(
+    doc: FiloDocumentJson,
+    sourceTierId: string,
+    translationTierId: string,
+  ): boolean {
+    const sourceAnnotations = tier(doc, sourceTierId).slice(0, maxTranslatedSpans);
+    if (sourceAnnotations.length === 0) return true;
+    const translatedRanges = new Set(
+      tier(doc, translationTierId)
+        .filter((annotation) => stringValue(annotation.payload.text))
+        .map((annotation) => rangeKey(annotation)),
+    );
+    return sourceAnnotations.every((annotation) => translatedRanges.has(rangeKey(annotation)));
+  }
+
+  function hasMissingLiteralFallbacks(
+    doc: FiloDocumentJson,
+    target: string,
+    source: string,
+  ): boolean {
+    const notFoundLiteralWordIds = new Set<string>();
+    const notFoundLiteralRanges = new Set<string>();
+    for (const annotation of tier(doc, `word.translation:${target}:literal`)) {
+      if (annotation.payload.notFound !== true) continue;
+      const sourceWordAnnotationId = stringValue(annotation.payload.sourceWordAnnotationId);
+      if (sourceWordAnnotationId) notFoundLiteralWordIds.add(sourceWordAnnotationId);
+      notFoundLiteralRanges.add(rangeKey(annotation));
+    }
+
+    return tier(doc, "dictionary").some((annotation) => {
+      if (!isDictionaryMiss(annotation, doc, source)) return false;
+      const wordAnnotationId = stringValue(annotation.payload.wordAnnotationId);
+      if (wordAnnotationId && notFoundLiteralWordIds.has(wordAnnotationId)) return false;
+      return !notFoundLiteralRanges.has(rangeKey(annotation));
+    });
+  }
+
+  function isDictionaryMiss(
+    annotation: FiloAnnotationJson,
+    doc: FiloDocumentJson,
+    source: string,
+  ): boolean {
+    if (annotation.payload.notFound === true) return true;
+    const definitions = Array.isArray(annotation.payload.definitions)
+      ? annotation.payload.definitions
+      : [];
+    if (definitions.some((definition) => stringValue(definition))) return false;
+    if (stringValue(annotation.payload.sourceTerm) || stringValue(annotation.payload.source_term)) {
+      return false;
+    }
+    if (
+      stringValue(annotation.payload.formDescription) ||
+      stringValue(annotation.payload.form_description) ||
+      stringValue(annotation.payload.sourceUrl) ||
+      stringValue(annotation.payload.source_url)
+    ) {
+      return false;
+    }
+    const surface = stringValue(annotation.payload.surface) || textOf(doc, annotation);
+    const lemma = stringValue(annotation.payload.lemma);
+    return !!surface && (!lemma || equivalentText(lemma, surface, source));
+  }
+
+  function equivalentText(left: string, right: string, locale: string): boolean {
+    return normalizeComparable(left, locale) === normalizeComparable(right, locale);
+  }
+
+  function normalizeComparable(value: string, locale: string): string {
+    return value
+      .replace(/\s+/gu, " ")
+      .replace(/[.,;:!?()[\]{}"“”'’`]+/gu, "")
+      .trim()
+      .toLocaleLowerCase(locale || undefined);
   }
 
   function spanViews(
@@ -214,6 +465,7 @@
       proper: translationFor(doc, span, `${level}.translation:${targetLanguage}:proper`),
       literal: translationFor(doc, span, `${level}.translation:${targetLanguage}:literal`),
       tokens: literalTokensForSpan(doc, span, targetLanguage),
+      properties: grammarPropertiesForRange(doc, span, level),
     }));
   }
 
@@ -225,13 +477,17 @@
     const words = tier(doc, "word").filter(
       (word) => span.start <= word.start && word.end <= span.end,
     );
-    const literalByWordId = new Map<string, string>();
-    const literalByRange = new Map<string, string>();
+    const literalByWordId = new Map<string, { text: string; notFound: boolean }>();
+    const literalByRange = new Map<string, { text: string; notFound: boolean }>();
     for (const annotation of tier(doc, `word.translation:${target}:literal`)) {
       const literal = stringValue(annotation.payload.text);
+      const literalValue = {
+        text: literal,
+        notFound: annotation.payload.notFound === true,
+      };
       const sourceWordAnnotationId = stringValue(annotation.payload.sourceWordAnnotationId);
-      if (sourceWordAnnotationId) literalByWordId.set(sourceWordAnnotationId, literal);
-      literalByRange.set(rangeKey(annotation), literal);
+      if (sourceWordAnnotationId) literalByWordId.set(sourceWordAnnotationId, literalValue);
+      literalByRange.set(rangeKey(annotation), literalValue);
     }
 
     const tokens: LiteralToken[] = [];
@@ -244,13 +500,16 @@
           text: textOf(doc, { start: cursor, end: word.start }),
         });
       }
+      const literal = literalByWordId.get(word.id) ?? literalByRange.get(rangeKey(word));
       tokens.push({
         kind: "word",
         id: word.id,
         start: word.start,
         end: word.end,
         text: textOf(doc, word),
-        literal: literalByWordId.get(word.id) ?? literalByRange.get(rangeKey(word)) ?? "",
+        literal: literal?.text ?? "",
+        notFound: literal?.notFound ?? false,
+        properties: grammarPropertiesForRange(doc, word, "word"),
       });
       cursor = word.end;
     }
@@ -272,6 +531,7 @@
       const lemma = stringValue(payload.lemma) || stringValue(payload.sourceTerm) || surface;
       const definition = firstString(payload.definitions) || "";
       const form = stringValue(payload.formDescription);
+      const lookupStatus = lookupStatusForPayload(payload, definition);
       return {
         id: annotation.id,
         start: annotation.start,
@@ -280,9 +540,96 @@
         lemma,
         definition,
         form,
+        lookupStatus,
+        lookupError: stringValue(payload.lookupError),
         href: `#/dictionary/${encodeURIComponent(language)}/${encodeURIComponent(lemma)}`,
+        properties: grammarPropertiesForRange(doc, annotation, "word"),
       };
     });
+  }
+
+  function grammarPropertiesForRange(
+    doc: FiloDocumentJson,
+    range: { start: number; end: number },
+    level: GrammarPropertyView["level"],
+  ): GrammarPropertyView[] {
+    return grammarPropertyViews(doc).filter(
+      (property) =>
+        property.level === level && property.start === range.start && property.end === range.end,
+    );
+  }
+
+  function grammarPropertyViews(doc: FiloDocumentJson | null): GrammarPropertyView[] {
+    if (!doc) return [];
+    return tier(doc, "grammar").map((annotation) => {
+      const payload = annotation.payload;
+      const category = stringValue(payload.category);
+      return {
+        id: annotation.id,
+        start: annotation.start,
+        end: annotation.end,
+        text: stringValue(payload.text) || textOf(doc, annotation),
+        category,
+        conceptId: stringValue(payload.conceptId) || stringValue(payload.concept_id),
+        label: stringValue(payload.label) || humanizeGrammarCategory(category),
+        description: stringValue(payload.description),
+        dimension: stringValue(payload.dimension),
+        level: grammarLevel(payload.level),
+        references: grammarReferenceViews(payload.references),
+      };
+    });
+  }
+
+  function grammarLevel(value: unknown): GrammarPropertyView["level"] {
+    return value === "sentence" || value === "phrase" || value === "word" ? value : "phrase";
+  }
+
+  function grammarReferenceViews(value: unknown): GrammarReferenceView[] {
+    if (!Array.isArray(value)) return [];
+    return value
+      .map((item) => {
+        const link = item as Record<string, unknown>;
+        return {
+          label: stringValue(link.label),
+          url: stringValue(link.url),
+          source: stringValue(link.source),
+          kind: stringValue(link.kind),
+        };
+      })
+      .filter((link) => link.label && link.url);
+  }
+
+  function humanizeGrammarCategory(category: string): string {
+    return category
+      .split(":")
+      .filter(Boolean)
+      .map((part) =>
+        part
+          .replace(/[._-]+/g, " ")
+          .replace(/\b\w/g, (char) => char.toLocaleUpperCase()),
+      )
+      .join(": ");
+  }
+
+  function linkTarget(url: string): "_blank" | undefined {
+    return /^https?:\/\//u.test(url) ? "_blank" : undefined;
+  }
+
+  function lookupStatusForPayload(
+    payload: Record<string, unknown>,
+    definition: string,
+  ): "found" | "not-found" | "error" {
+    const status = stringValue(payload.lookupStatus);
+    if (status === "found" || status === "not-found" || status === "error") return status;
+    if (payload.notFound === true) return "not-found";
+    return definition ? "found" : "not-found";
+  }
+
+  function dictionaryStatusText(word: WordView): string {
+    if (word.definition) return word.definition;
+    if (word.lookupStatus === "error") return "Lookup failed";
+    if (word.lookupStatus === "found") return "No definition in entry";
+    return "No dictionary entry found";
   }
 
   function tier(doc: FiloDocumentJson, tierId: string): FiloAnnotationJson[] {
@@ -516,6 +863,32 @@
     </button>
   </header>
 
+  {#if recentWorkbenchStates.length}
+    <section class="recent-documents" aria-label="Recent workbench documents">
+      <div class="recent-heading">
+        <h2><FiloText text="Recent documents" role="section-heading" /></h2>
+      </div>
+      <div class="recent-list">
+        {#each recentWorkbenchStates as saved (recentDocumentKey(saved))}
+          <a
+            class="recent-document"
+            class:active={isCurrentRecentDocument(saved)}
+            href={workbenchHref(saved)}
+            onclick={(event) => {
+              if (!shouldHandleLinkClick(event)) return;
+              event.preventDefault();
+              openRecentWorkbenchState(saved);
+            }}
+          >
+            <span class="recent-title">{saved.title || "Workbench document"}</span>
+            <span class="recent-meta">{recentDocumentMeta(saved)}</span>
+            <span class="recent-preview">{recentDocumentPreview(saved)}</span>
+          </a>
+        {/each}
+      </div>
+    </section>
+  {/if}
+
   {#if editing}
     <form class="input-card" onsubmit={(event) => { event.preventDefault(); analyze(); }}>
       <div class="field-row">
@@ -643,7 +1016,11 @@
                         baseByteOffset={token.start}
                       />
                     </span>
-                    <span class="literal-gloss">{token.literal}</span>
+                    <span
+                      class="literal-gloss"
+                      class:notFound={token.notFound}
+                      title={token.notFound ? "No dictionary gloss found; source word shown verbatim" : undefined}
+                    >{token.literal}</span>
                   </span>
                 {:else}
                   <span class="literal-text">{token.text}</span>
@@ -660,10 +1037,22 @@
                       ? "stop"
                       : "audio"}
                 </button>
-                <span class="label"><FiloText text="Good translation" role="popover-label" /></span>
-                <span>{sentence.proper || "No proper translation available."}</span>
-                <span class="label"><FiloText text="Literal dictionary gloss" role="popover-label" /></span>
-                <span>{sentence.literal || "No literal gloss available."}</span>
+                {#if sentence.proper}
+                  <span class="label"><FiloText text="Good translation" role="popover-label" /></span>
+                  <span>{sentence.proper}</span>
+                {/if}
+                {#if sentence.literal}
+                  <span class="label"><FiloText text="Literal dictionary gloss" role="popover-label" /></span>
+                  <span>{sentence.literal}</span>
+                {/if}
+                {#if sentence.properties.length}
+                  <span class="label"><FiloText text="Grammar" role="popover-label" /></span>
+                  <span class="grammar-chips">
+                    {#each sentence.properties as property}
+                      <span class="grammar-chip" title={property.description}>{property.label}</span>
+                    {/each}
+                  </span>
+                {/if}
               </span>
             {/if}
           </span>{" "}
@@ -686,8 +1075,19 @@
             >
               <div>
                 <strong>{phrase.text}</strong>
-                <p>{phrase.proper || "No proper translation available."}</p>
-                <small>{phrase.literal || "No literal gloss available."}</small>
+                {#if phrase.proper}
+                  <p>{phrase.proper}</p>
+                {/if}
+                {#if phrase.literal}
+                  <small>{phrase.literal}</small>
+                {/if}
+                {#if phrase.properties.length}
+                  <div class="grammar-chips">
+                    {#each phrase.properties as property}
+                      <span class="grammar-chip" title={property.description}>{property.label}</span>
+                    {/each}
+                  </div>
+                {/if}
               </div>
               <button type="button" onclick={() => playSpan(`phrase:${phrase.id}`, phrase.text, phrase)}>
                 {audioByKey[`phrase:${phrase.id}`]?.loading
@@ -710,20 +1110,71 @@
           {#each words as word}
             <a
               class="word-row"
+              class:lookupError={word.lookupStatus === "error"}
+              class:notFound={word.lookupStatus === "not-found"}
               href={word.href}
+              title={word.lookupStatus === "error" && word.lookupError ? word.lookupError : undefined}
               onmouseenter={() =>
                 recordWorkbenchInteraction("encounter", "workbench_definition", word, true)}
             >
               <strong>{word.surface}</strong>
               <span>{word.lemma}</span>
-              <span>{word.definition || "No definition found"}</span>
+              <span>{dictionaryStatusText(word)}</span>
               {#if word.form}
                 <small>{word.form}</small>
+              {/if}
+              {#if word.properties.length}
+                <span class="grammar-chips compact">
+                  {#each word.properties as property}
+                    <span class="grammar-chip" title={property.description}>{property.label}</span>
+                  {/each}
+                </span>
               {/if}
             </a>
           {/each}
         </div>
       </div>
+
+      {#if grammarProperties.length}
+        <div class="analysis-card">
+          <div class="section-heading">
+            <h2><FiloText text="Grammar properties" role="section-heading" /></h2>
+            <span><FiloText text="Concept annotations aligned to sentence, phrase, and word spans." role="section-description" /></span>
+          </div>
+          <div class="grammar-list">
+            {#each grammarProperties as property}
+              <article
+                class="grammar-row"
+                onmouseenter={() =>
+                  recordWorkbenchInteraction("encounter", "workbench_definition", property, true)}
+              >
+                <div class="grammar-main">
+                  <strong>{property.label}</strong>
+                  <span>{property.level} · {property.text}</span>
+                  {#if property.description}
+                    <small>{property.description}</small>
+                  {/if}
+                  <code>{property.conceptId || property.category}</code>
+                </div>
+                {#if property.references.length}
+                  <div class="grammar-links">
+                    {#each property.references as link}
+                      <a
+                        href={link.url}
+                        target={linkTarget(link.url)}
+                        rel={linkTarget(link.url) ? "noreferrer" : undefined}
+                      >
+                        {link.label}
+                        <span>{link.source}</span>
+                      </a>
+                    {/each}
+                  </div>
+                {/if}
+              </article>
+            {/each}
+          </div>
+        </div>
+      {/if}
     </section>
   {/if}
 </section>
@@ -790,6 +1241,75 @@
     margin-top: var(--space-3);
     color: var(--color-text-muted);
     font-size: var(--text-md);
+  }
+
+  .recent-documents {
+    display: grid;
+    max-width: 58rem;
+    gap: var(--space-3);
+    margin: 0 0 var(--space-5);
+    padding: var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-panel);
+  }
+
+  .recent-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+  }
+
+  .recent-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    gap: var(--space-2);
+  }
+
+  .recent-document {
+    display: grid;
+    min-height: 7rem;
+    gap: var(--space-1);
+    padding: var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    color: var(--color-text);
+    cursor: pointer;
+    text-align: left;
+    text-decoration: none;
+  }
+
+  .recent-document:hover,
+  .recent-document.active {
+    border-color: var(--color-accent);
+  }
+
+  .recent-title {
+    overflow: hidden;
+    font-weight: var(--font-medium);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .recent-meta {
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    line-height: 1.3;
+  }
+
+  .recent-preview {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+    line-height: 1.35;
+    overflow-wrap: anywhere;
   }
 
   .input-card,
@@ -1008,6 +1528,12 @@
     overflow-wrap: anywhere;
   }
 
+  .literal-gloss.notFound {
+    color: color-mix(in srgb, var(--color-text-muted) 72%, transparent);
+    font-family: var(--font-serif, serif);
+    font-style: italic;
+  }
+
   .literal-word:hover .literal-source,
   .literal-word.active .literal-source {
     color: var(--color-accent);
@@ -1050,7 +1576,7 @@
 
   .analysis-grid {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(18rem, 0.8fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--space-5);
     margin-top: var(--space-5);
   }
@@ -1061,13 +1587,15 @@
   }
 
   .span-list,
-  .word-table {
+  .word-table,
+  .grammar-list {
     display: grid;
     gap: var(--space-2);
   }
 
   .span-row,
-  .word-row {
+  .word-row,
+  .grammar-row {
     display: grid;
     gap: var(--space-2);
     padding: var(--space-3);
@@ -1081,12 +1609,17 @@
     align-items: start;
   }
 
+  .grammar-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .span-row p {
     margin-top: var(--space-1);
   }
 
   .span-row small,
-  .word-row small {
+  .word-row small,
+  .grammar-row small {
     color: var(--color-text-muted);
   }
 
@@ -1099,8 +1632,95 @@
     border-color: var(--color-text);
   }
 
+  .word-row.lookupError {
+    border-color: color-mix(in srgb, var(--color-danger, #b00020) 42%, var(--color-border));
+  }
+
+  .word-row.lookupError span {
+    color: var(--color-danger, #b00020);
+  }
+
+  .word-row.notFound span {
+    font-style: italic;
+  }
+
   .word-row span {
     color: var(--color-text-muted);
+  }
+
+  .grammar-chips {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+    margin-top: var(--space-2);
+  }
+
+  .grammar-chips.compact {
+    margin-top: 0;
+  }
+
+  .grammar-chip {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.35rem;
+    padding: 0 var(--space-2);
+    border: 1px solid color-mix(in srgb, var(--color-accent) 34%, var(--color-border));
+    border-radius: var(--radius-sm);
+    background: color-mix(in srgb, var(--color-accent) 8%, var(--color-bg));
+    color: var(--color-text);
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    line-height: 1;
+  }
+
+  .grammar-main {
+    display: grid;
+    gap: var(--space-1);
+    min-width: 0;
+  }
+
+  .grammar-main span {
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+    overflow-wrap: anywhere;
+  }
+
+  .grammar-main code {
+    width: fit-content;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+  }
+
+  .grammar-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .grammar-links a {
+    display: inline-grid;
+    gap: 0.1rem;
+    min-height: 2rem;
+    padding: var(--space-1) var(--space-2);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    color: var(--color-text);
+    font-size: var(--text-xs);
+    text-decoration: none;
+  }
+
+  .grammar-links a:hover {
+    border-color: var(--color-accent);
+  }
+
+  .grammar-links span {
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
   }
 
   @media (max-width: 900px) {

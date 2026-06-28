@@ -6,7 +6,7 @@ describe("example catalog", () => {
     const examples = await buildExampleCatalog();
 
     expect(examples.map((example) => example.id)).toEqual([
-      "langouste-hu",
+      "hungarian-dictionary",
       "english-overlap",
       "article-fixture",
       "transcript",

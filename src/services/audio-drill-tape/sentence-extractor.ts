@@ -1,5 +1,4 @@
-import { FiloDocument } from "../../../filo/src/document";
-import type { FiloAnnotation, FiloDocumentJson } from "../../../filo/src/types";
+import { FiloDocument, type FiloAnnotation, type FiloDocumentJson } from "filo";
 import { config } from "../../lib/config.ts";
 import { languageName } from "../../lib/languages.ts";
 import { getAnthropicClient } from "../ai/client.ts";
@@ -92,7 +91,7 @@ export class ClaudeSourceSentenceExtractor implements SourceSentenceExtractor {
 
     const sourceLanguageName = languageName(input.sourceLanguage);
     const bridgeLanguageName = languageName(input.bridgeLanguage);
-    const prompt = `You are preparing a Pimsleur-style language tape from a timed Filo transcript.
+    const prompt = `You are preparing a guided audio-drill language tape from a timed Filo transcript.
 
 Source language: ${sourceLanguageName} (${input.sourceLanguage})
 Bridge language: ${bridgeLanguageName} (${input.bridgeLanguage})

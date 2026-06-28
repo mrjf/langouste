@@ -280,11 +280,12 @@ function normalizeSchedulerOptions(
     };
   }
 
-  const parameters = input.parameters ?? DEFAULT_FSRS_PARAMETERS;
-  const requestRetention = input.requestRetention ?? DEFAULT_REQUEST_RETENTION;
-  const maximumIntervalDays = input.maximumIntervalDays ?? DEFAULT_MAXIMUM_INTERVAL_DAYS;
+  const options = input as FSRSSchedulerOptions;
+  const parameters = options.parameters ?? DEFAULT_FSRS_PARAMETERS;
+  const requestRetention = options.requestRetention ?? DEFAULT_REQUEST_RETENTION;
+  const maximumIntervalDays = options.maximumIntervalDays ?? DEFAULT_MAXIMUM_INTERVAL_DAYS;
   const failureReviewDelayMinutes =
-    input.failureReviewDelayMinutes ?? DEFAULT_FAILURE_REVIEW_DELAY_MINUTES;
+    options.failureReviewDelayMinutes ?? DEFAULT_FAILURE_REVIEW_DELAY_MINUTES;
 
   if (!Number.isFinite(requestRetention) || requestRetention <= 0 || requestRetention >= 1) {
     throw new Error(`requestRetention must be between 0 and 1, got ${requestRetention}`);

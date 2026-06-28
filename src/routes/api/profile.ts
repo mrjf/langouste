@@ -1,8 +1,9 @@
 import { Hono } from "hono";
 import { requireAuth } from "../middleware.ts";
 import { getProfile, updateProfile } from "../../services/database/profiles.ts";
+import type { AuthenticatedRouteBindings } from "../types.ts";
 
-export const profileRoutes = new Hono();
+export const profileRoutes = new Hono<AuthenticatedRouteBindings>();
 
 profileRoutes.use("*", requireAuth);
 

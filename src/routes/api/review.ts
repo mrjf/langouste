@@ -5,8 +5,9 @@ import { getDueGrammarGaps } from "../../services/database/grammar-gaps.ts";
 import { getFSRSConfig, upsertFSRSConfig } from "../../services/spaced-repetition/config.ts";
 import { recordInteraction } from "../../services/spaced-repetition/interactions.ts";
 import { tuneFSRSInteractionWeights } from "../../services/spaced-repetition/tuning.ts";
+import type { AuthenticatedRouteBindings } from "../types.ts";
 
-export const reviewRoutes = new Hono();
+export const reviewRoutes = new Hono<AuthenticatedRouteBindings>();
 
 reviewRoutes.use("*", requireAuth);
 

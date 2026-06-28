@@ -13,8 +13,9 @@ import {
 } from "../../services/database/members.ts";
 import { getConnector } from "../../services/database/agent-connectors.ts";
 import { adminDb } from "../../lib/db/index.ts";
+import type { AuthenticatedRouteBindings } from "../types.ts";
 
-export const conversationRoutes = new Hono();
+export const conversationRoutes = new Hono<AuthenticatedRouteBindings>();
 
 conversationRoutes.use("*", requireAuth);
 

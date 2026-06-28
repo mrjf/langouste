@@ -11,7 +11,7 @@
     | { kind: "new" }
     | { kind: "edit"; connector: AgentConnector };
 
-  let state: PanelState = $state({ kind: "list" });
+  let panelState: PanelState = $state({ kind: "list" });
   let connectors: AgentConnector[] = $state([]);
   let loading = $state(false);
   let saving = $state(false);
@@ -35,7 +35,7 @@
     saving = true;
     try {
       await api.createAgentConnector(payload);
-      state = { kind: "list" };
+      panelState = { kind: "list" };
       await load();
     } catch (err) {
       console.error("Create failed:", err);
@@ -46,14 +46,14 @@
   }
 
   async function updateConnection(payload: { name: string; type: string; config: Record<string, unknown> }) {
-    if (state.kind !== "edit") return;
+    if (panelState.kind !== "edit") return;
     saving = true;
     try {
-      await api.updateAgentConnector(state.connector.connector_id, {
+      await api.updateAgentConnector(panelState.connector.connector_id, {
         name: payload.name,
         config: payload.config,
       });
-      state = { kind: "list" };
+      panelState = { kind: "list" };
       await load();
     } catch (err) {
       console.error("Update failed:", err);
@@ -131,30 +131,30 @@
 <div class="connections">
   <header class="panel-header">
     <h1>Connections</h1>
-    {#if state.kind === "list"}
-      <button class="btn-primary" onclick={() => state = { kind: "new" }}>+ New connection</button>
+    {#if panelState.kind === "list"}
+      <button class="btn-primary" onclick={() => panelState = { kind: "new" }}>+ New connection</button>
     {/if}
   </header>
 
-  {#if state.kind === "new"}
+  {#if panelState.kind === "new"}
     <div class="card">
       <h2>New connection</h2>
       <ConnectionForm
         saveLabel="Create"
         saving={saving}
         onsave={createConnection}
-        oncancel={() => state = { kind: "list" }}
+        oncancel={() => panelState = { kind: "list" }}
       />
     </div>
-  {:else if state.kind === "edit"}
+  {:else if panelState.kind === "edit"}
     <div class="card">
-      <h2>Edit: {state.connector.name}</h2>
+      <h2>Edit: {panelState.connector.name}</h2>
       <ConnectionForm
-        initial={state.connector}
+        initial={panelState.connector}
         saveLabel="Save changes"
         saving={saving}
         onsave={updateConnection}
-        oncancel={() => state = { kind: "list" }}
+        oncancel={() => panelState = { kind: "list" }}
       />
     </div>
   {:else}
@@ -163,7 +163,7 @@
     {:else if connectors.length === 0}
       <div class="empty">
         <p>No connections yet.</p>
-        <button class="btn-primary" onclick={() => state = { kind: "new" }}>Create your first connection</button>
+        <button class="btn-primary" onclick={() => panelState = { kind: "new" }}>Create your first connection</button>
       </div>
     {:else}
       <div class="list">
@@ -188,7 +188,7 @@
               <button class="btn-ghost" onclick={() => testConnection(c)} title="Send a test message to verify it's reachable">
                 🧪 Test
               </button>
-              <button class="btn-ghost" onclick={() => state = { kind: "edit", connector: c }}>
+              <button class="btn-ghost" onclick={() => panelState = { kind: "edit", connector: c }}>
                 ✎ Edit
               </button>
               {#if deleteConfirmId === c.connector_id}

@@ -199,6 +199,31 @@ export interface WorkbenchAudioResponse {
   byteLength: number;
 }
 
+export interface AudioDrillListItem {
+  id: string;
+  title: string;
+  sourceLanguage: string | null;
+  bridgeLanguage: string | null;
+  segmentCount: number;
+  generatedAudioCount: number;
+  sourceAudioCount: number;
+  lessonUpdatedAt: string | null;
+  audioFileName: string | null;
+  audioByteLength: number | null;
+  audioUpdatedAt: string | null;
+}
+
+export interface AudioDrillListResponse {
+  drills: AudioDrillListItem[];
+}
+
+export interface AudioDrillDocumentResponse {
+  drill: AudioDrillListItem;
+  lesson: FiloDocumentJson;
+  source: FiloDocumentJson | null;
+  audioUrl: string | null;
+}
+
 export type ExerciseKind =
   | "meaning_choice"
   | "reverse_translation_choice"
@@ -501,6 +526,12 @@ export interface ApiClient {
   recordWorkbenchInteraction(
     body: WorkbenchInteractionRequest,
   ): Promise<WorkbenchInteractionResponse>;
+  getAudioDrills(): Promise<AudioDrillListResponse>;
+  getAudioDrill(id: string): Promise<AudioDrillDocumentResponse>;
+  saveAudioDrillLesson(
+    id: string,
+    lesson: FiloDocumentJson,
+  ): Promise<{ ok: boolean; drill: AudioDrillListItem; lesson: FiloDocumentJson }>;
   getExerciseSession(language: string, limit?: number): Promise<ExerciseSessionResponse>;
   submitExerciseAttempt(
     attemptId: string,

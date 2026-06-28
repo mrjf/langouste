@@ -64,7 +64,7 @@
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div class="overlay" onclick={onclose} onkeydown={(e) => e.key === "Escape" && onclose()}>
   <!-- svelte-ignore a11y_no_static_element_interactions -->
-  <div class="dialog" onclick={(e) => e.stopPropagation()}>
+  <div class="dialog" onclick={(e) => e.stopPropagation()} onkeydown={(e) => e.stopPropagation()}>
     {#if mode === "pick"}
       <h3>New chat</h3>
       {#if connectors.length > 0}

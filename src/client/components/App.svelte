@@ -13,6 +13,7 @@
   import ConnectionsPanel from "./ConnectionsPanel.svelte";
   import DictionaryPanel from "./DictionaryPanel.svelte";
   import WorkbenchPanel from "./WorkbenchPanel.svelte";
+  import AudioDrillEditor from "./AudioDrillEditor.svelte";
   import ExercisePanel from "./ExercisePanel.svelte";
   import ResourcesPanel from "./ResourcesPanel.svelte";
   import NewChatDialog from "./NewChatDialog.svelte";
@@ -35,6 +36,7 @@
     | "connections"
     | "dictionary"
     | "workbench"
+    | "audio-drills"
     | "exercises"
     | "resources" = $state("chat");
   // Profile route after #/profile. Examples:
@@ -44,6 +46,7 @@
   let profileRoute = $state("");
   let dictionaryRoute = $state("");
   let workbenchRoute = $state("");
+  let audioDrillRoute = $state("");
   const loggedIn = $derived(!!user.value && !!profile.value);
   let updatingHash = false;
 
@@ -58,8 +61,37 @@
   }
 
   function workbenchRouteFromHash(hash: string): string {
-    const m = hash.match(/^#\/workbench(?:\?(.*))?$/);
-    return m?.[1] ?? "";
+    const pathMatch = hash.match(/^#\/workbench\/([^?]+)(?:\?.*)?$/);
+    if (pathMatch?.[1]) {
+      try {
+        return decodeURIComponent(pathMatch[1]);
+      } catch {
+        return pathMatch[1];
+      }
+    }
+    const queryMatch = hash.match(/^#\/workbench(?:\?(.*))?$/);
+    return queryMatch?.[1] ?? "";
+  }
+
+  function workbenchHash(route: string): string {
+    if (!route) return "#/workbench";
+    if (route.startsWith("?")) return `#/workbench${route}`;
+    if (route.includes("=")) return `#/workbench?${route}`;
+    return `#/workbench/${encodeURIComponent(route)}`;
+  }
+
+  function audioDrillRouteFromHash(hash: string): string {
+    const m = hash.match(/^#\/audio-drills(?:\/([^?]+))?(?:\?.*)?$/);
+    if (!m?.[1]) return "";
+    try {
+      return decodeURIComponent(m[1]);
+    } catch {
+      return m[1];
+    }
+  }
+
+  function audioDrillHash(route: string): string {
+    return route ? `#/audio-drills/${encodeURIComponent(route)}` : "#/audio-drills";
   }
 
   function shortId(id: string): string {
@@ -83,7 +115,9 @@
     } else if (view === "dictionary") {
       target = dictionaryRoute ? `#/dictionary/${dictionaryRoute}` : "#/dictionary";
     } else if (view === "workbench") {
-      target = workbenchRoute ? `#/workbench?${workbenchRoute}` : "#/workbench";
+      target = workbenchHash(workbenchRoute);
+    } else if (view === "audio-drills") {
+      target = audioDrillHash(audioDrillRoute);
     } else if (view === "exercises") {
       target = "#/exercises";
     } else if (view === "resources") {
@@ -147,6 +181,11 @@
         workbenchRoute = workbenchRouteFromHash(location.hash);
         return;
       }
+      if (location.hash.startsWith("#/audio-drills")) {
+        view = "audio-drills";
+        audioDrillRoute = audioDrillRouteFromHash(location.hash);
+        return;
+      }
       if (location.hash.startsWith("#/exercises")) {
         view = "exercises";
         return;
@@ -185,6 +224,11 @@
     if (location.hash.startsWith("#/workbench")) {
       view = "workbench";
       workbenchRoute = workbenchRouteFromHash(location.hash);
+      return;
+    }
+    if (location.hash.startsWith("#/audio-drills")) {
+      view = "audio-drills";
+      audioDrillRoute = audioDrillRouteFromHash(location.hash);
       return;
     }
     if (location.hash.startsWith("#/exercises")) {
@@ -305,12 +349,18 @@
         />
         <SidebarNavButton
           index="06"
+          label="Audio"
+          active={view === "audio-drills"}
+          onclick={() => { view = "audio-drills"; audioDrillRoute = ""; chatStore.setActive(null); }}
+        />
+        <SidebarNavButton
+          index="07"
           label="Exercises"
           active={view === "exercises"}
           onclick={() => { view = "exercises"; chatStore.setActive(null); }}
         />
         <SidebarNavButton
-          index="07"
+          index="08"
           label="Resources"
           active={view === "resources"}
           onclick={() => { view = "resources"; chatStore.setActive(null); }}
@@ -343,6 +393,11 @@
         />
       {:else if view === "workbench"}
         <WorkbenchPanel route={workbenchRoute} onRouteChange={(route) => (workbenchRoute = route)} />
+      {:else if view === "audio-drills"}
+        <AudioDrillEditor
+          route={audioDrillRoute}
+          onRouteChange={(route) => (audioDrillRoute = route)}
+        />
       {:else if view === "exercises"}
         <ExercisePanel />
       {:else if view === "resources"}

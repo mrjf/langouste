@@ -1,5 +1,16 @@
 {
   "name": "langouste",
+  "version": "0.0.0",
+  "description": "Open-source language-learning chat with AI agents, correction, translation, and spaced repetition.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mrjf/langouste.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mrjf/langouste/issues"
+  },
+  "homepage": "https://github.com/mrjf/langouste#readme",
   "type": "module",
   "scripts": {
     "dev": "concurrently -k -n vite,hono -c blue,green \"vite dev\" \"bun --watch src/main.ts\"",
@@ -25,7 +36,7 @@
     "test:all:real": "bun run test && bun run test:e2e && bun run test:e2e:real",
     "migrate": "bun scripts/migrate.ts",
     "backfill:filo": "bun scripts/backfill-filo-docs.ts",
-    "build:pimsleur-tape": "bun scripts/build-pimsleur-tape.ts"
+    "build:audio-drill-tape": "bun scripts/build-audio-drill-tape.ts"
   },
   "dependencies": {
     "@anthropic-ai/claude-agent-sdk": "^0.2.112",
@@ -43,6 +54,7 @@
     "dictionary-pt": "^4.0.0",
     "dictionary-ru": "^3.0.0",
     "dictionary-tr": "^2.0.0",
+    "filo": "file:./filo",
     "hono": "^4.4.0",
     "nspell": "^2.1.5",
     "phonemize": "^1.2.0",

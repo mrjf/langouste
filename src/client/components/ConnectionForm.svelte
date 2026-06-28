@@ -26,13 +26,17 @@
   ];
 
   // Editing: type is immutable. Creating: starts at claude.
+  // svelte-ignore state_referenced_locally
   const isEdit = !!initial;
+  // svelte-ignore state_referenced_locally
   let agentType: ConnectorType = $state(
     (initial?.type as ConnectorType) ?? "claude",
   );
 
+  // svelte-ignore state_referenced_locally
   const initConfig = (initial?.config ?? {}) as Record<string, unknown>;
 
+  // svelte-ignore state_referenced_locally
   let agentName = $state(initial?.name ?? "");
   let agentModel = $state((initConfig.model as string) ?? "claude-sonnet-4-6");
   let agentSystemPrompt = $state((initConfig.system_prompt as string) ?? "");

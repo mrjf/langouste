@@ -87,8 +87,9 @@ const ENGLISH_MEDIATED_STRATEGY: AgentLanguageStrategy = {
       requiredLanguages: memberLanguages(input.member),
     };
   },
-  seedTranslations(response) {
-    return response ? { en: response } : {};
+  seedTranslations(response, _responseLanguage): Record<string, string> {
+    if (!response) return {};
+    return { en: response };
   },
 };
 

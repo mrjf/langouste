@@ -60,7 +60,7 @@ What we are *not* better at:
 
 - **Voice UX** (Speak wins).
 - **Scale** (Duolingo has 80M monthly users; we have 5).
-- **Curriculum** (Pimsleur and structured courses beat us for learners who want a path).
+- **Curriculum** (structured audio courses and guided curricula beat us for learners who want a path).
 - **Content richness today** (no stories, podcasts, partner media, or human tutor fallback in v1). The roadmap captures annotated real-media partnerships as a post-v1 bet.
 
 Don't overclaim. Every time we've been caught overselling, we lose a serious user for good.

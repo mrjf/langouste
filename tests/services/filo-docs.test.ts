@@ -1,6 +1,5 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { FiloDocument } from "../../filo/src/document";
-import type { DictionaryLookupPayload } from "../../filo/src/types";
+import { FiloDocument, type DictionaryLookupPayload } from "filo";
 import type { Database, Filter, SelectOptions } from "../../src/lib/db/types.ts";
 import {
   audioAssetId,

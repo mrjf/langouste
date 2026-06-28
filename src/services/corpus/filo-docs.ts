@@ -1,16 +1,16 @@
-import { annotateAudio } from "../../../filo/src/annotators/audio";
-import { annotateDictionaryLookups } from "../../../filo/src/annotators/dictionary";
-import { annotateSentences } from "../../../filo/src/annotators/sentences";
-import { annotateWords } from "../../../filo/src/annotators/tokenizer";
-import { annotateTranslation } from "../../../filo/src/annotators/translation";
-import { FiloDocument } from "../../../filo/src/document";
-import type {
-  AudioPayload,
-  DictionaryLookupPayload,
-  FiloAnnotation,
-  FiloDocumentJson,
-  SentencePayload,
-} from "../../../filo/src/types";
+import {
+  FiloDocument,
+  annotateAudio,
+  annotateDictionaryLookups,
+  annotateSentences,
+  annotateTranslation,
+  annotateWords,
+  type AudioPayload,
+  type DictionaryLookupPayload,
+  type FiloAnnotation,
+  type FiloDocumentJson,
+  type SentencePayload,
+} from "filo";
 import type { Database } from "../../lib/db/index.ts";
 import type { Message } from "../../types/index.ts";
 import { annotateFullRangeIpaLayers } from "./ipa-layers.ts";

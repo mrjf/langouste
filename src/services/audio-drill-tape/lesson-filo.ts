@@ -1,8 +1,11 @@
-import { annotateAudio } from "../../../filo/src/annotators/audio";
-import { annotateTranslation } from "../../../filo/src/annotators/translation";
-import { FiloDocument } from "../../../filo/src/document";
-import type { ByteRange, FiloAnnotation, FiloDocumentJson } from "../../../filo/src/types";
-import { languageName } from "../../lib/languages.ts";
+import {
+  FiloDocument,
+  annotateAudio,
+  annotateTranslation,
+  type ByteRange,
+  type FiloAnnotation,
+  type FiloDocumentJson,
+} from "filo";
 import type { TranslationProvider } from "../ai/translation/index.ts";
 import type {
   BuildLessonFiloOptions,
@@ -37,8 +40,17 @@ interface ReviewEvent {
   repetitionIndex: number;
 }
 
+interface WordAudioCandidate {
+  annotation: FiloAnnotation<SourceWordPayload>;
+  previousGapMs: number;
+  nextGapMs: number;
+  isolationScoreMs: number;
+  surroundingGapMs: number;
+}
+
 const DEFAULT_MAX_SENTENCES = 24;
 const DEFAULT_PAUSE_MS = 3000;
+const DEFAULT_WORD_PAUSE_MS = 750;
 const DEFAULT_REVIEW_OFFSETS = [2, 5, 10];
 
 export async function buildLessonTapeFilo(
@@ -59,21 +71,24 @@ export async function buildLessonTapeFilo(
     sourceLanguage,
     bridgeLanguage,
     pauseMs: options.pauseMs ?? DEFAULT_PAUSE_MS,
+    wordPauseMs: options.wordPauseMs ?? DEFAULT_WORD_PAUSE_MS,
     reviewOffsets: options.reviewOffsets ?? DEFAULT_REVIEW_OFFSETS,
   });
 
   const metadata: LessonTapeMetadata = {
-    corpus: "pimsleur-tape",
+    corpus: "audio-drill-tape",
     title: options.title,
     sourceDocumentId: sourceJson.id,
     sourceLanguage,
     bridgeLanguage,
     ...(options.sourceUrl ? { sourceUrl: options.sourceUrl } : {}),
     ...(options.sourceAudioPath ? { sourceAudioPath: options.sourceAudioPath } : {}),
+    pauseMs: options.pauseMs ?? DEFAULT_PAUSE_MS,
+    wordPauseMs: options.wordPauseMs ?? DEFAULT_WORD_PAUSE_MS,
     generatedAt: new Date().toISOString(),
   };
   const document = FiloDocument.fromText<LessonTapeMetadata>(draft.text, {
-    id: `pimsleur-tape:${slugId(options.title)}`,
+    id: `audio-drill-tape:${slugId(options.title)}`,
     metadata,
   });
 
@@ -105,7 +120,7 @@ export async function buildLessonTapeFilo(
           language: bridgeLanguage,
           sourceLanguage,
           text: item.translation,
-          source: "langouste.pimsleur.lesson",
+          source: "langouste.audio-drill.lesson",
           payload: {
             level: segment.payload.itemLevel ?? "segment",
             segmentId: segment.payload.segmentId,
@@ -138,6 +153,7 @@ export function selectLessonSentences(
       .annotations.map((annotation) => [annotation.id, annotation]),
   );
   const words = sourceDocument.requireTier<SourceWordPayload>("word").annotations;
+  const isolatedWordAudio = isolatedWordAudioSources(sourceDocument, words, sourceLanguage);
   const trainingSentences = sourceDocument.tier<TrainingSentencePayload>("training.sentence");
   const candidates =
     trainingSentences?.annotations ??
@@ -179,7 +195,16 @@ export function selectLessonSentences(
     selected.push({
       sentence: sentenceItem,
       words: sentenceWords.map((word, index) =>
-        toLessonItem(sourceDocument, word, "word", bridgeLanguage, sourceLanguage, index),
+        toLessonItem(
+          sourceDocument,
+          word,
+          "word",
+          bridgeLanguage,
+          sourceLanguage,
+          index,
+          undefined,
+          isolatedWordAudio.get(word.id)?.annotation,
+        ),
       ),
     });
   }
@@ -193,6 +218,7 @@ function buildLessonDraft(
     sourceLanguage: string;
     bridgeLanguage: string;
     pauseMs: number;
+    wordPauseMs: number;
     reviewOffsets: number[];
   },
 ): LessonDraft {
@@ -202,7 +228,7 @@ function buildLessonDraft(
   const queue: ReviewEvent[] = [];
 
   order = builder.append(
-    "This lesson uses the original recording. Listen to each sentence, then repeat during the pauses.",
+    "You will hear an English cue, then the Hungarian audio. Repeat during the silence. Later review cues give only the English; answer in Hungarian before the recording.",
     {
       segmentId: segmentId(order),
       order,
@@ -247,10 +273,15 @@ function appendSentenceLesson(
   lessonSentence: LessonSentence,
   order: number,
   turn: number,
-  options: { sourceLanguage: string; bridgeLanguage: string; pauseMs: number },
+  options: {
+    sourceLanguage: string;
+    bridgeLanguage: string;
+    pauseMs: number;
+    wordPauseMs: number;
+  },
 ): number {
   const sentence = lessonSentence.sentence;
-  order = builder.append(`The whole sentence means: "${sentence.translation}".`, {
+  order = builder.append(sentence.translation, {
     segmentId: segmentId(order),
     order,
     type: "meaning",
@@ -266,7 +297,7 @@ function appendSentenceLesson(
   order = appendSource(builder, sentence, order, "source", 0, turn);
 
   for (const word of lessonSentence.words) {
-    order = builder.append(`For "${word.translation}", listen:`, {
+    order = builder.append(word.translation, {
       segmentId: segmentId(order),
       order,
       type: "meaning",
@@ -279,25 +310,15 @@ function appendSentenceLesson(
       repetitionIndex: 0,
       promptTurn: turn,
     });
+    order = appendPause(builder, order, options.wordPauseMs, word.itemId, "word", turn, "padding");
     order = appendSource(builder, word, order, "source", 0, turn);
-    order = builder.append("Repeat it.", {
-      segmentId: segmentId(order),
-      order,
-      type: "repeat_prompt",
-      language: options.bridgeLanguage,
-      audioSource: "tts",
-      itemId: word.itemId,
-      itemLevel: "word",
-      sourceTierId: word.sourceTierId,
-      sourceAnnotationId: word.sourceAnnotationId,
-      repetitionIndex: 0,
-      promptTurn: turn,
-    });
-    order = appendPause(builder, order, options.pauseMs, word.itemId, "word", turn);
+    order = appendPause(builder, order, options.wordPauseMs, word.itemId, "word", turn, "padding");
+    order = appendPause(builder, order, options.pauseMs, word.itemId, "word", turn, "response");
     order = appendSource(builder, word, order, "answer", 0, turn);
+    order = appendPause(builder, order, options.wordPauseMs, word.itemId, "word", turn, "padding");
   }
 
-  order = builder.append(`Now say the full sentence: "${sentence.translation}".`, {
+  order = builder.append(sentence.translation, {
     segmentId: segmentId(order),
     order,
     type: "recall_prompt",
@@ -310,7 +331,15 @@ function appendSentenceLesson(
     repetitionIndex: 0,
     promptTurn: turn,
   });
-  order = appendPause(builder, order, options.pauseMs, sentence.itemId, "sentence", turn);
+  order = appendPause(
+    builder,
+    order,
+    options.pauseMs,
+    sentence.itemId,
+    "sentence",
+    turn,
+    "response",
+  );
   order = appendSource(builder, sentence, order, "answer", 0, turn);
   return order;
 }
@@ -320,7 +349,12 @@ function drainDueReviews(
   queue: ReviewEvent[],
   turn: number,
   order: number,
-  options: { sourceLanguage: string; bridgeLanguage: string; pauseMs: number },
+  options: {
+    sourceLanguage: string;
+    bridgeLanguage: string;
+    pauseMs: number;
+    wordPauseMs: number;
+  },
 ): number {
   queue.sort(
     (left, right) => left.dueTurn - right.dueTurn || left.sentence.ordinal - right.sentence.ordinal,
@@ -340,23 +374,28 @@ function appendSentenceReview(
   options: { sourceLanguage: string; bridgeLanguage: string; pauseMs: number },
 ): number {
   const sentence = event.sentence;
-  order = builder.append(
-    `How do you say "${sentence.translation}" in ${languageName(options.sourceLanguage)}?`,
-    {
-      segmentId: segmentId(order),
-      order,
-      type: "recall_prompt",
-      language: options.bridgeLanguage,
-      audioSource: "tts",
-      itemId: sentence.itemId,
-      itemLevel: "sentence",
-      sourceTierId: sentence.sourceTierId,
-      sourceAnnotationId: sentence.sourceAnnotationId,
-      repetitionIndex: event.repetitionIndex,
-      promptTurn: event.dueTurn,
-    },
+  order = builder.append(sentence.translation, {
+    segmentId: segmentId(order),
+    order,
+    type: "recall_prompt",
+    language: options.bridgeLanguage,
+    audioSource: "tts",
+    itemId: sentence.itemId,
+    itemLevel: "sentence",
+    sourceTierId: sentence.sourceTierId,
+    sourceAnnotationId: sentence.sourceAnnotationId,
+    repetitionIndex: event.repetitionIndex,
+    promptTurn: event.dueTurn,
+  });
+  order = appendPause(
+    builder,
+    order,
+    options.pauseMs,
+    sentence.itemId,
+    "sentence",
+    event.dueTurn,
+    "response",
   );
-  order = appendPause(builder, order, options.pauseMs, sentence.itemId, "sentence", event.dueTurn);
   order = appendSource(builder, sentence, order, "answer", event.repetitionIndex, event.dueTurn);
   return order;
 }
@@ -393,8 +432,9 @@ function appendPause(
   itemId: string,
   itemLevel: LessonItemLevel,
   promptTurn: number,
+  pauseRole: "padding" | "response",
 ): number {
-  return builder.append(`[pause ${Math.round(pauseMs / 1000)}s]`, {
+  return builder.append(`[pause ${formatPauseSeconds(pauseMs)}s]`, {
     segmentId: segmentId(order),
     order,
     type: "pause",
@@ -404,6 +444,7 @@ function appendPause(
     itemLevel,
     durationMs: pauseMs,
     promptTurn,
+    pauseRole,
   });
 }
 
@@ -411,32 +452,32 @@ function defineLessonTiers(document: FiloDocument): void {
   document.ensureTier<LessonSegmentPayload>({
     id: "lesson.segment",
     kind: "custom",
-    description: "Ordered Pimsleur-style tape segments",
-    source: "langouste.pimsleur.lesson",
+    description: "Ordered guided audio-drill tape segments",
+    source: "langouste.audio-drill.lesson",
   });
   document.ensureTier<LanguagePayload>({
     id: "language",
     kind: "language",
     description: "Language used by each generated tape segment",
-    source: "langouste.pimsleur.lesson",
+    source: "langouste.audio-drill.lesson",
   });
   document.ensureTier<Record<string, unknown>>({
     id: "word",
     kind: "word",
     description: "Source-language word-level training spans",
-    source: "langouste.pimsleur.lesson",
+    source: "langouste.audio-drill.lesson",
   });
   document.ensureTier<Record<string, unknown>>({
     id: "sentence",
     kind: "sentence",
     description: "Source-language sentence-level training spans",
-    source: "langouste.pimsleur.lesson",
+    source: "langouste.audio-drill.lesson",
   });
   document.ensureTier<Record<string, unknown>>({
     id: "spaced-repetition",
     kind: "custom",
     description: "Recall schedule events embedded in the tape",
-    source: "langouste.pimsleur.lesson",
+    source: "langouste.audio-drill.lesson",
   });
 }
 
@@ -448,7 +489,7 @@ function addLessonSegment(
   return document.addAnnotation<LessonSegmentPayload>("lesson.segment", {
     ...range,
     payload,
-    source: "langouste.pimsleur.lesson",
+    source: "langouste.audio-drill.lesson",
   });
 }
 
@@ -467,7 +508,7 @@ function addLanguageAnnotation(
       ...(payload.sourceTierId ? { sourceTierId: payload.sourceTierId } : {}),
       ...(payload.sourceAnnotationId ? { sourceAnnotationId: payload.sourceAnnotationId } : {}),
     },
-    source: "langouste.pimsleur.language",
+    source: "langouste.audio-drill.language",
   });
 }
 
@@ -495,7 +536,7 @@ function addStructuralAnnotation(
       sourceStartMs: payload.sourceStartMs,
       sourceEndMs: payload.sourceEndMs,
     },
-    source: "langouste.pimsleur.lesson",
+    source: "langouste.audio-drill.lesson",
   });
 }
 
@@ -517,7 +558,7 @@ function addSpacedRepetitionAnnotation(
       repetitionIndex: payload.repetitionIndex ?? 0,
       promptTurn: payload.promptTurn ?? null,
     },
-    source: "langouste.pimsleur.schedule",
+    source: "langouste.audio-drill.schedule",
   });
 }
 
@@ -538,7 +579,7 @@ function addSourceAudioAnnotation(
     mimeType: "audio/mpeg",
     startMs: payload.sourceStartMs,
     endMs: payload.sourceEndMs,
-    source: "langouste.pimsleur.source",
+    source: "langouste.audio-drill.source",
     payload: {
       segmentId: payload.segmentId,
       itemId: payload.itemId,
@@ -573,7 +614,7 @@ async function annotateBridgeSegmentTranslations(
       language: options.targetLanguage,
       sourceLanguage: options.sourceLanguage,
       text: translation,
-      source: "langouste.pimsleur.lesson",
+      source: "langouste.audio-drill.lesson",
       payload: {
         level: "sentence",
         segmentId: segment.payload.segmentId,
@@ -593,8 +634,10 @@ function toLessonItem(
   sourceLanguage: string,
   ordinal: number,
   translationOverride?: string,
+  audioAnnotation?: FiloAnnotation<SourceWordPayload | SourceSentencePayload>,
 ): LessonItem {
   const payload = annotation.payload;
+  const audioPayload = audioAnnotation?.payload ?? payload;
   const text = sourceDocument.textOf(annotation);
   return {
     itemId: `${level}:${annotation.id}`,
@@ -605,12 +648,80 @@ function toLessonItem(
       translationForAnnotation(sourceDocument, annotation, bridgeLanguage) ??
       text,
     language: sourceLanguage,
-    sourceTierId: annotation.tierId,
-    sourceAnnotationId: annotation.id,
-    sourceStartMs: payload.startMs,
-    sourceEndMs: payload.endMs,
+    sourceTierId: audioAnnotation?.tierId ?? annotation.tierId,
+    sourceAnnotationId: audioAnnotation?.id ?? annotation.id,
+    sourceStartMs: audioPayload.startMs,
+    sourceEndMs: audioPayload.endMs,
     ordinal,
   };
+}
+
+function isolatedWordAudioSources(
+  sourceDocument: FiloDocument,
+  words: Array<FiloAnnotation<SourceWordPayload>>,
+  sourceLanguage: string,
+): Map<string, WordAudioCandidate> {
+  const sortedWords = [...words].sort(
+    (left, right) => left.payload.startMs - right.payload.startMs || left.start - right.start,
+  );
+  const candidatesByKey = new Map<string, WordAudioCandidate[]>();
+
+  for (let index = 0; index < sortedWords.length; index += 1) {
+    const word = sortedWords[index];
+    if (!word) continue;
+    if (word.payload.endMs <= word.payload.startMs) continue;
+    const key = normalizedWordKey(sourceDocument.textOf(word), sourceLanguage);
+    if (!key) continue;
+    const previous = sortedWords[index - 1];
+    const next = sortedWords[index + 1];
+    const previousGapMs =
+      previous && previous.payload.endMs > 0
+        ? Math.max(0, word.payload.startMs - previous.payload.endMs)
+        : 0;
+    const nextGapMs =
+      next && next.payload.startMs > 0 ? Math.max(0, next.payload.startMs - word.payload.endMs) : 0;
+    const candidate: WordAudioCandidate = {
+      annotation: word,
+      previousGapMs,
+      nextGapMs,
+      isolationScoreMs: Math.min(previousGapMs, nextGapMs),
+      surroundingGapMs: previousGapMs + nextGapMs,
+    };
+    const candidates = candidatesByKey.get(key) ?? [];
+    candidates.push(candidate);
+    candidatesByKey.set(key, candidates);
+  }
+
+  const bestBySourceWord = new Map<string, WordAudioCandidate>();
+  for (const word of words) {
+    const key = normalizedWordKey(sourceDocument.textOf(word), sourceLanguage);
+    if (!key) continue;
+    const best = candidatesByKey.get(key)?.toSorted(compareWordAudioCandidate)[0];
+    if (best) bestBySourceWord.set(word.id, best);
+  }
+  return bestBySourceWord;
+}
+
+function compareWordAudioCandidate(left: WordAudioCandidate, right: WordAudioCandidate): number {
+  return (
+    right.isolationScoreMs - left.isolationScoreMs ||
+    right.surroundingGapMs - left.surroundingGapMs ||
+    wordDurationMs(right.annotation) - wordDurationMs(left.annotation) ||
+    left.annotation.payload.startMs - right.annotation.payload.startMs
+  );
+}
+
+function wordDurationMs(annotation: FiloAnnotation<SourceWordPayload>): number {
+  return annotation.payload.endMs - annotation.payload.startMs;
+}
+
+function normalizedWordKey(text: string, language: string): string {
+  return text
+    .trim()
+    .toLocaleLowerCase(language)
+    .normalize("NFC")
+    .replace(/^[^\p{Letter}\p{Mark}\p{Number}]+/gu, "")
+    .replace(/[^\p{Letter}\p{Mark}\p{Number}]+$/gu, "");
 }
 
 function segmentId(order: number): string {
@@ -624,6 +735,11 @@ function slugId(value: string): string {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
   return slug || "lesson";
+}
+
+function formatPauseSeconds(pauseMs: number): string {
+  const seconds = pauseMs / 1000;
+  return Number.isInteger(seconds) ? String(seconds) : seconds.toFixed(2).replace(/0+$/u, "");
 }
 
 class LessonDraftBuilder {

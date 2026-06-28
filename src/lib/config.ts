@@ -33,6 +33,8 @@ export const config = {
 
   anthropicApiKey: required("ANTHROPIC_API_KEY"),
   translationProvider: process.env.TRANSLATION_PROVIDER ?? "claude",
+  googleCloudProject: process.env.GOOGLE_CLOUD_PROJECT ?? "",
+  googleCloudLocation: process.env.GOOGLE_CLOUD_LOCATION ?? "global",
   agentLanguageStrategy,
 
   // Text-to-speech provider. "none" (default) disables audio playback.

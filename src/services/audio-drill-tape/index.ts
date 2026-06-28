@@ -3,10 +3,10 @@ export {
   selectLessonSentences,
 } from "./lesson-filo.ts";
 export {
-  buildPimsleurTape,
+  buildAudioDrillTape,
   downloadAudioFile,
-  type BuildPimsleurTapeInput,
-  type BuildPimsleurTapeResult,
+  type BuildAudioDrillTapeInput,
+  type BuildAudioDrillTapeResult,
 } from "./pipeline.ts";
 export { renderLessonAudio, type RenderLessonAudioOptions } from "./render.ts";
 export {
@@ -30,7 +30,7 @@ export type {
   LessonSentence,
   LessonSegmentPayload,
   LessonTapeMetadata,
-  PimsleurTapeDocuments,
+  AudioDrillTapeDocuments,
   RenderedAudioPayload,
   SourcePhrasePayload,
   SourceSentencePayload,

@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import { config } from "../lib/config.ts";
 import { adminDb, userDb } from "../lib/db/index.ts";
 import { validateToken } from "../lib/auth/local.ts";
+import type { AuthenticatedRouteBindings } from "./types.ts";
 
 /**
  * Validates the Authorization bearer token and binds a per-request Database
@@ -14,7 +15,7 @@ import { validateToken } from "../lib/auth/local.ts";
  *   validate with hono/jwt and hand back the admin Database (no RLS in
  *   SQLite).
  */
-export async function requireAuth(c: Context, next: Next) {
+export async function requireAuth(c: Context<AuthenticatedRouteBindings>, next: Next) {
   const authHeader = c.req.header("Authorization");
   if (!authHeader?.startsWith("Bearer ")) {
     return c.json({ error: "Missing or invalid Authorization header" }, 401);

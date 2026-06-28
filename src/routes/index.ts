@@ -11,6 +11,7 @@ import { dictionaryRoutes } from "./api/dictionary.ts";
 import { workbenchRoutes } from "./api/workbench.ts";
 import { exerciseRoutes } from "./api/exercises.ts";
 import { resourcesRoutes } from "./api/resources.ts";
+import { audioDrillRoutes } from "./api/audio-drills.ts";
 
 export const apiRoutes = new Hono();
 
@@ -25,6 +26,7 @@ apiRoutes.route("/dictionary", dictionaryRoutes);
 apiRoutes.route("/workbench", workbenchRoutes);
 apiRoutes.route("/exercises", exerciseRoutes);
 apiRoutes.route("/resources", resourcesRoutes);
+apiRoutes.route("/audio-drills", audioDrillRoutes);
 
 if (config.testMode) {
   // Loaded lazily so production builds don't ship test-only code.

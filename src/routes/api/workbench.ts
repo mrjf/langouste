@@ -11,7 +11,7 @@ import {
 } from "../../services/corpus/audio-assets.ts";
 import { recordInteraction } from "../../services/spaced-repetition/interactions.ts";
 import { adminDb, type Database } from "../../lib/db/index.ts";
-import type { FiloAnnotation, FiloDocumentJson, FiloTierJson } from "../../../filo/src/types";
+import type { FiloAnnotation, FiloDocumentJson, FiloTierJson } from "filo";
 import type { LanguageCode } from "../../types/index.ts";
 
 type WorkbenchRouteBindings = {

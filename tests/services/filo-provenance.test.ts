@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { FiloDocument } from "../../filo/src/document";
+import { FiloDocument } from "filo";
 import {
   filoTextDocument,
   sourceSummariesForDocument,
