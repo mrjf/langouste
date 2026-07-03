@@ -67,9 +67,18 @@ function memberLanguages(member: ConversationMember): string[] {
 // Get messages for a conversation
 messageRoutes.get("/:conversationId", async (c) => {
   const db = c.get("db");
+  const userId = c.get("userId");
   const conversationId = c.req.param("conversationId");
   const before = c.req.query("before");
   const limit = parseInt(c.req.query("limit") ?? "50", 10);
+
+  // Membership gate: in sqlite mode `db` is the admin (no-RLS) database, so
+  // this check is the only thing preventing a member of one conversation from
+  // reading another's history by guessing its ID.
+  const member = await getMember(db, conversationId, userId);
+  if (!member) {
+    return c.json({ error: "Not a member of this conversation" }, 403);
+  }
 
   const messages = await getMessages(db, conversationId, limit, before);
   return c.json(messages);

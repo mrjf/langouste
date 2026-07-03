@@ -8,6 +8,7 @@ import {
 } from "../../services/database/conversations.ts";
 import {
   addMember,
+  getMember,
   markConversationRead,
   updateMemberLanguages,
 } from "../../services/database/members.ts";
@@ -67,6 +68,14 @@ conversationRoutes.patch("/:conversationId/connector", async (c) => {
 
   if (!agent_connector_id) {
     return c.json({ error: "agent_connector_id is required" }, 400);
+  }
+
+  // Membership gate: swapping a conversation's agent must be limited to its
+  // members. Owning the target connector (checked below) is not enough — that
+  // would let anyone repoint any conversation they can name.
+  const member = await getMember(db, conversationId, userId);
+  if (!member) {
+    return c.json({ error: "Not a member of this conversation" }, 403);
   }
 
   const connector = await getConnector(db, agent_connector_id);
