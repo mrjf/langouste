@@ -13,10 +13,10 @@ Language-learning chat with AI agents. The user writes in their target language 
 
 ## Commands
 
-- `npm run dev` — run Vite dev server + Hono backend (parallel)
-- `npm run dev:client` — Vite dev server only (port 5173, proxies /api to :8000)
-- `npm run dev:server` — Hono backend only (port 8000)
-- `npm run build` — build frontend for production
+- `bun run dev` — run Vite dev server + Hono backend (parallel)
+- `bun run dev:client` — Vite dev server only (port 5173, proxies /api to :8000)
+- `bun run dev:server` — Hono backend only (port 8000)
+- `bun run build` — build frontend for production
 - `bun test` — run tests (backend, uses bun test runner)
 - `bun run migrate` — apply pending database migrations
 - `bun run start` — run production server (serves Vite build from dist/client)

@@ -1,5 +1,13 @@
 # Release Process
 
+> **Status — this is the target process, not the current one.** As of today,
+> Langouste is distributed as **source only**: clone the repo, `bun install`,
+> and run it locally in SQLite mode (see the [README](../README.md) quick
+> start). The Tauri desktop app, Docker Compose self-host, signed binaries, and
+> automated release pipeline described below are **planned, not yet
+> implemented** — see [ROADMAP.md](./ROADMAP.md) for what exists today versus
+> what's ahead. This document is the blueprint we're building toward.
+
 How Langouste ships. Two deployment tiers (local desktop and self-hosted), semver, atomic migrations, reversible rollouts. The goal: releasing on any given Friday at 5 p.m. is safe.
 
 ## Two tiers
