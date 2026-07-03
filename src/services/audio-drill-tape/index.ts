@@ -10,6 +10,20 @@ export {
 } from "./pipeline.ts";
 export { renderLessonAudio, type RenderLessonAudioOptions } from "./render.ts";
 export {
+  annotateTopicLessonSourceCards,
+  buildTopicAudioLesson,
+  ClaudeTopicLessonContentGenerator,
+  type BuildTopicAudioLessonInput,
+  type BuildTopicAudioLessonResult,
+  type TopicLessonContent,
+  type TopicLessonContentGenerator,
+  type TopicLessonContentInput,
+  type TopicLessonLogEntry,
+  type TopicLessonLogger,
+  type TopicLessonSentence,
+  type TopicLessonSourceCard,
+} from "./topic-lesson.ts";
+export {
   annotateSourceTranslations,
   annotateTrainingSentences,
   buildSourceTranscriptFilo,
@@ -37,4 +51,8 @@ export type {
   SourceTranscriptMetadata,
   SourceWordPayload,
   TrainingSentencePayload,
+  TopicLessonMetadata,
+  TopicLessonSourceCardPayload,
+  TopicLessonSentencePayload,
+  TopicLessonSourcePayload,
 } from "./types.ts";

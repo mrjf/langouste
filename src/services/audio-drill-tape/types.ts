@@ -5,6 +5,7 @@ export type LessonItemLevel = "word" | "phrase" | "sentence";
 export type LessonSegmentType =
   | "intro"
   | "meaning"
+  | "explanation"
   | "source"
   | "repeat_prompt"
   | "recall_prompt"
@@ -29,6 +30,7 @@ export interface SourceTranscriptMetadata {
 export interface LessonTapeMetadata {
   [key: string]: unknown;
   corpus: "audio-drill-tape";
+  lessonKind?: "source-audio" | "topic";
   title: string;
   sourceDocumentId: string;
   sourceLanguage: string;
@@ -36,6 +38,51 @@ export interface LessonTapeMetadata {
   sourceUrl?: string;
   sourceAudioPath?: string;
   generatedAt: string;
+}
+
+export interface TopicLessonMetadata {
+  [key: string]: unknown;
+  corpus: "audio-drill-topic-source";
+  title: string;
+  topic: string;
+  sourceLanguage: string;
+  targetLanguage: string;
+  baseLanguage: string;
+  learnerLevel: string;
+  sourceUrl?: string;
+  sourceUrls?: string[];
+  desiredRuntimeMinutes?: number;
+  extraInformation?: string;
+  createdAt: string;
+}
+
+export interface TopicLessonSourcePayload {
+  topic: string;
+  sourceUrl?: string;
+  sourceUrls?: string[];
+  sourceLanguage: string;
+  targetLanguage: string;
+  baseLanguage: string;
+  desiredRuntimeMinutes?: number;
+  extraInformation?: string;
+}
+
+export interface TopicLessonSourceCardPayload {
+  ordinal: number;
+  text: string;
+  language: string;
+  sourceTierId: "sentence";
+  sourceAnnotationId: string;
+}
+
+export interface TopicLessonSentencePayload {
+  sentenceId: string;
+  ordinal: number;
+  targetText: string;
+  baseTranslation: string;
+  explanation: string;
+  language: string;
+  baseLanguage: string;
 }
 
 export interface TimedPayload {
@@ -118,6 +165,7 @@ export interface LessonSegmentPayload {
   promptTurn?: number;
   durationMs?: number;
   pauseRole?: "padding" | "response";
+  speechRate?: number;
 }
 
 export interface RenderedAudioPayload {

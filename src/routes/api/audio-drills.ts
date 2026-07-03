@@ -1,9 +1,15 @@
-import { Hono } from "hono";
-import { readdir, stat, writeFile } from "node:fs/promises";
+import { Hono, type Context } from "hono";
+import { createHash } from "node:crypto";
+import { mkdir, readdir, stat, writeFile } from "node:fs/promises";
 import { basename, join, resolve } from "node:path";
 import { requireAuth } from "../middleware.ts";
 import type { Database } from "../../lib/db/index.ts";
 import type { FiloDocumentJson } from "filo";
+import { buildTopicAudioLesson } from "../../services/audio-drill-tape/index.ts";
+import { getDueGrammarGaps } from "../../services/database/grammar-gaps.ts";
+import { getProfile } from "../../services/database/profiles.ts";
+import { getDueVocabulary } from "../../services/database/vocabulary.ts";
+import type { CefrLevel, LearningLanguage } from "../../types/index.ts";
 
 type AudioDrillsRouteBindings = {
   Variables: {
@@ -24,6 +30,42 @@ interface AudioDrillListItem {
   audioFileName: string | null;
   audioByteLength: number | null;
   audioUpdatedAt: string | null;
+}
+
+interface CreateTopicAudioDrillRequest {
+  topic?: unknown;
+  sourceText?: unknown;
+  sourceUrl?: unknown;
+  sourceUrls?: unknown;
+  sourceLanguage?: unknown;
+  targetLanguage?: unknown;
+  baseLanguage?: unknown;
+  cefrLevel?: unknown;
+  title?: unknown;
+  maxSentences?: unknown;
+  desiredRuntimeMinutes?: unknown;
+  generationModel?: unknown;
+  pauseMs?: unknown;
+  extraInformation?: unknown;
+  renderAudio?: unknown;
+}
+
+interface BuildLogEvent {
+  type?: "log" | "complete" | "error";
+  step: string;
+  message: string;
+  data?: unknown;
+}
+
+type BuildLogEmitter = (event: BuildLogEvent) => void | Promise<void>;
+
+interface CreateTopicAudioDrillResponse {
+  ok: true;
+  id: string;
+  drill: AudioDrillListItem;
+  lesson: FiloDocumentJson;
+  source: FiloDocumentJson;
+  audioUrl: string | null;
 }
 
 export interface AudioDrillRouteOptions {
@@ -53,6 +95,84 @@ export function createAudioDrillRoutes(
       (right.lessonUpdatedAt ?? "").localeCompare(left.lessonUpdatedAt ?? ""),
     );
     return c.json({ drills: items });
+  });
+
+  routes.post("/topic", async (c) => {
+    const body = (await c.req.json().catch(() => null)) as CreateTopicAudioDrillRequest | null;
+    try {
+      const response = await createTopicAudioDrill(c, root, body);
+      return c.json(response);
+    } catch (err) {
+      const status: 400 | 404 | 500 = err instanceof RouteError ? err.status : 500;
+      return c.json({ error: errorMessage(err) }, status);
+    }
+  });
+
+  routes.post("/topic/stream", async (c) => {
+    const body = (await c.req.json().catch(() => null)) as CreateTopicAudioDrillRequest | null;
+    const encoder = new TextEncoder();
+    let aborted = false;
+    let heartbeat: ReturnType<typeof setInterval> | undefined;
+    const stream = new ReadableStream({
+      async start(controller) {
+        const emit: BuildLogEmitter = async (event) => {
+          if (aborted) return;
+          const line = `${stringifyStreamEvent(event)}\n`;
+          try {
+            controller.enqueue(encoder.encode(line));
+          } catch {
+            aborted = true;
+          }
+        };
+        heartbeat = setInterval(() => {
+          void emit({
+            step: "heartbeat",
+            message: "Topic audio drill generation is still running.",
+          });
+        }, 10_000);
+
+        try {
+          const response = await createTopicAudioDrill(c, root, body, emit);
+          await emit({
+            type: "complete",
+            step: "complete",
+            message: "Topic audio drill is ready.",
+            data: {
+              id: response.id,
+              audioUrl: response.audioUrl,
+              drill: response.drill,
+            },
+          });
+        } catch (err) {
+          await emit({
+            type: "error",
+            step: "error",
+            message: errorMessage(err),
+            data: { status: err instanceof RouteError ? err.status : 500 },
+          });
+        } finally {
+          if (heartbeat) clearInterval(heartbeat);
+          if (!aborted) {
+            try {
+              controller.close();
+            } catch {
+              aborted = true;
+            }
+          }
+        }
+      },
+      cancel() {
+        aborted = true;
+        if (heartbeat) clearInterval(heartbeat);
+      },
+    });
+
+    return new Response(stream, {
+      headers: {
+        "Content-Type": "application/x-ndjson; charset=utf-8",
+        "Cache-Control": "no-cache, no-transform",
+      },
+    });
   });
 
   routes.get("/:id", async (c) => {
@@ -124,6 +244,151 @@ export function createAudioDrillRoutes(
   });
 
   return routes;
+}
+
+async function createTopicAudioDrill(
+  c: Context<AudioDrillsRouteBindings>,
+  root: string,
+  body: CreateTopicAudioDrillRequest | null,
+  emit?: BuildLogEmitter,
+): Promise<CreateTopicAudioDrillResponse> {
+  await emit?.({
+    step: "request",
+    message: "Received topic audio drill request.",
+    data: { body: sanitizedRequestBody(body) },
+  });
+
+  const topic = stringBody(body?.topic);
+  const sourceText = stringBody(body?.sourceText);
+  const sourceUrls = sourceUrlsBody(body);
+  if (!topic && !sourceText && sourceUrls.length === 0) {
+    throw new RouteError("topic or at least one source URL is required", 400);
+  }
+
+  const db = c.get("db");
+  const userId = c.get("userId");
+  const profile = await getProfile(db, userId);
+  if (!profile) throw new RouteError("Profile not found", 404);
+  await emit?.({
+    step: "profile",
+    message: "Loaded learner profile.",
+    data: {
+      baseLanguage: profile.base_language,
+      learningLanguages: profile.learning_languages,
+    },
+  });
+
+  const requestedTargetLanguage = stringBody(body?.targetLanguage);
+  const learning = learningLanguageFor(profile.learning_languages, requestedTargetLanguage);
+  if (!learning && !requestedTargetLanguage) {
+    throw new RouteError("targetLanguage is required when the profile has no languages", 400);
+  }
+
+  const targetLanguage = learning?.lang ?? requestedTargetLanguage;
+  const baseLanguage = stringBody(body?.baseLanguage) || profile.base_language;
+  const cefrLevel = cefrBody(body?.cefrLevel) ?? learning?.cefr_level ?? "A1";
+  const maxSentences = numberBody(body?.maxSentences, 1, 20) ?? undefined;
+  const desiredRuntimeMinutes = numberBody(body?.desiredRuntimeMinutes, 1, 60) ?? undefined;
+  const generationModel = modelBody(body?.generationModel);
+  const pauseMs = numberBody(body?.pauseMs, 0, 10_000) ?? undefined;
+  const extraInformation = stringBody(body?.extraInformation);
+  await emit?.({
+    step: "profile",
+    message: "Resolved learner settings.",
+    data: {
+      targetLanguage,
+      baseLanguage,
+      cefrLevel,
+      profileMatchedLanguage: !!learning,
+      desiredRuntimeMinutes,
+      generationModel: generationModel || null,
+      renderAudio: body?.renderAudio !== false,
+    },
+  });
+
+  const [dueVocabulary, dueGrammar] = await Promise.all([
+    getDueVocabulary(db, userId, targetLanguage, 30).catch(() => []),
+    getDueGrammarGaps(db, userId, targetLanguage, 20).catch(() => []),
+  ]);
+  await emit?.({
+    step: "learner-context",
+    message: "Loaded learner context for prompt adaptation.",
+    data: {
+      dueVocabularyCount: dueVocabulary.length,
+      dueGrammarCount: dueGrammar.length,
+      dueVocabularyPreview: dueVocabulary.slice(0, 10).map((item) => ({
+        term: item.term,
+        translation: item.translation,
+        cefrLevel: item.cefr_level,
+      })),
+      dueGrammarPreview: dueGrammar.slice(0, 10).map((gap) => ({
+        category: gap.category,
+        description: gap.description,
+      })),
+    },
+  });
+
+  const id = uniqueTopicDrillId(topic, targetLanguage);
+  const dir = drillDir(root, id);
+  if (!dir) throw new RouteError("invalid generated drill id", 500);
+  await mkdir(dir, { recursive: true });
+  await emit?.({
+    step: "filesystem",
+    message: "Created drill directory.",
+    data: { id, dir },
+  });
+
+  const result = await buildTopicAudioLesson({
+    ...(topic ? { topic } : {}),
+    ...(sourceText ? { sourceText } : {}),
+    ...(sourceUrls.length > 0 ? { sourceUrls } : {}),
+    sourceLanguage: stringBody(body?.sourceLanguage) || baseLanguage,
+    title: stringBody(body?.title) || topic || "Topic audio lesson",
+    outputDir: dir,
+    renderAudio: body?.renderAudio !== false,
+    ...(maxSentences !== undefined ? { maxSentences } : {}),
+    ...(desiredRuntimeMinutes !== undefined ? { desiredRuntimeMinutes } : {}),
+    ...(generationModel ? { generationModel } : {}),
+    ...(pauseMs !== undefined ? { pauseMs } : {}),
+    ...(extraInformation ? { extraInformation } : {}),
+    learner: {
+      userId,
+      targetLanguage,
+      baseLanguage,
+      cefrLevel,
+      knownVocabulary: dueVocabulary.map((item) => `${item.term} = ${item.translation}`),
+      grammarGaps: dueGrammar.map((gap) => `${gap.category}: ${gap.description}`),
+    },
+    logger: emit
+      ? (entry) =>
+          emit({
+            step: entry.step,
+            message: entry.message,
+            data: entry.data,
+          })
+      : undefined,
+  });
+
+  const response: CreateTopicAudioDrillResponse = {
+    ok: true,
+    id,
+    drill: await audioDrillListItem(root, id),
+    lesson: result.lesson,
+    source: result.source,
+    audioUrl: result.outputAudioPath ? `/api/audio-drills/${encodeURIComponent(id)}/audio` : null,
+  };
+  await emit?.({
+    step: "response",
+    message: "Prepared topic audio drill response.",
+    data: {
+      id: response.id,
+      title: response.drill.title,
+      audioUrl: response.audioUrl,
+      segmentCount: response.drill.segmentCount,
+      generatedAudioCount: response.drill.generatedAudioCount,
+    },
+  });
+  return response;
 }
 
 export const audioDrillRoutes = createAudioDrillRoutes();
@@ -223,4 +488,122 @@ function tierCount(document: FiloDocumentJson, tierId: string): number {
 
 function stringValue(value: unknown): string | null {
   return typeof value === "string" && value.trim() ? value.trim() : null;
+}
+
+function stringBody(value: unknown): string {
+  return typeof value === "string" ? value.trim() : "";
+}
+
+function numberBody(value: unknown, min: number, max: number): number | null {
+  const number =
+    typeof value === "number" ? value : typeof value === "string" ? Number(value) : NaN;
+  if (!Number.isFinite(number)) return null;
+  return Math.min(max, Math.max(min, Math.trunc(number)));
+}
+
+function modelBody(value: unknown): string {
+  const model = stringBody(value);
+  return /^[a-zA-Z0-9._:/-]+$/u.test(model) ? model : "";
+}
+
+function sourceUrlsBody(body: CreateTopicAudioDrillRequest | null): string[] {
+  const raw = body?.sourceUrls;
+  const values = [
+    ...(Array.isArray(raw) ? raw : []),
+    ...(typeof raw === "string" ? raw.split(/[\s,]+/u) : []),
+    body?.sourceUrl,
+  ];
+  return [
+    ...new Set(
+      values
+        .map((value) => stringBody(value))
+        .filter((value) => value.startsWith("http://") || value.startsWith("https://")),
+    ),
+  ];
+}
+
+function cefrBody(value: unknown): CefrLevel | null {
+  const raw = stringBody(value).toUpperCase();
+  return ["A1", "A2", "B1", "B2", "C1", "C2"].includes(raw) ? (raw as CefrLevel) : null;
+}
+
+function learningLanguageFor(
+  languages: LearningLanguage[],
+  requested: string,
+): LearningLanguage | null {
+  if (requested) return languages.find((language) => language.lang === requested) ?? null;
+  return languages[0] ?? null;
+}
+
+function uniqueTopicDrillId(topic: string, targetLanguage: string): string {
+  const stamp = new Date()
+    .toISOString()
+    .replace(/[-:.TZ]/g, "")
+    .slice(0, 14);
+  const slug = topic
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 40);
+  const hash = createHash("sha1")
+    .update(`${topic}\0${targetLanguage}\0${stamp}\0${Math.random()}`)
+    .digest("hex")
+    .slice(0, 8);
+  return `topic-${targetLanguage}-${slug || "lesson"}-${stamp}-${hash}`;
+}
+
+function sanitizedRequestBody(body: CreateTopicAudioDrillRequest | null): Record<string, unknown> {
+  return {
+    topic: stringBody(body?.topic) || null,
+    sourceUrls: sourceUrlsBody(body),
+    sourceTextCharacters: stringBody(body?.sourceText).length,
+    sourceLanguage: stringBody(body?.sourceLanguage) || null,
+    targetLanguage: stringBody(body?.targetLanguage) || null,
+    baseLanguage: stringBody(body?.baseLanguage) || null,
+    cefrLevel: stringBody(body?.cefrLevel) || null,
+    desiredRuntimeMinutes: numberBody(body?.desiredRuntimeMinutes, 1, 60),
+    generationModel: modelBody(body?.generationModel) || null,
+    pauseMs: numberBody(body?.pauseMs, 0, 10_000),
+    extraInformation: stringBody(body?.extraInformation) || null,
+    renderAudio: body?.renderAudio !== false,
+  };
+}
+
+function buildStreamEvent(event: BuildLogEvent): Record<string, unknown> {
+  return {
+    type: event.type ?? "log",
+    at: new Date().toISOString(),
+    step: event.step,
+    message: event.message,
+    data: event.data ?? null,
+  };
+}
+
+function stringifyStreamEvent(event: BuildLogEvent): string {
+  try {
+    return JSON.stringify(buildStreamEvent(event));
+  } catch (err) {
+    return JSON.stringify(
+      buildStreamEvent({
+        type: "error",
+        step: "log",
+        message: "Failed to serialize build log event.",
+        data: { error: errorMessage(err) },
+      }),
+    );
+  }
+}
+
+class RouteError extends Error {
+  constructor(
+    message: string,
+    readonly status: 400 | 404 | 500,
+  ) {
+    super(message);
+  }
+}
+
+function errorMessage(err: unknown): string {
+  return err instanceof Error ? err.message : "Failed to create topic audio drill";
 }

@@ -15,6 +15,8 @@ export interface AudioSynthesisOptions {
   language?: string;
   /** Provider-agnostic voice hint. Implementations resolve to a concrete voice. */
   voice?: string;
+  /** Provider-agnostic speech rate. 1.0 is normal speed; 0.75 is 25% slower. */
+  speechRate?: number;
   /**
    * Requesting user. Unused today (env-backed voice resolution), but plumbed
    * through so a future per-user voice resolver needs no signature changes.

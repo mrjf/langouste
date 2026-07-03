@@ -345,6 +345,8 @@ export const api: ApiClient = {
   // Audio drills
   getAudioDrills: () => request("/audio-drills"),
   getAudioDrill: (id: string) => request(`/audio-drills/${encodeURIComponent(id)}`),
+  createTopicAudioDrill: (body) =>
+    request("/audio-drills/topic", { method: "POST", body: JSON.stringify(body) }),
   saveAudioDrillLesson: (id: string, lesson) =>
     request(`/audio-drills/${encodeURIComponent(id)}/lesson`, {
       method: "PUT",

@@ -57,6 +57,9 @@ export class ElevenLabsAudioProvider implements AudioProvider {
       text,
       model_id: profile.model,
     };
+    if (opts.speechRate !== undefined) {
+      body.voice_settings = { speed: opts.speechRate };
+    }
     // language_code is only accepted by v2.5 models; the resolver returns
     // null for models that don't support it (e.g. eleven_multilingual_v2).
     if (profile.languageCode) {

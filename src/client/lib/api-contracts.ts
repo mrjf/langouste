@@ -224,6 +224,29 @@ export interface AudioDrillDocumentResponse {
   audioUrl: string | null;
 }
 
+export interface CreateTopicAudioDrillRequest {
+  topic?: string;
+  sourceText?: string;
+  sourceUrl?: string;
+  sourceUrls?: string[];
+  sourceLanguage?: string;
+  targetLanguage?: string;
+  baseLanguage?: string;
+  cefrLevel?: string;
+  title?: string;
+  maxSentences?: number;
+  desiredRuntimeMinutes?: number;
+  generationModel?: string;
+  pauseMs?: number;
+  extraInformation?: string;
+  renderAudio?: boolean;
+}
+
+export interface CreateTopicAudioDrillResponse extends AudioDrillDocumentResponse {
+  ok: boolean;
+  id: string;
+}
+
 export type ExerciseKind =
   | "meaning_choice"
   | "reverse_translation_choice"
@@ -528,6 +551,7 @@ export interface ApiClient {
   ): Promise<WorkbenchInteractionResponse>;
   getAudioDrills(): Promise<AudioDrillListResponse>;
   getAudioDrill(id: string): Promise<AudioDrillDocumentResponse>;
+  createTopicAudioDrill(body: CreateTopicAudioDrillRequest): Promise<CreateTopicAudioDrillResponse>;
   saveAudioDrillLesson(
     id: string,
     lesson: FiloDocumentJson,

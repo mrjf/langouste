@@ -104,6 +104,32 @@ describe("audio drill routes", () => {
       404,
     );
   });
+
+  test("streams topic build log errors as ndjson", async () => {
+    const { drillRoot } = await writeFixture();
+    const routes = await fixtureRoutes(drillRoot);
+
+    const response = await routes.request("http://local/topic/stream", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ renderAudio: false }),
+    });
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("Content-Type")).toContain("application/x-ndjson");
+    const lines = (await response.text()).trim().split("\n");
+    expect(lines.length).toBeGreaterThanOrEqual(2);
+    const events = lines.map((line) => JSON.parse(line) as Record<string, unknown>);
+    expect(events[0]).toMatchObject({
+      type: "log",
+      step: "request",
+    });
+    expect(events.at(-1)).toMatchObject({
+      type: "error",
+      step: "error",
+      message: "topic or at least one source URL is required",
+    });
+  });
 });
 
 async function fixtureRoutes(root: string) {

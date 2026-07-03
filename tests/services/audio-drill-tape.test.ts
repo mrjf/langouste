@@ -14,9 +14,14 @@ import {
   type Source,
 } from "../../src/services/corpus/audio-assets.ts";
 import {
+  annotateTopicLessonSourceCards,
   buildLessonTapeFilo,
+  buildTopicAudioLesson,
+  ClaudeTopicLessonContentGenerator,
   downloadAudioFile,
   renderLessonAudio,
+  type TopicLessonContentGenerator,
+  type TopicLessonContentInput,
 } from "../../src/services/audio-drill-tape/index.ts";
 import {
   annotateSourceTranslations,
@@ -33,6 +38,7 @@ import type {
   SourceSentencePayload,
   SourceWordPayload,
   TrainingSentencePayload,
+  TopicLessonSourceCardPayload,
 } from "../../src/services/audio-drill-tape/types.ts";
 
 describe("Audio drill tape Filo pipeline", () => {
@@ -502,6 +508,326 @@ describe("Audio drill tape Filo pipeline", () => {
       await rm(dir, { recursive: true, force: true });
     }
   });
+
+  test("builds a topic audio lesson with adapted target sentences and base-language explanations", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "langouste-topic-drill-"));
+    try {
+      const result = await buildTopicAudioLesson({
+        topic: "Market news",
+        sourceText: "The central bank kept interest rates unchanged today.",
+        sourceLanguage: "en",
+        outputDir: dir,
+        renderAudio: false,
+        learner: {
+          targetLanguage: "hu",
+          baseLanguage: "en",
+          cefrLevel: "A1",
+          knownVocabulary: ["ma = today"],
+          grammarGaps: ["verb conjugation: present tense"],
+        },
+        contentGenerator: new FakeTopicLessonContentGenerator(),
+      });
+
+      const lesson = FiloDocument.fromJSON(result.lesson);
+      const source = FiloDocument.fromJSON(result.source);
+      expect(result.source.metadata.corpus).toBe("audio-drill-topic-source");
+      expect(result.lesson.metadata.lessonKind).toBe("topic");
+      const sourceCards =
+        source.requireTier<TopicLessonSourceCardPayload>("topic.source-card").annotations;
+      expect(sourceCards).toHaveLength(1);
+      expect(source.textOf(sourceCards[0]!)).toBe(
+        "The central bank kept interest rates unchanged today.",
+      );
+      expect(lesson.text).toContain("A bank ma nem változtat.");
+      expect(lesson.text).toContain("The bank does not change today.");
+      const segments = lesson.requireTier<LessonSegmentPayload>("lesson.segment").annotations;
+      expect(segments.length).toBeGreaterThan(15);
+      expect(
+        segments.filter(
+          (segment) => segment.payload.language === "hu" && segment.payload.speechRate === 0.75,
+        ).length,
+      ).toBeGreaterThanOrEqual(6);
+      expect(
+        segments.some(
+          (segment) =>
+            segment.payload.type === "recall_prompt" &&
+            lesson.textOf(segment).includes("Translate"),
+        ),
+      ).toBe(true);
+      expect(
+        segments.some(
+          (segment) =>
+            segment.payload.itemLevel === "phrase" && lesson.textOf(segment) === "A bank",
+        ),
+      ).toBe(true);
+      expect(
+        segments.some(
+          (segment) =>
+            segment.payload.type === "explanation" &&
+            segment.payload.language === "hu" &&
+            lesson.textOf(segment) === "nem változtat",
+        ),
+      ).toBe(true);
+      expect(
+        segments.some(
+          (segment) =>
+            segment.payload.repetitionIndex === 1 && segment.payload.type === "recall_prompt",
+        ),
+      ).toBe(true);
+      expect(lesson.requireTier("topic.sentence").annotations).toHaveLength(1);
+      expect(lesson.requireTier("word").annotations.length).toBeGreaterThan(0);
+      const translations = lesson.requireTier<TranslationPayload>("translation:en").annotations;
+      expect(translations[0]?.payload.text).toBe("The bank does not change today.");
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  test("extracts article text before building topic source cards", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "langouste-topic-article-"));
+    const server = Bun.serve({
+      port: 0,
+      fetch() {
+        return new Response(
+          `<!doctype html>
+          <html>
+            <body>
+              <nav>Skip to main content Newsletter Search Open Navigation Menu</nav>
+              <article>
+                <p>Illustration by Lydia Ortiz and Patrick Rafanan
+                Save this story Save this story
+                Save this story Save this story
+                Darwin found sex a mystery.</p>
+                <p>The article continues with another useful sentence.</p>
+              </article>
+            </body>
+          </html>`,
+          { headers: { "Content-Type": "text/html" } },
+        );
+      },
+    });
+    try {
+      const result = await buildTopicAudioLesson({
+        topic: "Article",
+        sourceUrls: [`http://127.0.0.1:${server.port}/article`],
+        sourceLanguage: "en",
+        outputDir: dir,
+        renderAudio: false,
+        learner: {
+          targetLanguage: "hu",
+          baseLanguage: "en",
+          cefrLevel: "A1",
+        },
+        contentGenerator: new FakeTopicLessonContentGenerator(),
+      });
+
+      const source = FiloDocument.fromJSON(result.source);
+      const sourceCards =
+        source.requireTier<TopicLessonSourceCardPayload>("topic.source-card").annotations;
+      expect(sourceCards).toHaveLength(2);
+      expect(source.text).not.toContain("Skip to main content");
+      expect(source.text).not.toContain("Illustration by Lydia Ortiz");
+      expect(source.text).not.toContain("Save this story");
+      expect(source.textOf(sourceCards[0]!)).toBe("Darwin found sex a mystery.");
+    } finally {
+      server.stop(true);
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  test("uses desired runtime as a source sentence cap", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "langouste-topic-runtime-cap-"));
+    try {
+      const result = await buildTopicAudioLesson({
+        topic: "Runtime cap",
+        sourceText: "One. Two. Three. Four. Five.",
+        sourceLanguage: "en",
+        outputDir: dir,
+        renderAudio: false,
+        desiredRuntimeMinutes: 1,
+        learner: {
+          targetLanguage: "hu",
+          baseLanguage: "en",
+          cefrLevel: "A1",
+        },
+        contentGenerator: new FakeTopicLessonContentGenerator(),
+      });
+
+      const source = FiloDocument.fromJSON(result.source);
+      const sourceCards =
+        source.requireTier<TopicLessonSourceCardPayload>("topic.source-card").annotations;
+      expect(sourceCards).toHaveLength(3);
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  test("annotates topic source cards from Filo sentence boundaries", () => {
+    const document = FiloDocument.fromText("First source sentence. Second source sentence.", {
+      id: "topic-source:test",
+      metadata: {},
+    });
+
+    const cards = annotateTopicLessonSourceCards(document, { language: "en" });
+
+    expect(document.requireTier("sentence").annotations).toHaveLength(2);
+    expect(cards).toHaveLength(2);
+    expect(document.textOf(cards[0]!)).toBe("First source sentence.");
+    expect(cards[0]?.payload.sourceTierId).toBe("sentence");
+    expect(cards[1]?.payload.ordinal).toBe(1);
+  });
+
+  test("generates topic sentence cards with parallel model calls", async () => {
+    let sentenceCallsInFlight = 0;
+    let maxSentenceCallsInFlight = 0;
+    let totalSentenceCalls = 0;
+    const prompts: string[] = [];
+    const fakeClient = {
+      messages: {
+        create: async (request: { messages?: Array<{ content?: unknown }> }) => {
+          const prompt = request.messages?.[0]?.content;
+          if (typeof prompt === "string") prompts.push(prompt);
+          totalSentenceCalls += 1;
+          sentenceCallsInFlight += 1;
+          maxSentenceCallsInFlight = Math.max(maxSentenceCallsInFlight, sentenceCallsInFlight);
+          await Bun.sleep(25);
+          sentenceCallsInFlight -= 1;
+          return {
+            stop_reason: "tool_use",
+            content: [
+              {
+                type: "tool_use",
+                input: {
+                  targetText: "Ez egy mondat.",
+                  baseTranslation: "This is a sentence.",
+                  explanation: "This is a simple sentence.",
+                  explanationParts: [
+                    { language: "base", text: "This means" },
+                    { language: "target", text: "Ez egy mondat." },
+                  ],
+                  phrases: [
+                    {
+                      targetText: "Ez",
+                      baseTranslation: "This",
+                      explanation: "This is the subject.",
+                      explanationParts: [
+                        { language: "target", text: "Ez" },
+                        { language: "base", text: "means this." },
+                      ],
+                    },
+                    {
+                      targetText: "egy mondat",
+                      baseTranslation: "a sentence",
+                      explanation: "This is the noun phrase.",
+                      explanationParts: [
+                        { language: "target", text: "egy mondat" },
+                        { language: "base", text: "means a sentence." },
+                      ],
+                    },
+                  ],
+                  quizPrompts: [
+                    {
+                      prompt: "Translate the sentence.",
+                      promptParts: [{ language: "base", text: "Translate the sentence." }],
+                      answer: "Ez egy mondat.",
+                    },
+                    {
+                      prompt: "Translate the phrase.",
+                      promptParts: [{ language: "base", text: "Translate the phrase." }],
+                      answer: "egy mondat",
+                    },
+                  ],
+                },
+              },
+            ],
+          };
+        },
+      },
+    };
+
+    const generator = new ClaudeTopicLessonContentGenerator(fakeClient as never);
+    const content = await generator.generate({
+      topic: "Parallel test",
+      sourceText: "One. Two. Three. Four.",
+      sourceUrls: [],
+      sourceLanguage: "en",
+      targetLanguage: "hu",
+      baseLanguage: "en",
+      cefrLevel: "A1",
+      generationModel: "claude-haiku-4-5-20251001",
+      extraInformation: "",
+      sourceCards: [
+        {
+          ordinal: 0,
+          sourceTierId: "sentence",
+          sourceAnnotationId: "s1",
+          sourceText: "One.",
+          language: "en",
+        },
+        {
+          ordinal: 1,
+          sourceTierId: "sentence",
+          sourceAnnotationId: "s2",
+          sourceText: "Two.",
+          language: "en",
+        },
+        {
+          ordinal: 2,
+          sourceTierId: "sentence",
+          sourceAnnotationId: "s3",
+          sourceText: "Three.",
+          language: "en",
+        },
+        {
+          ordinal: 3,
+          sourceTierId: "sentence",
+          sourceAnnotationId: "s4",
+          sourceText: "Four.",
+          language: "en",
+        },
+        {
+          ordinal: 4,
+          sourceTierId: "sentence",
+          sourceAnnotationId: "s5",
+          sourceText: "Five.",
+          language: "en",
+        },
+        {
+          ordinal: 5,
+          sourceTierId: "sentence",
+          sourceAnnotationId: "s6",
+          sourceText: "Six.",
+          language: "en",
+        },
+        {
+          ordinal: 6,
+          sourceTierId: "sentence",
+          sourceAnnotationId: "s7",
+          sourceText: "Seven.",
+          language: "en",
+        },
+        {
+          ordinal: 7,
+          sourceTierId: "sentence",
+          sourceAnnotationId: "s8",
+          sourceText: "Eight.",
+          language: "en",
+        },
+      ],
+      knownVocabulary: [],
+      grammarGaps: [],
+    });
+
+    expect(content.sentences).toHaveLength(8);
+    expect(totalSentenceCalls).toBe(8);
+    expect(maxSentenceCallsInFlight).toBe(8);
+    expect(prompts[0]).toContain("structured language-learning transcript card");
+    expect(prompts[0]).not.toContain("Your output is parsed into Filo transcript annotations");
+    expect(prompts[0]).not.toContain("simplify");
+    expect(prompts[0]).not.toContain("ElevenLabs");
+    expect(prompts[0]).not.toContain("Audio formula");
+    expect(prompts[0]).not.toContain("voice");
+  });
 });
 
 class EchoTranslationProvider implements TranslationProvider {
@@ -521,6 +847,54 @@ class FakeAudioProvider implements AudioProvider {
   async synthesize(): Promise<{ audio: Uint8Array; contentType: string }> {
     this.synthesizeCalls += 1;
     return { audio: new Uint8Array([4, 5, 6]), contentType: "audio/mpeg" };
+  }
+}
+
+class FakeTopicLessonContentGenerator implements TopicLessonContentGenerator {
+  async generate(_input: TopicLessonContentInput) {
+    return {
+      title: "Market News",
+      sourceSummary: "Central bank rate decision.",
+      sentences: [
+        {
+          targetText: "A bank ma nem változtat.",
+          baseTranslation: "The bank does not change today.",
+          explanation:
+            "A is the definite article. Nem makes the present-tense verb változtat negative.",
+          explanationParts: [
+            { language: "base", text: "The phrase" },
+            { language: "target", text: "nem változtat" },
+            { language: "base", text: "is a negative present-tense verb phrase." },
+          ],
+          phrases: [
+            {
+              targetText: "A bank",
+              baseTranslation: "The bank",
+              explanation: "This is the subject phrase.",
+              explanationParts: [{ language: "base", text: "This is the subject phrase." }],
+            },
+            {
+              targetText: "ma nem változtat",
+              baseTranslation: "does not change today",
+              explanation: "This is a present-tense negative verb phrase.",
+              explanationParts: [
+                { language: "target", text: "ma" },
+                { language: "base", text: "means today." },
+                { language: "target", text: "nem változtat" },
+                { language: "base", text: "means does not change." },
+              ],
+            },
+          ],
+          quizPrompts: [
+            {
+              prompt: "Translate the whole sentence.",
+              promptParts: [{ language: "base", text: "Translate the whole sentence." }],
+              answer: "A bank ma nem változtat.",
+            },
+          ],
+        },
+      ],
+    };
   }
 }
 

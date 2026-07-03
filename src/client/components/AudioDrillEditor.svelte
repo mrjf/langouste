@@ -5,7 +5,7 @@
     AudioDrillListItem,
   } from "../lib/api-contracts";
   import { api } from "../lib/api";
-  import { session, type FiloAnnotationJson, type FiloDocumentJson } from "../lib/stores.svelte";
+  import { profile, session, type FiloAnnotationJson, type FiloDocumentJson } from "../lib/stores.svelte";
   import Button from "./ui/Button.svelte";
   import FiloText from "./FiloText.svelte";
 
@@ -47,24 +47,52 @@
     clipEndMs: number | null;
   }
 
+  interface BuildLogEntry {
+    type: "log" | "complete" | "error";
+    at: string;
+    step: string;
+    message: string;
+    data: unknown;
+  }
+
   let { route = "", onRouteChange }: Props = $props();
 
   let drills = $state<AudioDrillListItem[]>([]);
   let detail = $state<AudioDrillDocumentResponse | null>(null);
   let loading = $state(false);
   let saving = $state(false);
+  let creating = $state(false);
   let error = $state("");
   let selectedDrillId = $state("");
   let selectedSegmentId = $state("");
   let sourceFilter = $state("all");
+  let activeTab = $state<"editor" | "build-log">("editor");
   let activeAudioKey = $state("");
   let dirty = $state(false);
   let appliedRoute = $state("");
   let currentAudio: HTMLAudioElement | null = null;
   let currentObjectUrl: string | null = null;
+  let topic = $state("");
+  let sourceUrlsText = $state("");
+  let extraInformation = $state("");
+  let topicTargetLanguage = $state("");
+  let topicBaseLanguage = $state("");
+  let topicCefrLevel = $state("A1");
+  let desiredRuntimeMinutes = $state("");
+  let generationModel = $state("claude-sonnet-4-6");
+  let topicRenderAudio = $state(true);
+  let buildLogs = $state<BuildLogEntry[]>([]);
+
+  const generationModelOptions = [
+    { id: "claude-sonnet-4-6", label: "Claude Sonnet 4.6" },
+    { id: "claude-opus-4-6", label: "Claude Opus 4.6" },
+    { id: "claude-haiku-4-5-20251001", label: "Claude Haiku 4.5" },
+  ];
 
   const lesson = $derived(detail?.lesson ?? null);
   const source = $derived(detail?.source ?? null);
+  const learningLanguages = $derived(profile.value?.learning_languages ?? []);
+  const targetLanguageOptions = $derived(learningLanguages.map((language) => language.lang));
   const segmentRows = $derived(lesson ? buildSegmentRows(lesson) : []);
   const visibleSegmentRows = $derived(
     sourceFilter === "all"
@@ -82,6 +110,16 @@
 
   onMount(() => {
     void loadDrills();
+  });
+
+  $effect(() => {
+    const firstLearning = learningLanguages[0];
+    const firstTarget = targetLanguageOptions[0];
+    if (!topicTargetLanguage && firstTarget) topicTargetLanguage = firstTarget;
+    if (firstLearning && topicCefrLevel === "A1") topicCefrLevel = firstLearning.cefr_level;
+    if (!topicBaseLanguage && profile.value?.base_language) {
+      topicBaseLanguage = profile.value.base_language;
+    }
   });
 
   $effect(() => {
@@ -147,6 +185,97 @@
     } finally {
       saving = false;
     }
+  }
+
+  async function createTopicDrill() {
+    const cleanTopic = topic.trim();
+    const sourceUrls = sourceUrlsText
+      .split(/[\s,]+/u)
+      .map((url) => url.trim())
+      .filter(Boolean);
+    if (!cleanTopic && sourceUrls.length === 0) {
+      error = "Enter a topic or at least one source URL";
+      return;
+    }
+    const runtimeMinutes = optionalRuntimeMinutes(desiredRuntimeMinutes);
+    creating = true;
+    loading = true;
+    error = "";
+    activeTab = "build-log";
+    buildLogs = [];
+    stopAudio();
+    try {
+      const response = await createTopicDrillStream({
+        ...(cleanTopic ? { topic: cleanTopic } : {}),
+        ...(sourceUrls.length > 0 ? { sourceUrls } : {}),
+        ...(runtimeMinutes !== null ? { desiredRuntimeMinutes: runtimeMinutes } : {}),
+        ...(generationModel ? { generationModel } : {}),
+        ...(extraInformation.trim() ? { extraInformation: extraInformation.trim() } : {}),
+        ...(topicTargetLanguage ? { targetLanguage: topicTargetLanguage } : {}),
+        ...(topicBaseLanguage ? { baseLanguage: topicBaseLanguage } : {}),
+        ...(topicCefrLevel ? { cefrLevel: topicCefrLevel } : {}),
+        renderAudio: topicRenderAudio,
+      });
+      detail = cloneJson(response);
+      drills = [response.drill, ...drills.filter((drill) => drill.id !== response.drill.id)];
+      selectedDrillId = response.drill.id;
+      selectedSegmentId =
+        response.lesson.tiers
+          .find((entry) => entry.id === "lesson.segment")
+          ?.annotations.sort(orderBySegment)[0]
+          ?.payload.segmentId?.toString() ?? "";
+      dirty = false;
+      appliedRoute = response.drill.id;
+      onRouteChange?.(response.drill.id);
+    } catch (err) {
+      error = errorMessage(err);
+      activeTab = "build-log";
+    } finally {
+      creating = false;
+      loading = false;
+    }
+  }
+
+  async function createTopicDrillStream(body: Record<string, unknown>): Promise<AudioDrillDocumentResponse> {
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      ...(session.value ? { Authorization: `Bearer ${session.value.access_token}` } : {}),
+    };
+    const res = await fetch("/api/audio-drills/topic/stream", {
+      method: "POST",
+      headers,
+      body: JSON.stringify(body),
+    });
+    if (!res.ok || !res.body) throw new Error(`${res.status} ${res.statusText}`);
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+    let completed: AudioDrillDocumentResponse | null = null;
+    let completedId = "";
+    let createdId = "";
+
+    try {
+      while (true) {
+        const { value, done } = await reader.read();
+        buffer += decoder.decode(value ?? new Uint8Array(), { stream: !done });
+        const parsed = consumeBuildLogLines(buffer, completed, completedId, createdId);
+        buffer = parsed.buffer;
+        completed = parsed.completed;
+        completedId = parsed.completedId;
+        createdId = parsed.createdId;
+        if (done) break;
+      }
+    } catch (err) {
+      if (!completedId && createdId) completedId = createdId;
+      if (!completedId) throw err;
+    }
+
+    if (!completed && completedId) {
+      completed = await api.getAudioDrill(completedId);
+    }
+    if (!completed) throw new Error("Topic audio drill stream ended without a result");
+    return completed;
   }
 
   async function playFinalAudio() {
@@ -366,8 +495,64 @@
     return `${value} B`;
   }
 
+  function optionalRuntimeMinutes(value: unknown): number | null {
+    if (value === null || value === undefined || String(value).trim() === "") return null;
+    const minutes = Number(value);
+    if (!Number.isFinite(minutes)) return null;
+    return Math.min(60, Math.max(1, Math.trunc(minutes)));
+  }
+
   function errorMessage(err: unknown): string {
     return err instanceof Error ? err.message : String(err);
+  }
+
+  function formatLogData(value: unknown): string {
+    if (value === null || value === undefined) return "";
+    return JSON.stringify(value, null, 2);
+  }
+
+  function consumeBuildLogLines(
+    text: string,
+    completed: AudioDrillDocumentResponse | null,
+    completedId: string,
+    createdId: string,
+  ): {
+    buffer: string;
+    completed: AudioDrillDocumentResponse | null;
+    completedId: string;
+    createdId: string;
+  } {
+    const lines = text.split("\n");
+    const buffer = lines.pop() ?? "";
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed) continue;
+      const event = JSON.parse(trimmed) as BuildLogEntry;
+      buildLogs = [...buildLogs, event];
+      const eventId = completeEventId(event.data);
+      if (event.step === "filesystem" && eventId) createdId = eventId;
+      if (event.type === "error") throw new Error(event.message);
+      if (event.type === "complete") {
+        if (isAudioDrillDocumentResponse(event.data)) {
+          completed = event.data;
+        } else {
+          completedId = eventId;
+        }
+      }
+    }
+    return { buffer, completed, completedId, createdId };
+  }
+
+  function isAudioDrillDocumentResponse(value: unknown): value is AudioDrillDocumentResponse {
+    const candidate = value as AudioDrillDocumentResponse | null | undefined;
+    return !!candidate?.drill && !!candidate.lesson;
+  }
+
+  function completeEventId(value: unknown): string {
+    const candidate = value as { id?: unknown; drill?: { id?: unknown } } | null | undefined;
+    if (typeof candidate?.id === "string") return candidate.id;
+    if (typeof candidate?.drill?.id === "string") return candidate.drill.id;
+    return "";
   }
 </script>
 
@@ -406,11 +591,137 @@
     </div>
   </header>
 
+  <form
+    class="create-panel"
+    onsubmit={(event) => {
+      event.preventDefault();
+      void createTopicDrill();
+    }}
+  >
+    <div class="create-fields">
+      <label>
+        <FiloText text="Topic" role="field-label" />
+        <input bind:value={topic} placeholder="Today's news, street food, a work presentation" />
+      </label>
+      <label>
+        <FiloText text="Target" role="field-label" />
+        {#if targetLanguageOptions.length > 0}
+          <select bind:value={topicTargetLanguage}>
+            {#each targetLanguageOptions as language}
+              <option value={language}>{language}</option>
+            {/each}
+          </select>
+        {:else}
+          <input bind:value={topicTargetLanguage} placeholder="hu" />
+        {/if}
+      </label>
+      <label>
+        <FiloText text="Level" role="field-label" />
+        <select bind:value={topicCefrLevel}>
+          {#each ["A1", "A2", "B1", "B2", "C1", "C2"] as level}
+            <option value={level}>{level}</option>
+          {/each}
+        </select>
+      </label>
+      <label>
+        <FiloText text="Runtime optional" role="field-label" />
+        <input
+          type="number"
+          min="1"
+          max="60"
+          bind:value={desiredRuntimeMinutes}
+          placeholder="all"
+        />
+      </label>
+      <label>
+        <FiloText text="Model" role="field-label" />
+        <select bind:value={generationModel}>
+          {#each generationModelOptions as model}
+            <option value={model.id}>{model.label}</option>
+          {/each}
+        </select>
+      </label>
+      <label class="check-label">
+        <input type="checkbox" bind:checked={topicRenderAudio} />
+        <FiloText text="Render audio" role="field-label" />
+      </label>
+    </div>
+    <div class="source-fields">
+      <label>
+        <FiloText text="Source URLs" role="field-label" />
+        <textarea bind:value={sourceUrlsText} placeholder="https://...&#10;https://..."></textarea>
+      </label>
+      <label>
+        <FiloText text="Extra information" role="field-label" />
+        <textarea
+          bind:value={extraInformation}
+          placeholder="Focus on business vocabulary, keep it upbeat, explain cases carefully"
+        ></textarea>
+      </label>
+      <Button
+        label={creating ? "Creating" : "Create topic drill"}
+        type="submit"
+        variant="primary"
+        size="sm"
+        disabled={creating}
+      />
+    </div>
+  </form>
+
   {#if error}
     <p class="error">{error}</p>
   {/if}
 
-  {#if loading && !detail}
+  <div class="view-tabs" role="tablist" aria-label="Audio drill workspace">
+    <button
+      type="button"
+      role="tab"
+      class:active={activeTab === "editor"}
+      aria-selected={activeTab === "editor"}
+      onclick={() => (activeTab = "editor")}
+    >
+      <FiloText text="Editor" role="tab-label" />
+    </button>
+    <button
+      type="button"
+      role="tab"
+      class:active={activeTab === "build-log"}
+      aria-selected={activeTab === "build-log"}
+      onclick={() => (activeTab = "build-log")}
+    >
+      <FiloText text="Build log" role="tab-label" />
+      {#if buildLogs.length > 0}
+        <span>{buildLogs.length}</span>
+      {/if}
+    </button>
+  </div>
+
+  {#if activeTab === "build-log"}
+    <section class="build-log-panel" aria-label="Build log">
+      <div class="section-heading">
+        <h2><FiloText text="Build log" role="section-heading" /></h2>
+        <span>{creating ? "running" : buildLogs.length ? "complete" : "idle"}</span>
+      </div>
+      {#if buildLogs.length === 0}
+        <div class="empty-state"><FiloText text="No build logs yet" role="empty-state" /></div>
+      {:else}
+        <div class="log-list">
+          {#each buildLogs as entry}
+            <article class={`log-entry ${entry.type}`}>
+              <div class="log-line">
+                <span>{new Date(entry.at).toLocaleTimeString()}</span>
+                <strong>{entry.step}</strong>
+                <p>{entry.message}</p>
+              </div>
+              {#if formatLogData(entry.data)}
+                <pre>{formatLogData(entry.data)}</pre>
+              {/if}
+            </article>
+          {/each}
+        </div>
+      {/if}
+    </section>
+  {:else if loading && !detail}
     <div class="empty-state"><FiloText text="Loading" role="status" /></div>
   {:else if detail && lesson}
     <section class="summary-grid" aria-label="Drill summary">
@@ -603,7 +914,8 @@
   }
 
   input,
-  select {
+  select,
+  textarea {
     min-height: 2.35rem;
     border: 1px solid var(--color-border);
     border-radius: var(--radius-sm);
@@ -611,6 +923,50 @@
     color: var(--color-text);
     font: inherit;
     padding: 0 var(--space-3);
+    text-transform: none;
+  }
+
+  textarea {
+    min-height: 6rem;
+    padding: var(--space-3);
+    resize: vertical;
+    text-transform: none;
+  }
+
+  .create-panel {
+    display: grid;
+    gap: var(--space-3);
+    margin-bottom: var(--space-5);
+    padding: var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-surface);
+  }
+
+  .create-fields {
+    display: grid;
+    grid-template-columns: minmax(16rem, 1fr) 6rem 5rem 7rem minmax(12rem, 0.8fr) auto;
+    align-items: end;
+    gap: var(--space-3);
+  }
+
+  .source-fields {
+    display: grid;
+    grid-template-columns: minmax(14rem, 0.8fr) minmax(18rem, 1.2fr) auto;
+    align-items: end;
+    gap: var(--space-3);
+  }
+
+  .check-label {
+    min-height: 2.35rem;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding-bottom: 0.15rem;
+  }
+
+  .check-label input {
+    min-height: auto;
   }
 
   .summary-grid {
@@ -618,6 +974,108 @@
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: var(--space-3);
     margin-bottom: var(--space-5);
+  }
+
+  .view-tabs {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .view-tabs button {
+    min-height: 2.4rem;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    border: 0;
+    border-bottom: 2px solid transparent;
+    background: transparent;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    font: inherit;
+    padding: 0 var(--space-3);
+  }
+
+  .view-tabs button.active {
+    border-color: var(--color-accent);
+    color: var(--color-text);
+  }
+
+  .view-tabs span {
+    min-width: 1.4rem;
+    border-radius: var(--radius-sm);
+    background: var(--color-panel);
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    line-height: 1.4rem;
+    text-align: center;
+  }
+
+  .build-log-panel {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-surface);
+    padding: var(--space-4);
+  }
+
+  .log-list {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .log-entry {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg);
+    overflow: hidden;
+  }
+
+  .log-entry.complete {
+    border-color: var(--color-success, #2a8c57);
+  }
+
+  .log-entry.error {
+    border-color: var(--color-error);
+  }
+
+  .log-line {
+    display: grid;
+    grid-template-columns: 5.5rem 9rem minmax(0, 1fr);
+    align-items: start;
+    gap: var(--space-3);
+    padding: var(--space-3);
+  }
+
+  .log-line span,
+  .log-line strong {
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+  }
+
+  .log-line span {
+    color: var(--color-text-muted);
+  }
+
+  .log-line p {
+    color: var(--color-text);
+    font-size: var(--text-sm);
+  }
+
+  .log-entry pre {
+    max-height: 28rem;
+    margin: 0;
+    overflow: auto;
+    border-top: 1px solid var(--color-border);
+    background: var(--color-panel);
+    color: var(--color-text);
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    line-height: 1.45;
+    padding: var(--space-3);
+    white-space: pre-wrap;
   }
 
   .summary-grid > div {
@@ -820,6 +1278,11 @@
       grid-template-columns: 1fr;
     }
 
+    .create-fields,
+    .source-fields {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
     .summary-grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
@@ -841,13 +1304,21 @@
     }
 
     .editor-header,
-    .header-actions {
+    .header-actions,
+    .create-fields,
+    .source-fields {
       display: grid;
       width: 100%;
+      grid-template-columns: 1fr;
     }
 
     .summary-grid {
       grid-template-columns: 1fr;
+    }
+
+    .log-line {
+      grid-template-columns: 1fr;
+      gap: var(--space-1);
     }
 
     .segment-row {

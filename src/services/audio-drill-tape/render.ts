@@ -204,6 +204,7 @@ async function renderSegmentClip(
       }
       const result = await options.audioProvider.synthesize(text, {
         language: segment.payload.language,
+        speechRate: segment.payload.speechRate,
       });
       await writeFile(clipPath, result.audio);
       if (segmentNormalization) {
@@ -371,6 +372,9 @@ function sourceForSegment(
         label: `${languageNameForSource(segment.payload.language)} for "${document.textOf(segment)}"`,
         language: segment.payload.language,
         text: document.textOf(segment),
+        ...(segment.payload.speechRate !== undefined
+          ? { speechRate: segment.payload.speechRate }
+          : {}),
         ...(normalization ? { normalization } : {}),
       };
     case "source":
