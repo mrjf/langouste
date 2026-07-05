@@ -2,6 +2,7 @@ import { FiloDocument, type FiloAnnotation, type FiloDocumentJson } from "filo";
 import { config } from "../../lib/config.ts";
 import { languageName } from "../../lib/languages.ts";
 import { getAnthropicClient } from "../ai/client.ts";
+import { requireArray, toolInputObject } from "../ai/tool-output.ts";
 import type {
   SourceSentencePayload,
   SourceTranscriptMetadata,
@@ -116,8 +117,9 @@ ${JSON.stringify(candidates, null, 2)}`;
       throw new Error("Claude did not return structured output for source sentence extraction");
     }
 
-    const result = toolUse.input as { sentences?: ExtractedSentenceReference[] };
-    return normalizeExtractorOutput(input, result.sentences ?? []);
+    const raw = toolInputObject(toolUse.input, "extract_training_sentences");
+    const sentences = requireArray(raw.sentences, "sentences") as ExtractedSentenceReference[];
+    return normalizeExtractorOutput(input, sentences);
   }
 }
 

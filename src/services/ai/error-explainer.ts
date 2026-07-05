@@ -1,4 +1,5 @@
 import { getAnthropicClient } from "./client.ts";
+import { requireArray, requireString, toolInputObject } from "./tool-output.ts";
 import { config } from "../../lib/config.ts";
 import { testRegistry } from "../../lib/test-registry.ts";
 import { buildErrorExplanationPrompt, ERROR_EXPLANATION_TOOL } from "./error-prompts.ts";
@@ -62,34 +63,33 @@ export async function explainErrors(input: ExplainErrorsInput): Promise<ExplainE
     throw new Error("Opus did not return structured output");
   }
 
-  const result = toolUse.input as {
-    corrected_message: string;
-    explanations: Array<{
-      error_index: number;
-      corrected: string;
-      explanations: Record<string, string>;
-      rule?: string;
-    }>;
-    additional_errors: Array<{
-      start: number;
-      end: number;
-      text: string;
-      corrected: string;
-      kind: "grammar";
-      explanations: Record<string, string>;
-      rule?: string;
-    }>;
-  };
+  const raw = toolInputObject(toolUse.input, "explain_errors");
+  const corrected_message = requireString(raw.corrected_message, "corrected_message");
+  const rawExplanations = requireArray(raw.explanations, "explanations") as Array<{
+    error_index: number;
+    corrected: string;
+    explanations: Record<string, string>;
+    rule?: string;
+  }>;
+  const rawAdditionalErrors = requireArray(raw.additional_errors, "additional_errors") as Array<{
+    start: number;
+    end: number;
+    text: string;
+    corrected: string;
+    kind: "grammar";
+    explanations: Record<string, string>;
+    rule?: string;
+  }>;
 
   // Map the tool output back to our types
-  const explanations: ErrorExplanation[] = (result.explanations ?? []).map((e) => ({
+  const explanations: ErrorExplanation[] = rawExplanations.map((e) => ({
     error: input.errors[e.error_index],
     corrected: e.corrected,
     explanations: e.explanations,
     rule: e.rule,
   }));
 
-  const additional_errors = (result.additional_errors ?? []).map((e) => ({
+  const additional_errors = rawAdditionalErrors.map((e) => ({
     start: e.start,
     end: e.end,
     text: e.text,
@@ -99,5 +99,5 @@ export async function explainErrors(input: ExplainErrorsInput): Promise<ExplainE
     rule: e.rule,
   }));
 
-  return { corrected_message: result.corrected_message, explanations, additional_errors };
+  return { corrected_message, explanations, additional_errors };
 }

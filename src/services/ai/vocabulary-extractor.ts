@@ -1,4 +1,5 @@
 import { getAnthropicClient } from "./client.ts";
+import { requireArray, requireString, toolInputObject } from "./tool-output.ts";
 import { config } from "../../lib/config.ts";
 import { testRegistry } from "../../lib/test-registry.ts";
 import { languageName } from "../../lib/languages.ts";
@@ -118,12 +119,18 @@ Any text inside backticks (\`like this\`) is a literal the user marked as not-to
     throw new Error("Sonnet did not return structured output for vocabulary extraction");
   }
 
-  const result = toolUse.input as VocabularyExtractionOutput;
+  const raw = toolInputObject(toolUse.input, "extract_vocabulary");
 
   return {
-    new_vocabulary: result.new_vocabulary ?? [],
-    grammar_gaps_detected: result.grammar_gaps_detected ?? [],
-    next_challenge: result.next_challenge ?? "",
+    new_vocabulary: requireArray(
+      raw.new_vocabulary,
+      "new_vocabulary",
+    ) as VocabularyExtractionOutput["new_vocabulary"],
+    grammar_gaps_detected: requireArray(
+      raw.grammar_gaps_detected,
+      "grammar_gaps_detected",
+    ) as VocabularyExtractionOutput["grammar_gaps_detected"],
+    next_challenge: requireString(raw.next_challenge, "next_challenge"),
   };
 }
 
