@@ -1,3 +1,4 @@
+import sanitizeHtml from "sanitize-html";
 import { languageName } from "../../lib/languages.ts";
 
 export interface ItemReferenceLink {
@@ -263,19 +264,72 @@ function audioLabel(url: string): string {
   return file.replace(/_/g, " ");
 }
 
-function sanitizeWiktionaryHtml(html: string): string {
-  return html
-    .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, "")
-    .replace(/<noscript\b[^>]*>[\s\S]*?<\/noscript>/gi, "")
-    .replace(/<span class="mw-editsection"[\s\S]*?<\/span><\/span>/gi, "")
-    .replace(/\s+on[a-z]+\s*=\s*"[^"]*"/gi, "")
-    .replace(/\s+on[a-z]+\s*=\s*'[^']*'/gi, "")
-    .replace(
-      /href="\/wiki\//g,
-      'target="_blank" rel="noreferrer" href="https://en.wiktionary.org/wiki/',
-    )
-    .replace(/href="\/w\//g, 'target="_blank" rel="noreferrer" href="https://en.wiktionary.org/w/')
-    .replace(/src="\/\//g, 'src="https://')
+const WIKTIONARY_ORIGIN = "https://en.wiktionary.org";
+
+/**
+ * Sanitize Wiktionary conjugation-table HTML before it is rendered via {@html}
+ * in the client. Wiktionary is community-editable and fetched over the network,
+ * so its HTML is untrusted. We use an allowlist sanitizer (only the tags and
+ * attributes a conjugation table needs; no event handlers, styles, scripts,
+ * iframes, images, or non-http(s) URLs) rather than trying to strip dangerous
+ * constructs by regex — then apply the display transforms the UI relies on
+ * (absolute Wiktionary links that open in a new tab, expanded tables).
+ *
+ * Exported for testing.
+ */
+export function sanitizeWiktionaryHtml(html: string): string {
+  const clean = sanitizeHtml(html, {
+    allowedTags: [
+      "table",
+      "thead",
+      "tbody",
+      "tfoot",
+      "tr",
+      "th",
+      "td",
+      "caption",
+      "colgroup",
+      "col",
+      "span",
+      "div",
+      "a",
+      "b",
+      "i",
+      "em",
+      "strong",
+      "sup",
+      "sub",
+      "abbr",
+      "br",
+      "p",
+      "small",
+      "ul",
+      "ol",
+      "li",
+    ],
+    allowedAttributes: {
+      "*": ["class", "title", "colspan", "rowspan", "lang", "dir"],
+      a: ["href", "target", "rel"],
+    },
+    allowedSchemes: ["http", "https"],
+    // Drop Wiktionary's inline "edit" links entirely.
+    exclusiveFilter: (frame) =>
+      (frame.attribs?.class ?? "").split(/\s+/).includes("mw-editsection"),
+    transformTags: {
+      a: (_tagName, attribs) => {
+        let href = attribs.href ?? "";
+        if (href.startsWith("/wiki/") || href.startsWith("/w/")) {
+          href = `${WIKTIONARY_ORIGIN}${href}`;
+        }
+        return {
+          tagName: "a",
+          attribs: { ...attribs, href, target: "_blank", rel: "noreferrer" },
+        };
+      },
+    },
+  });
+
+  return clean
     .replace(/\binflection-table-collapsed\b/g, "inflection-table-expanded")
     .slice(0, 140_000);
 }
