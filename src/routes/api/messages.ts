@@ -308,7 +308,9 @@ messageRoutes.post("/:conversationId", async (c) => {
   return c.json({ message, agent_message: agentMsg }, 201);
 });
 
-async function processAgentReply(args: {
+// Exported for testing (see tests/services/agent-reply-enrichment.test.ts).
+// The route invokes this as a fire-and-forget background task.
+export async function processAgentReply(args: {
   connector: NonNullable<Awaited<ReturnType<typeof getConnector>>>;
   conversationId: string;
   userId: string;
@@ -375,19 +377,29 @@ async function processAgentReply(args: {
       [{ op: "eq", column: "message_id", value: agentMessage.message_id }],
     );
 
-    await ensureTranslations([completedAgentMessage], agentLanguagePlan.requiredLanguages);
-    await enrichAndPersistMessageFiloDoc(adminDb(), completedAgentMessage);
-    await trackAgentVocabularyEncounters(
-      adminDb(),
-      userId,
-      senderMember,
-      conversationId,
-      senderMember.target_languages.map((target) => ({
-        message: completedAgentMessage,
-        language: target.lang,
-        cefrLevel: target.cefr_level,
-      })),
-    );
+    // Enrichment runs after the reply is already persisted (above). These
+    // steps are ordered (the Filo doc is built from the translations that
+    // ensureTranslations mutates onto completedAgentMessage), so they stay
+    // sequential — but a failure here must NOT fall through to the outer catch,
+    // which would overwrite a perfectly good agent reply with an "Agent error"
+    // message. Degrade gracefully: log and keep the reply intact.
+    try {
+      await ensureTranslations([completedAgentMessage], agentLanguagePlan.requiredLanguages);
+      await enrichAndPersistMessageFiloDoc(adminDb(), completedAgentMessage);
+      await trackAgentVocabularyEncounters(
+        adminDb(),
+        userId,
+        senderMember,
+        conversationId,
+        senderMember.target_languages.map((target) => ({
+          message: completedAgentMessage,
+          language: target.lang,
+          cefrLevel: target.cefr_level,
+        })),
+      );
+    } catch (enrichErr) {
+      console.error("Agent reply enrichment failed (reply preserved):", enrichErr);
+    }
     ensureTransliterations(
       [completedAgentMessage],
       agentLanguagePlan.responseLanguage,

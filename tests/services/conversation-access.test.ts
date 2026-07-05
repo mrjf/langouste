@@ -1,45 +1,15 @@
-import { afterAll, beforeAll, describe, expect, test } from "bun:test";
-import { mkdtemp, rm } from "node:fs/promises";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
+import "./_db-harness.ts"; // side-effect: sets sqlite env + shared data dir (must be first)
+import { describe, expect, test } from "bun:test";
 
 // Route-level access-control tests. These boot the real message and
 // conversation Hono routes against a real sqlite database and assert the
 // conversation-membership gates hold: no token -> 401, valid token but not a
 // member -> 403, member -> 200.
 //
-// The database layer is a process-wide singleton keyed off LANGOUSTE_DATA_DIR
-// at first use (src/lib/db/index.ts), so we set one temp data dir for the whole
-// file and give each test unique users/conversations rather than resetting the
-// DB between tests. All app modules are imported dynamically *inside* helpers so
-// config.ts (which reads process.env at load time) sees the env set in beforeAll.
-
-let rootDir = "";
-const ENV_KEYS = [
-  "ANTHROPIC_API_KEY",
-  "DATABASE_MODE",
-  "LANGOUSTE_JWT_SECRET",
-  "LANGOUSTE_DATA_DIR",
-] as const;
-const savedEnv: Record<string, string | undefined> = {};
-
-beforeAll(async () => {
-  for (const key of ENV_KEYS) savedEnv[key] = process.env[key];
-  process.env.ANTHROPIC_API_KEY ||= "test-key";
-  process.env.DATABASE_MODE = "sqlite";
-  process.env.LANGOUSTE_JWT_SECRET = "test-secret";
-  rootDir = await mkdtemp(join(tmpdir(), "langouste-access-"));
-  process.env.LANGOUSTE_DATA_DIR = join(rootDir, "db");
-});
-
-afterAll(async () => {
-  for (const key of ENV_KEYS) {
-    const value = savedEnv[key];
-    if (value === undefined) delete process.env[key];
-    else process.env[key] = value;
-  }
-  await rm(rootDir, { recursive: true, force: true });
-});
+// The database layer is a process-wide singleton (src/lib/db/index.ts); the
+// shared _db-harness owns one data dir for the whole test process, so each test
+// just uses unique users/conversations rather than resetting the DB. App modules
+// are imported dynamically inside helpers so config.ts sees the harness env.
 
 // signup() creates the `users` row and returns a signed session token, but does
 // not create a `profiles` row — and conversations/members/connectors all FK to
