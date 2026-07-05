@@ -186,12 +186,6 @@ advisories have been bumped (hono, svelte, vite within 5.x). Residuals:
 - **svelte (transitive, via `svelte-check`)** — a devDependency; the advisories
   are SSR XSS / DOM-clobbering, and Langouste is a client-rendered SPA (no SSR),
   so they are not reachable at runtime. The app's direct svelte is clear.
-- **form-data `4.0.5`** — via the direct `@anthropic-ai/sdk@0.39.x` →
-  `@types/node-fetch`. The advisory requires sending multipart requests with
-  attacker-controlled field names; the SDK abstracts multipart and Langouste
-  never does this. Clearing it means migrating `@anthropic-ai/sdk` from 0.39 to
-  0.8x (a broad, breaking bump across every AI call site) — deferred to its own
-  plan.
 - **shell-quote (critical)** — via `concurrently`, a devDependency used only by
   `bun run dev`. Not in any shipped path.
 - **protobufjs / grpc-js / qs** — via `@google-cloud/translate`, reachable only
