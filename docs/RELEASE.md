@@ -174,10 +174,13 @@ runtime, or that require a dedicated migration. They are tracked here so a raw
 audit run doesn't read as unaddressed. Direct dependencies with reachable
 advisories have been bumped (hono, svelte, vite within 5.x). Residuals:
 
-- **vite `server.fs.deny` bypass / `.map` traversal** — dev-server only, Windows
-  only. The fix is in vite 6.x, which also requires bumping
-  `@sveltejs/vite-plugin-svelte` to v5; that coordinated major bump is deferred
-  to its own change. Not present in the production build output.
+- **vite (transitive `5.x` under `filo/`)** — Langouste's own build/dev runs on
+  vite 6 (`@sveltejs/vite-plugin-svelte` v5), which clears the `server.fs.deny`
+  and `.map` advisories for the app. The remaining vite 5 is a devDependency of
+  the vendored `filo/` package's standalone demo (`filo`'s `dev:web`/`build:web`
+  scripts), which Langouste never runs; `filo/package.json` already pins vite 6
+  for when it's built on its own. Dev-server only, Windows only, not reachable by
+  Langouste.
 - **hono (transitive `4.12.9`)** — pulled in by
   `@anthropic-ai/claude-agent-sdk › @modelcontextprotocol/sdk`, not the app's
   HTTP surface (the app's direct hono is bumped and clear). The app defines no
