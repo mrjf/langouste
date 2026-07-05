@@ -1,4 +1,5 @@
 import type { LanguageCode, TextError } from "../../types/index.ts";
+import { config } from "../../lib/config.ts";
 import type { SpellCheckProvider } from "./provider.ts";
 import { NoopProvider } from "./noop-provider.ts";
 import { LanguageToolProvider } from "./languagetool-provider.ts";
@@ -22,7 +23,7 @@ export { NspellProvider } from "./nspell-provider.ts";
 // fr ~1.8s, pl ~4.8s, pt ~7.9s, Hungarian = minutes), which blocks the
 // server's event loop. It remains selectable for experimentation only.
 function createProvider(): SpellCheckProvider {
-  const setting = process.env.SPELLCHECK_PROVIDER ?? "noop";
+  const setting = config.spellcheckProvider;
   switch (setting) {
     case "languagetool":
       return new LanguageToolProvider();

@@ -11,6 +11,7 @@ import type {
   AgentStatusListener,
   OpenClawConfig,
 } from "./types.ts";
+import { config as appConfig } from "../../lib/config.ts";
 
 const CONNECT_TIMEOUT_MS = 15_000;
 const REQUEST_TIMEOUT_MS = 120_000;
@@ -196,7 +197,7 @@ export class OpenClawAgent implements AgentConnection {
           return;
         }
         const type = frame.type as string | undefined;
-        if (process.env.LANGOUSTE_OPENCLAW_DEBUG === "1") {
+        if (appConfig.openclawDebug) {
           const ev = (frame as { event?: string }).event;
           const fid = (frame as { id?: string }).id;
           console.log(

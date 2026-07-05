@@ -1,7 +1,8 @@
 import type { LanguageCode, TextError } from "../../types/index.ts";
+import { config } from "../../lib/config.ts";
 import type { SpellCheckProvider } from "./provider.ts";
 
-const LANGUAGETOOL_URL = process.env.LANGUAGETOOL_URL ?? "https://api.languagetool.org/v2";
+const LANGUAGETOOL_URL = config.languagetoolUrl;
 
 // Map our ISO 639-1 codes to LanguageTool's expected codes
 const LANG_MAP: Record<string, string> = {

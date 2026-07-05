@@ -37,6 +37,14 @@ export const config = {
   googleCloudLocation: process.env.GOOGLE_CLOUD_LOCATION ?? "global",
   agentLanguageStrategy,
 
+  // Spell-check provider: "noop" (default), "languagetool", or "nspell".
+  // See src/services/spellcheck/. Compared case-sensitively — keep it lowercase.
+  spellcheckProvider: process.env.SPELLCHECK_PROVIDER ?? "noop",
+  languagetoolUrl: process.env.LANGUAGETOOL_URL ?? "https://api.languagetool.org/v2",
+
+  // Verbose OpenClaw gateway frame logging (dev only).
+  openclawDebug: process.env.LANGOUSTE_OPENCLAW_DEBUG === "1",
+
   // Text-to-speech provider. "none" (default) disables audio playback.
   // "elevenlabs" requires ELEVENLABS_API_KEY.
   audioProvider: (process.env.AUDIO_PROVIDER ?? "none").toLowerCase(),
