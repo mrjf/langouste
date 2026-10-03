@@ -32,12 +32,12 @@ Shipped:
 - Deterministic spell-check (nspell) → Opus error explanation pipeline.
 - Sonnet-based vocabulary + grammar-gap extraction, FSRS concept scheduling.
 - Translation/transliteration/phonetics pipeline for message display.
-- Database-mode abstraction: local SQLite single-user mode for dev/desktop, Supabase Auth + Realtime + RLS for hosted/multi-user mode. Svelte 5 frontend, Hono backend.
+- turbopuffer storage/search adapter with table-scoped namespaces, durable Filo JSON, and a corpus BM25 index. Svelte 5 frontend, Hono backend.
 
 Known broken or missing:
 - Claude Code agent replies aren't streamed — the UI hangs for ~10–30 s per turn.
 - No streaming, no typing indicator, no progress feedback during the SDK roundtrip.
-- Supabase-mode session auth sometimes drops on backend restart (stale refresh token).
+- Multi-user authorization is application-enforced; it needs continued adversarial route testing because turbopuffer does not provide application-user RLS.
 - No audio (TTS), no listening exercises, no review UI beyond an API endpoint.
 - No reference links on corrections. User sees the error but can't deep-dive.
 - No CEFR assessment. Level is self-declared and never updated.
@@ -102,7 +102,9 @@ Where Claude Code goes from "chat partner" to "tutor that can actually do things
 
 Everything in phases 0–3 assumes the developer's machine. This phase makes the thing installable.
 
-1. Docker Compose bundle: Langouste + Postgres + GoTrue + Realtime. A single `docker compose up` brings the app up on a fresh host.
+1. Docker bundle: Langouste configured with a hosted or BYOC turbopuffer
+   endpoint. A single container plus server-side secrets brings the app up on a
+   fresh host; no companion search/database stack is required.
 2. Tauri desktop app. Wraps the Vite build + Bun backend. Signed for macOS, Windows, Linux AppImage. This is the "my grandma can install it" tier.
 3. Sandboxed tool use. When Claude Code has tools enabled (Bash, Read, Edit), execute them inside a Docker scratch container mounted at `/workspace`. Network off by default. "Trusted mode" toggle for users who want host access.
 4. Observability. Structured JSON logs, OpenTelemetry traces around each turn, a simple admin dashboard showing turns/day, cost/day, error rate.
@@ -145,7 +147,7 @@ Listed so we don't drift. Each has a defensible reason.
 ## Risk register
 
 - **Claude API cost explosion.** Each message is a Sonnet vocab-extraction + possibly an Opus error explanation + a Claude Code turn. Back-of-envelope: $0.05–0.20 per chat turn at current pricing. Mitigation: cost cap + cache the deterministic parts + switch vocab extraction to Haiku once the schema is stable.
-- **Supabase lock-in.** RLS and Realtime are deeply woven in. Mitigation: keep database access behind `src/services/database/` so a migration to Postgres-direct is mechanical.
+- **Search-database transaction limits.** turbopuffer is not a relational transaction engine. Mitigation: keep writes behind `Database`, batch mutations, serialize in-process read-modify-write operations, and use conditional writes where cross-process concurrency becomes necessary.
 - **Claude Code SDK API churn.** It's new. Mitigation: connector isolation in `src/services/agents/claude-code.ts` — the rest of the app doesn't know Claude Code exists.
 - **Reference link rot.** URL patterns for Lingolia / Kwiziq may change. Mitigation: link registry stored in DB; a weekly job pings URLs and flags 404s.
 - **Pedagogical claims outrunning evidence.** Don't market "CEFR-certified" or "proven to improve fluency" — we have no such evidence yet. Honest marketing in `docs/MARKETING.md`.

@@ -25,12 +25,14 @@ export interface RenderLessonAudioOptions {
   audioProvider: AudioProvider;
   db: Database;
   ffmpegPath?: string;
+  ffprobePath?: string;
   normalizeAudio?: boolean;
   targetLufs?: number;
   truePeakDb?: number;
   loudnessRange?: number;
   shortClipThresholdMs?: number;
   sourceClipPaddingMs?: number;
+  trimTtsSilence?: boolean;
 }
 
 export interface RenderLessonAudioResult {
@@ -53,24 +55,38 @@ const DEFAULT_NORMALIZATION: AudioNormalizationSettings = {
   shortClipThresholdMs: 500,
 };
 const DEFAULT_SOURCE_CLIP_PADDING_MS = 80;
+const DEFAULT_TRIM_TTS_SILENCE = true;
+const TTS_EDGE_SILENCE_TRIM = {
+  enabled: true,
+  thresholdDb: -42,
+  minimumLeadingSilenceMs: 20,
+  minimumTrailingSilenceMs: 80,
+  retainedLeadingSilenceMs: 35,
+  retainedTrailingSilenceMs: 60,
+} as const;
 
 export async function renderLessonAudio(
   lessonJson: FiloDocumentJson<LessonTapeMetadata>,
   options: RenderLessonAudioOptions,
 ): Promise<RenderLessonAudioResult> {
   const ffmpeg = options.ffmpegPath ?? "ffmpeg";
+  const ffprobe = options.ffprobePath ?? "ffprobe";
   const normalization = normalizationSettings(options);
   const sourceClipPaddingMs = options.sourceClipPaddingMs ?? DEFAULT_SOURCE_CLIP_PADDING_MS;
+  const trimTtsSilence = options.trimTtsSilence ?? DEFAULT_TRIM_TTS_SILENCE;
   const outputDir = resolve(options.outputDir);
   const clipsDir = join(outputDir, "clips");
   const validatedAudioIds = new Map<string, boolean>();
+  const clipDurationsMs = new Map<string, number>();
   await mkdir(clipsDir, { recursive: true });
 
   const document = FiloDocument.fromJSON<LessonTapeMetadata>(lessonJson);
   const segments = document
     .requireTier<LessonSegmentPayload>("lesson.segment")
     .annotations.sort((left, right) => left.payload.order - right.payload.order);
+  const boundedSourceClipRanges = sourceClipRangesForSegments(segments, sourceClipPaddingMs);
   const clipPaths: string[] = [];
+  let timelineMs = 0;
 
   for (const segment of segments) {
     const rendered = await renderSegmentClip(document, segment, clipsDir, {
@@ -80,11 +96,24 @@ export async function renderLessonAudio(
       ffmpeg,
       normalization,
       sourceClipPaddingMs,
+      boundedSourceClipRanges,
+      trimTtsSilence,
       validatedAudioIds,
     });
     const clipPath = rendered.clipPath;
     clipPaths.push(clipPath);
-    addRenderedAudioAnnotation(document, segment, rendered);
+    let durationMs = clipDurationsMs.get(clipPath);
+    if (durationMs === undefined) {
+      durationMs = await probeAudioDurationMs(ffprobe, clipPath);
+      clipDurationsMs.set(clipPath, durationMs);
+    }
+    const timelineStartMs = timelineMs;
+    timelineMs += durationMs;
+    addRenderedAudioAnnotation(document, segment, rendered, {
+      durationMs,
+      timelineStartMs,
+      timelineEndMs: timelineMs,
+    });
   }
 
   const outputPath = join(
@@ -136,18 +165,23 @@ async function renderSegmentClip(
     ffmpeg: string;
     normalization: AudioNormalizationSettings;
     sourceClipPaddingMs: number;
+    boundedSourceClipRanges: Map<string, SourceClipRange>;
+    trimTtsSilence: boolean;
     validatedAudioIds: Map<string, boolean>;
   },
 ): Promise<{ asset: CachedAudioAsset; clipPath: string }> {
   const text = document.textOf(segment);
   const segmentNormalization = normalizationForPayload(segment, options.normalization);
-  const sourceClipRange = sourceClipRangeForSegment(segment, options.sourceClipPaddingMs);
+  const sourceClipRange =
+    options.boundedSourceClipRanges.get(sourceClipRangeKey(segment)) ??
+    sourceClipRangeForSegment(segment, options.sourceClipPaddingMs);
   const source = sourceForSegment(
     document,
     segment,
     options.sourceAudioPath,
     segmentNormalization,
     sourceClipRange,
+    options.trimTtsSilence,
   );
   const provider = providerForSegment(segment, options.audioProvider.name);
   const request = {
@@ -165,7 +199,14 @@ async function renderSegmentClip(
   const reusable = segmentNormalization
     ? await findAudioAssetForRequest(options.db, {
         ...request,
-        source: sourceForSegment(document, segment, options.sourceAudioPath, null, sourceClipRange),
+        source: sourceForSegment(
+          document,
+          segment,
+          options.sourceAudioPath,
+          null,
+          sourceClipRange,
+          options.trimTtsSilence,
+        ),
       })
     : null;
   if (
@@ -207,9 +248,13 @@ async function renderSegmentClip(
         speechRate: segment.payload.speechRate,
       });
       await writeFile(clipPath, result.audio);
-      if (segmentNormalization) {
-        await normalizeAudioFile(options.ffmpeg, clipPath, segmentNormalization);
-      }
+      await processSpeechAudioFile(
+        options.ffmpeg,
+        clipPath,
+        segmentNormalization,
+        undefined,
+        options.trimTtsSilence,
+      );
       await assertAudioFileDecodable(options.ffmpeg, clipPath);
       const audio = new Uint8Array(await readFile(clipPath));
       const asset = await storeAudioAsset(options.db, {
@@ -235,10 +280,10 @@ async function renderSegmentClip(
       }
       await runCommand(options.ffmpeg, [
         "-y",
-        "-i",
-        options.sourceAudioPath,
         "-ss",
         msToSeconds(sourceClipRange.clipStartMs),
+        "-i",
+        options.sourceAudioPath,
         "-t",
         msToSeconds(sourceClipRange.clipEndMs - sourceClipRange.clipStartMs),
         "-vn",
@@ -306,6 +351,7 @@ function addRenderedAudioAnnotation(
   document: FiloDocument<LessonTapeMetadata>,
   segment: LessonSegmentAnnotation,
   rendered: { asset: CachedAudioAsset; clipPath: string },
+  timeline: { durationMs: number; timelineStartMs: number; timelineEndMs: number },
 ): void {
   const normalization = rendered.asset.source
     ? normalizationFromSource(rendered.asset.source)
@@ -331,7 +377,9 @@ function addRenderedAudioAnnotation(
       ? { sourceEndMs: segment.payload.sourceEndMs }
       : {}),
     ...(sourceClipRange ? sourceClipRange : {}),
-    ...(segment.payload.durationMs !== undefined ? { durationMs: segment.payload.durationMs } : {}),
+    durationMs: timeline.durationMs,
+    timelineStartMs: timeline.timelineStartMs,
+    timelineEndMs: timeline.timelineEndMs,
     ...(normalization ? { normalization } : {}),
     generatedAt: new Date().toISOString(),
   };
@@ -363,6 +411,7 @@ function sourceForSegment(
   sourceAudioPath: string,
   normalization: AudioNormalizationSettings | null,
   sourceClipRange: SourceClipRange | null,
+  trimTtsSilence: boolean,
 ): Source {
   const metadata = document.metadata;
   switch (segment.payload.audioSource) {
@@ -375,6 +424,7 @@ function sourceForSegment(
         ...(segment.payload.speechRate !== undefined
           ? { speechRate: segment.payload.speechRate }
           : {}),
+        ...(trimTtsSilence ? { edgeSilenceTrim: TTS_EDGE_SILENCE_TRIM } : {}),
         ...(normalization ? { normalization } : {}),
       };
     case "source":
@@ -536,6 +586,58 @@ async function normalizeAudioFile(
   await rename(normalizedPath, path);
 }
 
+async function processSpeechAudioFile(
+  ffmpeg: string,
+  path: string,
+  normalization: AudioNormalizationSettings | null,
+  durationMs: number | undefined,
+  trimEdgeSilence: boolean,
+): Promise<void> {
+  const filters: string[] = [];
+  if (trimEdgeSilence) filters.push(ttsEdgeSilenceFilter());
+  if (normalization?.enabled) filters.push(audioFilterExpression(normalization, durationMs));
+  if (filters.length === 0) return;
+  const processedPath = `${path}.processed.mp3`;
+  await runCommand(ffmpeg, [
+    "-y",
+    "-i",
+    path,
+    "-vn",
+    "-af",
+    filters.join(","),
+    "-acodec",
+    "libmp3lame",
+    "-ar",
+    "44100",
+    "-ac",
+    "2",
+    "-b:a",
+    "128k",
+    processedPath,
+  ]);
+  await rename(processedPath, path);
+}
+
+function ttsEdgeSilenceFilter(): string {
+  const trim = TTS_EDGE_SILENCE_TRIM;
+  return [
+    [
+      "silenceremove=start_periods=1",
+      `start_duration=${(trim.minimumLeadingSilenceMs / 1000).toFixed(3)}`,
+      `start_threshold=${trim.thresholdDb}dB`,
+      `start_silence=${(trim.retainedLeadingSilenceMs / 1000).toFixed(3)}`,
+    ].join(":"),
+    "areverse",
+    [
+      "silenceremove=start_periods=1",
+      `start_duration=${(trim.minimumTrailingSilenceMs / 1000).toFixed(3)}`,
+      `start_threshold=${trim.thresholdDb}dB`,
+      `start_silence=${(trim.retainedTrailingSilenceMs / 1000).toFixed(3)}`,
+    ].join(":"),
+    "areverse",
+  ].join(",");
+}
+
 function audioFilterArgs(normalization: AudioNormalizationSettings, durationMs?: number): string[] {
   if (!normalization.enabled) return [];
   return ["-af", audioFilterExpression(normalization, durationMs)];
@@ -585,6 +687,47 @@ function sourceClipRangeForSegment(
   };
 }
 
+function sourceClipRangesForSegments(
+  segments: LessonSegmentAnnotation[],
+  sourceClipPaddingMs: number,
+): Map<string, SourceClipRange> {
+  const uniqueRanges = new Map<string, { startMs: number; endMs: number }>();
+  for (const segment of segments) {
+    if (segment.payload.audioSource !== "source") continue;
+    const startMs = segment.payload.sourceStartMs;
+    const endMs = segment.payload.sourceEndMs;
+    if (startMs === undefined || endMs === undefined || endMs <= startMs) continue;
+    uniqueRanges.set(`${startMs}:${endMs}`, { startMs, endMs });
+  }
+  const ordered = [...uniqueRanges.values()].toSorted(
+    (left, right) => left.startMs - right.startMs || left.endMs - right.endMs,
+  );
+  const paddingMs = Math.max(0, sourceClipPaddingMs);
+  const bounded = new Map<string, SourceClipRange>();
+  for (const [index, current] of ordered.entries()) {
+    const previous = [...ordered.slice(0, index)]
+      .reverse()
+      .find((candidate) => candidate.endMs <= current.startMs);
+    const next = ordered.slice(index + 1).find((candidate) => candidate.startMs >= current.endMs);
+    const lowerBoundary = previous ? previous.endMs + (current.startMs - previous.endMs) / 2 : 0;
+    const upperBoundary = next
+      ? current.endMs + (next.startMs - current.endMs) / 2
+      : Number.POSITIVE_INFINITY;
+    const clipStartMs = Math.max(0, current.startMs - paddingMs, lowerBoundary);
+    const clipEndMs = Math.min(current.endMs + paddingMs, upperBoundary);
+    bounded.set(`${current.startMs}:${current.endMs}`, {
+      clipStartMs,
+      clipEndMs,
+      sourceClipPaddingMs: Math.max(current.startMs - clipStartMs, clipEndMs - current.endMs),
+    });
+  }
+  return bounded;
+}
+
+function sourceClipRangeKey(segment: LessonSegmentAnnotation): string {
+  return `${segment.payload.sourceStartMs ?? ""}:${segment.payload.sourceEndMs ?? ""}`;
+}
+
 function sourceClipRangeFromSource(source: Source): SourceClipRange | null {
   const { clipStartMs, clipEndMs, sourceClipPaddingMs } = source;
   if (
@@ -626,6 +769,32 @@ async function canDecodeAudioFile(ffmpeg: string, path: string): Promise<boolean
   } catch {
     return false;
   }
+}
+
+async function probeAudioDurationMs(ffprobe: string, path: string): Promise<number> {
+  const proc = Bun.spawn(
+    [
+      ffprobe,
+      "-v",
+      "error",
+      "-show_entries",
+      "format=duration",
+      "-of",
+      "default=noprint_wrappers=1:nokey=1",
+      path,
+    ],
+    { stdout: "pipe", stderr: "pipe" },
+  );
+  const [stdout, stderr, exitCode] = await Promise.all([
+    new Response(proc.stdout).text(),
+    new Response(proc.stderr).text(),
+    proc.exited,
+  ]);
+  const seconds = Number.parseFloat(stdout.trim());
+  if (exitCode !== 0 || !Number.isFinite(seconds) || seconds <= 0) {
+    throw new Error(`Could not probe rendered clip duration for ${path}: ${stderr.trim()}`);
+  }
+  return Math.round(seconds * 1000 * 1000) / 1000;
 }
 
 async function runCommand(command: string, args: string[]): Promise<void> {

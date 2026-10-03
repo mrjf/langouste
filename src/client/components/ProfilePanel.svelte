@@ -55,6 +55,7 @@
     messages?: number;
     vocabulary?: number;
     grammar?: number;
+    reading_interactions?: number;
   }
 
   interface ItemReference {
@@ -102,6 +103,7 @@
   let availableLangs = $state<ProfileLanguage[]>([]);
   let level: Level = $state({ kind: "dashboard" });
   let stats: any = $state(null);
+  let readingInteractions: any[] = $state([]);
   let dimensionData: any = $state(null);
   let itemData: any = $state(null);
   let referenceData = $state<ItemReference | null>(null);
@@ -137,6 +139,7 @@
       if (selectedLang !== parsed.lang) {
         selectedLang = parsed.lang;
         stats = null;
+        readingInteractions = [];
         dimensionData = null;
         itemData = null;
       }
@@ -200,10 +203,19 @@
   async function loadDashboard(lang: string) {
     loading = true;
     try {
-      stats = await api.getLanguageStats(lang);
+      const [nextStats, readingResponse] = await Promise.all([
+        api.getLanguageStats(lang),
+        api.getReadingInteractions(lang, 12).catch((err) => {
+          console.error("reading interactions load failed:", err);
+          return { items: [] };
+        }),
+      ]);
+      stats = nextStats;
+      readingInteractions = readingResponse.items;
     } catch (err) {
       console.error("stats load failed:", err);
       stats = null;
+      readingInteractions = [];
     } finally {
       loading = false;
     }
@@ -412,7 +424,12 @@
   }
 
   function dataCount(lang: ProfileLanguage): number {
-    return (lang.messages ?? 0) + (lang.vocabulary ?? 0) + (lang.grammar ?? 0);
+    return (lang.messages ?? 0) + (lang.vocabulary ?? 0) + (lang.grammar ?? 0)
+      + (lang.reading_interactions ?? 0);
+  }
+
+  function readingEventLabel(value: string): string {
+    return value.replaceAll("_", " ");
   }
 
   function selectLanguage(lang: string) {
@@ -602,6 +619,11 @@
             <span class="tile-value">{stats.messages_sent}</span>
           </div>
           <div class="tile">
+            <span class="tile-label">Article interactions</span>
+            <span class="tile-value">{stats.reading_interactions ?? 0}</span>
+            <span class="tile-sub">from News and other reading surfaces</span>
+          </div>
+          <div class="tile">
             <span class="tile-label">Vocabulary items</span>
             <span class="tile-value">{stats.vocab_total}</span>
             <span class="tile-sub">{stats.vocab_mastered} mastered · {stats.vocab_heard ?? 0} heard · {stats.vocab_spoken ?? 0} spoken</span>
@@ -617,6 +639,42 @@
             <span class="tile-sub">{stats.vocab_self_corrected + stats.grammar_self_corrected} self-corrected</span>
           </div>
         </div>
+
+        {#if readingInteractions.length > 0}
+          <div class="section">
+            <h2>Recent article text</h2>
+            <p class="section-note">
+              Text you inspected, hovered, heard, or opened from connected reading surfaces.
+            </p>
+            <div class="reading-events">
+              {#each readingInteractions as interaction (interaction.interaction_id)}
+                <article class="reading-event">
+                  <div>
+                    <span>{readingEventLabel(interaction.event_type)}</span>
+                    <time datetime={interaction.observed_at}>{fmtDate(interaction.observed_at)}</time>
+                  </div>
+                  <h3>{interaction.title}</h3>
+                  <p>{interaction.text}</p>
+                  <div class="reading-actions">
+                    {#if onWorkbenchText}
+                      <button
+                        type="button"
+                        onclick={() => openWorkbench(
+                          interaction.text,
+                          interaction.language ?? selectedLang,
+                          `${interaction.title} — News reading`,
+                        )}
+                      >Open in Workbench</button>
+                    {/if}
+                    {#if interaction.source_url}
+                      <a href={interaction.source_url} target="_blank" rel="noreferrer">Original ↗</a>
+                    {/if}
+                  </div>
+                </article>
+              {/each}
+            </div>
+          </div>
+        {/if}
 
         <div class="section">
           <h2>Vocabulary by CEFR level</h2>
@@ -795,7 +853,7 @@
                 aria-label="Play pronunciation"
                 onclick={playItemPronunciation}
               >
-                {itemAudioLoading ? "…" : itemAudioPlaying ? "⏸" : "🔊"}
+                {itemAudioLoading ? "…" : itemAudioPlaying ? "⏸" : "▶"}
               </button>
             {/if}
             {#if level.itemType === "vocabulary" && onWorkbenchText && displayLabel}
@@ -1173,6 +1231,66 @@
     font-size: var(--text-sm);
     color: var(--color-text-muted);
     margin-bottom: var(--space-3);
+  }
+
+  .reading-events {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+    gap: var(--space-3);
+  }
+
+  .reading-event {
+    display: grid;
+    gap: var(--space-2);
+    padding: var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+  }
+
+  .reading-event > div:first-child,
+  .reading-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+  }
+
+  .reading-event > div:first-child,
+  .reading-event time {
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    text-transform: uppercase;
+  }
+
+  .reading-event h3,
+  .reading-event p {
+    margin: 0;
+  }
+
+  .reading-event h3 {
+    font-size: var(--text-sm);
+  }
+
+  .reading-event p {
+    color: var(--color-text);
+    font-size: var(--text-sm);
+    line-height: 1.45;
+  }
+
+  .reading-actions {
+    justify-content: flex-start;
+  }
+
+  .reading-actions button,
+  .reading-actions a {
+    border: 0;
+    background: transparent;
+    color: var(--color-accent);
+    font-size: var(--text-xs);
+    text-decoration: none;
+    cursor: pointer;
   }
 
   .cefr-bars {

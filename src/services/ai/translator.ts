@@ -59,7 +59,9 @@ export async function ensureTranslations(
   for (const lang of validLanguages) {
     // Skip messages that already have a translation, or whose source language
     // matches the target (translating French→French would fail).
-    const missing = messages.filter((m) => !m.translations?.[lang] && m.language !== lang);
+    const missing = messages.filter(
+      (m) => !!m.healed_text?.trim() && !m.translations?.[lang] && m.language !== lang,
+    );
     if (missing.length === 0) continue;
 
     const texts = missing.map((m) => m.healed_text);

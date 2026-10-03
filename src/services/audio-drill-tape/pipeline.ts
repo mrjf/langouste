@@ -11,17 +11,14 @@ import { getTranslationProvider } from "../ai/translation/index.ts";
 import type { TimedTranscript, TranscriptionProvider } from "../ai/transcription/index.ts";
 import { getTranscriptionProvider } from "../ai/transcription/index.ts";
 import { buildLessonTapeFilo } from "./lesson-filo.ts";
+import { auditRenderedLessonTape } from "./quality.ts";
 import { renderLessonAudio } from "./render.ts";
-import {
-  annotateSourceTranslations,
-  annotateTrainingSentences,
-  buildSourceTranscriptFilo,
-} from "./source-filo.ts";
+import { annotateTrainingSentences, buildSourceTranscriptFilo } from "./source-filo.ts";
 import {
   ClaudeSourceSentenceExtractor,
   type SourceSentenceExtractor,
 } from "./sentence-extractor.ts";
-import type { AudioDrillTapeDocuments } from "./types.ts";
+import type { AudioDrillTapeDocuments, LessonPlanOverride } from "./types.ts";
 
 export interface BuildAudioDrillTapeInput {
   sourceUrl: string;
@@ -34,6 +31,9 @@ export interface BuildAudioDrillTapeInput {
   maxItems?: number;
   pauseMs?: number;
   wordPauseMs?: number;
+  reviewIntervalsMs?: number[];
+  reviewOffsets?: number[];
+  lessonPlan?: LessonPlanOverride;
   phraseMaxWords?: number;
   phrasePauseMs?: number;
   normalizeAudio?: boolean;
@@ -42,6 +42,9 @@ export interface BuildAudioDrillTapeInput {
   loudnessRange?: number;
   shortClipThresholdMs?: number;
   sourceClipPaddingMs?: number;
+  trimTtsSilence?: boolean;
+  cueOverrides?: Record<string, string>;
+  targetTextOverrides?: Record<string, string>;
   transcriptionProvider?: TranscriptionProvider;
   translationProvider?: TranslationProvider;
   audioProvider?: AudioProvider;
@@ -54,6 +57,7 @@ export interface BuildAudioDrillTapeResult {
   transcriptPath: string;
   sourceFiloPath: string;
   lessonFiloPath: string;
+  qualityReportPath: string;
   outputAudioPath?: string;
 }
 
@@ -89,18 +93,18 @@ export async function buildAudioDrillTape(
     phraseMaxWords: input.phraseMaxWords,
     phrasePauseMs: input.phrasePauseMs,
   });
-  const translatedSource = await annotateSourceTranslations(
-    sourceBase,
-    translationProvider,
-    bridgeLanguage,
-  );
   const sentenceExtractor = input.sentenceExtractor ?? new ClaudeSourceSentenceExtractor();
   const extractedSentences = await sentenceExtractor.extractSentences({
-    source: translatedSource,
+    source: sourceBase,
     sourceLanguage: input.sourceLanguage,
     bridgeLanguage,
+    maxCandidates: Math.max(72, (input.maxItems ?? 12) * 12),
   });
-  const source = annotateTrainingSentences(translatedSource, extractedSentences, bridgeLanguage);
+  // The extractor supplies contextual sentence translations. Translating every raw word and
+  // pause-derived phrase first produced expensive, context-free glosses (and made those glosses
+  // tempting lesson material), so the production pipeline intentionally enriches only reviewed
+  // training sentences.
+  const source = annotateTrainingSentences(sourceBase, extractedSentences, bridgeLanguage);
   const sourceFiloPath = join(outputDir, "source.filo.json");
   await writeJson(sourceFiloPath, source);
 
@@ -113,6 +117,11 @@ export async function buildAudioDrillTape(
     maxItems: input.maxItems,
     pauseMs: input.pauseMs,
     wordPauseMs: input.wordPauseMs,
+    reviewIntervalsMs: input.reviewIntervalsMs,
+    reviewOffsets: input.reviewOffsets,
+    lessonPlan: input.lessonPlan,
+    cueOverrides: input.cueOverrides,
+    targetTextOverrides: input.targetTextOverrides,
   });
 
   let outputAudioPath: string | undefined;
@@ -128,6 +137,7 @@ export async function buildAudioDrillTape(
       loudnessRange: input.loudnessRange,
       shortClipThresholdMs: input.shortClipThresholdMs,
       sourceClipPaddingMs: input.sourceClipPaddingMs,
+      trimTtsSilence: input.trimTtsSilence,
     });
     lesson = rendered.lesson;
     outputAudioPath = rendered.outputPath;
@@ -135,6 +145,14 @@ export async function buildAudioDrillTape(
 
   const lessonFiloPath = join(outputDir, "lesson.filo.json");
   await writeJson(lessonFiloPath, lesson);
+  const qualityReportPath = join(outputDir, "quality-report.json");
+  const qualityReport = await auditRenderedLessonTape(lesson, outputAudioPath);
+  await writeJson(qualityReportPath, qualityReport);
+  if (!qualityReport.passed) {
+    throw new Error(
+      `Audio drill quality gate failed; see ${qualityReportPath}: ${qualityReport.issues.join(" ")}`,
+    );
+  }
 
   return {
     documents: { source, lesson },
@@ -142,6 +160,7 @@ export async function buildAudioDrillTape(
     transcriptPath,
     sourceFiloPath,
     lessonFiloPath,
+    qualityReportPath,
     ...(outputAudioPath ? { outputAudioPath } : {}),
   };
 }

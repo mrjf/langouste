@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { TestApi } from "./helpers";
+import { getLocalToken, TestApi } from "./helpers";
 
 test.describe("Boot in single-user mode", () => {
   test.beforeEach(async ({ request }) => {
@@ -13,7 +13,7 @@ test.describe("Boot in single-user mode", () => {
     await expect(page.getByRole("heading", { name: "Langouste" })).toBeVisible();
     // The three nav items appear.
     await expect(page.getByRole("button", { name: /Chats/ })).toBeVisible();
-    await expect(page.getByRole("button", { name: /Your progress/ })).toBeVisible();
+    await expect(page.getByRole("button", { name: /Progress/ })).toBeVisible();
     await expect(page.getByRole("button", { name: /Connections/ })).toBeVisible();
     // No login form fields.
     await expect(page.locator("#email")).toHaveCount(0);
@@ -46,5 +46,24 @@ test.describe("Boot in single-user mode", () => {
     await expect(page.locator(".sidebar-footer")).toContainText("You");
     // No login form after reload.
     await expect(page.locator("#email")).toHaveCount(0);
+  });
+
+  test("opens the integrated News tab and authenticated news API", async ({ page, request }) => {
+    await page.goto("/");
+    await page.getByRole("button", { name: /News/ }).click();
+
+    await expect(page).toHaveURL(/#\/news/u);
+    await expect(page.getByRole("heading", { name: "News", exact: true })).toBeVisible();
+    await expect(page.getByRole("navigation", { name: "News sources" })).toContainText(
+      "Hacker News",
+    );
+    await expect(page.getByRole("heading", { name: "Ready to read" })).toBeVisible();
+
+    const token = await getLocalToken(request);
+    const response = await request.get("/api/news/config", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(response.ok()).toBe(true);
+    expect(await response.json()).toMatchObject({ maxLanguages: 8 });
   });
 });

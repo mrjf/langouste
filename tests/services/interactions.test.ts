@@ -86,6 +86,41 @@ class MemoryDatabase implements Database {
 }
 
 describe("recordInteraction", () => {
+  test("serializes concurrent events for the same new item", async () => {
+    const db = new MemoryDatabase();
+
+    await Promise.all([
+      recordInteraction(db, {
+        userId: "user-1",
+        language: "fr",
+        itemType: "vocabulary",
+        lookupKey: "chat",
+        seed: { translation: "cat" },
+        eventType: "production",
+        outcome: "correct",
+        source: "chat_produce",
+      }),
+      recordInteraction(db, {
+        userId: "user-1",
+        language: "fr",
+        itemType: "vocabulary",
+        lookupKey: "chat",
+        seed: { translation: "cat" },
+        eventType: "encounter",
+        source: "chat_encounter",
+      }),
+    ]);
+
+    expect(db.rows.vocabulary).toHaveLength(1);
+    expect(db.rows.vocabulary[0]).toMatchObject({
+      term: "chat",
+      productions: 1,
+      correct_productions: 1,
+      encounters: 1,
+    });
+    expect(db.rows.review_log).toHaveLength(2);
+  });
+
   test("schedules atomic concepts instead of per-card state", async () => {
     const db = new MemoryDatabase();
     const conceptId = "fr:concept:article-gender";

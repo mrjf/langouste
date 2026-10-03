@@ -81,7 +81,10 @@ reviewRoutes.post("/vocabulary/:vocabId", async (c) => {
 
   const row = await db.selectOne<{ language: string }>("vocabulary", {
     columns: "language",
-    filters: [{ op: "eq", column: "vocab_id", value: vocabId }],
+    filters: [
+      { op: "eq", column: "vocab_id", value: vocabId },
+      { op: "eq", column: "user_id", value: userId },
+    ],
   });
   if (!row) return c.json({ error: "Vocabulary item not found" }, 404);
 
@@ -111,7 +114,10 @@ reviewRoutes.post("/grammar/:gapId", async (c) => {
 
   const row = await db.selectOne<{ language: string }>("grammar_gaps", {
     columns: "language",
-    filters: [{ op: "eq", column: "gap_id", value: gapId }],
+    filters: [
+      { op: "eq", column: "gap_id", value: gapId },
+      { op: "eq", column: "user_id", value: userId },
+    ],
   });
   if (!row) return c.json({ error: "Grammar gap not found" }, 404);
 

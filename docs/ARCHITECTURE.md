@@ -8,10 +8,9 @@ How Langouste is put together, where the seams are, and what the interesting bit
 ┌─────────────────────────────────────────────────────────────────┐
 │                        Browser (Svelte 5)                        │
 │                                                                  │
-│   ConversationList   ChatThread   MessageInput   Review   …     │
+│   ConversationList   ChatThread   News reader    Review   …     │
 │            │              │             │           │            │
-│            └──── Realtime subscription ─┘           │            │
-│                 (Supabase mode only)                │            │
+│            └──────── HTTP application API ──────────┘            │
 │                                                     │            │
 └──────────────────────────┬──────────────────────────┼────────────┘
                            │ /api                     │
@@ -36,6 +35,7 @@ How Langouste is put together, where the seams are, and what the interesting bit
 │    http.ts                ──────── any HTTP API     │            │
 │                                                     │            │
 │  services/spellcheck/     local nspell              │            │
+│  services/news/           source ingestion + Filo   │            │
 │  services/spaced-rep/     FSRS concept scheduler    │            │
 │  services/database/       Database interface        │            │
 │                                                     │            │
@@ -46,13 +46,15 @@ How Langouste is put together, where the seams are, and what the interesting bit
 └──────────────────────────┬───────────────────────────────────────┘
                            │
                            ▼
-      Storage (sqlite mode)              or   Supabase (supabase mode)
-      ~/.../Langouste/langouste.db            Postgres + RLS + Realtime + Auth
+                    turbopuffer
+       table namespaces + Filo corpus BM25 index
+              durable object storage
 ```
 
-The backend is stateless except for per-connector agent connections cached in memory (`services/agents/factory.ts`). Auth, persistence, and optional pub/sub are owned by whichever backend `DATABASE_MODE` selects. The current local/dev `.env.example` uses `sqlite`; Supabase is the hosted/multi-user mode.
-
-The two modes are explained in [MODES.md](./MODES.md); this doc covers the shared architecture.
+The backend is stateless except for per-connector agent connections cached in
+memory (`services/agents/factory.ts`). turbopuffer owns durable persistence and
+search. Langouste owns JWT authentication and enforces ownership/membership in
+its route and service layer. Storage is detailed in [MODES.md](./MODES.md).
 
 ## Layer responsibilities
 
@@ -61,12 +63,13 @@ The two modes are explained in [MODES.md](./MODES.md); this doc covers the share
 - Authoritative on UI state only. Never mutates domain data directly — always via `/api`.
 - Uses runes (`$state`, `$derived`, `$effect`) consistently; no legacy Svelte 4 syntax.
 - Per-conversation message cache in memory so conversation switching is instant.
-- In Supabase mode, subscribes to Supabase Realtime for incoming messages from the agent. In SQLite mode, this is a no-op and the client refreshes through normal API reads.
+- Agent responses are returned through the application API and merged into the per-conversation client model.
+- The `#/news` tab owns only view and build-job state; finished editions and reader interactions cross authenticated `/api/news/*` routes.
 
 ### Hono backend
 
 - Thin route handlers delegating to service modules. No business logic in routes beyond auth/validation.
-- Middleware: `requireAuth` verifies either a Supabase JWT (`supabase` mode) or a local HS256 JWT (`sqlite` mode), then injects `userId` and a scoped `Database`.
+- Middleware: `requireAuth` verifies the application-owned HS256 JWT, then injects `userId` and a `Database`. Routes apply explicit ownership or membership filters.
 - Streaming endpoint (Phase 0) uses Server-Sent Events. Hono has first-class `streamSSE` — we use it.
 
 ### `services/ai/`
@@ -106,11 +109,28 @@ Provider pattern, fully local.
 - `tracker.ts` — records chat productions and target-language encounters; see `docs/LEARNING-TRACKING.md` for the event/state contract.
 - `sm2.ts` — legacy pure scheduler kept for continuity/tests, not the active default.
 
+### `services/news/`
+
+- `sources/` — Hacker News, New York Times RSS, and San Francisco Chronicle listing/article extraction behind one SSRF-safe adapter contract.
+- `reading.ts` — turns immutable English reporting into Filo sentence, translation, word-alignment, explanation, grammar, and vocabulary tiers.
+- `cache.ts` — rebuildable artifact cache for generated editions. Profile ownership and durable availability come from `corpus_documents`, not this cache.
+- `services/ai/news-layers.ts` — the structured, level-controlled multilingual generation boundary; routes never call the model SDK directly.
+
 ### `services/database/`
 
-Every database interaction goes through here. Routes never touch `SupabaseClient` directly except for Supabase-mode auth/session handling in `routes/middleware.ts` and `routes/api/auth.ts`.
-
-Why: local SQLite and hosted Supabase share the same route/service layer. If we change backends later, the surface of work is a handful of files instead of the whole app.
+Every persistence interaction goes through the `Database` interface.
+`src/lib/db/turbopuffer.ts` maps each logical table to its own namespace,
+materializes filter/sort/FTS attributes, and preserves the complete row as
+chunked JSON. `services/corpus/store.ts` stores complete Filo documents and
+builds the searchable annotation projection. Audio-drill render directories
+are build caches only; `services/corpus/audio-drills.ts` persists their lesson
+and source documents plus every audio asset before the API exposes them.
+`services/reading/profile.ts` is the shared boundary for reading surfaces. The
+integrated News tab uses it to store learner-owned Filo editions through the
+same corpus path, resolve
+semantic reader coordinates back to exact tier text, writes idempotent
+`reading_interactions`, and forwards vocabulary exposure/audio signals through
+`recordInteraction`.
 
 ### `mcp/` (Phase 3)
 
@@ -242,7 +262,7 @@ Don't do either until a profiler says we need to.
 Runtime:
 
 - Bun ≥ 1.1
-- Node-compatible: `hono`, `@supabase/supabase-js`, `@anthropic-ai/sdk`, `@anthropic-ai/claude-agent-sdk`, `@modelcontextprotocol/sdk`, `nspell`, `dictionary-*` per language, `@google-cloud/translate`, `@google/genai`.
+- Node-compatible: `hono`, `@turbopuffer/turbopuffer`, `@anthropic-ai/sdk`, `@anthropic-ai/claude-agent-sdk`, `nspell`, `dictionary-*` per language, and `@google-cloud/translate`.
 
 Dev:
 
@@ -250,8 +270,7 @@ Dev:
 
 Infra:
 
-- SQLite for local/dev mode.
-- Supabase for hosted/multi-user mode (local via Supabase CLI or managed in prod).
+- turbopuffer hosted or BYOC for persistence and search.
 - Docker (Phase 4 sandbox).
 
-Removed from scope: ollama, langchain, any ORM. Keep the deps tight.
+Removed from scope: relational storage backends, ollama, langchain, and ORMs.

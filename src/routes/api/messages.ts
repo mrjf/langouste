@@ -40,6 +40,7 @@ import {
   seedAgentResponseTranslations,
 } from "../../services/messages/language-strategy.ts";
 import { adminDb, type Database } from "../../lib/db/index.ts";
+import { runBackgroundTask } from "../../lib/background-tasks.ts";
 import type {
   AgentType,
   CefrLevel,
@@ -72,9 +73,8 @@ messageRoutes.get("/:conversationId", async (c) => {
   const before = c.req.query("before");
   const limit = parseInt(c.req.query("limit") ?? "50", 10);
 
-  // Membership gate: in sqlite mode `db` is the admin (no-RLS) database, so
-  // this check is the only thing preventing a member of one conversation from
-  // reading another's history by guessing its ID.
+  // turbopuffer has no application-user RLS. This membership check prevents a
+  // user from reading another conversation by guessing its ID.
   const member = await getMember(db, conversationId, userId);
   if (!member) {
     return c.json({ error: "Not a member of this conversation" }, 403);
@@ -212,18 +212,21 @@ messageRoutes.post("/:conversationId", async (c) => {
 
   const userLangs = memberLanguages(senderMember);
 
-  void (async () => {
-    try {
-      await ensureTranslations([message], userLangs);
-    } catch (err) {
-      console.error("Failed to pre-translate message:", err);
-    }
-    try {
-      await enrichAndPersistMessageFiloDoc(adminDb(), message);
-    } catch (err) {
-      console.error("Failed to enrich message Filo document:", err);
-    }
-  })();
+  runBackgroundTask(
+    (async () => {
+      try {
+        await ensureTranslations([message], userLangs);
+      } catch (err) {
+        console.error("Failed to pre-translate message:", err);
+      }
+      try {
+        await enrichAndPersistMessageFiloDoc(adminDb(), message);
+      } catch (err) {
+        console.error("Failed to enrich message Filo document:", err);
+      }
+    })(),
+    "User vocabulary extraction",
+  );
   ensureTransliterations([message], msgLanguage, userLangs).catch((err) =>
     console.error("Failed to transliterate message:", err),
   );
@@ -294,16 +297,19 @@ messageRoutes.post("/:conversationId", async (c) => {
     filo_doc: null,
   });
 
-  void processAgentReply({
-    connector,
-    conversationId,
-    userId,
-    senderMember,
-    userMessage: message,
-    agentMessage: agentMsg,
-    inputText: text,
-    inputLanguage: msgLanguage,
-  });
+  runBackgroundTask(
+    processAgentReply({
+      connector,
+      conversationId,
+      userId,
+      senderMember,
+      userMessage: message,
+      agentMessage: agentMsg,
+      inputText: text,
+      inputLanguage: msgLanguage,
+    }),
+    "Agent reply processing",
+  );
 
   return c.json({ message, agent_message: agentMsg }, 201);
 });
@@ -400,14 +406,14 @@ export async function processAgentReply(args: {
     } catch (enrichErr) {
       console.error("Agent reply enrichment failed (reply preserved):", enrichErr);
     }
-    ensureTransliterations(
-      [completedAgentMessage],
-      agentLanguagePlan.responseLanguage,
-      userLangs,
-    ).catch((err) => console.error("Failed to transliterate agent response:", err));
-    ensurePhonetics([completedAgentMessage], ["ipa"], userLangs).catch((err) =>
-      console.error("Failed to generate agent phonetics:", err),
-    );
+    await Promise.allSettled([
+      ensureTransliterations(
+        [completedAgentMessage],
+        agentLanguagePlan.responseLanguage,
+        userLangs,
+      ),
+      ensurePhonetics([completedAgentMessage], ["ipa"], userLangs),
+    ]);
   } catch (err) {
     const detail = err instanceof Error ? err.message : String(err);
     console.error("Agent communication failed:", err);
@@ -575,6 +581,7 @@ messageRoutes.post("/:conversationId/translate", async (c) => {
     requestedLanguages,
   );
   await ensureTranslations(messages, requestedLanguages);
+  await ensureTransliterations(messages, "", requestedLanguages);
   await ensureMessageIpaLayers(messages, requestedLanguages);
   await trackAgentVocabularyEncounters(
     adminDb(),

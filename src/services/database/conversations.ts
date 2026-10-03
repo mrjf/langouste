@@ -1,4 +1,3 @@
-import { config } from "../../lib/config.ts";
 import type { Database } from "../../lib/db/index.ts";
 import type {
   AgentConnector,
@@ -23,19 +22,6 @@ export interface EnrichedConversation extends Conversation {
   unread_count: number;
 }
 
-const SUPABASE_NESTED_SELECT = `
-  *,
-  members:conversation_members(
-    user_id,
-    target_languages,
-    base_languages,
-    joined_at,
-    last_read_at,
-    profile:profiles(user_id, display_name)
-  ),
-  agent_connector:agent_connectors(connector_id, name, type, config)
-`;
-
 export async function getConversationsForUser(
   db: Database,
   userId: string,
@@ -48,13 +34,7 @@ export async function getConversationsForUser(
 
   const convIds = memberRows.map((m) => m.conversation_id);
 
-  // Supabase supports nested selects via PostgREST embedding; SQLite doesn't,
-  // so branch here.
-  const convs =
-    config.databaseMode === "supabase"
-      ? await supabaseSelectNested(db, convIds)
-      : await sqliteSelectEnriched(db, convIds);
-
+  const convs = await selectEnriched(db, convIds);
   return annotateUnread(db, convs, userId);
 }
 
@@ -104,11 +84,7 @@ export async function getConversation(
   db: Database,
   conversationId: string,
 ): Promise<EnrichedConversation | null> {
-  if (config.databaseMode === "supabase") {
-    const rows = await supabaseSelectNested(db, [conversationId]);
-    return rows[0] ?? null;
-  }
-  const rows = await sqliteSelectEnriched(db, [conversationId]);
+  const rows = await selectEnriched(db, [conversationId]);
   return rows[0] ?? null;
 }
 
@@ -133,30 +109,9 @@ export async function setConversationConnector(
   ]);
 }
 
-// --- Supabase nested-select path ---
-// Uses the existing PostgREST embed feature. The `columns` param carries the
-// nested-select syntax; the abstraction layer passes it through as-is.
-async function supabaseSelectNested(
-  db: Database,
-  convIds: string[],
-): Promise<EnrichedConversation[]> {
-  const rows = await db.select<Omit<EnrichedConversation, "unread_count">>("conversations", {
-    columns: SUPABASE_NESTED_SELECT,
-    filters: [{ op: "in", column: "conversation_id", values: convIds }],
-    order: [{ column: "created_at", ascending: false }],
-  });
-  // unread_count is filled by annotateUnread (list path); default 0 so
-  // single-conversation callers get a valid shape.
-  return rows.map((r) => ({ ...r, unread_count: 0 }));
-}
-
-// --- SQLite fan-out path ---
-// One conversation-row query, one members query, one agent-connector query,
-// stitched together in TypeScript.
-async function sqliteSelectEnriched(
-  db: Database,
-  convIds: string[],
-): Promise<EnrichedConversation[]> {
+// turbopuffer does not provide relational joins. Fetch the isolated logical
+// namespaces in parallel and stitch the API shape together in TypeScript.
+async function selectEnriched(db: Database, convIds: string[]): Promise<EnrichedConversation[]> {
   if (convIds.length === 0) return [];
 
   const convs = await db.select<Conversation>("conversations", {

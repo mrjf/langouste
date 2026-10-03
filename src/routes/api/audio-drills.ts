@@ -10,6 +10,16 @@ import { getDueGrammarGaps } from "../../services/database/grammar-gaps.ts";
 import { getProfile } from "../../services/database/profiles.ts";
 import { getDueVocabulary } from "../../services/database/vocabulary.ts";
 import type { CefrLevel, LearningLanguage } from "../../types/index.ts";
+import {
+  audioDrillListItem as storedAudioDrillListItem,
+  findStoredAudioDrillAsset,
+  findStoredAudioDrillClip,
+  getStoredAudioDrill,
+  listStoredAudioDrills,
+  persistAudioDrillDirectory,
+  updateStoredAudioDrillLesson,
+} from "../../services/corpus/audio-drills.ts";
+import type { CachedAudioAsset } from "../../services/corpus/audio-assets.ts";
 
 type AudioDrillsRouteBindings = {
   Variables: {
@@ -82,6 +92,10 @@ export function createAudioDrillRoutes(
   if (options.requireAuthentication ?? true) routes.use("*", requireAuth);
 
   routes.get("/", async (c) => {
+    const durable = durableContext(c);
+    if (durable) {
+      return c.json({ drills: await listStoredAudioDrills(durable.db, durable.ownerId) });
+    }
     const dirs = await readdir(root, { withFileTypes: true }).catch(() => []);
     const items: AudioDrillListItem[] = [];
     for (const dir of dirs) {
@@ -179,6 +193,19 @@ export function createAudioDrillRoutes(
     const id = c.req.param("id");
     const dir = drillDir(root, id);
     if (!dir) return c.json({ error: "invalid drill id" }, 400);
+    const durable = durableContext(c);
+    if (durable) {
+      const record = await getStoredAudioDrill(durable.db, durable.ownerId, id);
+      if (!record) return c.json({ error: "drill not found" }, 404);
+      return c.json({
+        drill: storedAudioDrillListItem(record),
+        lesson: record.lesson,
+        source: record.source,
+        audioUrl: record.final_audio_id
+          ? `/api/audio-drills/${encodeURIComponent(id)}/audio`
+          : null,
+      });
+    }
     if (!(await hasFile(join(dir, "lesson.filo.json")))) {
       return c.json({ error: "drill not found" }, 404);
     }
@@ -199,14 +226,20 @@ export function createAudioDrillRoutes(
     const id = c.req.param("id");
     const dir = drillDir(root, id);
     if (!dir) return c.json({ error: "invalid drill id" }, 400);
-    if (!(await hasFile(join(dir, "lesson.filo.json")))) {
-      return c.json({ error: "drill not found" }, 404);
-    }
     const body = await c.req.json();
     const lesson = body?.lesson as FiloDocumentJson | undefined;
     if (!isFiloDocument(lesson)) return c.json({ error: "lesson document is required" }, 400);
     if (lesson.metadata?.corpus !== "audio-drill-tape") {
       return c.json({ error: "lesson document is not an audio drill" }, 400);
+    }
+    const durable = durableContext(c);
+    if (durable) {
+      const updated = await updateStoredAudioDrillLesson(durable.db, durable.ownerId, id, lesson);
+      if (!updated) return c.json({ error: "drill not found" }, 404);
+      return c.json({ ok: true, drill: storedAudioDrillListItem(updated), lesson });
+    }
+    if (!(await hasFile(join(dir, "lesson.filo.json")))) {
+      return c.json({ error: "drill not found" }, 404);
     }
     await writeFile(join(dir, "lesson.filo.json"), `${JSON.stringify(lesson, null, 2)}\n`);
     return c.json({ ok: true, drill: await audioDrillListItem(root, id), lesson });
@@ -216,6 +249,11 @@ export function createAudioDrillRoutes(
     const id = c.req.param("id");
     const dir = drillDir(root, id);
     if (!dir) return c.json({ error: "invalid drill id" }, 400);
+    const durable = durableContext(c);
+    if (durable) {
+      const asset = await findStoredAudioDrillAsset(durable.db, durable.ownerId, id, "final");
+      return asset ? storedAudioResponse(asset) : c.json({ error: "audio not found" }, 404);
+    }
     const audioFileName = await finalAudioFileName(dir);
     if (!audioFileName) return c.json({ error: "audio not found" }, 404);
     return audioFileResponse(join(dir, audioFileName));
@@ -225,6 +263,11 @@ export function createAudioDrillRoutes(
     const id = c.req.param("id");
     const dir = drillDir(root, id);
     if (!dir) return c.json({ error: "invalid drill id" }, 400);
+    const durable = durableContext(c);
+    if (durable) {
+      const asset = await findStoredAudioDrillAsset(durable.db, durable.ownerId, id, "source");
+      return asset ? storedAudioResponse(asset) : c.json({ error: "source audio not found" }, 404);
+    }
     const sourceFileName = await sourceAudioFileName(dir);
     if (!sourceFileName) return c.json({ error: "source audio not found" }, 404);
     return audioFileResponse(join(dir, sourceFileName));
@@ -237,6 +280,11 @@ export function createAudioDrillRoutes(
     if (!dir) return c.json({ error: "invalid drill id" }, 400);
     if (!/^aud_[a-f0-9]{64}$/u.test(audioId)) {
       return c.json({ error: "invalid audio id" }, 400);
+    }
+    const durable = durableContext(c);
+    if (durable) {
+      const asset = await findStoredAudioDrillClip(durable.db, durable.ownerId, id, audioId);
+      return asset ? storedAudioResponse(asset) : c.json({ error: "clip not found" }, 404);
     }
     const path = join(dir, "clips", `${audioId}.mp3`);
     if (!(await hasFile(path))) return c.json({ error: "clip not found" }, 404);
@@ -368,14 +416,26 @@ async function createTopicAudioDrill(
           })
       : undefined,
   });
+  await emit?.({
+    step: "storage",
+    message: "Writing the completed drill corpus and audio assets to turbopuffer.",
+  });
+  const stored = await persistAudioDrillDirectory(
+    db,
+    userId,
+    id,
+    dir,
+    result.lesson,
+    result.source,
+  );
 
   const response: CreateTopicAudioDrillResponse = {
     ok: true,
     id,
-    drill: await audioDrillListItem(root, id),
+    drill: storedAudioDrillListItem(stored),
     lesson: result.lesson,
     source: result.source,
-    audioUrl: result.outputAudioPath ? `/api/audio-drills/${encodeURIComponent(id)}/audio` : null,
+    audioUrl: stored.final_audio_id ? `/api/audio-drills/${encodeURIComponent(id)}/audio` : null,
   };
   await emit?.({
     step: "response",
@@ -431,6 +491,27 @@ async function audioFileResponse(path: string): Promise<Response> {
       "Content-Length": String(file.size),
     },
   });
+}
+
+function storedAudioResponse(asset: CachedAudioAsset): Response {
+  const body = new ArrayBuffer(asset.audio.byteLength);
+  new Uint8Array(body).set(asset.audio);
+  return new Response(body, {
+    headers: {
+      "Content-Type": asset.contentType,
+      "Cache-Control": "private, max-age=3600",
+      "Content-Length": String(asset.byteLength),
+      "X-Langouste-Audio-Id": asset.audioId,
+    },
+  });
+}
+
+function durableContext(
+  c: Context<AudioDrillsRouteBindings>,
+): { db: Database; ownerId: string } | null {
+  const db = c.get("db");
+  const ownerId = c.get("userId");
+  return db && ownerId ? { db, ownerId } : null;
 }
 
 async function finalAudioFileName(dir: string): Promise<string | null> {

@@ -4,8 +4,8 @@ import { setupTestApp, teardownTestApp, type TestAppHandle } from "./tests/e2e/h
 /**
  * Langouste e2e config.
  *
- * All tests run against a freshly-spawned backend with an isolated SQLite
- * DB in /tmp. LANGOUSTE_TEST_MODE=true activates the stub agent and
+ * All tests run against a freshly-spawned backend with an isolated in-memory
+ * turbopuffer contract transport. LANGOUSTE_TEST_MODE=true activates the stub agent and
  * canned-response LLM services so no real APIs are called.
  *
  * Lifecycle: playwright.config.ts runs once per test run, before any test

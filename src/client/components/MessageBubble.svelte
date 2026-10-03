@@ -5,6 +5,7 @@
   import { api } from "../lib/api";
   import { playExclusive, stopCurrent, isCurrent } from "../lib/audio-player";
   import { filoSource } from "../lib/filo-provenance";
+  import { transliterationForLanguage } from "../lib/transliteration";
   import type { WorkbenchTextPayload } from "../lib/workbench";
   import DictionaryText from "./DictionaryText.svelte";
   import IpaLayer from "./IpaLayer.svelte";
@@ -17,6 +18,8 @@
     baseLangs?: string[];
     challenge?: string | null;
     conversationId?: string;
+    showAllLanguages?: boolean;
+    languagesLoading?: boolean;
     onWorkbenchText?: (payload: WorkbenchTextPayload) => void;
   }
 
@@ -28,6 +31,8 @@
     baseLangs = [],
     challenge = null,
     conversationId,
+    showAllLanguages = false,
+    languagesLoading = false,
     onWorkbenchText,
   }: Props = $props();
 
@@ -97,10 +102,25 @@
 
   // What's visible below the bubble
   let showBase = $state(false);
+  let showTransliteration = $state(false);
   let showOriginal = $state(false);
   let showCorrections = $state(false);
   let showChallenge = $state(false);
   let shownLangs = $state<Set<string>>(new Set());
+  let wasShowingAllLanguages = false;
+
+  // The conversation-level "hide all" action is authoritative: clear any
+  // language rows that had also been opened individually in this bubble.
+  $effect(() => {
+    if (showAllLanguages) {
+      wasShowingAllLanguages = true;
+      return;
+    }
+    if (!wasShowingAllLanguages) return;
+    wasShowingAllLanguages = false;
+    showBase = false;
+    shownLangs = new Set();
+  });
 
   let hasTargetTranslation = $derived(
     !viewerLang || !!message.translations?.[viewerLang]
@@ -116,6 +136,14 @@
     viewerLang && message.translations?.[viewerLang] ? viewerLang : (message.language ?? ""),
   );
   let displayIsTargetLanguage = $derived(!!viewerLang && displayLang === viewerLang);
+  let displayTransliteration = $derived.by(() => {
+    const transliteration = transliterationForLanguage(
+      message.transliterations,
+      displayLang,
+      [...baseLangs, ...viewerLangs],
+    );
+    return transliteration && transliteration !== displayText.trim() ? transliteration : null;
+  });
 
   // Awaiting the viewer-language (e.g. hu) translation while we already
   // have source/English text. We hold the skeleton during this window
@@ -163,22 +191,39 @@
     !!message._pending && !!message.is_agent && !message.healed_text,
   );
 
+  function textForLanguage(language: string): string | null {
+    if (!language) return null;
+    if (message.language === language) return message.healed_text?.trim() || null;
+    return message.translations?.[language]?.trim() || null;
+  }
+
   let baseText = $derived.by(() => {
-    if (!baseLang || baseLang === viewerLang) return null;
-    const t = message.translations?.[baseLang];
-    if (!t || t === displayText) return null;
-    return t;
+    if (!baseLang || baseLang === displayLang) return null;
+    const t = textForLanguage(baseLang);
+    return t || null;
   });
+  let hasBaseLanguageDetail = $derived(!!baseLang && baseLang !== displayLang);
 
   let hasOriginal = $derived(message.raw_text !== message.healed_text);
   let hasCorrections = $derived(message.corrections?.length > 0);
   let hasChallenge = $derived(!!challenge);
 
-  // Other languages available in translations (not viewer's target or base languages)
+  // Every configured secondary target/base language is eligible even when its
+  // translation has not been generated yet. Existing translation languages
+  // remain available after conversation language settings change.
   let otherLangs = $derived.by(() => {
-    if (!message.translations) return [];
-    const exclude = new Set([...viewerLangs, ...baseLangs]);
-    return Object.keys(message.translations).filter((l) => !exclude.has(l));
+    const exclude = new Set([displayLang, baseLang]);
+    return [
+      ...new Set([
+        ...viewerLangs,
+        ...baseLangs,
+        ...Object.keys(message.translations ?? {}),
+        message.language,
+      ]),
+    ].filter(
+      (language): language is string =>
+        typeof language === "string" && language.length > 0 && !exclude.has(language),
+    );
   });
 
   let time = $derived(
@@ -216,7 +261,13 @@
   }
 
   let hasDetails = $derived(
-    showBase || showOriginal || showCorrections || showChallenge || shownLangs.size > 0
+    showBase ||
+      (showTransliteration && !!displayTransliteration) ||
+      showOriginal ||
+      showCorrections ||
+      showChallenge ||
+      shownLangs.size > 0 ||
+      (showAllLanguages && (hasBaseLanguageDetail || otherLangs.length > 0))
   );
 </script>
 
@@ -287,15 +338,28 @@
           workbench
         </button>
       {/if}
+      {#if displayTransliteration}
+        <button
+          class="action-btn"
+          class:active={showTransliteration}
+          title={showTransliteration ? "Hide transliteration" : "Show transliteration in Latin script"}
+          aria-pressed={showTransliteration}
+          onclick={() => showTransliteration = !showTransliteration}
+        >
+          transliteration
+        </button>
+      {/if}
       {#if baseText}
-        <button class="action-btn" class:active={showBase} onclick={() => showBase = !showBase}>
+        <button class="action-btn" class:active={showAllLanguages || showBase} onclick={() => showBase = !showBase}>
           {langTag(baseLang)}
         </button>
       {/if}
       {#each otherLangs as lang}
-        <button class="action-btn" class:active={shownLangs.has(lang)} onclick={() => toggleLang(lang)}>
-          {langTag(lang)}
-        </button>
+        {#if textForLanguage(lang)}
+          <button class="action-btn" class:active={showAllLanguages || shownLangs.has(lang)} onclick={() => toggleLang(lang)}>
+            {langTag(lang)}
+          </button>
+        {/if}
       {/each}
       {#if hasOriginal}
         <button class="action-btn" class:active={showOriginal} onclick={() => showOriginal = !showOriginal}>
@@ -317,10 +381,26 @@
 
     {#if hasDetails}
       <div class="details">
-        {#if showBase && baseText}
+        {#if showTransliteration && displayTransliteration}
+          <div class="detail-row transliteration-row">
+            <span class="detail-label">Latin script</span>
+            <div
+              class="detail-text transliteration-text"
+              dir="ltr"
+              use:filoSource={{
+                text: displayTransliteration,
+                role: "message-transliteration",
+                language: displayLang,
+                includeDocument: false,
+              }}
+            >{displayTransliteration}</div>
+          </div>
+        {/if}
+
+        {#if (showBase && baseText) || (showAllLanguages && hasBaseLanguageDetail)}
           <div class="detail-row base-row">
             <span class="detail-label">{langTag(baseLang)}</span>
-            {#if conversationId}
+            {#if baseText && conversationId}
               <button
                 class="detail-speaker"
                 class:active={audioByLang[baseLang]?.playing}
@@ -332,7 +412,7 @@
                   {audioByLang[baseLang]?.loading ? "…" : audioByLang[baseLang]?.playing ? "stop" : "audio"}
               </button>
             {/if}
-            {#if onWorkbenchText}
+            {#if baseText && onWorkbenchText}
               <button
                 class="detail-action"
                 title="Analyze this translation in the Filo workbench"
@@ -341,24 +421,31 @@
                 workbench
               </button>
             {/if}
-            <div
-              class="detail-text"
-              use:filoSource={{
-                document: message.filo_doc,
-                text: baseText,
-                role: "message-base-translation",
-                language: baseLang,
-                includeDocument: false,
-              }}
-            >{@html md(baseText)}</div>
+            {#if baseText}
+              <div
+                class="detail-text"
+                use:filoSource={{
+                  document: message.filo_doc,
+                  text: baseText,
+                  role: "message-base-translation",
+                  language: baseLang,
+                  includeDocument: false,
+                }}
+              >{@html md(baseText)}</div>
+            {:else}
+              <div class="detail-text translation-status">
+                {languagesLoading ? "Generating translation…" : "Translation unavailable"}
+              </div>
+            {/if}
           </div>
         {/if}
 
         {#each otherLangs as lang}
-          {#if shownLangs.has(lang) && message.translations?.[lang]}
+          {@const languageText = textForLanguage(lang)}
+          {#if shownLangs.has(lang) || showAllLanguages}
             <div class="detail-row">
               <span class="detail-label">{langTag(lang)}</span>
-              {#if conversationId}
+              {#if languageText && conversationId}
                 <button
                   class="detail-speaker"
                   class:active={audioByLang[lang]?.playing}
@@ -370,32 +457,38 @@
                     {audioByLang[lang]?.loading ? "…" : audioByLang[lang]?.playing ? "stop" : "audio"}
                 </button>
               {/if}
-              {#if onWorkbenchText}
+              {#if languageText && onWorkbenchText}
                 <button
                   class="detail-action"
                   title="Analyze this translation in the Filo workbench"
-                  onclick={() => openWorkbench(message.translations?.[lang], lang, `${langTag(lang)} translation`)}
+                  onclick={() => openWorkbench(languageText, lang, `${langTag(lang)} translation`)}
                 >
                   workbench
                 </button>
               {/if}
-            <div
-              class="detail-text"
-              use:filoSource={{
-                document: message.filo_doc,
-                text: message.translations[lang],
-                role: "message-extra-translation",
-                language: lang,
-                includeDocument: false,
-              }}
-            >
-              {#if viewerLangs.includes(lang)}
-                <DictionaryText text={message.translations[lang]} language={lang} />
-                <IpaLayer text={message.translations[lang]} language={lang} filoDoc={message.filo_doc} />
+              {#if languageText}
+                <div
+                  class="detail-text"
+                  use:filoSource={{
+                    document: message.filo_doc,
+                    text: languageText,
+                    role: "message-extra-translation",
+                    language: lang,
+                    includeDocument: false,
+                  }}
+                >
+                  {#if viewerLangs.includes(lang)}
+                    <DictionaryText text={languageText} language={lang} />
+                    <IpaLayer text={languageText} language={lang} filoDoc={message.filo_doc} />
+                  {:else}
+                    {@html md(languageText)}
+                  {/if}
+                </div>
               {:else}
-                {@html md(message.translations[lang])}
+                <div class="detail-text translation-status">
+                  {languagesLoading ? "Generating translation…" : "Translation unavailable"}
+                </div>
               {/if}
-            </div>
             </div>
           {/if}
         {/each}
@@ -713,6 +806,20 @@
 
   .detail-text {
     color: var(--color-text);
+  }
+
+  .translation-status {
+    color: var(--color-text-muted);
+    font-style: italic;
+  }
+
+  .transliteration-row {
+    border-left-color: var(--color-accent-soft);
+  }
+
+  .transliteration-text {
+    font-family: var(--font-mono);
+    overflow-wrap: anywhere;
   }
 
   /* Compact markdown blocks inside message content. User-agent defaults on

@@ -32,7 +32,7 @@ test.describe("Correction flow", () => {
     await seedConnector(request, "stub");
 
     await page.goto("/");
-    await page.getByRole("button", { name: "+ New" }).click();
+    await page.getByRole("button", { name: "New", exact: true }).click();
     await page.getByRole("button", { name: /stub/i }).click();
 
     // Type the wrong version and press Enter.
@@ -80,7 +80,7 @@ test.describe("Correction flow", () => {
     await seedConnector(request, "stub");
 
     await page.goto("/");
-    await page.getByRole("button", { name: "+ New" }).click();
+    await page.getByRole("button", { name: "New", exact: true }).click();
     await page.getByRole("button", { name: /stub/i }).click();
 
     const editable = page.locator(".editable[contenteditable='true']");

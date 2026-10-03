@@ -15,6 +15,7 @@ import type { Database } from "../../lib/db/index.ts";
 import type { Message } from "../../types/index.ts";
 import { annotateFullRangeIpaLayers } from "./ipa-layers.ts";
 import { normalizeVocabularyTerm } from "../spaced-repetition/vocabulary-normalizer.ts";
+import { indexFiloDocument } from "./store.ts";
 
 export interface MessageFiloInput {
   messageId: string;
@@ -80,9 +81,7 @@ export async function persistBaseMessageFiloDoc(
   message: Message,
 ): Promise<FiloDocumentJson> {
   const filoDoc = buildBaseMessageFiloDocument(messageToFiloInput(message));
-  await db.update("messages", { filo_doc: filoDoc }, [
-    { op: "eq", column: "message_id", value: message.message_id },
-  ]);
+  await persistMessageFiloDocument(db, message, filoDoc);
   message.filo_doc = filoDoc;
   return filoDoc;
 }
@@ -92,9 +91,7 @@ export async function enrichAndPersistMessageFiloDoc(
   message: Message,
 ): Promise<FiloDocumentJson> {
   const filoDoc = await buildMessageFiloDocument(messageToFiloInput(message));
-  await db.update("messages", { filo_doc: filoDoc }, [
-    { op: "eq", column: "message_id", value: message.message_id },
-  ]);
+  await persistMessageFiloDocument(db, message, filoDoc);
   message.filo_doc = filoDoc;
   return filoDoc;
 }
@@ -108,9 +105,7 @@ export async function enrichAndPersistMessageIpaLayers(
   );
   await annotateMessageIpa(document, messageToFiloInput(message));
   const filoDoc = document.toJSON();
-  await db.update("messages", { filo_doc: filoDoc }, [
-    { op: "eq", column: "message_id", value: message.message_id },
-  ]);
+  await persistMessageFiloDocument(db, message, filoDoc);
   message.filo_doc = filoDoc;
   return filoDoc;
 }
@@ -153,9 +148,7 @@ export async function appendMessageAudioTier(
   }
 
   const filoDoc = document.toJSON();
-  await db.update("messages", { filo_doc: filoDoc }, [
-    { op: "eq", column: "message_id", value: message.message_id },
-  ]);
+  await persistMessageFiloDocument(db, message, filoDoc);
   message.filo_doc = filoDoc;
   return filoDoc;
 }
@@ -195,6 +188,23 @@ export function messageToFiloInput(message: Message): MessageFiloInput {
     isAgent: message.is_agent,
     createdAt: message.created_at,
   };
+}
+
+async function persistMessageFiloDocument(
+  db: Database,
+  message: Message,
+  filoDoc: FiloDocumentJson,
+): Promise<void> {
+  await db.update("messages", { filo_doc: filoDoc }, [
+    { op: "eq", column: "message_id", value: message.message_id },
+  ]);
+  await indexFiloDocument(db, filoDoc, {
+    ownerId: message.sender_id,
+    sourceType: "message",
+    sourceId: message.message_id,
+    conversationId: message.conversation_id,
+    language: message.language,
+  });
 }
 
 function annotateMessageTranslations(document: FiloDocument, input: MessageFiloInput): void {
@@ -239,13 +249,19 @@ async function annotateMessageDictionary(document: FiloDocument, language: strin
     source: "langouste.vocabulary-normalizer",
     lookup: async ({ surface }) => {
       const normalized = await normalizeVocabularyTerm(surface, language);
-      const definitions = normalized.definition ? [normalized.definition] : [];
+      if (normalized.lookup_status === "not-found") return null;
       return {
         lemma: normalized.term || surface,
-        definitions,
-        source: normalized.source_term ? "wiktionary" : "langouste-normalizer",
+        definitions: normalized.definitions,
+        senses: normalized.senses,
+        source:
+          normalized.lookup_source === "wiktionary" ? "wiktionary" : "langouste-local-dictionary",
+        sourceUrl: normalized.source_url ?? undefined,
+        targetSourceUrl: normalized.target_source_url ?? undefined,
         sourceTerm: normalized.source_term,
         formDescription: normalized.form_description,
+        lookupStatus: normalized.lookup_status,
+        lookupError: normalized.lookup_error,
       };
     },
   });

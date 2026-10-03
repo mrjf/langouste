@@ -1,64 +1,100 @@
-# Database modes
+# turbopuffer storage
 
-Langouste runs in one of two modes, chosen by the `DATABASE_MODE` environment variable. Same app, same features, different backing store.
+Langouste has one durable storage and search engine: turbopuffer. Logical
+tables are isolated into namespaced document collections, and Filo documents
+are also projected into a dedicated full-text corpus index.
 
-The current local/dev setup uses `DATABASE_MODE=sqlite` and `VITE_DATABASE_MODE=sqlite` from `.env.example`. Treat that as the intended contributor/default setup. If `DATABASE_MODE` is omitted entirely, `src/lib/config.ts` currently falls back to `supabase`, so keep the mode explicit in `.env`.
+## Configuration
 
-| | `sqlite` (default) | `supabase` |
-|---|---|---|
-| **Stores data in** | a single `langouste.db` file in your OS data directory | a managed or self-hosted Supabase project |
-| **Auth** | local bcrypt + HS256 JWT | Supabase Auth (email/password, OAuth etc.) |
-| **Realtime** | none (request/response only) | Supabase Realtime websockets |
-| **RLS** | none (app-level filters) | enforced by Postgres |
-| **Users** | one-to-many supported, but aimed at single-user local | many-user multi-tenant |
-| **External services** | Anthropic API only | Anthropic API + Supabase |
-| **When to pick it** | running Langouste on your laptop; OSS contributors; desktop app | hosted tier; teams; anything with >1 human user |
+| Variable | Required | Default | Purpose |
+|---|---:|---|---|
+| `TURBOPUFFER_API_KEY` | yes | — | Server-side turbopuffer API key |
+| `TURBOPUFFER_REGION` | no | `aws-us-west-2` | Data and query region |
+| `TURBOPUFFER_NAMESPACE_PREFIX` | no | `langouste` | Environment/tenant namespace isolation |
+| `TURBOPUFFER_BASE_URL` | no | SDK default | BYOC, proxy, or test endpoint |
+| `LANGOUSTE_JWT_SECRET` | yes | — | Signs application-owned auth tokens |
 
-## Running in `sqlite` mode
+`bun run migrate` validates the connection and lists matching namespaces.
+Namespaces and schemas are created lazily on the first batch write.
 
-1. Copy `.env.example` to `.env`, leave `DATABASE_MODE=sqlite`, `VITE_DATABASE_MODE=sqlite`, and `VITE_SINGLE_USER=true`, then set `ANTHROPIC_API_KEY` and `LANGOUSTE_JWT_SECRET`.
-2. `bun install`
-3. `bun run migrate` — creates `langouste.db` in the data directory.
-4. `bun run dev` — Vite on `:5173`, Hono on `:8000`.
+## Object storage and source documents
 
-The database file lives at:
+turbopuffer uses object storage as its durable source of truth. A successful
+write is committed to that object storage, so normal deployments do not need
+to create or operate an S3 bucket for database rows.
 
-- **macOS**: `~/Library/Application Support/Langouste/langouste.db`
-- **Linux**: `$XDG_DATA_HOME/langouste/langouste.db`, or `~/.local/share/langouste/langouste.db`
-- **Windows**: `%APPDATA%/Langouste/langouste.db`
-- **Docker** (when we ship the image): `/data/langouste.db`
+In turbopuffer Cloud, turbopuffer operates that storage. A BYOC deployment is
+different: its control-plane setup provisions/configures object storage in
+your cloud account (S3, Google Cloud Storage, or Azure Blob Storage).
 
-Override with `LANGOUSTE_DATA_DIR=/absolute/path`. Handy for dev: `LANGOUSTE_DATA_DIR=./data` keeps the DB next to the repo.
+Complete Filo JSON documents are stored inline in `corpus_documents` and
+projected into searchable `title`, `text`, and `annotation_text` attributes.
+Langouste chunks the JSON payload so no single attribute exceeds
+turbopuffer's 8 MiB attribute limit, and caps the combined payload below the
+64 MiB document limit. Objects larger than that need an external blob store;
+store their URI and searchable metadata in turbopuffer.
 
-## Running in `supabase` mode
+Audio-drill generation may use a local directory while ffmpeg and the lesson
+builder are running. That directory is a disposable cache: completed lesson
+and source Filo documents are indexed in `corpus_documents`, drill metadata is
+stored in `audio_drills`, and final/source/clip bytes are stored as individual
+`audio_assets` rows.
 
-1. Create a Supabase project (or self-host one).
-2. Copy `.env.example` to `.env`, uncomment the supabase block, fill in the keys, set `DATABASE_MODE=supabase` and `VITE_DATABASE_MODE=supabase`.
-3. `supabase login` so the migrator can reach the Management API.
-4. `bun run migrate` — applies incremental migrations from `supabase/migrations/`.
-5. `bun run dev`.
+## Namespace layout
 
-## Switching modes
+With prefix `langouste-prod`, examples include:
 
-You can keep separate `.env` files and `cp` between them, or toggle with `DATABASE_MODE=sqlite VITE_DATABASE_MODE=sqlite bun run dev`. The two modes don't share data — switching means a fresh conversation history on the other side. (Data export/migration between modes is a future tool; ping the roadmap if you need it.)
+- `langouste-prod-messages`
+- `langouste-prod-vocabulary`
+- `langouste-prod-review-log`
+- `langouste-prod-reading-interactions`
+- `langouste-prod-audio-drills`
+- `langouste-prod-corpus-documents`
 
-## Invariants the abstraction preserves
+Different schemas use different namespaces. Scalar attributes needed by
+filters and ordering are materialized; the complete logical row is preserved
+as chunked JSON. Filo corpus rows enable BM25 on source and annotation text.
+The integrated News tab stores complete editions in `corpus_documents` with
+`source_type=reading`; exact word, sentence, audio, vocabulary, and Workbench
+actions are stored under the same owner in `reading_interactions`. Its local
+JSON cache is rebuildable and never replaces the learner-owned corpus row.
 
-- **Identical API surface.** Routes, types, and client JSON shapes are the same in both modes.
-- **Identical pedagogy.** FSRS concept scheduling, Opus explanation, Sonnet vocabulary extraction all run the same way.
-- **Per-request scoping.** In supabase mode, `c.get("db")` is scoped to the authenticated user's JWT (RLS respected). In sqlite mode, it's the admin DB (single-user context, no RLS exists).
+## Importing legacy data
 
-## What sqlite mode intentionally drops
+Imports are non-destructive and batch writes:
 
-- **Multi-tab live sync.** New messages in tab A don't push to tab B — you'd refresh. Fine for single-user use.
-- **Row-level security.** SQLite has none. App-level `WHERE user_id = $1` filters in `src/services/database/*` do the equivalent work; belt-and-braces.
-- **Supabase Studio GUI.** Use `sqlite3 path/to/langouste.db` or a GUI like DB Browser for SQLite.
+```sh
+bun run import:turbopuffer --sqlite /path/to/langouste.db
+```
 
-## Files that differ between modes
+or:
 
-- `src/routes/middleware.ts` picks the JWT validator at boot.
-- `src/routes/api/auth.ts` has both paths; the sqlite branch activates in sqlite mode.
-- `src/services/database/conversations.ts` fans out the nested-select query for SQLite; Supabase uses PostgREST embedding.
-- `src/lib/db/{sqlite,supabase}.ts` are the two backends behind the shared `Database` interface.
+```sh
+LEGACY_SUPABASE_URL=https://project.supabase.co \
+LEGACY_SUPABASE_SECRET_KEY=... \
+bun run import:turbopuffer --supabase
+```
 
-Everything else — `services/ai/*`, `services/agents/*`, `services/spaced-repetition/*`, the whole Svelte client — is mode-agnostic.
+The importer copies logical rows, hydrates legacy JSON columns, builds corpus
+search rows for Filo documents, and verifies a readable sample in every
+written namespace. It never deletes the source database.
+
+Legacy filesystem drill corpora can be imported separately or alongside a
+database import:
+
+```sh
+bun run import:turbopuffer \
+  --audio-drills-root ./data/audio-drills \
+  --owner-id <destination-user-id>
+```
+
+## Authentication and isolation
+
+turbopuffer is not the application's identity provider and does not supply
+row-level security. Langouste owns password hashing and JWT validation.
+Routes and services must continue to enforce user ownership and conversation
+membership explicitly. API keys must remain server-side.
+
+Tests use `LANGOUSTE_TEST_MODE=true` plus
+`LANGOUSTE_TEST_STORAGE=memory`, an ephemeral contract test double that cannot
+be enabled in production.

@@ -67,9 +67,9 @@ agentConnectorRoutes.patch("/:connectorId", async (c) => {
   return c.json(updated);
 });
 
-// Delete a connector. Conversations that used it will have their
-// agent_connector_id set to null by the FK ON DELETE SET NULL clause; the
-// client shows an orphan banner so the user can reattach.
+// Delete a connector. The storage service explicitly clears references on
+// conversations (turbopuffer has no foreign keys), and the client shows an
+// orphan banner so the user can reattach.
 agentConnectorRoutes.delete("/:connectorId", async (c) => {
   const db = c.get("db");
   const userId = c.get("userId");

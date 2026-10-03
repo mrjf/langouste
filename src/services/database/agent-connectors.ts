@@ -38,5 +38,10 @@ export async function updateConnector(
 }
 
 export async function deleteConnector(db: Database, connectorId: string): Promise<void> {
+  // turbopuffer has no foreign keys. Preserve the old ON DELETE SET NULL
+  // behavior explicitly so conversations become reattachable orphans.
+  await db.update("conversations", { agent_connector_id: null }, [
+    { op: "eq", column: "agent_connector_id", value: connectorId },
+  ]);
   await db.delete("agent_connectors", [{ op: "eq", column: "connector_id", value: connectorId }]);
 }

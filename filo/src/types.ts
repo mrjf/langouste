@@ -111,9 +111,17 @@ export interface DictionaryLookupPayload {
   lemma?: string;
   language: string;
   definitions: string[];
+  senses?: Array<{
+    part_of_speech: string;
+    definition: string;
+    examples: string[];
+  }>;
   partOfSpeech?: string;
   source?: string;
   sourceUrl?: string;
+  targetSourceUrl?: string;
+  sourceTerm?: string;
+  formDescription?: string;
   wordAnnotationId?: AnnotationId;
   notFound?: boolean;
   [key: string]: unknown;

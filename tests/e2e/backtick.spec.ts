@@ -17,7 +17,7 @@ test.describe("Backtick literal convention", () => {
     await seedConnector(request, "stub");
 
     await page.goto("/");
-    await page.getByRole("button", { name: "+ New" }).click();
+    await page.getByRole("button", { name: "New", exact: true }).click();
     await page.getByRole("button", { name: /stub/i }).click();
     await sendMessage(page, "hello `Biscuit`");
 
@@ -46,7 +46,7 @@ test.describe("Backtick literal convention", () => {
     await seedConnector(request, "stub");
 
     await page.goto("/");
-    await page.getByRole("button", { name: "+ New" }).click();
+    await page.getByRole("button", { name: "New", exact: true }).click();
     await page.getByRole("button", { name: /stub/i }).click();
 
     await sendMessage(page, "my cat is `Biscuit`");

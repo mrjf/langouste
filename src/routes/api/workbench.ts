@@ -1,18 +1,18 @@
 import { Hono } from "hono";
 import { requireAuth } from "../middleware.ts";
-import { getAudioProvider } from "../../services/ai/audio/index.ts";
+import {
+  audioAssetResponse,
+  audioProviderAvailable,
+  synthesizeCachedAudio,
+} from "../../services/ai/audio/synthesis.ts";
 import { analyzeWorkbenchDocument } from "../../services/corpus/workbench.ts";
 import { getMessageById } from "../../services/database/messages.ts";
 import { getMember } from "../../services/database/members.ts";
-import {
-  findAudioAssetForRequest,
-  storeAudioAsset,
-  type CachedAudioAsset,
-} from "../../services/corpus/audio-assets.ts";
 import { recordInteraction } from "../../services/spaced-repetition/interactions.ts";
 import { adminDb, type Database } from "../../lib/db/index.ts";
 import type { FiloAnnotation, FiloDocumentJson, FiloTierJson } from "filo";
 import type { LanguageCode } from "../../types/index.ts";
+import { indexFiloDocument } from "../../services/corpus/store.ts";
 
 type WorkbenchRouteBindings = {
   Variables: {
@@ -95,28 +95,12 @@ workbenchRoutes.post("/audio", async (c) => {
   if (!text) return c.json({ error: "text is required" }, 400);
   if (text.length > 1000) return c.json({ error: "text is too long for audio" }, 413);
 
-  const provider = getAudioProvider();
-  if (!provider.isAvailable()) {
+  if (!audioProviderAvailable()) {
     return c.json({ error: "Audio provider not configured" }, 503);
   }
 
   try {
-    const assetDb = adminDb();
-    const cached = await findAudioAssetForRequest(assetDb, {
-      provider: provider.name,
-      language: language ?? null,
-      text,
-    }).catch(() => null);
-    if (cached) return audioAssetResponse(cached);
-
-    const result = await provider.synthesize(text, { language, userId });
-    const asset = await storeAudioAsset(assetDb, {
-      provider: provider.name,
-      language: language ?? null,
-      text,
-      audio: result.audio,
-      contentType: result.contentType,
-    });
+    const asset = await synthesizeCachedAudio({ text, language, userId });
     return audioAssetResponse(asset);
   } catch (err) {
     const detail = err instanceof Error ? err.message : String(err);
@@ -124,20 +108,6 @@ workbenchRoutes.post("/audio", async (c) => {
     return c.json({ error: detail }, 502);
   }
 });
-
-function audioAssetResponse(asset: CachedAudioAsset): Response {
-  const audioBody = new ArrayBuffer(asset.audio.byteLength);
-  new Uint8Array(audioBody).set(asset.audio);
-  return new Response(audioBody, {
-    status: 200,
-    headers: {
-      "Content-Type": asset.contentType,
-      "Cache-Control": "private, max-age=86400",
-      "Content-Length": String(asset.audio.byteLength),
-      "X-Langouste-Audio-Id": asset.audioId,
-    },
-  });
-}
 
 function documentFromRequest(value: unknown): FiloDocumentJson | null {
   const document = value as FiloDocumentJson | null | undefined;
@@ -176,10 +146,22 @@ async function persistCorpusDocument(
   document: FiloDocumentJson,
 ): Promise<void> {
   const message = await messageForDocument(db, userId, document);
-  if (!message || message.filo_doc === document) return;
-  await adminDb().update("messages", { filo_doc: document }, [
-    { op: "eq", column: "message_id", value: message.message_id },
-  ]);
+  if (message && message.filo_doc !== document) {
+    await adminDb().update("messages", { filo_doc: document }, [
+      { op: "eq", column: "message_id", value: message.message_id },
+    ]);
+  }
+  await indexFiloDocument(adminDb(), document, {
+    ownerId: userId,
+    sourceType: message ? "message" : "workbench",
+    sourceId: message?.message_id ?? document.id,
+    conversationId: message?.conversation_id ?? null,
+    language:
+      typeof document.metadata.sourceLanguage === "string"
+        ? document.metadata.sourceLanguage
+        : message?.language,
+    title: typeof document.metadata.title === "string" ? document.metadata.title : null,
+  });
 }
 
 async function messageForDocument(db: Database, userId: string, document: FiloDocumentJson) {

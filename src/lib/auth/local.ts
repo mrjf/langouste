@@ -1,13 +1,13 @@
 /**
- * Local auth for DATABASE_MODE=sqlite. Stores users in the local `users`
- * table, hashes passwords with Bun's built-in bcrypt, and issues JWTs signed
+ * Application-owned auth. Stores users in turbopuffer's `users` namespace,
+ * hashes passwords with Bun's built-in bcrypt, and issues JWTs signed
  * with LANGOUSTE_JWT_SECRET.
  *
  * JWT payload:
  *   { sub: user_id, iat: <epoch-seconds>, exp: <epoch-seconds> }
  *
- * The Supabase path lives alongside in src/routes/api/auth.ts; this module is
- * only wired up when databaseMode === "sqlite".
+ * turbopuffer is not an identity provider and has no row-level auth, so all
+ * authenticated routes validate these tokens before querying storage.
  */
 
 import { sign, verify } from "hono/jwt";

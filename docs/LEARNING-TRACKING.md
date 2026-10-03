@@ -104,6 +104,11 @@ Current sources:
 | `chat_produce` | clean learner-authored message | `production` | `4` |
 | `chat_correct` | grammar/vocabulary issue detected in final sent message | `production` | `1` |
 | `chat_self_correct` | learner corrected using correction info before sending | `production` | `1` |
+| `reading_sentence` | article sentence hovered or inspected | `encounter` | `null` |
+| `reading_word` | aligned article word opened/hovered | `encounter` | `null` |
+| `reading_vocabulary` | authored article vocabulary note selected | `encounter` | `null` |
+| `reading_audio` | article sentence played | `heard` | `null` |
+| `reading_workbench` | article sentence handed to Workbench | `encounter` | `null` |
 | `content_encounter` | podcast/video/tutorial transcript span viewed or heard | `encounter` | `null` |
 | `assignment_encounter` | teacher-assigned passage or media segment viewed or heard | `encounter` | `null` |
 | `review` | explicit SRS review | `recall` | caller-provided `0..5` |
@@ -120,6 +125,13 @@ The `review_log` row stores:
 - `observed_at`
 
 That makes every profile number auditable. If a user asks why a word is due today, we can show the sequence: seen here, produced wrong here, reviewed wrong here, reviewed correct here.
+
+Reading surfaces also append an idempotent `reading_interactions` row keyed by
+learner, edition, event type, language, and Filo coordinates. The exact target
+and source text is resolved server-side from the learner-owned
+`corpus_documents` Filo document. This preserves article context for the
+profile without trusting arbitrary client-supplied text or inflating counters
+on repeated pointer events.
 
 ## Current chat flow
 
@@ -499,7 +511,7 @@ Required invariants:
 6. Roll-up counters must be derivable from `review_log`.
 7. Reprocessing a message must not double-count the same seen item for the same message.
 8. The profile UI must read persisted state; it must not invent transient counters from currently loaded chat messages.
-9. In Supabase mode, Supabase Realtime should propagate changed rows to the UI; no custom websocket learning-state channel. In SQLite mode, the UI refreshes through request/response APIs.
+9. The UI refreshes learning state through request/response APIs.
 10. Offline or failed async extraction should be visible as missing/pending processing, not silently treated as zero knowledge.
 
 ## Known current limitations
@@ -525,7 +537,7 @@ Current files:
 - `src/routes/api/messages.ts` — message submission, agent response, translation, and async tracking orchestration.
 - `src/routes/api/review.ts` — due review queries and explicit recall submission.
 - `src/routes/api/profile-stats.ts` — language/profile drill-down reads from persisted learning state.
-- `sqlite/schema.sql` and `supabase/migrations/*` — durable event, roll-up, and FSRS state schema.
+- `src/lib/db/table-schema.ts` — durable event, roll-up, and FSRS logical schema.
 
 Future files should preserve the same shape:
 

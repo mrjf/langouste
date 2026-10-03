@@ -10,6 +10,11 @@ export {
 } from "./pipeline.ts";
 export { renderLessonAudio, type RenderLessonAudioOptions } from "./render.ts";
 export {
+  auditLessonTape,
+  auditRenderedLessonTape,
+  type AudioDrillQualityReport,
+} from "./quality.ts";
+export {
   annotateTopicLessonSourceCards,
   buildTopicAudioLesson,
   ClaudeTopicLessonContentGenerator,
@@ -41,6 +46,7 @@ export type {
   BuildSourceFiloOptions,
   LanguagePayload,
   LessonItem,
+  LessonPlanOverride,
   LessonSentence,
   LessonSegmentPayload,
   LessonTapeMetadata,

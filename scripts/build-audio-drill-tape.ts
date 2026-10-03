@@ -17,13 +17,14 @@
 
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import type { LessonPlanOverride } from "../src/services/audio-drill-tape/types.ts";
 
 loadDotenv();
 
 const args = parseArgs(process.argv.slice(2));
 if (!args.url || !args.lang || !args.out) {
   console.error(
-    "Usage: bun scripts/build-audio-drill-tape.ts --url <mp3-url> --lang <source-language> --out <dir> [--bridge en] [--title <title>] [--transcript <json>] [--max-items 48] [--pause-ms 3000] [--word-pause-ms 750] [--render-audio] [--no-normalize-audio] [--target-lufs -18] [--true-peak-db -1.5] [--loudness-range 11] [--short-clip-threshold-ms 500] [--source-clip-padding-ms 80]",
+    "Usage: bun scripts/build-audio-drill-tape.ts --url <mp3-url> --lang <source-language> --out <dir> [--bridge en] [--title <title>] [--transcript <json>] [--lesson-plan <json>] [--target-text-overrides <json>] [--cue-overrides <json>] [--max-items 12] [--pause-ms <fixed-override>] [--review-intervals-ms 25000,120000] [--review-offsets 2,6] [--render-audio] [--no-normalize-audio] [--no-trim-tts-silence] [--target-lufs -18] [--true-peak-db -1.5] [--loudness-range 11] [--short-clip-threshold-ms 500] [--source-clip-padding-ms 80]",
   );
   process.exit(1);
 }
@@ -41,18 +42,27 @@ const result = await buildAudioDrillTape({
   maxItems: args.maxItems,
   pauseMs: args.pauseMs,
   wordPauseMs: args.wordPauseMs,
+  reviewIntervalsMs: args.reviewIntervalsMs,
+  reviewOffsets: args.reviewOffsets,
+  lessonPlan: args.lessonPlan ? readLessonPlan(args.lessonPlan) : undefined,
   normalizeAudio: args.normalizeAudio,
   targetLufs: args.targetLufs,
   truePeakDb: args.truePeakDb,
   loudnessRange: args.loudnessRange,
   shortClipThresholdMs: args.shortClipThresholdMs,
   sourceClipPaddingMs: args.sourceClipPaddingMs,
+  trimTtsSilence: args.trimTtsSilence,
+  cueOverrides: args.cueOverrides ? readCueOverrides(args.cueOverrides) : undefined,
+  targetTextOverrides: args.targetTextOverrides
+    ? readOverrides(args.targetTextOverrides, "--target-text-overrides")
+    : undefined,
 });
 
 console.log("Wrote:");
 console.log(`  transcript: ${result.transcriptPath}`);
 console.log(`  source Filo: ${result.sourceFiloPath}`);
 console.log(`  lesson Filo: ${result.lessonFiloPath}`);
+console.log(`  quality report: ${result.qualityReportPath}`);
 if (result.outputAudioPath) console.log(`  audio: ${result.outputAudioPath}`);
 
 interface Args {
@@ -65,6 +75,9 @@ interface Args {
   maxItems?: number;
   pauseMs?: number;
   wordPauseMs?: number;
+  reviewIntervalsMs?: number[];
+  reviewOffsets?: number[];
+  lessonPlan?: string;
   renderAudio?: boolean;
   normalizeAudio?: boolean;
   targetLufs?: number;
@@ -72,6 +85,9 @@ interface Args {
   loudnessRange?: number;
   shortClipThresholdMs?: number;
   sourceClipPaddingMs?: number;
+  trimTtsSilence?: boolean;
+  cueOverrides?: string;
+  targetTextOverrides?: string;
 }
 
 function parseArgs(argv: string[]): Args {
@@ -106,6 +122,18 @@ function parseArgs(argv: string[]): Args {
         index += 1;
         parsed.transcript = requireValue(argv, index, arg);
         break;
+      case "--cue-overrides":
+        index += 1;
+        parsed.cueOverrides = requireValue(argv, index, arg);
+        break;
+      case "--target-text-overrides":
+        index += 1;
+        parsed.targetTextOverrides = requireValue(argv, index, arg);
+        break;
+      case "--lesson-plan":
+        index += 1;
+        parsed.lessonPlan = requireValue(argv, index, arg);
+        break;
       case "--max-items":
         index += 1;
         parsed.maxItems = parsePositiveInt(requireValue(argv, index, arg), arg);
@@ -117,6 +145,14 @@ function parseArgs(argv: string[]): Args {
       case "--word-pause-ms":
         index += 1;
         parsed.wordPauseMs = parsePositiveInt(requireValue(argv, index, arg), arg);
+        break;
+      case "--review-intervals-ms":
+        index += 1;
+        parsed.reviewIntervalsMs = parseIntegerList(requireValue(argv, index, arg), arg);
+        break;
+      case "--review-offsets":
+        index += 1;
+        parsed.reviewOffsets = parseIntegerList(requireValue(argv, index, arg), arg);
         break;
       case "--render-audio":
         parsed.renderAudio = true;
@@ -143,6 +179,9 @@ function parseArgs(argv: string[]): Args {
       case "--source-clip-padding-ms":
         index += 1;
         parsed.sourceClipPaddingMs = parseNonNegativeInt(requireValue(argv, index, arg), arg);
+        break;
+      case "--no-trim-tts-silence":
+        parsed.trimTtsSilence = false;
         break;
       default:
         throw new Error(`Unknown argument: ${arg}`);
@@ -171,10 +210,45 @@ function parseNonNegativeInt(value: string, flag: string): number {
   return parsed;
 }
 
+function parseIntegerList(value: string, flag: string): number[] {
+  const values = value.split(",").map((entry) => entry.trim());
+  if (values.length === 0 || values.some((entry) => entry.length === 0)) {
+    throw new Error(`${flag} must be a comma-separated list of non-negative integers`);
+  }
+  return values.map((entry) => parseNonNegativeInt(entry, flag));
+}
+
 function parseFiniteNumber(value: string, flag: string): number {
   const parsed = Number.parseFloat(value);
   if (!Number.isFinite(parsed)) throw new Error(`${flag} must be a finite number`);
   return parsed;
+}
+
+function readCueOverrides(path: string): Record<string, string> {
+  return readOverrides(path, "--cue-overrides");
+}
+
+function readLessonPlan(path: string): LessonPlanOverride {
+  const parsed = JSON.parse(readFileSync(resolve(path), "utf8")) as unknown;
+  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+    throw new Error("--lesson-plan must contain a JSON object");
+  }
+  return parsed as LessonPlanOverride;
+}
+
+function readOverrides(path: string, flag: string): Record<string, string> {
+  const parsed = JSON.parse(readFileSync(resolve(path), "utf8")) as unknown;
+  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+    throw new Error(`${flag} must contain a JSON object of source text to replacement text`);
+  }
+  const overrides: Record<string, string> = {};
+  for (const [target, cue] of Object.entries(parsed)) {
+    if (typeof cue !== "string" || !target.trim() || !cue.trim()) {
+      throw new Error(`${flag} entries must have non-empty string keys and values`);
+    }
+    overrides[target] = cue;
+  }
+  return overrides;
 }
 
 function loadDotenv(): void {

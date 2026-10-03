@@ -24,6 +24,7 @@ import {
 import type { Database } from "../../lib/db/index.ts";
 import { adminDb } from "../../lib/db/index.ts";
 import type { LanguageCode } from "../../types/index.ts";
+import { listReadingInteractions } from "../../services/database/reading-interactions.ts";
 
 type ProfileStatsRouteBindings = {
   Variables: {
@@ -49,6 +50,7 @@ profileStatsRoutes.get("/languages", async (c) => {
       messages: number;
       vocabulary: number;
       grammar: number;
+      reading_interactions: number;
     }
   >();
 
@@ -66,37 +68,44 @@ profileStatsRoutes.get("/languages", async (c) => {
       messages: 0,
       vocabulary: 0,
       grammar: 0,
+      reading_interactions: 0,
     };
     langs.set(code, row);
     return row;
   };
 
-  const [profileRows, memberRows, messageRows, vocabRows, gapRows] = await Promise.all([
-    db.select<{ learning_languages: Array<{ lang: string; cefr_level?: string }> }>("profiles", {
-      columns: "learning_languages",
-      filters: [{ op: "eq", column: "user_id", value: userId }],
-      limit: 1,
-    }),
-    db.select<{ target_languages: Array<{ lang: string; cefr_level?: string }> }>(
-      "conversation_members",
-      {
-        columns: "target_languages",
+  const [profileRows, memberRows, messageRows, vocabRows, gapRows, readingRows] = await Promise.all(
+    [
+      db.select<{ learning_languages: Array<{ lang: string; cefr_level?: string }> }>("profiles", {
+        columns: "learning_languages",
         filters: [{ op: "eq", column: "user_id", value: userId }],
-      },
-    ),
-    db.select<{ language: string | null }>("messages", {
-      columns: "language",
-      filters: [{ op: "eq", column: "sender_id", value: userId }],
-    }),
-    db.select<{ language: string }>("vocabulary", {
-      columns: "language",
-      filters: [{ op: "eq", column: "user_id", value: userId }],
-    }),
-    db.select<{ language: string; category: string }>("grammar_gaps", {
-      columns: "language, category",
-      filters: [{ op: "eq", column: "user_id", value: userId }],
-    }),
-  ]);
+        limit: 1,
+      }),
+      db.select<{ target_languages: Array<{ lang: string; cefr_level?: string }> }>(
+        "conversation_members",
+        {
+          columns: "target_languages",
+          filters: [{ op: "eq", column: "user_id", value: userId }],
+        },
+      ),
+      db.select<{ language: string | null }>("messages", {
+        columns: "language",
+        filters: [
+          { op: "eq", column: "sender_id", value: userId },
+          { op: "eq", column: "is_agent", value: false },
+        ],
+      }),
+      db.select<{ language: string }>("vocabulary", {
+        columns: "language",
+        filters: [{ op: "eq", column: "user_id", value: userId }],
+      }),
+      db.select<{ language: string; category: string }>("grammar_gaps", {
+        columns: "language, category",
+        filters: [{ op: "eq", column: "user_id", value: userId }],
+      }),
+      listReadingInteractions(db, userId, { limit: 10_000 }),
+    ],
+  );
 
   for (const row of profileRows) {
     for (const lang of row.learning_languages ?? []) ensure(lang.lang, lang.cefr_level);
@@ -117,15 +126,46 @@ profileStatsRoutes.get("/languages", async (c) => {
     const lang = ensure(row.language);
     if (lang) lang.grammar++;
   }
+  for (const row of readingRows) {
+    const lang = ensure(row.language);
+    if (lang) lang.reading_interactions++;
+  }
 
   return c.json(
     [...langs.values()].sort((a, b) => {
-      const aData = a.messages + a.vocabulary + a.grammar;
-      const bData = b.messages + b.vocabulary + b.grammar;
+      const aData = a.messages + a.vocabulary + a.grammar + a.reading_interactions;
+      const bData = b.messages + b.vocabulary + b.grammar + b.reading_interactions;
       if (aData !== bData) return bData - aData;
       return a.lang.localeCompare(b.lang);
     }),
   );
+});
+
+profileStatsRoutes.get("/reading-interactions/:language", async (c) => {
+  const language = c.req.param("language").trim();
+  const rawLimit = Number.parseInt(c.req.query("limit") ?? "12", 10);
+  if (!language) return c.json({ error: "language is required" }, 400);
+  const rows = await listReadingInteractions(c.get("db"), c.get("userId"), {
+    language,
+    limit: Number.isFinite(rawLimit) ? Math.min(Math.max(rawLimit, 1), 200) : 12,
+  });
+  return c.json({
+    items: rows.map((row) => ({
+      interaction_id: row.interaction_id,
+      document_id: row.document_id,
+      source_type: row.source_type,
+      source_id: row.source_id,
+      source_url: row.source_url,
+      title: row.title,
+      language: row.language,
+      event_type: row.event_type,
+      sentence_ordinal: row.sentence_ordinal,
+      token_ordinal: row.token_ordinal,
+      text: row.text,
+      source_text: row.source_text,
+      observed_at: row.observed_at,
+    })),
+  });
 });
 
 // Per-language dashboard payload

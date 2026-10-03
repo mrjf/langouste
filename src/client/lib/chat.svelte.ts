@@ -7,7 +7,7 @@
  *   - the unsent draft (text / intent / language) — kept 100% of the time
  *   - the review pipeline state (phase + errors + explanations + correction)
  *   - whether the chat is "working" (review or agent in flight)
- *   - its realtime subscription
+ *   - its API-backed message refresh state
  *
  * State physically cannot leak between conversations: each Chat has its own
  * fields, and the two views (sidebar row + main thread) are *pure
@@ -21,9 +21,10 @@
  */
 
 import { SvelteMap } from "svelte/reactivity";
+import { languageUsesNonLatinScript } from "../../lib/language-scripts";
 import { api } from "./api";
-import { subscribeToMessages } from "./supabase";
 import type { Conversation, Message, ConversationMember } from "./stores.svelte";
+import { transliterationForLanguage } from "./transliteration";
 
 export interface TextError {
   start: number;
@@ -110,13 +111,14 @@ export class Chat {
   /** Last agent error for this chat (banner in the thread). */
   agentError = $state<string | null>(null);
 
-  /** Unread agent messages. Server seeds it; realtime + open bump/clear. */
+  /** Unread agent messages. Server seeds it; opening the chat clears it. */
   unread = $state(0);
 
   // --- private ---
   #messagesLoaded = false;
-  #unsub: (() => void) | null = null;
   #pendingSelfCorrections: SelfCorrectedSpan[] = [];
+  #agentPollTimer: ReturnType<typeof setTimeout> | null = null;
+  #agentPollAttempts = 0;
   // Monotonic token: bumping it invalidates any in-flight pipeline so a
   // stale response can never write into this chat. Cancel/resend bumps it.
   #reviewToken = 0;
@@ -144,25 +146,69 @@ export class Chat {
 
   // --- messages ---------------------------------------------------------
 
-  /** Fetch messages once (cached on the instance) + start realtime. */
+  /** Fetch messages once (cached on the instance). */
   async load(): Promise<void> {
-    this.ensureRealtime();
     if (this.#messagesLoaded && !this.#hasUnfinishedAgentMessage()) return;
     try {
-      const loaded = (await api.getMessages(this.id)) as Message[];
-      // Don't clobber optimistic/pending messages added meanwhile.
-      const pending = this.messages.filter((m) => m._pending);
-      const byId = new Set(loaded.map((m) => m.message_id));
-      this.messages = [...loaded, ...pending.filter((p) => !byId.has(p.message_id))];
-      this.#messagesLoaded = true;
-      this.#ensureTranslations();
+      await this.#refreshMessages();
+      if (this.#hasUnfinishedAgentMessage()) this.#startAgentPolling();
     } catch (err) {
       console.error(`[Chat ${this.id.slice(0, 8)}] load failed:`, err);
     }
   }
 
+  async #refreshMessages(): Promise<void> {
+    const loaded = (await api.getMessages(this.id)) as Message[];
+    // Don't clobber optimistic/pending messages added meanwhile.
+    const pending = this.messages.filter((m) => m._pending);
+    const byId = new Set(loaded.map((m) => m.message_id));
+    this.messages = [...loaded, ...pending.filter((p) => !byId.has(p.message_id))];
+    this.#messagesLoaded = true;
+    this.#ensureTranslations();
+  }
+
   #hasUnfinishedAgentMessage(): boolean {
     return this.messages.some((message) => !!message.is_agent && !message.healed_text?.trim());
+  }
+
+  /**
+   * Agent replies are completed by a server-owned background task. Poll the
+   * durable message row while it is empty; this replaces the Supabase
+   * Realtime subscription without introducing another storage system.
+   */
+  #startAgentPolling(resetAttempts = false): void {
+    if (!this.#hasUnfinishedAgentMessage()) {
+      this.working = false;
+      this.#agentPollAttempts = 0;
+      return;
+    }
+    if (resetAttempts) this.#agentPollAttempts = 0;
+    if (this.#agentPollTimer !== null) return;
+    if (this.#agentPollAttempts >= 120) {
+      this.working = false;
+      this.agentError = "Agent reply is still pending. Reload the conversation to check again.";
+      return;
+    }
+
+    this.working = true;
+    this.#agentPollTimer = setTimeout(() => void this.#pollAgentReply(), 1_000);
+  }
+
+  async #pollAgentReply(): Promise<void> {
+    this.#agentPollTimer = null;
+    this.#agentPollAttempts += 1;
+    try {
+      await this.#refreshMessages();
+    } catch (err) {
+      console.error(`[Chat ${this.id.slice(0, 8)}] agent refresh failed:`, err);
+    }
+
+    if (this.#hasUnfinishedAgentMessage()) {
+      this.#startAgentPolling();
+    } else {
+      this.working = false;
+      this.#agentPollAttempts = 0;
+    }
   }
 
   /**
@@ -197,9 +243,16 @@ export class Chat {
     try {
       do {
         this.#translationQueued = false;
-        const needs = this.messages.some(
-          (msg) => !msg._pending && langs.some((l) => !msg.translations?.[l]),
-        );
+        const needs = this.messages.some((msg) => {
+          if (msg._pending || !msg.healed_text?.trim()) return false;
+          return langs.some((language) => {
+            const visibleText =
+              msg.language === language ? msg.healed_text : msg.translations?.[language];
+            if (!visibleText?.trim()) return true;
+            if (!languageUsesNonLatinScript(language)) return false;
+            return !transliterationForLanguage(msg.transliterations, language, langs);
+          });
+        });
         if (!needs) continue;
 
         const translated = (await api.translateMessages(this.id, langs)) as Message[];
@@ -216,44 +269,11 @@ export class Chat {
     }
   }
 
-  /** Subscribe to realtime message inserts/updates for this conversation. */
-  ensureRealtime(): void {
-    if (this.#unsub) return;
-    this.#unsub = subscribeToMessages(this.id, (raw) => {
-      const msg = raw as unknown as Message;
-      this.#ingestMessage(msg);
-    });
-  }
-
-  #ingestMessage(msg: Message): void {
-    const existingIdx = this.messages.findIndex((m) => m.message_id === msg.message_id);
-    if (existingIdx !== -1) {
-      const next = this.messages.slice();
-      next[existingIdx] = { ...next[existingIdx], ...msg };
-      this.messages = next;
-      this.#ensureTranslations();
-      return;
-    }
-    // Replace the matching optimistic placeholder rather than duplicating:
-    // agent reply → the pending agent bubble; user echo → pending user msg.
-    const pendingIdx = this.messages.findIndex(
-      (m) => m._pending && (msg.is_agent ? !!m.is_agent : m.sender_id === msg.sender_id),
-    );
-    if (pendingIdx !== -1) {
-      const next = this.messages.slice();
-      next[pendingIdx] = msg;
-      this.messages = next;
-    } else {
-      this.messages = [...this.messages, msg];
-    }
-    // Agent replies arrive English-only — fill the viewer's translation
-    // so the bubble doesn't sit in its loading skeleton.
-    this.#ensureTranslations();
-  }
-
   dispose(): void {
-    this.#unsub?.();
-    this.#unsub = null;
+    if (this.#agentPollTimer !== null) {
+      clearTimeout(this.#agentPollTimer);
+      this.#agentPollTimer = null;
+    }
   }
 
   // --- draft ------------------------------------------------------------
@@ -461,13 +481,13 @@ export class Chat {
         m.message_id === userPendingId ? result.message : m,
       );
       if (result.agent_message) {
-        // Realtime may already have ingested it — dedupe, then drop the
-        // placeholder.
+        // Dedupe defensively, then replace the optimistic placeholder.
         if (this.messages.some((m) => m.message_id === result.agent_message!.message_id)) {
           resolveAgent(null);
         } else {
           resolveAgent(result.agent_message);
         }
+        if (!result.agent_message.healed_text?.trim()) this.#startAgentPolling(true);
       } else {
         resolveAgent(null);
         if (result.agent_error) this.agentError = result.agent_error;
@@ -478,7 +498,8 @@ export class Chat {
         (m) => m.message_id !== userPendingId && m.message_id !== agentPendingId,
       );
     } finally {
-      this.working = false;
+      if (this.#hasUnfinishedAgentMessage()) this.#startAgentPolling();
+      else this.working = false;
       // Agent reply + the user's stored message arrive English/source-only;
       // fill the viewer-language translations so bubbles don't get stuck
       // in the loading skeleton.

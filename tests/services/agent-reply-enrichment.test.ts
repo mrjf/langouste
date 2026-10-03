@@ -1,4 +1,4 @@
-import "./_db-harness.ts"; // side-effect: sets sqlite env + shared data dir (must be first)
+import "./_db-harness.ts"; // side-effect: selects the shared in-memory storage double
 import { afterAll, beforeAll, describe, expect, mock, test } from "bun:test";
 import type { ConversationMember, Message } from "../../src/types/index.ts";
 

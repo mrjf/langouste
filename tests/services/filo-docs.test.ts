@@ -133,8 +133,17 @@ describe("message Filo documents", () => {
     expect(entries.get("Szétszórva")).toMatchObject({
       lemma: "szétszór",
       sourceTerm: "szór",
+      sourceUrl: "https://en.wiktionary.org/wiki/sz%C3%B3r#Hungarian",
+      targetSourceUrl: "https://hu.wiktionary.org/wiki/sz%C3%B3r",
       formDescription: "adverbial participle of szétszór",
       definitions: ["to sprinkle, scatter"],
+      senses: [
+        {
+          part_of_speech: "Verb",
+          definition: "to sprinkle, scatter",
+          examples: [],
+        },
+      ],
       notFound: false,
     });
     expect(entries.get("ebben")).toMatchObject({

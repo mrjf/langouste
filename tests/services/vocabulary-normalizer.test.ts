@@ -25,6 +25,8 @@ describe("vocabulary normalization", () => {
     expect(normalized.term).toBe("számos");
     expect(normalized.source_term).toBe("számos");
     expect(normalized.definition).toBe("numerous, many");
+    expect(normalized.source_url).toBe("https://en.wiktionary.org/wiki/sz%C3%A1mos#Hungarian");
+    expect(normalized.target_source_url).toBe("https://hu.wiktionary.org/wiki/sz%C3%A1mos");
   });
 
   test("prefers the form lemma over a fallback base-source page", async () => {

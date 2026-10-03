@@ -73,10 +73,12 @@ export interface ProfileLanguageSummary {
   messages?: number;
   vocabulary?: number;
   grammar?: number;
+  reading_interactions?: number;
 }
 
 export interface LanguageStatsResponse {
   messages_sent: number;
+  reading_interactions: number;
   vocab_total: number;
   vocab_mastered: number;
   vocab_struggling: number;
@@ -88,6 +90,24 @@ export interface LanguageStatsResponse {
   vocab_spoken: number;
   grammar_self_corrected: number;
   [key: string]: unknown;
+}
+
+export interface ReadingInteractionsResponse {
+  items: Array<{
+    interaction_id: string;
+    document_id: string;
+    source_type: string;
+    source_id: string;
+    source_url: string;
+    title: string;
+    language: string | null;
+    event_type: string;
+    sentence_ordinal: number | null;
+    token_ordinal: number | null;
+    text: string;
+    source_text: string;
+    observed_at: string;
+  }>;
 }
 
 export interface DimensionItemsResponse {
@@ -177,6 +197,24 @@ export interface WorkbenchAnalyzeResponse {
     phrases: number;
     targetLanguage: string;
   };
+}
+
+export interface CorpusSearchResult {
+  document_id: string;
+  source_type: "message" | "workbench" | "audio" | "import";
+  source_id: string | null;
+  conversation_id: string | null;
+  language: string | null;
+  title: string | null;
+  text: string;
+  tier_ids: string[];
+  search_score?: number;
+  filo_doc?: FiloDocumentJson;
+}
+
+export interface CorpusSearchResponse {
+  query: string;
+  results: CorpusSearchResult[];
 }
 
 export interface WorkbenchInteractionRequest {
@@ -517,6 +555,7 @@ export interface ApiClient {
   setConversationConnector(conversationId: string, agentConnectorId: string): Promise<Conversation>;
   getProfileLanguages(): Promise<ProfileLanguageSummary[]>;
   getLanguageStats(language: string): Promise<LanguageStatsResponse>;
+  getReadingInteractions(language: string, limit?: number): Promise<ReadingInteractionsResponse>;
   getDimensionItems(
     language: string,
     dimension: string,
@@ -569,4 +608,13 @@ export interface ApiClient {
   reviewVocabulary(vocabId: string, quality: number): Promise<unknown>;
   reviewGrammar(gapId: string, quality: number): Promise<unknown>;
   getLanguageResources(): Promise<LanguageResourcesCatalog>;
+  searchCorpus(
+    query: string,
+    options?: {
+      language?: string;
+      sourceType?: CorpusSearchResult["source_type"];
+      limit?: number;
+      includeDocument?: boolean;
+    },
+  ): Promise<CorpusSearchResponse>;
 }

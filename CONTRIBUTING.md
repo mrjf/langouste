@@ -49,7 +49,7 @@ it blocking.
 
 ### Tests
 
-`bun run test` runs `bun test tests/services` (unit tests only).
+`bun run test` preloads the in-memory storage contract and runs `tests/services` (unit tests only).
 Playwright suites (`tests/e2e`, `tests/e2e-real`) are **not** run in
 CI: the real-integration specs need live agent endpoints and API
 keys. Run them locally with `bun run test:e2e` /

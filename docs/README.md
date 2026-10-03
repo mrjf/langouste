@@ -21,7 +21,7 @@ Start here. The docs are layered — read in order if you're new, jump to the re
 ## Engineering
 
 - [ARCHITECTURE.md](./ARCHITECTURE.md) — system shape, Claude Code integration, MCP server surface, streaming pipeline, OpenClaw, sandboxing.
-- [MODES.md](./MODES.md) — sqlite vs supabase deployment modes and how to pick one.
+- [MODES.md](./MODES.md) — turbopuffer storage, corpus indexing, limits, and legacy imports.
 - [message-processing.md](./message-processing.md) — the per-message pipeline spec.
 - [TESTING.md](./TESTING.md) — five-layer testing strategy including the pedagogical eval harness.
 - [RELEASE.md](./RELEASE.md) — two deployment tiers, versioning, migrations, rollbacks, feature flags.

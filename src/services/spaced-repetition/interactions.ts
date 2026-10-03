@@ -42,6 +42,11 @@ export type InteractionSource =
   | "profile_audio"
   | "workbench_definition"
   | "workbench_audio"
+  | "reading_sentence"
+  | "reading_word"
+  | "reading_vocabulary"
+  | "reading_audio"
+  | "reading_workbench"
   | "review"
   | "exercise";
 
@@ -98,7 +103,26 @@ interface ConceptStateRow extends FSRSConceptState {
   next_review_at: string;
 }
 
+const interactionTails = new Map<string, Promise<void>>();
+
 export async function recordInteraction(db: Database, input: InteractionInput): Promise<void> {
+  const key = `${input.userId}\0${input.language}\0${input.itemType}\0${input.lookupKey ?? input.itemId ?? ""}`;
+  const previous = interactionTails.get(key) ?? Promise.resolve();
+  let release = () => {};
+  const current = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  interactionTails.set(key, current);
+  await previous;
+  try {
+    await recordInteractionLocked(db, input);
+  } finally {
+    release();
+    if (interactionTails.get(key) === current) interactionTails.delete(key);
+  }
+}
+
+async function recordInteractionLocked(db: Database, input: InteractionInput): Promise<void> {
   const table = input.itemType === "vocabulary" ? "vocabulary" : "grammar_gaps";
   const idColumn = input.itemType === "vocabulary" ? "vocab_id" : "gap_id";
   const config = await getFSRSConfig(db, input.userId, input.language);

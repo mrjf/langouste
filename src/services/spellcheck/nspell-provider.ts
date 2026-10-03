@@ -2,7 +2,7 @@ import nspell from "nspell";
 import type { NSpell } from "nspell";
 import type { LanguageCode, TextError } from "../../types/index.ts";
 import type { SpellCheckProvider } from "./provider.ts";
-import { tokenize } from "./tokenizer.ts";
+import { tokenize, URL_TOKEN_PATTERN } from "./tokenizer.ts";
 
 // Common elision prefixes that result from apostrophe splitting.
 // These are valid word fragments, not misspellings.
@@ -109,6 +109,7 @@ export class NspellProvider implements SpellCheckProvider {
       const word = token.word;
 
       if (word.length < MIN_TOKEN_LENGTH) continue;
+      if (URL_TOKEN_PATTERN.test(word)) continue;
       if (ELISION_PREFIXES.has(word.toLowerCase())) continue;
       if (dict.correct(word) || dict.correct(word.toLowerCase())) continue;
 

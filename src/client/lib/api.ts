@@ -1,5 +1,4 @@
 import { session } from "./stores.svelte";
-import { getSupabase } from "./supabase";
 import type { SelfCorrectedSpan } from "../../types/index.ts";
 import type {
   AgentConnectorPayload,
@@ -22,10 +21,8 @@ function profileItemQuery(language?: string): string {
 const SINGLE_USER =
   (import.meta.env.VITE_SINGLE_USER as string | undefined)?.toLowerCase() === "true";
 
-/** Try to refresh the Supabase session and update the store. */
+/** Refresh the fixed single-user session. Multi-user JWTs require login again. */
 async function refreshSession(): Promise<boolean> {
-  // Single-user / sqlite mode has no Supabase; mint a fresh token from
-  // /auth/local. The backend auto-issues for the local user.
   if (SINGLE_USER) {
     try {
       const res = await fetch(`${BASE}/auth/local`, { method: "POST" });
@@ -45,47 +42,6 @@ async function refreshSession(): Promise<boolean> {
     }
   }
 
-  const supabase = getSupabase();
-  if (!supabase) return false;
-
-  try {
-    // Try refreshSession first
-    const { data, error } = await supabase.auth.refreshSession();
-    if (!error && data.session) {
-      session.value = data.session as any;
-      localStorage.setItem(
-        "langouste_session",
-        JSON.stringify({ session: data.session, user: data.user }),
-      );
-      console.log("[API] Session refreshed successfully");
-      return true;
-    }
-
-    // Fallback: try re-setting session from stored refresh token
-    const stored = localStorage.getItem("langouste_session");
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      if (parsed.session?.refresh_token) {
-        const { data: retryData, error: retryError } = await supabase.auth.setSession({
-          access_token: parsed.session.access_token,
-          refresh_token: parsed.session.refresh_token,
-        });
-        if (!retryError && retryData.session) {
-          session.value = retryData.session as any;
-          localStorage.setItem(
-            "langouste_session",
-            JSON.stringify({ session: retryData.session, user: retryData.user }),
-          );
-          console.log("[API] Session restored via setSession");
-          return true;
-        }
-      }
-    }
-  } catch (err) {
-    console.error("[API] Session refresh failed:", err);
-  }
-
-  // All refresh attempts failed — clear stale session
   console.warn("[API] Could not refresh session, clearing");
   localStorage.removeItem("langouste_session");
   session.value = null;
@@ -131,6 +87,11 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   }
   console.log(`[API] ${method} ${path} → ${res.status}`);
   return data as T;
+}
+
+/** Authenticated JSON transport for feature modules that own their contracts. */
+export function apiRequest<T>(path: string, options: RequestInit = {}): Promise<T> {
+  return request<T>(path, options);
 }
 
 export const api: ApiClient = {
@@ -240,6 +201,10 @@ export const api: ApiClient = {
   // Profile stats
   getProfileLanguages: () => request("/profile/languages"),
   getLanguageStats: (language: string) => request(`/profile/stats/${language}`),
+  getReadingInteractions: (language: string, limit = 12) =>
+    request(
+      `/profile/reading-interactions/${encodeURIComponent(language)}?limit=${Math.min(Math.max(limit, 1), 200)}`,
+    ),
   getDimensionItems: (language: string, dimension: string, params?: Record<string, string>) => {
     const qs = params ? `?${new URLSearchParams(params).toString()}` : "";
     return request(`/profile/dimension/${language}/${dimension}${qs}`);
@@ -386,6 +351,14 @@ export const api: ApiClient = {
 
   // Resources
   getLanguageResources: () => request("/resources"),
+  searchCorpus: (query, options = {}) => {
+    const params = new URLSearchParams({ q: query });
+    if (options.language) params.set("language", options.language);
+    if (options.sourceType) params.set("source_type", options.sourceType);
+    if (options.limit != null) params.set("limit", String(options.limit));
+    if (options.includeDocument) params.set("include_document", "true");
+    return request(`/corpus/search?${params}`);
+  },
 
   // Review
   getDueReview: (language: string) => request(`/review/due/${language}`),

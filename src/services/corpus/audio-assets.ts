@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import type { FiloDocumentJson } from "filo";
 import type { Database } from "../../lib/db/index.ts";
+import { indexFiloDocument } from "./store.ts";
 
 export interface Source {
   [key: string]: unknown;
@@ -41,6 +42,10 @@ export interface AudioAssetInput {
   contentType: string;
   source?: Source | null;
   filoDoc?: FiloDocumentJson | null;
+}
+
+export interface IdentifiedAudioAssetInput extends AudioAssetInput {
+  audioId: string;
 }
 
 export interface CachedAudioAsset {
@@ -91,7 +96,15 @@ export async function storeAudioAsset(
   db: Database,
   input: AudioAssetInput,
 ): Promise<CachedAudioAsset> {
-  const audioId = audioAssetId(input);
+  return storeIdentifiedAudioAsset(db, { ...input, audioId: audioAssetId(input) });
+}
+
+/** Store generated/imported audio whose Filo annotations already name its ID. */
+export async function storeIdentifiedAudioAsset(
+  db: Database,
+  input: IdentifiedAudioAssetInput,
+): Promise<CachedAudioAsset> {
+  const audioId = input.audioId;
   const row = await db.upsert<AudioAsset>(
     "audio_assets",
     {
@@ -108,6 +121,22 @@ export async function storeAudioAsset(
     },
     ["audio_id"],
   );
+  if (input.filoDoc) {
+    const ownerId =
+      typeof input.filoDoc.metadata.ownerId === "string"
+        ? input.filoDoc.metadata.ownerId
+        : typeof input.filoDoc.metadata.userId === "string"
+          ? input.filoDoc.metadata.userId
+          : null;
+    if (ownerId) {
+      await indexFiloDocument(db, input.filoDoc, {
+        ownerId,
+        sourceType: "audio",
+        sourceId: audioId,
+        language: input.language ?? null,
+      });
+    }
+  }
   return toCachedAudioAsset(row);
 }
 

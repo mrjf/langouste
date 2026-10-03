@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { config } from "../../lib/config.ts";
 import { adminDb } from "../../lib/db/index.ts";
+import { drainBackgroundTasks } from "../../lib/background-tasks.ts";
 import { testRegistry } from "../../lib/test-registry.ts";
 import { disconnectAgent } from "../../services/agents/factory.ts";
 
@@ -64,6 +65,7 @@ testRoutes.post("/reset-stubs", async (c) => {
 // Wipe all data except schema. Used between test files when we want a
 // clean DB without tearing down the whole server.
 testRoutes.post("/reset-db", async (c) => {
+  await drainBackgroundTasks();
   const db = adminDb();
   // Order matters for FKs even with ON DELETE CASCADE: empty the leaves first.
   const tables = [
@@ -82,7 +84,8 @@ testRoutes.post("/reset-db", async (c) => {
   ];
   for (const t of tables) {
     try {
-      await db.raw(`DELETE FROM "${t}"`);
+      if (!db.clear) throw new Error("database does not expose test reset");
+      await db.clear(t);
     } catch (err) {
       console.error(`[test] failed to clear ${t}:`, err);
     }
@@ -118,6 +121,6 @@ testRoutes.get("/db/:table", async (c) => {
     "review_log",
   ]);
   if (!allowed.has(table)) return c.json({ error: "unknown table" }, 400);
-  const rows = await adminDb().raw(`SELECT * FROM "${table}"`);
+  const rows = await adminDb().select(table);
   return c.json(rows);
 });

@@ -127,8 +127,15 @@ export interface TrainingSentencePayload extends SourceSentencePayload {
   fullSentence: boolean;
   sourceTierId: string;
   sourceAnnotationId: string;
+  /** Orthography repaired without changing the words heard in the source audio. */
+  correctedText?: string;
   translation?: string;
   reason?: string;
+  /** Whether the utterance is suitable as a standalone lesson item. */
+  lessonEligible?: boolean;
+  /** 0-1 estimate of beginner usefulness, naturalness, and self-containedness. */
+  teachingScore?: number;
+  qualityFlags?: string[];
 }
 
 export interface LessonItem {
@@ -146,7 +153,20 @@ export interface LessonItem {
 
 export interface LessonSentence {
   sentence: LessonItem;
+  /** An optional slower clean take used for the first model only. */
+  modelSentence?: LessonItem;
+  /** Additional independently timed clean takes with the same semantic item id. */
+  alternateSentences?: LessonItem[];
   words: LessonItem[];
+}
+
+export interface LessonPlanOverride {
+  /** Exact normalized target texts to select, in authoritative teaching order. */
+  itemOrder?: string[];
+  /** Reviewed target text to concise bridge-language situation prompts. */
+  reviewPrompts?: Record<string, string[]>;
+  /** Exact selected target texts forming the passive opening/closing dialogue. */
+  dialogue?: string[];
 }
 
 export interface LessonSegmentPayload {
@@ -163,8 +183,21 @@ export interface LessonSegmentPayload {
   sourceEndMs?: number;
   repetitionIndex?: number;
   promptTurn?: number;
+  /** Planned lesson-clock position used by the elapsed-time review scheduler. */
+  plannedStartMs?: number;
+  /** Deterministic duration estimate used before speech clips have been rendered. */
+  plannedDurationMs?: number;
+  /** Absolute planned lesson-clock time at which a review becomes eligible. */
+  dueAtMs?: number;
+  /** Requested delay from initial presentation completion to this review. */
+  scheduledIntervalMs?: number;
   durationMs?: number;
-  pauseRole?: "padding" | "response";
+  pauseRole?: "padding" | "response" | "transition";
+  responseMode?: "imitation" | "recall";
+  promptMode?: "situation" | "translation";
+  activity?: "dialogue";
+  dialoguePass?: "opening" | "closing";
+  dialogueIndex?: number;
   speechRate?: number;
 }
 
@@ -182,7 +215,12 @@ export interface RenderedAudioPayload {
   clipStartMs?: number;
   clipEndMs?: number;
   sourceClipPaddingMs?: number;
+  /** Exact probed duration of the rendered segment clip. */
   durationMs?: number;
+  /** Exact position of this clip within the rendered concatenation timeline. */
+  timelineStartMs?: number;
+  /** Exact end position of this clip within the rendered concatenation timeline. */
+  timelineEndMs?: number;
   normalization?: AudioNormalizationSettings;
   generatedAt: string;
 }
@@ -211,9 +249,22 @@ export interface BuildLessonFiloOptions {
   sourceUrl?: string;
   sourceAudioPath?: string;
   maxItems?: number;
+  /** Fixed response window override. Omit to derive it from answer duration. */
   pauseMs?: number;
+  /** Legacy word-drill padding. Word drills are disabled by default. */
   wordPauseMs?: number;
+  transitionPauseMs?: number;
+  /** Preferred review delays measured from presentation completion. */
+  reviewIntervalsMs?: number[];
+  /** Explicit legacy item-turn schedule. Omit to use elapsed-time intervals. */
   reviewOffsets?: number[];
+  lessonPlan?: LessonPlanOverride;
+  drillWords?: boolean;
+  annotateBridgeTranslations?: boolean;
+  /** Authoritative target-text → spoken bridge cue corrections, applied after ASR/LLM review. */
+  cueOverrides?: Record<string, string>;
+  /** Authoritative raw-ASR → corrected target text, applied before deduplication. */
+  targetTextOverrides?: Record<string, string>;
 }
 
 export interface AudioDrillTapeDocuments {

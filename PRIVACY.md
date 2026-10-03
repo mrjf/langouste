@@ -1,18 +1,13 @@
 # Privacy
 
-Langouste is designed for self-hosted and local-first use. This document describes the default project behavior; deployments can change behavior by changing providers, hosting, logging, or analytics.
+Langouste stores application data in the configured turbopuffer region. This
+includes conversations, messages, Filo annotation documents, translations,
+corrections, vocabulary, grammar gaps, review history, audio assets, and auth
+state. turbopuffer durably commits successful writes to object storage.
 
-## Local SQLite Mode
-
-In `DATABASE_MODE=sqlite`, Langouste stores application data in a local SQLite database on the machine running the app. By default, that includes conversations, messages, translations, corrections, vocabulary, grammar gaps, review history, and local auth state.
-
-Langouste does not include product analytics by default.
-
-## Supabase Mode
-
-In `DATABASE_MODE=supabase`, application data is stored in the configured Supabase project. Access control is enforced through Supabase Auth, Postgres, Realtime, and row-level security policies.
-
-If you use a managed Supabase project, your data handling is also subject to Supabase's terms, configuration, and infrastructure.
+Langouste owns application authentication and authorization; turbopuffer does
+not provide row-level security for Langouste users. API keys remain on the
+server. Langouste does not include product analytics by default.
 
 ## External Providers
 
@@ -27,7 +22,7 @@ Provider requests may include message text, translations, corrections, or metada
 
 ## Secrets
 
-Do not commit `.env`, API keys, Supabase secret keys, service-account JSON, private keys, generated databases, or local data directories. The repository tracks `.env.example` only.
+Do not commit `.env`, API keys, service-account JSON, private keys, or exported datasets. The repository tracks `.env.example` only.
 
 ## Logs
 
@@ -35,4 +30,6 @@ Development logs may include request paths, errors, and provider failures. Avoid
 
 ## Data Export And Deletion
 
-SQLite mode data can be backed up or deleted by copying or removing the configured data directory. Supabase mode data should be exported or deleted from the configured Supabase project. Dedicated in-app export and delete commands are roadmap items, not stable public interfaces yet.
+Use turbopuffer's namespace tools for backup/export/deletion. The legacy
+importer is intentionally copy-only. Dedicated in-app export and account
+deletion commands are roadmap items, not stable public interfaces yet.

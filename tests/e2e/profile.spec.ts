@@ -21,7 +21,7 @@ test.describe("Profile dashboard", () => {
     await seedConnector(request, "stub");
 
     await page.goto("/");
-    await page.getByRole("button", { name: "+ New" }).click();
+    await page.getByRole("button", { name: "New", exact: true }).click();
     await page.getByRole("button", { name: /stub/i }).click();
     await sendMessage(page, "Salut test");
 
@@ -32,7 +32,7 @@ test.describe("Profile dashboard", () => {
     await page.waitForTimeout(500);
 
     // Navigate to profile.
-    await page.getByRole("button", { name: /Your progress/ }).click();
+    await page.getByRole("button", { name: /Progress/ }).click();
     await expect(page.getByRole("heading", { name: "Your progress" })).toBeVisible();
 
     // Messages sent tile is 1 (we sent one).
@@ -83,20 +83,20 @@ test.describe("Profile dashboard", () => {
     await seedConnector(request, "stub");
 
     await page.goto("/");
-    await page.getByRole("button", { name: "+ New" }).click();
+    await page.getByRole("button", { name: "New", exact: true }).click();
     await page.getByRole("button", { name: /stub/i }).click();
     await sendMessage(page, "je mange");
     await expect(page.locator(".messages").getByText("ok")).toBeVisible({ timeout: 15_000 });
     await page.waitForTimeout(500);
 
-    await page.getByRole("button", { name: /Your progress/ }).click();
+    await page.getByRole("button", { name: /Progress/ }).click();
     await expect(page).toHaveURL(/#\/profile\/fr$/);
     // Click the Lexis dimension card.
     await page.getByRole("button", { name: /Lexis/ }).click();
     await expect(page).toHaveURL(/#\/profile\/fr\/lexis$/);
     // Item shows up in the table.
     await expect(page.getByRole("cell", { name: "manger" })).toBeVisible();
-    await page.getByRole("cell", { name: "manger" }).click();
+    await page.locator(".items-table tbody tr").filter({ hasText: "manger" }).click();
     await expect(page).toHaveURL(/#\/profile\/fr\/lexis\/vocabulary\/manger$/);
     // Item detail panel shows linked message.
     await expect(page.locator(".item-hero")).toContainText("manger");
@@ -142,12 +142,12 @@ test.describe("Profile dashboard", () => {
     await seedConnector(request, "stub");
 
     await page.goto("/");
-    await page.getByRole("button", { name: "+ New" }).click();
+    await page.getByRole("button", { name: "New", exact: true }).click();
     await page.getByRole("button", { name: /stub/i }).click();
     await sendMessage(page, "bonjour");
     await expect(page.locator(".messages").getByText("ok")).toBeVisible({ timeout: 15_000 });
 
-    await page.getByRole("button", { name: /Your progress/ }).click();
+    await page.getByRole("button", { name: /Progress/ }).click();
     await expect(page.getByRole("heading", { name: "Your progress" })).toBeVisible();
 
     await page.locator(".conv-item").filter({ hasText: "stub" }).click();
@@ -157,6 +157,7 @@ test.describe("Profile dashboard", () => {
   });
 
   test("target-language words show dictionary definitions on hover", async ({ page, request }) => {
+    let pronunciationRequest: URL | null = null;
     const api = new TestApi(request);
     await api.setDefaultAgentReply("ok");
     await api.setDefaultVocabResponse({
@@ -177,16 +178,29 @@ test.describe("Profile dashboard", () => {
         }),
       });
     });
+    await page.route(/\/api\/dictionary\/audio\?/, async (route) => {
+      pronunciationRequest = new URL(route.request().url());
+      await route.fulfill({ body: silentWav(), contentType: "audio/wav" });
+    });
     await seedConnector(request, "stub");
 
     await page.goto("/");
-    await page.getByRole("button", { name: "+ New" }).click();
+    await page.getByRole("button", { name: "New", exact: true }).click();
     await page.getByRole("button", { name: /stub/i }).click();
     await sendMessage(page, "bonjour");
     await expect(page.locator(".messages").getByText("ok")).toBeVisible({ timeout: 15_000 });
 
     await page.locator(".messages .dict-word").filter({ hasText: "bonjour" }).first().hover();
-    await expect(page.getByRole("tooltip")).toContainText("hello; good morning");
+    const dictionary = page.locator("dialog.dictionary-popover");
+    await expect(dictionary).toContainText(/hello/i);
+    await expect(
+      dictionary.getByRole("button", {
+        name: "Play pronunciation for bonjour",
+      }),
+    ).toBeVisible();
+    await dictionary.getByRole("button", { name: "Play pronunciation for bonjour" }).click();
+    await expect.poll(() => pronunciationRequest?.searchParams.get("term")).toBe("bonjour");
+    await expect.poll(() => pronunciationRequest?.searchParams.get("language")).toBe("fr");
   });
 
   test("syntax item detail does not fetch or show lexical reference", async ({ page, request }) => {
@@ -215,13 +229,13 @@ test.describe("Profile dashboard", () => {
     await seedConnector(request, "stub");
 
     await page.goto("/");
-    await page.getByRole("button", { name: "+ New" }).click();
+    await page.getByRole("button", { name: "New", exact: true }).click();
     await page.getByRole("button", { name: /stub/i }).click();
     await sendMessage(page, "bad syntax");
     await expect(page.locator(".messages").getByText("ok")).toBeVisible({ timeout: 15_000 });
     await page.waitForTimeout(500);
 
-    await page.getByRole("button", { name: /Your progress/ }).click();
+    await page.getByRole("button", { name: /Progress/ }).click();
     await page.getByRole("button", { name: /Syntax/ }).click();
     await expect(page).toHaveURL(/#\/profile\/fr\/syntax$/);
     await expect(
@@ -275,4 +289,26 @@ async function sendMessage(page: Page, text: string): Promise<void> {
   await editable.click();
   await page.keyboard.type(text);
   await page.keyboard.press("Enter");
+}
+
+function silentWav(durationSeconds = 2): Buffer {
+  const sampleRate = 8_000;
+  const channels = 1;
+  const bitsPerSample = 16;
+  const dataSize = sampleRate * durationSeconds * channels * (bitsPerSample / 8);
+  const wav = Buffer.alloc(44 + dataSize);
+  wav.write("RIFF", 0);
+  wav.writeUInt32LE(36 + dataSize, 4);
+  wav.write("WAVE", 8);
+  wav.write("fmt ", 12);
+  wav.writeUInt32LE(16, 16);
+  wav.writeUInt16LE(1, 20);
+  wav.writeUInt16LE(channels, 22);
+  wav.writeUInt32LE(sampleRate, 24);
+  wav.writeUInt32LE(sampleRate * channels * (bitsPerSample / 8), 28);
+  wav.writeUInt16LE(channels * (bitsPerSample / 8), 32);
+  wav.writeUInt16LE(bitsPerSample, 34);
+  wav.write("data", 36);
+  wav.writeUInt32LE(dataSize, 40);
+  return wav;
 }

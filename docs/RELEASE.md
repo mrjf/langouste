@@ -2,7 +2,7 @@
 
 > **Status — this is the target process, not the current one.** As of today,
 > Langouste is distributed as **source only**: clone the repo, `bun install`,
-> and run it locally in SQLite mode (see the [README](../README.md) quick
+> and run it with turbopuffer (see the [README](../README.md) quick
 > start). The Tauri desktop app, Docker Compose self-host, signed binaries, and
 > automated release pipeline described below are **planned, not yet
 > implemented** — see [ROADMAP.md](./ROADMAP.md) for what exists today versus
@@ -18,7 +18,7 @@ The flagship user experience. Target audience: a solo learner who wants Langoust
 
 - Wraps the Vite-built frontend + Bun backend in a Tauri shell.
 - Single binary per platform: `.dmg` (macOS, signed + notarised), `.msi` (Windows, code-signed), `.AppImage` (Linux).
-- Bundled local Supabase (GoTrue + Postgres + Realtime via embedded tauri-plugin-sqlx or a per-user Docker subordinate).
+- Connects to a configured hosted or BYOC turbopuffer deployment.
 - Auto-update via Tauri's built-in updater, signed with a project key.
 - Settings UI for `ANTHROPIC_API_KEY`, translation provider, connector configs.
 
@@ -26,7 +26,7 @@ Deployment pipeline:
 
 1. Tag `v1.2.3` on the `main` branch.
 2. GitHub Actions matrix builds macOS arm64 + Intel, Windows x64, Linux x64.
-3. Each platform runs `tauri build`, `bun test`, `bun run build`.
+3. Each platform runs `tauri build`, `bun run test`, `bun run build`.
 4. Signed binaries uploaded to GitHub Releases.
 5. Auto-updater manifest (`updater.json`) published to the project site, signed.
 
@@ -34,11 +34,13 @@ Deployment pipeline:
 
 For users who want a persistent Langouste on a home server or VPS; families / small groups sharing an instance.
 
-- `docker-compose.yml` in the repo root brings up: Langouste app, Postgres, GoTrue, Realtime, Kong (optional for external hosting).
+- `docker-compose.yml` in the repo root brings up the Langouste app configured
+  for a hosted or BYOC turbopuffer endpoint.
 - Single-command install: `curl -fsSL https://langouste.dev/install.sh | sh` (or the documented manual path).
 - `.env.example` holds every required variable; `install.sh` interactively generates `.env`.
 - Reverse proxy is not included — users bring their own Caddy / nginx / Cloudflare Tunnel.
-- Database backups: a sidecar container runs `pg_dump` to a volume on a schedule.
+- Durable data is owned by turbopuffer's object-storage-backed service. Export
+  jobs are optional operational snapshots rather than database-volume backups.
 
 Deployment pipeline:
 
@@ -56,17 +58,22 @@ Strict semver. In public-beta (0.x) the rules are relaxed; from 1.0 onward:
 
 Pre-1.0, we use 0.Y.Z where Y bumps on breaking changes. Expect 0.x to last for roughly the duration of Phases 0–3.
 
-## Migrations
+## Storage changes and imports
 
 Critical. A botched migration corrupts the data we spent months accumulating.
 
 Rules:
 
-- **Every schema change is a new migration file.** Never edit an existing one.
-- **Migrations are additive.** Prefer adding a nullable column + backfill + then enforcing the constraint in a later migration, over a single destructive ALTER.
-- **No migration depends on the application being on a specific version.** The app tolerates schemas that are one release ahead (column exists but unused) and one release behind (column about to exist is handled as optional).
-- **`bun run migrate` is idempotent.** Re-running is a no-op, enforced by the `_migrations` table.
-- **Test every migration on a fresh DB AND an upgrade from the previous release.** The integration suite has both scenarios.
+- **Namespace schema changes are additive.** Keep existing attributes readable;
+  introduce new nullable attributes and backfill them before callers require
+  them.
+- **`bun run migrate` is read-only.** It validates credentials, region, and
+  namespace visibility; schemas are created or extended on writes.
+- **Legacy imports are non-destructive.** `bun run import:turbopuffer` reads
+  SQLite or Supabase sources, batch-upserts logical rows, builds the Filo corpus
+  projection, and verifies samples without deleting the source.
+- **Test every schema change against an empty prefix and a copy of the previous
+  release's namespace set.**
 
 Migration naming: `NNN_short_description.sql`, monotonically increasing.
 
@@ -200,7 +207,7 @@ For hosted instances (if we ever offer them):
 
 - Sentry for unhandled exceptions.
 - PostHog for anonymous usage events (opt-out respected).
-- A `/healthz` endpoint returning 200 if DB + Supabase + Anthropic are reachable.
+- A `/healthz` endpoint returning 200 if turbopuffer + Anthropic are reachable.
 - Anthropic cost watch: alert at 50/75/90% of monthly budget.
 
 For self-hosted: a bundled `langouste status` CLI command reports local health, logs tail, and last error. Nothing phones home without explicit opt-in.

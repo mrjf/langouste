@@ -41,7 +41,7 @@ export function buildSourceTranscriptFilo(
   options: BuildSourceFiloOptions,
 ): FiloDocumentJson<SourceTranscriptMetadata> {
   const normalized = normalizeTranscriptText(transcript);
-  const language = transcript.language === "und" ? options.sourceLanguage : transcript.language;
+  const language = canonicalTranscriptLanguage(transcript.language, options.sourceLanguage);
   const metadata: SourceTranscriptMetadata = {
     corpus: "audio-drill-source-audio",
     title: options.title,
@@ -207,8 +207,20 @@ export function annotateTrainingSentences(
       fullSentence: extractedSentence.fullSentence,
       sourceTierId: sentence.tierId,
       sourceAnnotationId: sentence.id,
+      ...(extractedSentence.correctedText
+        ? { correctedText: extractedSentence.correctedText }
+        : {}),
       ...(extractedSentence.translation ? { translation: extractedSentence.translation } : {}),
       ...(extractedSentence.reason ? { reason: extractedSentence.reason } : {}),
+      ...(extractedSentence.lessonEligible !== undefined
+        ? { lessonEligible: extractedSentence.lessonEligible }
+        : {}),
+      ...(extractedSentence.teachingScore !== undefined
+        ? { teachingScore: extractedSentence.teachingScore }
+        : {}),
+      ...(extractedSentence.qualityFlags?.length
+        ? { qualityFlags: extractedSentence.qualityFlags }
+        : {}),
     };
 
     const trainingSentence = document.addAnnotation<TrainingSentencePayload>("training.sentence", {
@@ -248,6 +260,32 @@ export function annotateTrainingSentences(
   }
 
   return document.toJSON();
+}
+
+const ISO_639_3_TO_1: Record<string, string> = {
+  deu: "de",
+  eng: "en",
+  fra: "fr",
+  hun: "hu",
+  ita: "it",
+  nld: "nl",
+  pol: "pl",
+  por: "pt",
+  rus: "ru",
+  spa: "es",
+  tur: "tr",
+};
+
+function canonicalTranscriptLanguage(detected: string, requested: string): string {
+  const requestedCode = canonicalLanguageCode(requested);
+  const detectedCode = canonicalLanguageCode(detected);
+  if (!detectedCode || detectedCode === "und") return requestedCode;
+  return detectedCode === requestedCode ? requestedCode : detectedCode;
+}
+
+function canonicalLanguageCode(language: string): string {
+  const normalized = language.trim().toLocaleLowerCase().replace(/_/gu, "-").split("-")[0] ?? "";
+  return ISO_639_3_TO_1[normalized] ?? normalized;
 }
 
 export function translationForAnnotation(
@@ -556,11 +594,16 @@ function sentenceEnd(text: string, start: number): number {
     const char = text[cursor] ?? "";
     if (char === "\n" && text[cursor + 1] === "\n") return cursor;
     if (!SENTENCE_TERMINATORS.has(char)) continue;
+    if (char === "." && isDigit(text[cursor - 1]) && isDigit(text[cursor + 1])) continue;
     let end = cursor + 1;
     while (end < text.length && SENTENCE_CLOSERS.has(text[end] ?? "")) end += 1;
     return end;
   }
   return text.length;
+}
+
+function isDigit(char: string | undefined): boolean {
+  return char !== undefined && /\p{Number}/u.test(char);
 }
 
 function trimRight(text: string, end: number): number {

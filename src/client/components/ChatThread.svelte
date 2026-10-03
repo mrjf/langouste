@@ -18,7 +18,7 @@
   const chat = $derived(chatStore.active);
   const userId = $derived(user.value?.id);
 
-  // Load messages + realtime whenever the active chat changes. The Chat
+  // Load messages whenever the active chat changes. The Chat
   // caches its own messages, so re-entering is instant and idempotent.
   $effect(() => {
     const c = chat;
@@ -39,14 +39,31 @@
 
   let messagesEl = $state<HTMLElement>();
   let translating = $state(false);
+  let showAllLanguages = $state(false);
+  let generatingAllLanguages = $state(false);
+  let allLanguagesError = $state<string | null>(null);
+  let visibilityConversationId = $state<string | null>(null);
+  let allLanguagesRequestId = 0;
+
+  // Language visibility is a view preference for the current thread. Do not
+  // carry an expanded wall of translations into the next conversation.
+  $effect(() => {
+    const nextConversationId = chat?.id ?? null;
+    if (visibilityConversationId === nextConversationId) return;
+    visibilityConversationId = nextConversationId;
+    allLanguagesRequestId += 1;
+    showAllLanguages = false;
+    generatingAllLanguages = false;
+    allLanguagesError = null;
+  });
 
   // Depend on the active chat's messages SIGNAL directly. `chat` is a
   // stable Chat instance (chatStore.active returns the same object), so a
   // chained $derived over `chat` memoises on that unchanging reference and
   // does NOT propagate an invalidation when chat.messages is reassigned
   // (the agent reply replacing the "…" bubble) — that was the
-  // "stuck until reload" bug. In sqlite mode the HTTP response in #send is
-  // the ONLY updater (no realtime), so this must react. Reading
+  // "stuck until reload" bug. The HTTP response in #send is the updater, so
+  // this must react. Reading
   // chatStore.active?.messages inside this single $derived.by makes the
   // messages $state itself the tracked dependency.
   const uniqueMessages = $derived.by(() => {
@@ -102,12 +119,70 @@
   }
 
   // --- language switch + (re)translation -------------------------------
+  async function toggleAllLanguages() {
+    if (showAllLanguages) {
+      allLanguagesRequestId += 1;
+      showAllLanguages = false;
+      generatingAllLanguages = false;
+      allLanguagesError = null;
+      return;
+    }
+
+    const currentChat = chat;
+    if (!currentChat) return;
+
+    // Expand immediately so missing rows can communicate that they are being
+    // generated. The API is idempotent and only translates missing variants.
+    showAllLanguages = true;
+    allLanguagesError = null;
+    const languages = [
+      ...new Set(
+        [
+          ...(currentChat.member?.target_languages.map((target) => target.lang) ?? []),
+          ...(currentChat.member?.base_languages ?? []),
+        ].filter(Boolean),
+      ),
+    ];
+    const needsTranslations = currentChat.messages.some(
+      (message) =>
+        !message._pending &&
+        !!message.healed_text?.trim() &&
+        languages.some(
+          (language) =>
+            message.language !== language && !message.translations?.[language]?.trim(),
+        ),
+    );
+    if (!needsTranslations) return;
+
+    const requestId = ++allLanguagesRequestId;
+    generatingAllLanguages = true;
+    try {
+      const translated = await api.translateMessages(currentChat.id, languages);
+      const translatedById = new Map(translated.map((message) => [message.message_id, message]));
+      currentChat.messages = currentChat.messages.map((message) =>
+        message._pending ? message : (translatedById.get(message.message_id) ?? message),
+      );
+    } catch (err) {
+      console.error("Failed to generate all message translations:", err);
+      if (requestId === allLanguagesRequestId) {
+        allLanguagesError =
+          err instanceof Error ? err.message : "Some language versions could not be generated.";
+      }
+    } finally {
+      if (requestId === allLanguagesRequestId) generatingAllLanguages = false;
+    }
+  }
+
   async function switchLanguage(
     field: LanguageUpdateField,
     value: string,
   ) {
     if (!chat) return;
     const id = chat.id;
+    allLanguagesRequestId += 1;
+    showAllLanguages = false;
+    generatingAllLanguages = false;
+    allLanguagesError = null;
     try {
       const updates =
         field === "target_languages"
@@ -198,6 +273,17 @@
             {/each}
           </select>
         </label>
+        <button
+          class="all-languages-btn"
+          class:active={showAllLanguages}
+          aria-pressed={showAllLanguages}
+          title={showAllLanguages
+            ? "Hide the other configured languages"
+            : "Show every configured target and base language"}
+          onclick={toggleAllLanguages}
+        >
+          {showAllLanguages ? "Hide all languages" : "Show all languages"}
+        </button>
       </div>
     </div>
   </div>
@@ -213,6 +299,8 @@
         baseLangs={myBaseLangs}
         challenge={msg.next_challenge ?? null}
         conversationId={chat.id}
+        {showAllLanguages}
+        languagesLoading={generatingAllLanguages}
         {onWorkbenchText}
       />
     {/each}
@@ -220,6 +308,12 @@
 
   {#if translating}
     <div class="translating">Translating messages...</div>
+  {/if}
+
+  {#if allLanguagesError}
+    <div class="translation-error" role="status">
+      Some language versions are unavailable: {allLanguagesError}
+    </div>
   {/if}
 
   {#if chat.agentError}
@@ -275,6 +369,14 @@
     background: var(--color-challenge);
   }
 
+  .translation-error {
+    padding: var(--space-2) var(--space-5);
+    text-align: center;
+    font-size: var(--text-sm);
+    color: var(--color-error);
+    background: color-mix(in srgb, var(--color-error) 8%, var(--color-panel));
+  }
+
   .thread-header {
     min-height: 5rem;
     padding: var(--space-5) var(--space-6);
@@ -325,6 +427,24 @@
     border-radius: var(--radius-sm);
     background: var(--color-surface);
     color: var(--color-text);
+  }
+
+  .all-languages-btn {
+    min-height: 1.9rem;
+    padding: 0 var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    cursor: pointer;
+  }
+
+  .all-languages-btn:hover,
+  .all-languages-btn.active {
+    color: var(--color-text);
+    border-color: var(--color-accent);
   }
 
   .messages {

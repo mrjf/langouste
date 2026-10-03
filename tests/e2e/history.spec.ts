@@ -13,7 +13,7 @@ test.describe("Message history persistence", () => {
     await seedConnector(request, "stub");
 
     await page.goto("/");
-    await page.getByRole("button", { name: "+ New" }).click();
+    await page.getByRole("button", { name: "New", exact: true }).click();
     await page.getByRole("button", { name: /stub/i }).click();
 
     for (const msg of ["one", "two", "three"]) {
@@ -47,7 +47,7 @@ test.describe("Message history persistence", () => {
     await seedConnector(request, "stub");
 
     await page.goto("/");
-    await page.getByRole("button", { name: "+ New" }).click();
+    await page.getByRole("button", { name: "New", exact: true }).click();
     await page.getByRole("button", { name: /stub/i }).click();
     await sendMessage(page, "bonjour le chat");
     await expect(page.locator(".messages").getByText("ok")).toBeVisible({ timeout: 15_000 });
@@ -74,8 +74,7 @@ test.describe("Message history persistence", () => {
     request,
   }) => {
     const api = new TestApi(request);
-    await api.setDefaultAgentReply("good morning");
-    await api.setTranslation("good morning", "fr", "bonjour");
+    await api.setDefaultAgentReply("bonjour");
     await api.setVocabResponse("bonjour", {
       new_vocabulary: [
         { term: "bonjour", translation: "hello", context_sentence: "bonjour", cefr_level: "A1" },
@@ -86,7 +85,7 @@ test.describe("Message history persistence", () => {
     await seedConnector(request, "stub");
 
     await page.goto("/");
-    await page.getByRole("button", { name: "+ New" }).click();
+    await page.getByRole("button", { name: "New", exact: true }).click();
     await page.getByRole("button", { name: /stub/i }).click();
     await sendMessage(page, "salut");
     await expect(page.locator(".messages").getByText("bonjour")).toBeVisible({ timeout: 15_000 });
@@ -118,14 +117,14 @@ test.describe("Message history persistence", () => {
       ),
     ).toBe(true);
 
-    await page.getByRole("button", { name: /Your progress/ }).click();
+    await page.getByRole("button", { name: /Progress/ }).click();
     await page.getByRole("button", { name: /Lexis/ }).click();
     await expect(page.getByRole("cell", { name: "bonjour" })).toBeVisible();
-    await page.getByRole("cell", { name: "bonjour" }).click();
+    await page.locator(".items-table tbody tr").filter({ hasText: "bonjour" }).click();
     await expect(page.locator(".item-hero")).toContainText("bonjour");
     await expect(
       page.locator(".stat-grid div").filter({ hasText: "Seen" }).locator("strong"),
-    ).toHaveText("1");
+    ).toHaveText("2");
     await expect(
       page.locator(".stat-grid div").filter({ hasText: "Produced" }).locator("strong"),
     ).toHaveText("0");
@@ -163,7 +162,7 @@ test.describe("Message history persistence", () => {
     await seedConnector(request, "stub");
 
     await page.goto("/");
-    await page.getByRole("button", { name: "+ New" }).click();
+    await page.getByRole("button", { name: "New", exact: true }).click();
     await page.getByRole("button", { name: /stub/i }).click();
 
     const editable = page.locator(".editable[contenteditable='true']");
@@ -205,10 +204,10 @@ test.describe("Message history persistence", () => {
       self_corrected_productions: 1,
     });
 
-    await page.getByRole("button", { name: /Your progress/ }).click();
+    await page.getByRole("button", { name: /Progress/ }).click();
     await page.getByRole("button", { name: /Lexis/ }).click();
     await expect(page.getByRole("cell", { name: "chat" })).toBeVisible();
-    await page.getByRole("cell", { name: "chat" }).click();
+    await page.locator(".items-table tbody tr").filter({ hasText: "chat" }).click();
     await expect(page.locator(".item-hero")).toContainText("chat");
     await expect(page.locator(".stat-grid")).toContainText("Produced");
     await expect(page.locator(".stat-grid")).toContainText("Self-corrected");

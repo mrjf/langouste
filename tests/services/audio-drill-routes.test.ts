@@ -6,7 +6,8 @@ import type { FiloDocumentJson } from "filo";
 
 const originalEnv = {
   anthropicApiKey: process.env.ANTHROPIC_API_KEY,
-  databaseMode: process.env.DATABASE_MODE,
+  testMode: process.env.LANGOUSTE_TEST_MODE,
+  testStorage: process.env.LANGOUSTE_TEST_STORAGE,
   jwtSecret: process.env.LANGOUSTE_JWT_SECRET,
   dataDir: process.env.LANGOUSTE_DATA_DIR,
 };
@@ -15,7 +16,8 @@ let rootDir = "";
 
 beforeEach(async () => {
   process.env.ANTHROPIC_API_KEY ||= "test-key";
-  process.env.DATABASE_MODE = "sqlite";
+  process.env.LANGOUSTE_TEST_MODE = "true";
+  process.env.LANGOUSTE_TEST_STORAGE = "memory";
   process.env.LANGOUSTE_JWT_SECRET = "test-secret";
   rootDir = await mkdtemp(join(tmpdir(), "langouste-audio-drills-"));
   process.env.LANGOUSTE_DATA_DIR = join(rootDir, "db");
@@ -23,13 +25,51 @@ beforeEach(async () => {
 
 afterEach(async () => {
   restoreEnv("ANTHROPIC_API_KEY", originalEnv.anthropicApiKey);
-  restoreEnv("DATABASE_MODE", originalEnv.databaseMode);
+  restoreEnv("LANGOUSTE_TEST_MODE", originalEnv.testMode);
+  restoreEnv("LANGOUSTE_TEST_STORAGE", originalEnv.testStorage);
   restoreEnv("LANGOUSTE_JWT_SECRET", originalEnv.jwtSecret);
   restoreEnv("LANGOUSTE_DATA_DIR", originalEnv.dataDir);
   await rm(rootDir, { recursive: true, force: true });
 });
 
 describe("audio drill routes", () => {
+  test("persists drill documents and every audio asset in the storage contract", async () => {
+    const { drillRoot, lessonPath, audioId } = await writeFixture();
+    const drillDir = join(drillRoot, "unit-01");
+    const lesson = JSON.parse(await readFile(lessonPath, "utf8")) as FiloDocumentJson;
+    const source = JSON.parse(
+      await readFile(join(drillDir, "source.filo.json"), "utf8"),
+    ) as FiloDocumentJson;
+    const { createMemoryDatabaseSet } = await import("../../src/lib/db/memory.ts");
+    const {
+      findStoredAudioDrillAsset,
+      findStoredAudioDrillClip,
+      getStoredAudioDrill,
+      persistAudioDrillDirectory,
+    } = await import("../../src/services/corpus/audio-drills.ts");
+    const { searchCorpus } = await import("../../src/services/corpus/store.ts");
+    const set = createMemoryDatabaseSet();
+
+    await persistAudioDrillDirectory(set.admin, "user-a", "unit-01", drillDir, lesson, source);
+
+    expect(await getStoredAudioDrill(set.admin, "user-a", "unit-01")).toMatchObject({
+      title: "Unit 01",
+      clip_audio_ids: [audioId],
+    });
+    expect(
+      (await findStoredAudioDrillAsset(set.admin, "user-a", "unit-01", "final"))?.byteLength,
+    ).toBe(4);
+    expect(
+      (await findStoredAudioDrillClip(set.admin, "user-a", "unit-01", audioId))?.byteLength,
+    ).toBe(3);
+    expect(
+      await searchCorpus(set.admin, "jó", {
+        ownerId: "user-a",
+        sourceType: "audio_drill",
+      }),
+    ).toHaveLength(2);
+  });
+
   test("lists drill documents and serves generated audio clips from a configured root", async () => {
     const { drillRoot, audioId } = await writeFixture();
     const routes = await fixtureRoutes(drillRoot);

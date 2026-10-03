@@ -52,7 +52,20 @@
         literal: string;
         notFound: boolean;
         properties: GrammarPropertyView[];
+        trailingPunctuation: string;
       };
+
+  interface SpanMapSegment {
+    id: string;
+    text: string;
+    spanId: string | null;
+    spanIndex: number;
+    start: number;
+    end: number;
+  }
+
+  const SPAN_MAP_TIERS = ["sentence", "phrase", "word"] as const;
+  type SpanMapTierId = (typeof SPAN_MAP_TIERS)[number];
 
   interface GrammarReferenceView {
     label: string;
@@ -114,19 +127,27 @@
   let loading = $state(false);
   let error = $state("");
   let activeSentenceId = $state<string | null>(null);
+  let pinnedSentenceId = $state<string | null>(null);
   let activeLiteralWordId = $state<string | null>(null);
   let sourceFiloDoc = $state<FiloDocumentJson | null>(null);
   let audioByKey = $state<Record<string, AudioState>>({});
   let recentWorkbenchStates = $state<SavedWorkbenchState[]>([]);
   let appliedRoute = "";
   let loadedSavedWorkbench = false;
+  let sentenceHideTimer: ReturnType<typeof setTimeout> | null = null;
   const trackedInteractionKeys = new Set<string>();
+  let showSpanMap = $state(false);
+  let spanMapTier = $state<SpanMapTierId>("sentence");
 
   const document = $derived(result?.document ?? null);
   const sentences = $derived.by(() => spanViews(document, "sentence", "sentence"));
+  const activeSentence = $derived(
+    sentences.find((sentence) => sentence.id === activeSentenceId) ?? null,
+  );
   const phrases = $derived.by(() => spanViews(document, "phrase", "phrase"));
   const words = $derived.by(() => wordViews(document, sourceLanguage));
   const grammarProperties = $derived.by(() => grammarPropertyViews(document));
+  const spanMapSegments = $derived.by(() => buildSpanMap(document, spanMapTier));
 
   $effect(() => {
     refreshRecentWorkbenchStates();
@@ -168,6 +189,7 @@
     editing = false;
     error = "";
     activeSentenceId = null;
+    pinnedSentenceId = null;
     activeLiteralWordId = null;
     audioByKey = {};
     trackedInteractionKeys.clear();
@@ -198,6 +220,7 @@
     loading = true;
     error = "";
     activeSentenceId = null;
+    pinnedSentenceId = null;
     activeLiteralWordId = null;
     try {
       text = cleanText;
@@ -229,6 +252,7 @@
     loading = false;
     error = "";
     activeSentenceId = null;
+    pinnedSentenceId = null;
     activeLiteralWordId = null;
     sourceFiloDoc = null;
     audioByKey = {};
@@ -250,6 +274,7 @@
     editing = !result;
     error = "";
     activeSentenceId = null;
+    pinnedSentenceId = null;
     activeLiteralWordId = null;
     audioByKey = {};
     trackedInteractionKeys.clear();
@@ -494,11 +519,7 @@
     let cursor = span.start;
     for (const word of words) {
       if (cursor < word.start) {
-        tokens.push({
-          kind: "text",
-          id: `text:${cursor}:${word.start}`,
-          text: textOf(doc, { start: cursor, end: word.start }),
-        });
+        pushGapText(tokens, textOf(doc, { start: cursor, end: word.start }), cursor);
       }
       const literal = literalByWordId.get(word.id) ?? literalByRange.get(rangeKey(word));
       tokens.push({
@@ -510,17 +531,31 @@
         literal: literal?.text ?? "",
         notFound: literal?.notFound ?? false,
         properties: grammarPropertiesForRange(doc, word, "word"),
+        trailingPunctuation: "",
       });
       cursor = word.end;
     }
     if (cursor < span.end) {
-      tokens.push({
-        kind: "text",
-        id: `text:${cursor}:${span.end}`,
-        text: textOf(doc, { start: cursor, end: span.end }),
-      });
+      pushGapText(tokens, textOf(doc, { start: cursor, end: span.end }), cursor);
     }
     return tokens;
+  }
+
+  // Punctuation directly after a word (e.g. the "." in "könyvtárban.") is its
+  // own inline-flex sibling once words are stacked with a gloss underneath,
+  // so it can wrap onto its own line as an orphan. Attach it to the
+  // preceding word's box instead, so it always wraps together with it.
+  function pushGapText(tokens: LiteralToken[], text: string, start: number): void {
+    if (!text) return;
+    const attached = /^[^\s\p{L}\p{M}]+/u.exec(text)?.[0] ?? "";
+    const previous = tokens[tokens.length - 1];
+    if (attached && previous?.kind === "word") {
+      previous.trailingPunctuation += attached;
+      const rest = text.slice(attached.length);
+      if (rest) tokens.push({ kind: "text", id: `text:${start}:${tokens.length}`, text: rest });
+      return;
+    }
+    tokens.push({ kind: "text", id: `text:${start}:${tokens.length}`, text });
   }
 
   function wordViews(doc: FiloDocumentJson | null, language: string): WordView[] {
@@ -630,6 +665,50 @@
     if (word.lookupStatus === "error") return "Lookup failed";
     if (word.lookupStatus === "found") return "No definition in entry";
     return "No dictionary entry found";
+  }
+
+  /**
+   * Lay the whole document out as a flat sequence of segments, one per span
+   * of the chosen tier (plus a segment for any gap the tier doesn't cover),
+   * so the parser's actual span boundaries can be inspected directly.
+   */
+  function buildSpanMap(doc: FiloDocumentJson | null, tierId: SpanMapTierId): SpanMapSegment[] {
+    if (!doc) return [];
+    const spans = tier(doc, tierId);
+    const segments: SpanMapSegment[] = [];
+    let cursor = 0;
+    spans.forEach((span, index) => {
+      if (cursor < span.start) {
+        segments.push({
+          id: `gap:${cursor}:${span.start}`,
+          text: textOf(doc, { start: cursor, end: span.start }),
+          spanId: null,
+          spanIndex: -1,
+          start: cursor,
+          end: span.start,
+        });
+      }
+      segments.push({
+        id: span.id,
+        text: textOf(doc, span),
+        spanId: span.id,
+        spanIndex: index,
+        start: span.start,
+        end: span.end,
+      });
+      cursor = span.end;
+    });
+    if (cursor < doc.byteLength) {
+      segments.push({
+        id: `gap:${cursor}:${doc.byteLength}`,
+        text: textOf(doc, { start: cursor, end: doc.byteLength }),
+        spanId: null,
+        spanIndex: -1,
+        start: cursor,
+        end: doc.byteLength,
+      });
+    }
+    return segments;
   }
 
   function tier(doc: FiloDocumentJson, tierId: string): FiloAnnotationJson[] {
@@ -809,6 +888,37 @@
   }
 
   function showSentence(sentence: SpanView) {
+    if (pinnedSentenceId && pinnedSentenceId !== sentence.id) return;
+    keepSentenceOpen();
+    activeSentenceId = sentence.id;
+    void recordWorkbenchInteraction("encounter", "workbench_definition", sentence, true);
+  }
+
+  function hideSentenceSoon() {
+    if (pinnedSentenceId) return;
+    if (sentenceHideTimer) clearTimeout(sentenceHideTimer);
+    sentenceHideTimer = setTimeout(() => {
+      activeSentenceId = null;
+      activeLiteralWordId = null;
+      sentenceHideTimer = null;
+    }, 180);
+  }
+
+  function keepSentenceOpen() {
+    if (!sentenceHideTimer) return;
+    clearTimeout(sentenceHideTimer);
+    sentenceHideTimer = null;
+  }
+
+  function toggleSentence(sentence: SpanView) {
+    keepSentenceOpen();
+    if (pinnedSentenceId === sentence.id) {
+      pinnedSentenceId = null;
+      activeSentenceId = null;
+      activeLiteralWordId = null;
+      return;
+    }
+    pinnedSentenceId = sentence.id;
     activeSentenceId = sentence.id;
     void recordWorkbenchInteraction("encounter", "workbench_definition", sentence, true);
   }
@@ -839,6 +949,7 @@
   }
 
   onDestroy(() => {
+    if (sentenceHideTimer) clearTimeout(sentenceHideTimer);
     for (const value of Object.values(audioByKey)) {
       if (value.audio && isCurrent(value.audio)) stopCurrent();
       if (value.url) URL.revokeObjectURL(value.url);
@@ -974,89 +1085,158 @@
     <section class="surface-card">
       <div class="section-heading">
         <h2><FiloText text="Text surface" role="section-heading" /></h2>
-        <span><FiloText text="Original text with word-aligned literal glosses." role="section-description" /></span>
+        <span><FiloText text="Original text with word-aligned literal glosses. Hover a word for its gloss and dictionary entry." role="section-description" /></span>
       </div>
-      <div
-        class="text-surface"
-        use:filoSource={{
-          document,
-          text,
-          role: "workbench-text-surface",
-          language: sourceLanguage,
-          includeDocument: false,
-        }}
-      >
-        {#each sentences as sentence}
-          <!-- svelte-ignore a11y_no_static_element_interactions -->
-          <span
-            class="sentence-wrap"
-            onmouseenter={() => showSentence(sentence)}
-            onmouseleave={() => {
-              activeSentenceId = null;
-              activeLiteralWordId = null;
-            }}
-          >
-            <span class="interlinear-sentence">
-              {#each sentence.tokens as token (token.id)}
-                {#if token.kind === "word"}
-                  <!-- svelte-ignore a11y_no_static_element_interactions -->
-                  <span
-                    class="literal-word"
-                    class:active={activeLiteralWordId === token.id}
-                    onmouseenter={() => (activeLiteralWordId = token.id)}
-                    onfocusin={() => (activeLiteralWordId = token.id)}
-                    onmouseleave={() => (activeLiteralWordId = null)}
-                    onfocusout={() => (activeLiteralWordId = null)}
-                  >
-                    <span class="literal-source">
-                      <DictionaryText
-                        text={token.text}
-                        language={sourceLanguage}
-                        filoDoc={document}
-                        baseByteOffset={token.start}
-                      />
-                    </span>
-                    <span
-                      class="literal-gloss"
-                      class:notFound={token.notFound}
-                      title={token.notFound ? "No dictionary gloss found; source word shown verbatim" : undefined}
-                    >{token.literal}</span>
-                  </span>
-                {:else}
-                  <span class="literal-text">{token.text}</span>
-                {/if}
-              {/each}
-            </span>
-            {#if activeSentenceId === sentence.id}
-              <span class="sentence-popover" role="tooltip">
-                <span class="popover-title"><FiloText text="Sentence" role="popover-title" /></span>
-                <button type="button" onclick={() => playSpan(`sentence:${sentence.id}`, sentence.text, sentence)}>
-                  {audioByKey[`sentence:${sentence.id}`]?.loading
-                    ? "…"
-                    : audioByKey[`sentence:${sentence.id}`]?.playing
-                      ? "stop"
-                      : "audio"}
-                </button>
-                {#if sentence.proper}
-                  <span class="label"><FiloText text="Good translation" role="popover-label" /></span>
-                  <span>{sentence.proper}</span>
-                {/if}
-                {#if sentence.literal}
-                  <span class="label"><FiloText text="Literal dictionary gloss" role="popover-label" /></span>
-                  <span>{sentence.literal}</span>
-                {/if}
-                {#if sentence.properties.length}
-                  <span class="label"><FiloText text="Grammar" role="popover-label" /></span>
-                  <span class="grammar-chips">
-                    {#each sentence.properties as property}
-                      <span class="grammar-chip" title={property.description}>{property.label}</span>
-                    {/each}
-                  </span>
-                {/if}
+      <div class="span-map-toggle">
+        <button
+          type="button"
+          class:active={showSpanMap}
+          aria-pressed={showSpanMap}
+          onclick={() => (showSpanMap = !showSpanMap)}
+        >{showSpanMap ? "Hide parse spans" : "Visualize parse spans"}</button>
+        {#if showSpanMap}
+          <div class="span-map-tiers" role="tablist" aria-label="Span tier">
+            {#each SPAN_MAP_TIERS as tierId}
+              <button
+                type="button"
+                role="tab"
+                aria-selected={spanMapTier === tierId}
+                class:active={spanMapTier === tierId}
+                onclick={() => (spanMapTier = tierId)}
+              >{tierId}</button>
+            {/each}
+          </div>
+        {/if}
+      </div>
+      {#if showSpanMap}
+        <div class="span-map" aria-label={`${spanMapTier} span map`}>
+          {#each spanMapSegments as segment (segment.id)}
+            <span
+              class="span-segment"
+              class:covered={segment.spanId !== null}
+              class:alt={segment.spanIndex % 2 === 1}
+              title={
+                segment.spanId
+                  ? `${spanMapTier} span · bytes ${segment.start}-${segment.end}`
+                  : `uncovered by ${spanMapTier} tier · bytes ${segment.start}-${segment.end}`
+              }
+            >{segment.text}</span>
+          {/each}
+        </div>
+      {/if}
+      <div class="surface-layout">
+        <div
+          class="text-surface"
+          use:filoSource={{
+            document,
+            text,
+            role: "workbench-text-surface",
+            language: sourceLanguage,
+            includeDocument: false,
+          }}
+        >
+          {#each sentences as sentence, sentenceIndex}
+            <!-- svelte-ignore a11y_no_static_element_interactions -->
+            <div
+              class="sentence-row"
+              class:active={activeSentenceId === sentence.id}
+              onmouseenter={() => showSentence(sentence)}
+              onmouseleave={hideSentenceSoon}
+            >
+              <button
+                class="sentence-handle"
+                class:pinned={pinnedSentenceId === sentence.id}
+                type="button"
+                title="Show this sentence's full explanation"
+                aria-label={`Show explanation for sentence ${sentenceIndex + 1}`}
+                aria-pressed={pinnedSentenceId === sentence.id}
+                onfocus={() => showSentence(sentence)}
+                onblur={hideSentenceSoon}
+                onclick={() => toggleSentence(sentence)}
+              >{sentenceIndex + 1}</button>
+              <span class="sentence-wrap">
+                <span class="interlinear-sentence">
+                  {#each sentence.tokens as token (token.id)}
+                    {#if token.kind === "word"}
+                      <!-- svelte-ignore a11y_no_static_element_interactions -->
+                      <span
+                        class="literal-word"
+                        class:active={activeLiteralWordId === token.id}
+                        onmouseenter={() => (activeLiteralWordId = token.id)}
+                        onfocusin={() => (activeLiteralWordId = token.id)}
+                        onmouseleave={() => (activeLiteralWordId = null)}
+                        onfocusout={() => (activeLiteralWordId = null)}
+                      >
+                        <span class="literal-source">
+                          <DictionaryText
+                            text={token.text}
+                            language={sourceLanguage}
+                            filoDoc={document}
+                            baseByteOffset={token.start}
+                          />{token.trailingPunctuation}</span>
+                        <span
+                          class="literal-gloss"
+                          class:notFound={token.notFound}
+                          title={token.notFound ? "No dictionary gloss found; source word shown verbatim" : undefined}
+                        >{token.literal}</span>
+                      </span>
+                    {:else}
+                      <span class="literal-text">{token.text}</span>
+                    {/if}
+                  {/each}
+                </span>
+              </span>
+            </div>
+          {/each}
+        </div>
+
+        <aside
+          class="sentence-inspector"
+          class:populated={!!activeSentence}
+          aria-live="polite"
+          onmouseenter={keepSentenceOpen}
+          onmouseleave={hideSentenceSoon}
+        >
+          {#if activeSentence}
+            <div class="inspector-heading">
+              <span class="popover-title">
+                <FiloText text={`Sentence ${sentences.findIndex((sentence) => sentence.id === activeSentence.id) + 1}`} role="popover-title" />
+              </span>
+              <button
+                type="button"
+                onclick={() => playSpan(`sentence:${activeSentence.id}`, activeSentence.text, activeSentence)}
+              >
+                {audioByKey[`sentence:${activeSentence.id}`]?.loading
+                  ? "…"
+                  : audioByKey[`sentence:${activeSentence.id}`]?.playing
+                    ? "stop"
+                    : "audio"}
+              </button>
+            </div>
+            <strong class="inspector-source">{activeSentence.text}</strong>
+            {#if activeSentence.proper}
+              <span class="label"><FiloText text="Good translation" role="popover-label" /></span>
+              <span>{activeSentence.proper}</span>
+            {/if}
+            {#if activeSentence.literal}
+              <span class="label"><FiloText text="Literal dictionary gloss" role="popover-label" /></span>
+              <span>{activeSentence.literal}</span>
+            {/if}
+            {#if activeSentence.properties.length}
+              <span class="label"><FiloText text="Grammar" role="popover-label" /></span>
+              <span class="grammar-chips">
+                {#each activeSentence.properties as property}
+                  <span class="grammar-chip" title={property.description}>{property.label}</span>
+                {/each}
               </span>
             {/if}
-          </span>{" "}
-        {/each}
+          {:else}
+            <span class="popover-title"><FiloText text="Sentence explanation" role="popover-title" /></span>
+            <span class="inspector-empty">
+              Hover a sentence to see its full translation and grammar. Select its number to keep the explanation open.
+            </span>
+          {/if}
+        </aside>
       </div>
     </section>
 
@@ -1414,7 +1594,7 @@
   }
 
   .audio-button,
-  .sentence-popover button,
+  .sentence-inspector button,
   .span-row button {
     border: 1px solid var(--color-border);
     border-radius: var(--radius-sm);
@@ -1466,6 +1646,13 @@
     padding: var(--space-5);
   }
 
+  .surface-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(17rem, 22rem);
+    align-items: start;
+    gap: var(--space-5);
+  }
+
   .section-heading {
     display: flex;
     align-items: baseline;
@@ -1474,20 +1661,116 @@
     margin-bottom: var(--space-4);
   }
 
+  .span-map-toggle {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
+  }
+
+  .span-map-toggle > button,
+  .span-map-tiers button {
+    min-height: 1.9rem;
+    padding: 0 var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg);
+    color: var(--color-text-muted);
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    text-transform: uppercase;
+  }
+
+  .span-map-toggle > button.active,
+  .span-map-tiers button.active {
+    border-color: var(--color-accent);
+    background: color-mix(in srgb, var(--color-accent) 12%, var(--color-bg));
+    color: var(--color-accent);
+  }
+
+  .span-map-tiers {
+    display: flex;
+    gap: var(--space-1);
+  }
+
+  .span-map {
+    margin-bottom: var(--space-4);
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg);
+    font-size: var(--text-md);
+    line-height: 1.8;
+    white-space: pre-wrap;
+  }
+
+  .span-segment {
+    border-radius: 2px;
+  }
+
+  .span-segment.covered {
+    background: color-mix(in srgb, var(--color-accent) 16%, transparent);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-accent) 32%, transparent);
+  }
+
+  .span-segment.covered.alt {
+    background: color-mix(in srgb, var(--color-accent) 30%, transparent);
+  }
+
   .text-surface {
-    max-width: 64rem;
+    display: grid;
+    min-width: 0;
+    gap: var(--space-2);
     font-size: clamp(1.25rem, 2.2vw, 2rem);
     line-height: 1.55;
     white-space: pre-wrap;
   }
 
-  .sentence-wrap {
-    position: relative;
+  .sentence-row {
+    display: grid;
+    grid-template-columns: 1.7rem minmax(0, 1fr);
+    align-items: start;
+    gap: var(--space-2);
+    padding: var(--space-2);
     border-radius: var(--radius-sm);
   }
 
-  .sentence-wrap:hover {
+  .sentence-row:hover,
+  .sentence-row.active {
     background: color-mix(in srgb, var(--color-accent) 8%, transparent);
+  }
+
+  .sentence-handle {
+    display: inline-grid;
+    place-items: center;
+    width: 1.65rem;
+    height: 1.65rem;
+    margin-top: 0.05rem;
+    padding: 0;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg);
+    color: var(--color-text-muted);
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    line-height: 1;
+  }
+
+  .sentence-handle:hover,
+  .sentence-handle:focus-visible,
+  .sentence-handle.pinned {
+    border-color: var(--color-accent);
+    background: color-mix(in srgb, var(--color-accent) 12%, var(--color-bg));
+    color: var(--color-accent);
+    outline: none;
+  }
+
+  .sentence-wrap {
+    min-width: 0;
+    border-radius: var(--radius-sm);
   }
 
   .interlinear-sentence {
@@ -1525,7 +1808,15 @@
     color: var(--color-text-muted);
     font-size: var(--text-caption);
     line-height: 1.05;
+    opacity: 0;
     overflow-wrap: anywhere;
+    transition: opacity 100ms ease;
+  }
+
+  .literal-word:hover .literal-gloss,
+  .literal-word.active .literal-gloss,
+  .literal-word:focus-within .literal-gloss {
+    opacity: 1;
   }
 
   .literal-gloss.notFound {
@@ -1548,22 +1839,45 @@
     white-space: pre-wrap;
   }
 
-  .sentence-popover {
-    position: absolute;
-    left: 0;
-    top: calc(100% + 0.3rem);
-    z-index: 40;
+  .sentence-inspector {
+    position: sticky;
+    top: var(--space-4);
     display: grid;
-    width: min(28rem, 80vw);
+    min-height: 12rem;
     gap: var(--space-2);
     padding: var(--space-4);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-sm);
-    background: var(--color-surface);
-    box-shadow: var(--shadow-lg);
+    background: var(--color-bg);
     color: var(--color-text);
     font-size: var(--text-sm);
     line-height: 1.35;
+  }
+
+  .sentence-inspector.populated {
+    border-color: color-mix(in srgb, var(--color-accent) 45%, var(--color-border));
+  }
+
+  .sentence-inspector button {
+    min-height: 1.8rem;
+    padding: 0 var(--space-2);
+  }
+
+  .inspector-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+  }
+
+  .inspector-source {
+    font-size: var(--text-md);
+    font-weight: var(--font-medium);
+  }
+
+  .inspector-empty {
+    max-width: 28rem;
+    color: var(--color-text-muted);
   }
 
   .popover-title,
@@ -1721,6 +2035,17 @@
     color: var(--color-text-muted);
     font-family: var(--font-mono);
     font-size: var(--text-caption);
+  }
+
+  @media (max-width: 1100px) {
+    .surface-layout {
+      grid-template-columns: 1fr;
+    }
+
+    .sentence-inspector {
+      position: static;
+      min-height: 0;
+    }
   }
 
   @media (max-width: 900px) {

@@ -21,4 +21,7 @@ We aim to acknowledge high-severity reports within 72 hours.
 
 ## Scope
 
-Security-sensitive areas include authentication, Supabase RLS, local token handling, agent connectors, provider API key handling, database migrations, and any path that can expose learner messages or credentials.
+Security-sensitive areas include application-owned authentication, ownership
+and membership filters, token handling, agent connectors, provider API keys,
+turbopuffer namespace access, imports, and any path that can expose learner
+messages or credentials.

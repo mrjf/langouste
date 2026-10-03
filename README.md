@@ -4,9 +4,9 @@
 
 Langouste is an open-source language-learning chat app for serious self-learners. You hold a real conversation in the language you're learning; Langouste checks your mistakes, explains the corrections in your native language, translates both sides, tracks the vocabulary and grammar you're picking up, and schedules it all for review with spaced repetition.
 
-It runs locally with your own Anthropic API key — no account, no cloud, your data stays on your machine.
+It runs with your own Anthropic and turbopuffer API keys.
 
-> **Status:** early and developer-oriented. The shipping path today is local SQLite mode with your own Anthropic key. A Supabase mode exists for multi-user/self-hosted setups. Desktop and Docker packaging are on the [roadmap](docs/ROADMAP.md), not done yet.
+> **Status:** early and developer-oriented. turbopuffer is the durable store and corpus search engine. Desktop and Docker packaging are on the [roadmap](docs/ROADMAP.md), not done yet.
 
 ## Why Langouste
 
@@ -37,7 +37,8 @@ Each message you send runs through a deliberate pipeline (full spec in [docs/mes
 - **Learning model**: tracks vocabulary, grammar gaps, productions, self-corrections, and review history.
 - **Spaced repetition**: SM-2 scheduling now; concept-level FSRS and CEFR-band estimation in progress.
 - **Optional text-to-speech** (ElevenLabs) with per-language voice configuration.
-- **Runs fully local** with SQLite, or multi-user with **Supabase** (Auth, Postgres, Realtime, Row-Level Security).
+- **Object-storage-native persistence and corpus search** with turbopuffer, including BM25 over Filo source text and annotation tiers.
+- **Integrated multilingual News reader**: build sentence-aligned editions from Hacker News, The New York Times, or the San Francisco Chronicle; read across up to eight languages; and send every lookup, listen, and vocabulary encounter into the same learner profile.
 
 ## Stack
 
@@ -46,34 +47,35 @@ Each message you send runs through a deliberate pipeline (full spec in [docs/mes
 | Runtime   | [Bun](https://bun.sh)                              |
 | HTTP API  | [Hono](https://hono.dev)                           |
 | Frontend  | [Svelte 5](https://svelte.dev) (runes) + Vite      |
-| Database  | SQLite (local, default) or Supabase (Postgres + RLS) |
+| Storage/search | [turbopuffer](https://turbopuffer.com)          |
 | AI        | Anthropic Claude API                               |
 
 ## Quick start
 
-**Prerequisites:** [Bun](https://bun.sh) and an [Anthropic API key](https://console.anthropic.com/).
+**Prerequisites:** [Bun](https://bun.sh), an [Anthropic API key](https://console.anthropic.com/), and a [turbopuffer API key](https://turbopuffer.com/dashboard).
 
 ```sh
 git clone https://github.com/mrjf/langouste.git
 cd langouste
 cp .env.example .env      # then edit .env — see below
 bun install
-bun run migrate           # create the local SQLite schema
+bun run migrate           # validate turbopuffer and list namespaces
 bun run dev               # Vite on :5173, Hono API on :8000
 ```
 
 Before `bun run migrate`, open `.env` and set:
 
-| Variable                | Value                                            |
-|-------------------------|--------------------------------------------------|
-| `DATABASE_MODE`         | `sqlite`                                          |
-| `VITE_DATABASE_MODE`    | `sqlite`                                          |
-| `ANTHROPIC_API_KEY`     | your key from the Anthropic Console               |
-| `LANGOUSTE_JWT_SECRET`  | any long random string (`.env.example` shows how) |
+| Variable | Value |
+|---|---|
+| `TURBOPUFFER_API_KEY` | your key from the turbopuffer dashboard |
+| `TURBOPUFFER_REGION` | the closest supported region, such as `aws-us-west-2` |
+| `TURBOPUFFER_NAMESPACE_PREFIX` | an environment-specific prefix |
+| `ANTHROPIC_API_KEY` | your key from the Anthropic Console |
+| `LANGOUSTE_JWT_SECRET` | any long random string |
 
-Then open **http://localhost:5173**. In default SQLite mode, single-user mode is on — you're signed in automatically, no signup needed.
+Then open **http://localhost:5173**. Single-user mode is on by default, so you are signed in automatically.
 
-`.env.example` documents every option (translation provider, spell-check provider, text-to-speech, Supabase mode). Every variable the server reads is centralized in [`src/lib/config.ts`](src/lib/config.ts).
+`.env.example` documents every option. Every variable the server reads is centralized in [`src/lib/config.ts`](src/lib/config.ts).
 
 ### Common commands
 
@@ -82,17 +84,23 @@ bun run dev          # Vite frontend + Hono backend (parallel)
 bun run dev:client   # frontend only (:5173)
 bun run dev:server   # backend only (:8000)
 bun run build        # production frontend build
-bun run migrate      # apply database migrations
+bun run migrate      # verify turbopuffer connectivity
+bun run import:turbopuffer --sqlite /path/to/langouste.db
+# Optional legacy drill corpus:
+bun run import:turbopuffer --audio-drills-root ./data/audio-drills --owner-id <user-id>
 bun run check        # Biome lint + format (the CI gate)
-bun test             # unit tests (tests/services)
+bun run test         # unit tests (tests/services)
 ```
 
-## Database modes
+## Storage
 
-- **SQLite (default)** — zero-config, fully local, single-user. Data lives in a `langouste.db` file under your OS data directory. This is the contributor and self-learner path.
-- **Supabase** — managed or self-hosted Postgres with Auth, Realtime, and Row-Level Security, for multi-user deployments.
-
-See [docs/MODES.md](docs/MODES.md) to pick and set up a mode.
+turbopuffer durably commits rows to object storage, so Langouste does not need
+an application-managed S3 bucket for normal records or inline Filo documents.
+Audio-drill render directories are disposable build caches; completed lesson
+documents, source tiers, final audio, source audio, and generated clips are
+persisted in turbopuffer.
+See [docs/MODES.md](docs/MODES.md) for namespace layout, document limits,
+authentication boundaries, and legacy import commands.
 
 ## Documentation
 
@@ -100,18 +108,18 @@ New here? Start with the [documentation index](docs/README.md). Highlights:
 
 - [VISION.md](VISION.md) — what Langouste is for and the bet behind it.
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — system shape, agent connectors, message pipeline.
-- [docs/MODES.md](docs/MODES.md) — SQLite vs Supabase.
+- [docs/MODES.md](docs/MODES.md) — turbopuffer storage, corpus indexing, and imports.
 - [docs/LEARNING-MODEL.md](docs/LEARNING-MODEL.md) — how progress is measured, explained, and scheduled.
 - [docs/ROADMAP.md](docs/ROADMAP.md) — where the project is and where it's going.
 - [CONTRIBUTING.md](CONTRIBUTING.md) — local quality gates and how to send a change.
 
 ## Contributing
 
-Contributions are welcome. The short version: run `bun run check` and `bun test` before you push (they're the blocking CI gates), match the existing style, and keep changes focused. Full details, including the type-check backlog and how to add a language or an agent connector, are in [CONTRIBUTING.md](CONTRIBUTING.md) and the [docs index](docs/README.md). Please also read the [Code of Conduct](CODE_OF_CONDUCT.md).
+Contributions are welcome. The short version: run `bun run check` and `bun run test` before you push (they're the blocking CI gates), match the existing style, and keep changes focused. Full details, including the type-check backlog and how to add a language or an agent connector, are in [CONTRIBUTING.md](CONTRIBUTING.md) and the [docs index](docs/README.md). Please also read the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## Privacy
 
-Local (SQLite) mode keeps your application data on your machine. Messages are still sent to the AI and translation providers you configure when those features run. See [PRIVACY.md](PRIVACY.md).
+Application data is stored in the configured turbopuffer region. Messages are also sent to the AI and translation providers you configure when those features run. See [PRIVACY.md](PRIVACY.md).
 
 ## Security
 

@@ -1,15 +1,15 @@
-import "./_db-harness.ts"; // side-effect: sets sqlite env + shared data dir (must be first)
+import "./_db-harness.ts"; // side-effect: selects the shared in-memory storage double
 import { describe, expect, test } from "bun:test";
 
 // Route-level access-control tests. These boot the real message and
-// conversation Hono routes against a real sqlite database and assert the
+// conversation Hono routes against the Database contract double and assert the
 // conversation-membership gates hold: no token -> 401, valid token but not a
 // member -> 403, member -> 200.
 //
-// The database layer is a process-wide singleton (src/lib/db/index.ts); the
-// shared _db-harness owns one data dir for the whole test process, so each test
-// just uses unique users/conversations rather than resetting the DB. App modules
-// are imported dynamically inside helpers so config.ts sees the harness env.
+// The database layer is a process-wide singleton (src/lib/db/index.ts), so each
+// test uses unique users/conversations rather than resetting shared state. App
+// modules are imported dynamically inside helpers so config.ts sees the harness
+// environment first.
 
 // signup() creates the `users` row and returns a signed session token, but does
 // not create a `profiles` row — and conversations/members/connectors all FK to

@@ -44,7 +44,7 @@ export interface Conversation {
   created_at: string;
   members: ConversationMember[];
   /** Unread agent messages (server-computed on list fetch). Live-updated
-   *  client-side via the Realtime subscription / mark-read. */
+   *  client-side when the conversation is opened / marked read. */
   unread_count?: number;
 }
 
@@ -57,6 +57,7 @@ export interface Message {
   language: string | null;
   translation: string | null;
   translations: Record<string, string>;
+  transliterations?: Record<string, string>;
   corrections: Correction[];
   next_challenge: string | null;
   is_agent?: boolean;
@@ -116,7 +117,7 @@ export interface FiloDocumentJson {
 }
 
 // User-scoped reactive state. Per-conversation state (messages, draft,
-// review, working, unread, realtime) lives on the Chat model in
+// review, working, unread, message refresh) lives on the Chat model in
 // chat.svelte.ts — see ChatStore. These three are the only truly global,
 // not-conversation-scoped pieces.
 export const user = $state<{ value: User | null }>({ value: null });

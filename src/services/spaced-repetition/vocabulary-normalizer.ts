@@ -1,13 +1,17 @@
 import type { Database } from "../../lib/db/index.ts";
-import { lookupDictionary } from "../references/dictionary.ts";
+import { lookupDictionary, type DictionarySense } from "../references/dictionary.ts";
 
 export interface NormalizedVocabularyTerm {
   original: string;
   term: string;
   language: string;
   source_term: string | null;
+  source_url: string | null;
+  target_source_url: string | null;
   form_description: string | null;
   definition: string | null;
+  definitions: string[];
+  senses: DictionarySense[];
   lookup_source: "wiktionary" | "local" | null;
   lookup_status: "found" | "not-found" | "error";
   lookup_error: string | null;
@@ -62,8 +66,12 @@ export async function normalizeVocabularyTerm(
       term: original,
       language,
       source_term: null,
+      source_url: null,
+      target_source_url: null,
       form_description: null,
       definition: null,
+      definitions: [],
+      senses: [],
       lookup_source: null,
       lookup_status: "not-found",
       lookup_error: null,
@@ -84,8 +92,12 @@ export async function normalizeVocabularyTerm(
       term: normalizeLemmaSurface(original, language),
       language,
       source_term: null,
+      source_url: null,
+      target_source_url: null,
       form_description: null,
       definition: null,
+      definitions: [],
+      senses: [],
       lookup_source: null,
       lookup_status: "error",
       lookup_error: lookupError,
@@ -109,8 +121,12 @@ export async function normalizeVocabularyTerm(
     term: normalizeLemmaSurface(lemma, language),
     language,
     source_term: lookup?.source_term ?? null,
+    source_url: lookup?.source_url ?? null,
+    target_source_url: lookup?.target_source_url ?? null,
     form_description: lookup?.form_description ?? null,
     definition: lookup?.definitions?.[0] ?? null,
+    definitions: lookup?.definitions ?? [],
+    senses: lookup?.senses ?? [],
     lookup_source: lookup?.source ?? (hasEntry ? "local" : null),
     lookup_status: hasEntry ? "found" : "not-found",
     lookup_error: null,

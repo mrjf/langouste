@@ -18,7 +18,7 @@ test.describe("Orphaned conversations", () => {
     void bId;
 
     await page.goto("/");
-    await page.getByRole("button", { name: "+ New" }).click();
+    await page.getByRole("button", { name: "New", exact: true }).click();
     // Click the first (conn-a).
     await page.getByRole("button", { name: /conn-a/ }).click();
     await sendMessage(page, "first");

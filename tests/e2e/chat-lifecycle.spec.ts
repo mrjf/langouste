@@ -15,7 +15,7 @@ test.describe("Chat lifecycle", () => {
     await page.goto("/");
 
     // Open the new-chat dialog.
-    await page.getByRole("button", { name: "+ New" }).click();
+    await page.getByRole("button", { name: "New", exact: true }).click();
     // Pick the stub connection.
     await page.getByRole("button", { name: /stub/i }).click();
 
@@ -43,7 +43,7 @@ test.describe("Chat lifecycle", () => {
     await seedConnector(request, "stub");
 
     await page.goto("/");
-    await page.getByRole("button", { name: "+ New" }).click();
+    await page.getByRole("button", { name: "New", exact: true }).click();
     await page.getByRole("button", { name: /stub/i }).click();
     await typeMessage(page, "Hello there");
     await page.keyboard.press("Enter");
@@ -60,6 +60,33 @@ test.describe("Chat lifecycle", () => {
     expect(userMsg?.raw_text).toBe("Hello there");
     expect(agentMsg?.raw_text).toBe("ok");
   });
+
+  test("shows and hides every configured message language", async ({ page, request }) => {
+    const api = new TestApi(request);
+    await api.setDefaultAgentReply("Bien sûr");
+    await setLearningLanguages(request, ["fr", "es"]);
+    await seedConnector(request, "stub");
+
+    await page.goto("/");
+    await page.getByRole("button", { name: "New", exact: true }).click();
+    await page.getByRole("button", { name: /stub/i }).click();
+    await typeMessage(page, "Bonjour");
+    await page.keyboard.press("Enter");
+    await expect(page.locator(".messages .message-bubble")).toHaveCount(2, { timeout: 15_000 });
+
+    const firstBubble = page.locator(".messages .message-bubble").first();
+    await firstBubble.getByRole("button", { name: "🇪🇸 es" }).click();
+    await expect(page.locator(".messages .details")).toHaveCount(1);
+    await page.getByRole("button", { name: "Show all languages" }).click();
+    await expect(page.getByRole("button", { name: "Hide all languages" })).toBeVisible();
+    await expect(page.locator(".messages .details")).toHaveCount(2);
+    await expect(
+      page.locator(".messages .details").getByText("🇪🇸 es", { exact: true }),
+    ).toHaveCount(2);
+
+    await page.getByRole("button", { name: "Hide all languages" }).click();
+    await expect(page.locator(".messages .details")).toHaveCount(0);
+  });
 });
 
 // --- helpers local to this file ---
@@ -71,6 +98,24 @@ async function seedConnector(request: APIRequestContext, name: string): Promise<
     data: { name, type: "stub", config: {} },
   });
   return (await res.json()).connector_id;
+}
+
+async function setLearningLanguages(
+  request: APIRequestContext,
+  languages: string[],
+): Promise<void> {
+  const token = (await (await request.post("/api/auth/local")).json()).session.access_token;
+  const res = await request.patch("/api/profile", {
+    headers: { Authorization: `Bearer ${token}` },
+    data: {
+      learning_languages: languages.map((lang) => ({
+        lang,
+        cefr_level: "A1",
+        assessed_at: "",
+      })),
+    },
+  });
+  if (!res.ok()) throw new Error(`profile update failed: ${res.status()} ${await res.text()}`);
 }
 
 async function typeMessage(page: import("@playwright/test").Page, text: string): Promise<void> {

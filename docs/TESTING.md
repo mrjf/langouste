@@ -4,7 +4,7 @@ Five layers, each with a different job. Confusing them produces either flaky CI 
 
 1. **Unit** — pure functions in isolation. Sub-millisecond.
 2. **Contract** — service-to-service interface verification with mocks.
-3. **Integration** — real database, real HTTP, stubbed LLMs.
+3. **Integration** — real turbopuffer namespace, real HTTP, stubbed LLMs.
 4. **End-to-end** — real browser, real backend, recorded-or-live LLMs.
 5. **Pedagogical eval** — LLM-graded quality checks against fixed fixtures.
 
@@ -26,7 +26,7 @@ Coverage targets:
 Runtime target: full unit suite < 2 s. Run on every save in watch mode.
 
 ```bash
-bun test tests/services/
+bun run test
 ```
 
 ## Layer 2 — Contract tests
@@ -46,13 +46,15 @@ Runtime target: full contract suite < 10 s. Run on PR and pre-commit.
 
 ## Layer 3 — Integration tests
 
-What belongs here: API routes against a real Postgres, with LLMs stubbed to deterministic responses.
+What belongs here: API routes against a disposable turbopuffer namespace prefix,
+with LLMs stubbed to deterministic responses.
 
 Test harness:
 
-- `docker compose up -d` brings up Postgres + GoTrue + Realtime.
-- `bun run migrate` against the test DB applies all migrations.
-- Each test acquires an isolated schema (`test_<testname>_<uuid>`), runs its assertions, drops the schema.
+- A restricted test API key targets a dedicated turbopuffer account or region.
+- Each run gets an isolated `TURBOPUFFER_NAMESPACE_PREFIX` containing a UUID.
+- `bun run migrate` validates the connection before the suite starts.
+- The harness deletes only namespaces bearing that exact generated prefix.
 - LLM calls go through a `SCENARIO_FIXTURES` env var that routes to recorded fixtures.
 
 Suite covers:
@@ -63,7 +65,8 @@ Suite covers:
 - SRS flow: trigger reviews, post quality, verify `review_log` entries and `next_review_at` deltas.
 - MCP server tools: each tool returns MCP-spec-compliant payloads (Phase 3).
 - Reference links: a correction's concept_id resolves to expected URL set.
-- Migrations: `_migrations` table advances correctly; re-running `migrate` is a no-op.
+- Storage schema: first-write schema creation is idempotent and every imported
+  logical table can be queried back.
 
 Runtime target: full integration suite < 2 min. Runs on PR.
 
@@ -156,7 +159,10 @@ Each real spec preflight-checks its dependency and **skips loudly** if missing:
 
 ### Architecture
 
-- The same `tests/e2e/harness.ts` boots the backend with an isolated SQLite DB under `/tmp`. For real tests it sets `LANGOUSTE_STUB_AI=false` so the real LLM services are wired up, but keeps `LANGOUSTE_TEST_MODE=true` so `/api/test/*` DB-reset routes are available between tests.
+- The same `tests/e2e/harness.ts` boots the backend with the isolated in-memory
+  turbopuffer contract transport. For real tests it sets
+  `LANGOUSTE_STUB_AI=false` so real LLM services are wired up, while
+  `LANGOUSTE_TEST_MODE=true` keeps `/api/test/*` reset routes available.
 - `playwright.config.real.ts` is the separate config pointing at `tests/e2e-real/`. 120s timeout per test for Claude Code's slower subprocess spawn.
 - `tests/e2e-real/helpers.ts` provides preflight checks (`requireAnthropicKey`, `requireOpenclawGateway`), a `sendAndAwaitReply(text)` that defaults to Shift+Enter force-submit (bypassing the real Opus check pipeline for prompts in the "wrong" language), and a `waitFor(pred, ms)` poller for async post-send pipelines (real Sonnet vocab extraction takes a few seconds).
 

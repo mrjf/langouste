@@ -15,6 +15,7 @@ import {
 } from "../../src/services/corpus/audio-assets.ts";
 import {
   annotateTopicLessonSourceCards,
+  auditLessonTape,
   buildLessonTapeFilo,
   buildTopicAudioLesson,
   ClaudeTopicLessonContentGenerator,
@@ -34,6 +35,7 @@ import type {
   LanguagePayload,
   LessonSegmentPayload,
   LessonTapeMetadata,
+  RenderedAudioPayload,
   SourcePhrasePayload,
   SourceSentencePayload,
   SourceWordPayload,
@@ -135,14 +137,16 @@ describe("Audio drill tape Filo pipeline", () => {
       pauseMs: 1500,
       wordPauseMs: 450,
       reviewOffsets: [1],
+      annotateBridgeTranslations: true,
     });
     const document = FiloDocument.fromJSON(lesson);
+    expect(document.metadata.reviewSchedule).toEqual({ kind: "legacy-turns", offsets: [1] });
 
     const segments = document.requireTier<LessonSegmentPayload>("lesson.segment").annotations;
     expect(segments.map((segment) => segment.payload.audioSource)).toContain("tts");
     expect(segments.map((segment) => segment.payload.audioSource)).toContain("source");
     expect(segments.map((segment) => segment.payload.audioSource)).toContain("silence");
-    expect(document.text).toContain("You will hear an English cue");
+    expect(document.text).toContain("Hungarian practice.");
     expect(document.text).not.toContain("How do you say");
     expect(document.text).not.toContain("The whole sentence means");
     expect(document.text).not.toContain("Repeat it");
@@ -179,19 +183,15 @@ describe("Audio drill tape Filo pipeline", () => {
     expect(spaced.some((annotation) => annotation.payload.phase === "recall_prompt")).toBe(true);
     expect(spaced.some((annotation) => annotation.payload.repetitionIndex === 1)).toBe(true);
 
-    const wordPaddingPauses = segments.filter(
-      (segment) =>
-        segment.payload.type === "pause" &&
-        segment.payload.itemLevel === "word" &&
-        segment.payload.pauseRole === "padding",
+    const wordSegments = segments.filter(
+      (segment) => segment.payload.itemLevel === "word" && segment.payload.audioSource === "source",
     );
-    expect(wordPaddingPauses.length).toBeGreaterThan(0);
-    expect(wordPaddingPauses.every((segment) => segment.payload.durationMs === 450)).toBe(true);
+    expect(wordSegments).toHaveLength(0);
     expect(
       segments.some(
         (segment) =>
           segment.payload.type === "pause" &&
-          segment.payload.itemLevel === "word" &&
+          segment.payload.itemLevel === "sentence" &&
           segment.payload.pauseRole === "response" &&
           segment.payload.durationMs === 1500,
       ),
@@ -203,6 +203,73 @@ describe("Audio drill tape Filo pipeline", () => {
 
     const trainedWords = document.requireTier("word").annotations;
     expect(trainedWords.map((word) => document.textOf(word))).not.toContain("Hello");
+  });
+
+  test("schedules reviews on the planned lesson clock and defers events not due at EOF", async () => {
+    const sourceBase = buildSourceTranscriptFilo(fixtureTranscript(), {
+      title: "Hungarian timed reviews",
+      sourceLanguage: "hu",
+      sourceUrl: "https://example.com/hu.mp3",
+    });
+    const translated = await annotateSourceTranslations(
+      sourceBase,
+      new EchoTranslationProvider(),
+      "en",
+    );
+    const source = annotateTrainingSentences(translated, extractedSentencesFor(translated), "en");
+    const lesson = await buildLessonTapeFilo(source, new EchoTranslationProvider(), {
+      title: "Hungarian timed reviews",
+      sourceLanguage: "hu",
+      bridgeLanguage: "en",
+      sourceUrl: "https://example.com/hu.mp3",
+      maxItems: 2,
+      reviewIntervalsMs: [0, 1_000_000],
+    });
+    const document = FiloDocument.fromJSON(lesson);
+    const recallPrompts = document
+      .requireTier<LessonSegmentPayload>("lesson.segment")
+      .annotations.filter((segment) => segment.payload.type === "recall_prompt");
+
+    expect(document.metadata.reviewSchedule).toEqual({
+      kind: "elapsed-time",
+      intervalsMs: [0, 1_000_000],
+    });
+    expect(document.metadata.scheduledReviewCount).toBe(4);
+    expect(document.metadata.emittedReviewCount).toBe(2);
+    expect(document.metadata.deferredReviewCount).toBe(2);
+    expect(recallPrompts).toHaveLength(2);
+    expect(
+      recallPrompts.every(
+        (segment) =>
+          segment.payload.plannedStartMs !== undefined &&
+          segment.payload.dueAtMs !== undefined &&
+          segment.payload.plannedStartMs >= segment.payload.dueAtMs,
+      ),
+    ).toBe(true);
+    const quality = auditLessonTape(lesson);
+    expect(quality.metrics.reviewPromptCount).toBe(2);
+    expect(quality.metrics.deferredReviewCount).toBe(2);
+    expect(quality.metrics.plannedEarlyReviewCount).toBe(0);
+
+    const defaultLesson = await buildLessonTapeFilo(source, new EchoTranslationProvider(), {
+      title: "Hungarian default timed reviews",
+      sourceLanguage: "hu",
+      bridgeLanguage: "en",
+      sourceUrl: "https://example.com/hu.mp3",
+      maxItems: 1,
+    });
+    const defaultDocument = FiloDocument.fromJSON(defaultLesson);
+    expect(defaultDocument.metadata.reviewSchedule).toEqual({
+      kind: "elapsed-time",
+      intervalsMs: [25_000, 120_000],
+    });
+    expect(defaultDocument.metadata.emittedReviewCount).toBe(0);
+    expect(defaultDocument.metadata.deferredReviewCount).toBe(2);
+    expect(
+      defaultDocument
+        .requireTier<LessonSegmentPayload>("lesson.segment")
+        .annotations.some((segment) => segment.payload.type === "recall_prompt"),
+    ).toBe(false);
   });
 
   test("uses the most isolated matching word timing for word-level source audio", async () => {
@@ -235,6 +302,7 @@ describe("Audio drill tape Filo pipeline", () => {
       pauseMs: 1500,
       wordPauseMs: 450,
       reviewOffsets: [],
+      drillWords: true,
     });
     const document = FiloDocument.fromJSON(lesson);
     const wordSourceSegments = document
@@ -257,6 +325,288 @@ describe("Audio drill tape Filo pipeline", () => {
         (segment) => segment.payload.sourceStartMs === 2000 && segment.payload.sourceEndMs === 2250,
       ),
     ).toBe(true);
+  });
+
+  test("deduplicates corrected utterances, chooses clean takes, and sizes response windows", async () => {
+    const sourceBase = buildSourceTranscriptFilo(qualityFixtureTranscript(), {
+      title: "Hungarian quality fixture",
+      sourceLanguage: "hu",
+      sourceUrl: "https://example.com/quality.mp3",
+    });
+    expect(sourceBase.metadata.language).toBe("hu");
+    const sourceDocument = FiloDocument.fromJSON(sourceBase);
+    const sentences = sourceDocument.requireTier<SourceSentencePayload>("sentence").annotations;
+    const extracted: ExtractedSentenceReference[] = sentences.map((sentence, index) => {
+      const text = sourceDocument.textOf(sentence);
+      const fixtures = [
+        { correctedText: "Jó napot!", translation: "Hello!", teachingScore: 0.9 },
+        { correctedText: "Jó napot!", translation: "Hello!", teachingScore: 0.9 },
+        { correctedText: "És maga?", translation: "And you?", teachingScore: 1 },
+        {
+          correctedText: "Jó estét, kisúr!",
+          translation: "Good evening, Mr. Little!",
+          teachingScore: 0.8,
+        },
+      ] as const;
+      const fixture = fixtures[index];
+      if (!fixture) throw new Error(`Missing extracted fixture ${index}`);
+      return {
+        sourceTierId: "sentence",
+        sourceAnnotationId: sentence.id,
+        text,
+        language: "hun",
+        fullSentence: true,
+        correctedText: fixture.correctedText,
+        translation: fixture.translation,
+        confidence: 0.99,
+        reason: "quality fixture",
+        lessonEligible: true,
+        teachingScore: fixture.teachingScore,
+        qualityFlags: [],
+      };
+    });
+    const source = annotateTrainingSentences(sourceBase, extracted, "en");
+    const lesson = await buildLessonTapeFilo(source, new EchoTranslationProvider(), {
+      title: "Hungarian quality fixture",
+      sourceLanguage: "hu",
+      bridgeLanguage: "en",
+      sourceUrl: "https://example.com/quality.mp3",
+      maxItems: 3,
+      reviewIntervalsMs: [0],
+      targetTextOverrides: { "Jó estét, kisúr!": "Jó estét, Kis úr!" },
+    });
+    const document = FiloDocument.fromJSON(lesson);
+    const segments = document.requireTier<LessonSegmentPayload>("lesson.segment").annotations;
+    const meanings = segments.filter((segment) => segment.payload.type === "meaning");
+    expect(meanings).toHaveLength(3);
+    expect(meanings.map((segment) => document.textOf(segment))).toEqual([
+      "Hello!",
+      "And you?",
+      "Good evening, Mr. Little!",
+    ]);
+
+    const targetSource = segments.filter(
+      (segment) => segment.payload.type === "source" && segment.payload.itemLevel === "sentence",
+    );
+    expect(targetSource.map((segment) => document.textOf(segment))).toContain("Jó estét, Kis úr!");
+    const helloAnswer = segments.find(
+      (segment) => segment.payload.type === "answer" && document.textOf(segment) === "Jó napot!",
+    );
+    expect(helloAnswer?.payload.sourceStartMs).toBe(2000);
+
+    const responsePauses = segments.filter(
+      (segment) => segment.payload.type === "pause" && segment.payload.pauseRole === "response",
+    );
+    const imitationPauses = responsePauses
+      .filter((segment) => segment.payload.responseMode === "imitation")
+      .map((segment) => segment.payload.durationMs);
+    const recallPauses = responsePauses
+      .filter((segment) => segment.payload.responseMode === "recall")
+      .map((segment) => segment.payload.durationMs);
+    expect(imitationPauses).toContain(2400);
+    expect(imitationPauses).toContain(5500);
+    expect(recallPauses).toContain(3300);
+    expect(recallPauses).toContain(6500);
+    expect(recallPauses.every((duration) => typeof duration === "number" && duration >= 3300)).toBe(
+      true,
+    );
+    expect(
+      segments.some(
+        (segment) =>
+          segment.payload.itemLevel === "word" && segment.payload.audioSource === "source",
+      ),
+    ).toBe(false);
+    const quality = auditLessonTape(lesson);
+    expect(quality.passed).toBe(true);
+    expect(quality.metrics.duplicateIntroductionCount).toBe(0);
+
+    const broken = structuredClone(lesson);
+    const brokenSegments = broken.tiers
+      .find((tier) => tier.id === "lesson.segment")
+      ?.annotations.toSorted(
+        (left, right) =>
+          (left.payload as unknown as LessonSegmentPayload).order -
+          (right.payload as unknown as LessonSegmentPayload).order,
+      );
+    const responseIndex =
+      brokenSegments?.findIndex(
+        (segment) => (segment.payload as unknown as LessonSegmentPayload).pauseRole === "response",
+      ) ?? -1;
+    const following = brokenSegments?.[responseIndex + 1]?.payload as unknown as
+      | LessonSegmentPayload
+      | undefined;
+    if (!following) throw new Error("Missing answer after fixture response pause");
+    following.type = "source";
+    const brokenQuality = auditLessonTape(broken);
+    expect(
+      brokenQuality.issues.some((issue) => issue.includes("immediately followed by its answer")),
+    ).toBe(true);
+  });
+
+  test("applies an exact curated item order, rotates review prompts and takes, and frames passive dialogue", async () => {
+    const sourceBase = buildSourceTranscriptFilo(qualityFixtureTranscript(), {
+      title: "Hungarian curated plan fixture",
+      sourceLanguage: "hu",
+      sourceUrl: "https://example.com/quality.mp3",
+    });
+    const sourceDocument = FiloDocument.fromJSON(sourceBase);
+    const fixtures = [
+      { correctedText: "Jó napot!", translation: "Hello!", teachingScore: 0.9 },
+      { correctedText: "Jó napot!", translation: "Hello!", teachingScore: 0.9 },
+      { correctedText: "És maga?", translation: "And you?", teachingScore: 1 },
+      {
+        correctedText: "Jó estét, kisúr!",
+        translation: "Good evening, Mr. Little!",
+        teachingScore: 0.8,
+      },
+    ] as const;
+    const extracted: ExtractedSentenceReference[] = sourceDocument
+      .requireTier<SourceSentencePayload>("sentence")
+      .annotations.map((sentence, index) => {
+        const fixture = fixtures[index];
+        if (!fixture) throw new Error(`Missing curated fixture ${index}`);
+        return {
+          sourceTierId: "sentence",
+          sourceAnnotationId: sentence.id,
+          text: sourceDocument.textOf(sentence),
+          language: "hu",
+          fullSentence: true,
+          correctedText: fixture.correctedText,
+          translation: fixture.translation,
+          confidence: 0.99,
+          reason: "curated plan fixture",
+          lessonEligible: true,
+          teachingScore: fixture.teachingScore,
+          qualityFlags: [],
+        };
+      });
+    const source = annotateTrainingSentences(sourceBase, extracted, "en");
+    const buildOptions = {
+      title: "Hungarian curated plan fixture",
+      sourceLanguage: "hu",
+      bridgeLanguage: "en",
+      sourceUrl: "https://example.com/quality.mp3",
+      maxItems: 1,
+      reviewIntervalsMs: [0, 0, 0] as number[],
+      targetTextOverrides: { "Jó estét, kisúr!": "Jó estét, Kis úr!" },
+    };
+    const lesson = await buildLessonTapeFilo(source, new EchoTranslationProvider(), {
+      ...buildOptions,
+      lessonPlan: {
+        itemOrder: ["És maga?", "Jó napot!", "Jó estét, Kis úr!"],
+        reviewPrompts: {
+          "Jó napot!": [
+            "You meet someone during the day. Greet them politely.",
+            "You enter a shop. Greet the clerk.",
+          ],
+        },
+        dialogue: ["Jó napot!", "És maga?", "Jó napot!"],
+      },
+    });
+    const document = FiloDocument.fromJSON(lesson);
+    const segments = document.requireTier<LessonSegmentPayload>("lesson.segment").annotations;
+    expect(
+      segments
+        .filter((segment) => segment.payload.type === "meaning")
+        .map((segment) => document.textOf(segment)),
+    ).toEqual(["And you?", "Hello!", "Good evening, Mr. Little!"]);
+
+    const helloItemId = segments.find(
+      (segment) => segment.payload.type === "meaning" && document.textOf(segment) === "Hello!",
+    )?.payload.itemId;
+    if (!helloItemId) throw new Error("Missing planned hello item");
+    const helloPrompts = segments
+      .filter(
+        (segment) =>
+          segment.payload.type === "recall_prompt" && segment.payload.itemId === helloItemId,
+      )
+      .map((segment) => ({ text: document.textOf(segment), mode: segment.payload.promptMode }));
+    expect(helloPrompts).toEqual([
+      {
+        text: "You meet someone during the day. Greet them politely.",
+        mode: "situation",
+      },
+      { text: "You enter a shop. Greet the clerk.", mode: "situation" },
+      {
+        text: "You meet someone during the day. Greet them politely.",
+        mode: "situation",
+      },
+    ]);
+    expect(
+      segments.some(
+        (segment) =>
+          segment.payload.type === "recall_prompt" &&
+          document.textOf(segment) === "And you?" &&
+          segment.payload.promptMode === "translation",
+      ),
+    ).toBe(true);
+
+    const dialogueSources = segments.filter(
+      (segment) =>
+        segment.payload.activity === "dialogue" && segment.payload.audioSource === "source",
+    );
+    for (const pass of ["opening", "closing"] as const) {
+      expect(
+        dialogueSources
+          .filter((segment) => segment.payload.dialoguePass === pass)
+          .toSorted(
+            (left, right) => (left.payload.dialogueIndex ?? 0) - (right.payload.dialogueIndex ?? 0),
+          )
+          .map((segment) => document.textOf(segment)),
+      ).toEqual(["Jó napot!", "És maga?", "Jó napot!"]);
+    }
+    expect(
+      segments
+        .filter(
+          (segment) =>
+            segment.payload.activity === "dialogue" && segment.payload.audioSource === "tts",
+        )
+        .map((segment) => document.textOf(segment)),
+    ).toEqual(["First, listen.", "Now listen again."]);
+    expect(
+      segments.some(
+        (segment) =>
+          segment.payload.activity === "dialogue" && segment.payload.pauseRole === "response",
+      ),
+    ).toBe(false);
+
+    const helloSources = segments.filter(
+      (segment) =>
+        segment.payload.audioSource === "source" && segment.payload.itemId === helloItemId,
+    );
+    expect(new Set(helloSources.map((segment) => segment.payload.sourceStartMs))).toEqual(
+      new Set([0, 2000]),
+    );
+    expect(new Set(helloSources.map((segment) => segment.payload.itemId))).toEqual(
+      new Set([helloItemId]),
+    );
+    expect((document.metadata.sourceTakeCounts as Record<string, number>)[helloItemId]).toBe(2);
+    const quality = auditLessonTape(lesson);
+    expect(quality.passed).toBe(true);
+    expect(quality.metrics.dialogueSourceSegmentCount).toBe(6);
+    expect(quality.metrics.distinctSourceTakeCount).toBeGreaterThan(3);
+
+    await expect(
+      buildLessonTapeFilo(source, new EchoTranslationProvider(), {
+        ...buildOptions,
+        lessonPlan: { itemOrder: ["Jó napot!", "jó napot"] },
+      }),
+    ).rejects.toThrow("duplicate target");
+    await expect(
+      buildLessonTapeFilo(source, new EchoTranslationProvider(), {
+        ...buildOptions,
+        lessonPlan: { itemOrder: ["Missing phrase"] },
+      }),
+    ).rejects.toThrow("not an eligible exact timed source item");
+    await expect(
+      buildLessonTapeFilo(source, new EchoTranslationProvider(), {
+        ...buildOptions,
+        lessonPlan: {
+          itemOrder: ["Jó napot!"],
+          reviewPrompts: { "Jó napot!": [" "] },
+        },
+      }),
+    ).rejects.toThrow("must be a nonempty string");
   });
 
   test("caches source downloads and restores later output paths without refetching", async () => {
@@ -323,17 +673,19 @@ describe("Audio drill tape Filo pipeline", () => {
     const dir = await mkdtemp(join(tmpdir(), "langouste-audio-render-"));
     try {
       const ffmpegPath = await writeFakeFfmpeg(dir);
+      const ffprobePath = await writeFakeFfprobe(dir);
       const logPath = join(dir, "ffmpeg.log");
       const sourceAudioPath = join(dir, "source.mp3");
       await writeFile(sourceAudioPath, new Uint8Array([0, 1, 2, 3]));
-      const lesson = await fixtureLesson();
+      const lesson = await fixtureLesson([0]);
 
-      await renderLessonAudio(lesson, {
+      const rendered = await renderLessonAudio(lesson, {
         sourceAudioPath,
         outputDir: dir,
         audioProvider: new FakeAudioProvider(),
         db: new MemoryDatabase(),
         ffmpegPath,
+        ffprobePath,
         normalizeAudio: true,
         targetLufs: -19,
         truePeakDb: -2,
@@ -355,6 +707,39 @@ describe("Audio drill tape Filo pipeline", () => {
           .every((args) => !args.includes("-af")),
       ).toBe(true);
       expect(calls.filter((args) => args.includes("-af")).length).toBeGreaterThanOrEqual(2);
+      const timeline = rendered.lesson.tiers
+        .find((tier) => tier.id === "audio:generated")
+        ?.annotations.map((annotation) => annotation.payload as RenderedAudioPayload)
+        .toSorted((left, right) => left.order - right.order);
+      expect(timeline?.every((payload) => payload.durationMs === 100)).toBe(true);
+      expect(timeline?.at(0)?.timelineStartMs).toBe(0);
+      expect(timeline?.at(-1)?.timelineEndMs).toBe((timeline?.length ?? 0) * 100);
+      expect(
+        timeline
+          ?.slice(1)
+          .every((payload, index) => payload.timelineStartMs === timeline[index]?.timelineEndMs),
+      ).toBe(true);
+      expect(auditLessonTape(rendered.lesson).metrics.renderedTimelineDurationMs).toBe(
+        (timeline?.length ?? 0) * 100,
+      );
+
+      const earlyLesson = structuredClone(rendered.lesson);
+      const earlyPrompt = earlyLesson.tiers
+        .find((tier) => tier.id === "lesson.segment")
+        ?.annotations.find(
+          (annotation) =>
+            (annotation.payload as unknown as LessonSegmentPayload).type === "recall_prompt",
+        );
+      if (!earlyPrompt) throw new Error("Missing rendered recall prompt fixture");
+      (earlyPrompt.payload as unknown as LessonSegmentPayload).scheduledIntervalMs = 10_000;
+      const earlyQuality = auditLessonTape(earlyLesson);
+      expect(earlyQuality.passed).toBe(false);
+      expect(earlyQuality.metrics.renderedEarlyReviewCount).toBe(1);
+      expect(
+        earlyQuality.issues.some((issue) =>
+          issue.includes("arrived materially before their scheduled interval"),
+        ),
+      ).toBe(true);
     } finally {
       await rm(dir, { recursive: true, force: true });
     }
@@ -364,6 +749,7 @@ describe("Audio drill tape Filo pipeline", () => {
     const dir = await mkdtemp(join(tmpdir(), "langouste-audio-render-"));
     try {
       const ffmpegPath = await writeFakeFfmpeg(dir);
+      const ffprobePath = await writeFakeFfprobe(dir);
       const logPath = join(dir, "ffmpeg.log");
       const sourceAudioPath = join(dir, "source.mp3");
       const db = new MemoryDatabase();
@@ -391,7 +777,9 @@ describe("Audio drill tape Filo pipeline", () => {
         audioProvider,
         db,
         ffmpegPath,
+        ffprobePath,
         normalizeAudio: true,
+        trimTtsSilence: false,
       });
 
       const calls = (await readFile(logPath, "utf8"))
@@ -408,10 +796,57 @@ describe("Audio drill tape Filo pipeline", () => {
     }
   });
 
+  test("trims only TTS edges and preserves an internal pause", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "langouste-audio-trim-"));
+    try {
+      const syntheticPath = join(dir, "synthetic.mp3");
+      await runAudioCommand([
+        "ffmpeg",
+        "-y",
+        "-f",
+        "lavfi",
+        "-i",
+        "aevalsrc=if(between(t\\,0.2\\,0.5)+between(t\\,0.7\\,1.0)\\,0.3*sin(2*PI*440*t)\\,0):s=44100:d=1.2",
+        "-ac",
+        "2",
+        "-b:a",
+        "128k",
+        syntheticPath,
+      ]);
+      const bytes = new Uint8Array(await readFile(syntheticPath));
+      const rendered = await renderLessonAudio(singleTtsLesson("Two sentences. Still here."), {
+        sourceAudioPath: syntheticPath,
+        outputDir: dir,
+        outputFileName: "trimmed.mp3",
+        audioProvider: new BytesAudioProvider(bytes),
+        db: new MemoryDatabase(),
+        normalizeAudio: false,
+        trimTtsSilence: true,
+      });
+      const duration = Number.parseFloat(
+        await runAudioCommand([
+          "ffprobe",
+          "-v",
+          "error",
+          "-show_entries",
+          "format=duration",
+          "-of",
+          "default=noprint_wrappers=1:nokey=1",
+          rendered.outputPath,
+        ]),
+      );
+      expect(duration).toBeGreaterThan(0.7);
+      expect(duration).toBeLessThan(1.15);
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
   test("pads source clip extraction while preserving original source timings", async () => {
     const dir = await mkdtemp(join(tmpdir(), "langouste-audio-render-"));
     try {
       const ffmpegPath = await writeFakeFfmpeg(dir);
+      const ffprobePath = await writeFakeFfprobe(dir);
       const logPath = join(dir, "ffmpeg.log");
       const sourceAudioPath = join(dir, "source.mp3");
       await writeFile(sourceAudioPath, new Uint8Array([1, 2, 3]));
@@ -424,6 +859,7 @@ describe("Audio drill tape Filo pipeline", () => {
           audioProvider: new FakeAudioProvider(),
           db: new MemoryDatabase(),
           ffmpegPath,
+          ffprobePath,
           sourceClipPaddingMs: 75,
         },
       );
@@ -459,6 +895,7 @@ describe("Audio drill tape Filo pipeline", () => {
     const dir = await mkdtemp(join(tmpdir(), "langouste-audio-render-"));
     try {
       const ffmpegPath = await writeFakeFfmpeg(dir);
+      const ffprobePath = await writeFakeFfprobe(dir);
       const logPath = join(dir, "ffmpeg.log");
       const sourceAudioPath = join(dir, "source.mp3");
       const db = new MemoryDatabase();
@@ -481,6 +918,7 @@ describe("Audio drill tape Filo pipeline", () => {
         audioProvider: new FakeAudioProvider(),
         db,
         ffmpegPath,
+        ffprobePath,
         normalizeAudio: true,
       });
 
@@ -850,6 +1288,20 @@ class FakeAudioProvider implements AudioProvider {
   }
 }
 
+class BytesAudioProvider implements AudioProvider {
+  readonly name = "bytes-audio";
+
+  constructor(private readonly bytes: Uint8Array) {}
+
+  isAvailable(): boolean {
+    return true;
+  }
+
+  async synthesize(): Promise<{ audio: Uint8Array; contentType: string }> {
+    return { audio: this.bytes, contentType: "audio/mpeg" };
+  }
+}
+
 class FakeTopicLessonContentGenerator implements TopicLessonContentGenerator {
   async generate(_input: TopicLessonContentInput) {
     return {
@@ -947,7 +1399,9 @@ class MemoryDatabase implements Database {
   }
 }
 
-async function fixtureLesson(): Promise<Awaited<ReturnType<typeof buildLessonTapeFilo>>> {
+async function fixtureLesson(
+  reviewIntervalsMs?: number[],
+): Promise<Awaited<ReturnType<typeof buildLessonTapeFilo>>> {
   const sourceBase = buildSourceTranscriptFilo(fixtureTranscript(), {
     title: "Hungarian Unit 01A",
     sourceLanguage: "hu",
@@ -968,7 +1422,7 @@ async function fixtureLesson(): Promise<Awaited<ReturnType<typeof buildLessonTap
     maxItems: 1,
     pauseMs: 100,
     wordPauseMs: 50,
-    reviewOffsets: [],
+    ...(reviewIntervalsMs ? { reviewIntervalsMs } : { reviewOffsets: [] }),
   });
 }
 
@@ -992,6 +1446,18 @@ if (args.at(-1) === "-") {
 const outputPath = args[args.length - 1];
 await mkdir(dirname(outputPath), { recursive: true });
 await writeFile(outputPath, new Uint8Array([1, 2, 3, 4]));
+`,
+  );
+  await chmod(scriptPath, 0o755);
+  return scriptPath;
+}
+
+async function writeFakeFfprobe(dir: string): Promise<string> {
+  const scriptPath = join(dir, "fake-ffprobe.js");
+  await writeFile(
+    scriptPath,
+    `#!/usr/bin/env bun
+console.log("0.100");
 `,
   );
   await chmod(scriptPath, 0o755);
@@ -1106,6 +1572,19 @@ function valueAfter(args: string[], flag: string): string | undefined {
   return index === -1 ? undefined : args[index + 1];
 }
 
+async function runAudioCommand(args: string[]): Promise<string> {
+  const process = Bun.spawn(args, { stdout: "pipe", stderr: "pipe" });
+  const [stdout, stderr, exitCode] = await Promise.all([
+    new Response(process.stdout).text(),
+    new Response(process.stderr).text(),
+    process.exited,
+  ]);
+  if (exitCode !== 0) {
+    throw new Error(`${args.join(" ")} failed with exit ${exitCode}: ${stderr}`);
+  }
+  return stdout.trim();
+}
+
 function defaultNormalization(): AudioNormalizationSettings {
   return {
     enabled: true,
@@ -1156,6 +1635,39 @@ function isolatedWordTranscript(): TimedTranscript {
       { text: " ", startSec: null, endSec: null, type: "spacing" },
       { text: "Köszönöm", startSec: 4.0, endSec: 4.5, type: "word" },
       { text: ".", startSec: null, endSec: null, type: "punctuation" },
+    ],
+  };
+}
+
+function qualityFixtureTranscript(): TimedTranscript {
+  return {
+    text: "Jó napot! Jó napot! És maga? Jó estét, kisúr!",
+    language: "hun",
+    provider: "fixture",
+    model: "fixture",
+    words: [
+      { text: "Jó", startSec: 0, endSec: 0.4, type: "word" },
+      { text: " ", startSec: null, endSec: null, type: "spacing" },
+      { text: "napot", startSec: 0.7, endSec: 1.3, type: "word" },
+      { text: "!", startSec: null, endSec: null, type: "punctuation" },
+      { text: " ", startSec: null, endSec: null, type: "spacing" },
+      { text: "Jó", startSec: 2, endSec: 2.2, type: "word" },
+      { text: " ", startSec: null, endSec: null, type: "spacing" },
+      { text: "napot", startSec: 2.3, endSec: 2.6, type: "word" },
+      { text: "!", startSec: null, endSec: null, type: "punctuation" },
+      { text: " ", startSec: null, endSec: null, type: "spacing" },
+      { text: "És", startSec: 3, endSec: 3.4, type: "word" },
+      { text: " ", startSec: null, endSec: null, type: "spacing" },
+      { text: "maga", startSec: 5.7, endSec: 6.2, type: "word" },
+      { text: "?", startSec: null, endSec: null, type: "punctuation" },
+      { text: " ", startSec: null, endSec: null, type: "spacing" },
+      { text: "Jó", startSec: 7, endSec: 7.2, type: "word" },
+      { text: " ", startSec: null, endSec: null, type: "spacing" },
+      { text: "estét", startSec: 7.3, endSec: 7.7, type: "word" },
+      { text: ",", startSec: null, endSec: null, type: "punctuation" },
+      { text: " ", startSec: null, endSec: null, type: "spacing" },
+      { text: "kisúr", startSec: 7.8, endSec: 8.2, type: "word" },
+      { text: "!", startSec: null, endSec: null, type: "punctuation" },
     ],
   };
 }

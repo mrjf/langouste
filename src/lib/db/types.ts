@@ -1,8 +1,5 @@
 /**
- * Small query-builder surface shared by both the Supabase and SQLite backends.
- *
- * Each method is async because the Supabase impl always is; the SQLite impl
- * runs synchronously under the hood but wraps in a resolved promise for parity.
+ * Small query-builder surface implemented by turbopuffer.
  *
  * We intentionally keep the surface narrow: only the operations used today by
  * src/services/database/*.ts. Growing it is cheap; shrinking it is painful.
@@ -28,6 +25,19 @@ export interface SelectOptions {
   limit?: number;
 }
 
+export interface FullTextField {
+  column: string;
+  weight?: number;
+}
+
+export interface FullTextSearchOptions {
+  fields: FullTextField[];
+  filters?: Filter[];
+  limit?: number;
+  /** Materialized attributes to return. Omit to reconstruct the complete row. */
+  columns?: string;
+}
+
 export interface Database {
   /** Return up to `limit` rows matching the filters, optionally ordered. */
   select<T = Record<string, unknown>>(table: string, options?: SelectOptions): Promise<T[]>;
@@ -48,6 +58,9 @@ export interface Database {
     conflictColumns: string[],
   ): Promise<T>;
 
+  /** Bulk upsert complete rows during migrations/backfills. */
+  bulkUpsert?(table: string, rows: Record<string, unknown>[]): Promise<void>;
+
   /** Update matching rows with the given patch. Does not return rows. */
   update(table: string, patch: Record<string, unknown>, filters: Filter[]): Promise<void>;
 
@@ -61,24 +74,21 @@ export interface Database {
   /** Delete matching rows. */
   delete(table: string, filters: Filter[]): Promise<void>;
 
-  /**
-   * Call a stored procedure / RPC. The Supabase impl calls `rpc(name, args)`;
-   * the SQLite impl dispatches to an in-process function registry (see
-   * lib/db/rpc.ts).
-   */
-  rpc<T = unknown>(name: string, args: Record<string, unknown>): Promise<T>;
+  /** Run BM25 over one or more full-text-enabled attributes. */
+  fullTextSearch?<T = Record<string, unknown>>(
+    table: string,
+    query: string,
+    options: FullTextSearchOptions,
+  ): Promise<T[]>;
 
-  /**
-   * Execute raw SQL with positional parameters. The caller is responsible for
-   * dialect compatibility — use sparingly, prefer the structured methods.
-   */
-  raw<T = Record<string, unknown>>(sql: string, params?: Scalar[]): Promise<T[]>;
+  /** Test-only destructive reset. Implementations must reject it in production. */
+  clear?(table: string): Promise<void>;
 }
 
 /**
- * Both backends expose two clients: an "admin" one that bypasses RLS and a
- * per-request one scoped to a user's JWT. In SQLite mode there is no RLS and
- * both clients are the same instance.
+ * The app validates JWTs before handing a database handle to a request.
+ * turbopuffer has no built-in row-level security, so service-layer ownership
+ * and membership filters remain mandatory.
  */
 export interface DatabaseSet {
   admin: Database;

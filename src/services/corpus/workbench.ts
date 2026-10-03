@@ -40,7 +40,7 @@ export interface WorkbenchAnalysisResult {
 
 const MAX_TRANSLATED_SPANS = 80;
 const MAX_LITERAL_FALLBACK_WORDS = 240;
-const WORKBENCH_ANALYSIS_VERSION = 4;
+const WORKBENCH_ANALYSIS_VERSION = 5;
 
 interface LiteralGloss {
   surface: string;
@@ -373,13 +373,16 @@ async function annotateWorkbenchDictionary(
         isMeaningfulLemmaChange(normalized.term, surface, language))
         ? {
             lemma: normalized.term || surface,
-            definitions: normalized.definition ? [normalized.definition] : [],
+            definitions: normalized.definitions,
+            senses: normalized.senses,
             source:
               normalized.lookup_source === "wiktionary"
                 ? "wiktionary"
                 : "langouste-local-dictionary",
-            sourceTerm: normalized.source_term,
-            formDescription: normalized.form_description,
+            sourceUrl: normalized.source_url ?? undefined,
+            targetSourceUrl: normalized.target_source_url ?? undefined,
+            sourceTerm: normalized.source_term ?? undefined,
+            formDescription: normalized.form_description ?? undefined,
           }
         : null;
     document.addAnnotation<DictionaryLookupPayload>("dictionary", {

@@ -135,9 +135,9 @@ Optional future: hosted tier for users who don't want to self-host. Priced aroun
 Critical for audience 1 and 2. Must be explicit.
 
 ```
-- Your messages stay on your machine (self-hosted) or in your Supabase
-  instance (hosted). We never send them anywhere except Anthropic's API
-  to get completions, and they're subject to Anthropic's data policy.
+- Your application data stays in your configured turbopuffer region. Message
+  content is also sent to the AI/translation providers you enable, subject to
+  their data policies.
 - No analytics by default. Optional PostHog opt-in with redacted data
   for us to improve the app. Off unless you flip it.
 - No accounts required for self-hosted mode.

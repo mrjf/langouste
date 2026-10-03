@@ -1,10 +1,9 @@
 <script lang="ts">
-  import { onMount, onDestroy } from "svelte";
+  import { onMount } from "svelte";
   import { user, profile } from "../lib/stores.svelte";
   import { chatStore } from "../lib/chat.svelte";
   import { loadSession, clearSession, loadProfile, loadLocalSession } from "../lib/auth";
   import { loadDisplaySettings } from "../lib/display-settings.svelte";
-  import { initSupabase, subscribeToAllMessages } from "../lib/supabase";
   import { api } from "../lib/api";
   import LoginForm from "./LoginForm.svelte";
   import ConversationList from "./ConversationList.svelte";
@@ -16,6 +15,8 @@
   import AudioDrillEditor from "./AudioDrillEditor.svelte";
   import ExercisePanel from "./ExercisePanel.svelte";
   import ResourcesPanel from "./ResourcesPanel.svelte";
+  import ParallelReader from "./ParallelReader.svelte";
+  import NewsPanel from "./NewsPanel.svelte";
   import NewChatDialog from "./NewChatDialog.svelte";
   import IpaToggle from "./IpaToggle.svelte";
   import FiloSourceInspector from "./FiloSourceInspector.svelte";
@@ -36,6 +37,8 @@
     | "connections"
     | "dictionary"
     | "workbench"
+    | "reader"
+    | "news"
     | "audio-drills"
     | "exercises"
     | "resources" = $state("chat");
@@ -46,9 +49,11 @@
   let profileRoute = $state("");
   let dictionaryRoute = $state("");
   let workbenchRoute = $state("");
+  let newsRoute = $state("");
   let audioDrillRoute = $state("");
   const loggedIn = $derived(!!user.value && !!profile.value);
   let updatingHash = false;
+  let newsHashNavigation: "push" | "replace" = "push";
 
   function profileRouteFromHash(hash: string): string {
     const m = hash.match(/^#\/profile(?:\/(.+))?$/);
@@ -90,6 +95,11 @@
     }
   }
 
+  function newsRouteFromHash(hash: string): string {
+    const match = hash.match(/^#\/news(?:\/(.*))?$/);
+    return match?.[1] ?? "";
+  }
+
   function audioDrillHash(route: string): string {
     return route ? `#/audio-drills/${encodeURIComponent(route)}` : "#/audio-drills";
   }
@@ -116,6 +126,10 @@
       target = dictionaryRoute ? `#/dictionary/${dictionaryRoute}` : "#/dictionary";
     } else if (view === "workbench") {
       target = workbenchHash(workbenchRoute);
+    } else if (view === "reader") {
+      target = "#/reader";
+    } else if (view === "news") {
+      target = newsRoute ? `#/news/${newsRoute}` : "#/news";
     } else if (view === "audio-drills") {
       target = audioDrillHash(audioDrillRoute);
     } else if (view === "exercises") {
@@ -128,18 +142,18 @@
     }
     if (location.hash !== target) {
       updatingHash = true;
-      history.pushState(null, "", target || location.pathname);
+      history[view === "news" && newsHashNavigation === "replace" ? "replaceState" : "pushState"](
+        null,
+        "",
+        target || location.pathname,
+      );
+      newsHashNavigation = "push";
       updatingHash = false;
     }
   });
 
   onMount(async () => {
     loadDisplaySettings();
-    initSupabase(
-      import.meta.env.VITE_SUPABASE_URL,
-      import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-    );
-
     let hasSession = loadSession();
     // Single-user local mode: auto-issue a session on every boot if we don't
     // have one already. No login screen.
@@ -154,7 +168,6 @@
       ]);
       chatStore.setConversations(convs);
       routeFromHash();
-      startUnreadSubscription();
     }
 
     routed = true;
@@ -179,6 +192,15 @@
       if (location.hash.startsWith("#/workbench")) {
         view = "workbench";
         workbenchRoute = workbenchRouteFromHash(location.hash);
+        return;
+      }
+      if (location.hash.startsWith("#/reader")) {
+        view = "reader";
+        return;
+      }
+      if (location.hash.startsWith("#/news")) {
+        view = "news";
+        newsRoute = newsRouteFromHash(location.hash);
         return;
       }
       if (location.hash.startsWith("#/audio-drills")) {
@@ -226,6 +248,15 @@
       workbenchRoute = workbenchRouteFromHash(location.hash);
       return;
     }
+    if (location.hash.startsWith("#/reader")) {
+      view = "reader";
+      return;
+    }
+    if (location.hash.startsWith("#/news")) {
+      view = "news";
+      newsRoute = newsRouteFromHash(location.hash);
+      return;
+    }
     if (location.hash.startsWith("#/audio-drills")) {
       view = "audio-drills";
       audioDrillRoute = audioDrillRouteFromHash(location.hash);
@@ -247,41 +278,14 @@
     }
   }
 
-  // Sidebar-wide Realtime subscription: a new agent message anywhere bumps
-  // that conversation's unread badge (unless it's the open chat). No-op in
-  // sqlite mode (no Realtime); badges there refresh on list reload.
-  let unsubUnread: (() => void) | null = null;
-
-  function startUnreadSubscription() {
-    if (unsubUnread) return;
-    unsubUnread = subscribeToAllMessages((msg) => {
-      if (!msg.is_agent) return; // only agent replies count as unread
-      const convId = msg.conversation_id as string | undefined;
-      if (!convId) return;
-      const chat = chatStore.get(convId);
-      // The Chat's own realtime sub ingests the message; here we only own
-      // the badge. Don't badge the conversation that's open on screen.
-      if (chat && chatStore.activeId !== convId) chat.bumpUnread();
-    });
-  }
-
-  function stopUnreadSubscription() {
-    unsubUnread?.();
-    unsubUnread = null;
-  }
-
-  onDestroy(stopUnreadSubscription);
-
   async function onAuthenticated() {
     const convs = await api.getConversations();
     chatStore.setConversations(convs);
     routeFromHash();
-    startUnreadSubscription();
     routed = true;
   }
 
   function logout() {
-    stopUnreadSubscription();
     clearSession();
     history.replaceState(null, "", location.pathname);
   }
@@ -349,18 +353,30 @@
         />
         <SidebarNavButton
           index="06"
+          label="Reader"
+          active={view === "reader"}
+          onclick={() => { view = "reader"; }}
+        />
+        <SidebarNavButton
+          index="07"
+          label="News"
+          active={view === "news"}
+          onclick={() => { view = "news"; chatStore.setActive(null); }}
+        />
+        <SidebarNavButton
+          index="08"
           label="Audio"
           active={view === "audio-drills"}
           onclick={() => { view = "audio-drills"; audioDrillRoute = ""; chatStore.setActive(null); }}
         />
         <SidebarNavButton
-          index="07"
+          index="09"
           label="Exercises"
           active={view === "exercises"}
           onclick={() => { view = "exercises"; chatStore.setActive(null); }}
         />
         <SidebarNavButton
-          index="08"
+          index="10"
           label="Resources"
           active={view === "resources"}
           onclick={() => { view = "resources"; chatStore.setActive(null); }}
@@ -393,6 +409,16 @@
         />
       {:else if view === "workbench"}
         <WorkbenchPanel route={workbenchRoute} onRouteChange={(route) => (workbenchRoute = route)} />
+      {:else if view === "reader"}
+        <ParallelReader />
+      {:else if view === "news"}
+        <NewsPanel
+          route={newsRoute}
+          onRouteChange={(route, navigation = "replace") => {
+            newsHashNavigation = navigation;
+            newsRoute = route;
+          }}
+        />
       {:else if view === "audio-drills"}
         <AudioDrillEditor
           route={audioDrillRoute}

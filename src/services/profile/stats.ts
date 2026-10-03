@@ -1,6 +1,7 @@
 import type { Database } from "../../lib/db/index.ts";
 import { ALL_DIMENSIONS, type Dimension } from "./dimensions.ts";
 import { grammarDimensionForCategory } from "./grammar-ontology.ts";
+import { listReadingInteractions } from "../database/reading-interactions.ts";
 
 export interface DimensionStat {
   dimension: Dimension;
@@ -14,6 +15,7 @@ export interface DimensionStat {
 export interface LanguageStats {
   language: string;
   messages_sent: number;
+  reading_interactions: number;
   vocab_total: number;
   vocab_by_cefr: Record<string, number>;
   vocab_mastered: number; // repetitions >= 3 AND correct recent
@@ -34,7 +36,7 @@ export async function languageStats(
   userId: string,
   language: string,
 ): Promise<LanguageStats> {
-  const [messages, vocab, gaps, activity] = await Promise.all([
+  const [messages, vocab, gaps, activity, readingInteractions] = await Promise.all([
     db.select<{ message_id: string; corrections: unknown[] | null; created_at: string }>(
       "messages",
       {
@@ -42,6 +44,7 @@ export async function languageStats(
         filters: [
           { op: "eq", column: "sender_id", value: userId },
           { op: "eq", column: "language", value: language },
+          { op: "eq", column: "is_agent", value: false },
         ],
       },
     ),
@@ -62,9 +65,11 @@ export async function languageStats(
       filters: [
         { op: "eq", column: "sender_id", value: userId },
         { op: "eq", column: "language", value: language },
+        { op: "eq", column: "is_agent", value: false },
         { op: "lte", column: "created_at", value: new Date().toISOString() },
       ],
     }),
+    listReadingInteractions(db, userId, { language, limit: 10_000 }),
   ]);
 
   const vocab_by_cefr: Record<string, number> = {};
@@ -106,6 +111,7 @@ export async function languageStats(
   return {
     language,
     messages_sent: messages.length,
+    reading_interactions: readingInteractions.length,
     vocab_total: vocab.length,
     vocab_by_cefr,
     vocab_mastered,

@@ -7,9 +7,8 @@ import { join, resolve } from "node:path";
 /**
  * Spin up a completely isolated Langouste backend for integration tests.
  *
- * - Creates a fresh data directory under /tmp, so the SQLite file is
- *   disposable and tests don't share state with your dev instance.
- * - Runs bun scripts/migrate.ts against that data dir.
+ * - Uses the ephemeral turbopuffer contract transport, isolated per process.
+ * - Runs the migration command to validate the test configuration.
  * - Spawns `bun src/main.ts` with LANGOUSTE_TEST_MODE=true, a random port,
  *   and all the knobs test mode needs.
  * - Polls /health until the server responds, then returns.
@@ -61,11 +60,10 @@ export async function setupTestApp(options: TestAppOptions = {}): Promise<TestAp
 
   const env: Record<string, string> = {
     ...process.env,
-    DATABASE_MODE: "sqlite",
-    LANGOUSTE_DATA_DIR: dataDir,
     LANGOUSTE_JWT_SECRET: "test-jwt-secret-do-not-use-in-production",
     LANGOUSTE_SINGLE_USER: "true",
     LANGOUSTE_TEST_MODE: "true",
+    LANGOUSTE_TEST_STORAGE: "memory",
     LANGOUSTE_STUB_AI: stubAi ? "true" : "false",
     ANTHROPIC_API_KEY: anthropicKey,
     PORT: String(port),
@@ -154,7 +152,6 @@ async function ensureClientBuild(): Promise<void> {
   console.log("[harness] Building client bundle (first run)...");
   const result = await runOnce(["bun", "run", "build"], {
     ...process.env,
-    VITE_DATABASE_MODE: "sqlite",
     VITE_SINGLE_USER: "true",
   });
   if (result.code !== 0) {

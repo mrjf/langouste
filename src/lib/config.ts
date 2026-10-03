@@ -4,14 +4,23 @@ function required(name: string): string {
   return value;
 }
 
-function requiredIf(mode: string, currentMode: string, name: string): string {
-  if (mode !== currentMode) return "";
-  return required(name);
+const testMode = process.env.LANGOUSTE_TEST_MODE === "true";
+const requestedTestStorage = process.env.LANGOUSTE_TEST_STORAGE?.trim().toLowerCase();
+if (requestedTestStorage && requestedTestStorage !== "memory") {
+  throw new Error(`LANGOUSTE_TEST_STORAGE must be 'memory', got: ${requestedTestStorage}`);
 }
-
-const databaseMode = (process.env.DATABASE_MODE ?? "supabase") as "supabase" | "sqlite";
-if (databaseMode !== "supabase" && databaseMode !== "sqlite") {
-  throw new Error(`DATABASE_MODE must be 'supabase' or 'sqlite', got: ${databaseMode}`);
+if (requestedTestStorage === "memory" && !testMode) {
+  throw new Error("LANGOUSTE_TEST_STORAGE=memory is only allowed with LANGOUSTE_TEST_MODE=true");
+}
+const testStorage = requestedTestStorage === "memory" ? "memory" : null;
+const turbopufferNamespacePrefix = process.env.TURBOPUFFER_NAMESPACE_PREFIX?.trim() || "langouste";
+if (
+  !/^[A-Za-z0-9-_.]+$/u.test(turbopufferNamespacePrefix) ||
+  turbopufferNamespacePrefix.length > 96
+) {
+  throw new Error(
+    "TURBOPUFFER_NAMESPACE_PREFIX must match [A-Za-z0-9-_.]+ and be at most 96 characters",
+  );
 }
 
 const agentLanguageStrategy = (process.env.LANGOUSTE_AGENT_LANGUAGE_STRATEGY ?? "target-first") as
@@ -24,12 +33,14 @@ if (agentLanguageStrategy !== "target-first" && agentLanguageStrategy !== "engli
 }
 
 export const config = {
-  databaseMode,
-
-  // Supabase credentials only required when running in supabase mode.
-  supabaseUrl: requiredIf("supabase", databaseMode, "SUPABASE_URL"),
-  supabasePublishableKey: requiredIf("supabase", databaseMode, "SUPABASE_PUBLISHABLE_KEY"),
-  supabaseSecretKey: requiredIf("supabase", databaseMode, "SUPABASE_SECRET_KEY"),
+  // turbopuffer is the sole durable storage and search engine. The hosted
+  // service commits successful writes directly to object storage; Langouste
+  // does not need its own S3 bucket for inline rows and Filo documents.
+  turbopufferApiKey: testStorage ? "" : required("TURBOPUFFER_API_KEY"),
+  turbopufferRegion: process.env.TURBOPUFFER_REGION ?? "aws-us-west-2",
+  turbopufferNamespacePrefix,
+  turbopufferBaseUrl: process.env.TURBOPUFFER_BASE_URL ?? "",
+  testStorage,
 
   anthropicApiKey: required("ANTHROPIC_API_KEY"),
   translationProvider: process.env.TRANSLATION_PROVIDER ?? "claude",
@@ -58,23 +69,23 @@ export const config = {
   // Parsed + validated by the voice resolver. See docs/MODES.md / README.
   elevenLabsVoices: process.env.ELEVENLABS_VOICES ?? "",
 
-  // Local auth JWT secret (sqlite mode). Required only when DATABASE_MODE=sqlite.
-  jwtSecret: requiredIf("sqlite", databaseMode, "LANGOUSTE_JWT_SECRET"),
+  // Authentication is application-owned; turbopuffer does not provide row
+  // level auth. Routes validate these JWTs before applying ownership filters.
+  jwtSecret: required("LANGOUSTE_JWT_SECRET"),
 
-  // Single-user mode: skip signup/login entirely and auto-issue a session for
-  // a fixed local user. Default is on when running sqlite, off in supabase.
+  // Single-user mode skips signup/login and auto-issues a local session.
   // Override explicitly via LANGOUSTE_SINGLE_USER=true|false.
   singleUser: (() => {
     const raw = process.env.LANGOUSTE_SINGLE_USER?.trim().toLowerCase();
     if (raw === "true") return true;
     if (raw === "false") return false;
-    return databaseMode === "sqlite";
+    return true;
   })(),
 
   // Test mode: enables /api/test/* routes and the `stub` agent type. Safe to
   // leave on for both stub-only and real-integration test runs.
   // Must NOT be set in production.
-  testMode: process.env.LANGOUSTE_TEST_MODE === "true",
+  testMode,
 
   // Stub AI: intercept error-explainer / vocabulary-extractor / translator
   // calls with canned responses. On by default whenever testMode is on (so
@@ -85,6 +96,15 @@ export const config = {
     if (raw === "true") return true;
     if (raw === "false") return false;
     return process.env.LANGOUSTE_TEST_MODE === "true";
+  })(),
+
+  // Integrated multilingual news reader. Generated editions are cached as
+  // immutable Filo documents, then saved into each authenticated profile.
+  newsModel: process.env.LANGOUSTE_NEWS_MODEL?.trim() || "claude-sonnet-4-6",
+  newsCacheDir: process.env.LANGOUSTE_NEWS_CACHE_DIR?.trim() || "./data/news-cache",
+  newsMaxSentences: (() => {
+    const value = Number(process.env.LANGOUSTE_NEWS_MAX_SENTENCES);
+    return Number.isInteger(value) && value >= 3 && value <= 24 ? value : 14;
   })(),
 
   port: parseInt(process.env.PORT ?? "8000", 10),

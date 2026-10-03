@@ -1,24 +1,33 @@
 /**
- * Boot-time entry point for the database layer. Inspects config to pick either
- * the Supabase-backed or SQLite-backed DatabaseSet, and exposes it as a
- * process-wide singleton.
+ * Boot-time entry point for the turbopuffer database layer. Tests may opt into
+ * an ephemeral contract double; production always uses turbopuffer.
  */
 
 import { config } from "../config.ts";
-import { createSupabaseDatabaseSet } from "./supabase.ts";
-import { createSqliteDatabaseSet } from "./sqlite.ts";
-import "./rpc.ts"; // side-effect: registers SQLite RPC handlers
+import { createMemoryDatabaseSet } from "./memory.ts";
+import { createTurbopufferDatabaseSet } from "./turbopuffer.ts";
 import type { Database, DatabaseSet } from "./types.ts";
 
-export type { Database, DatabaseSet, Filter, SelectOptions } from "./types.ts";
+export type {
+  Database,
+  DatabaseSet,
+  Filter,
+  FullTextField,
+  FullTextSearchOptions,
+  SelectOptions,
+} from "./types.ts";
 
 let _set: DatabaseSet | null = null;
 
 export function db(): DatabaseSet {
   if (!_set) {
     _set =
-      config.databaseMode === "sqlite" ? createSqliteDatabaseSet() : createSupabaseDatabaseSet();
-    console.log(`[db] initialised in ${config.databaseMode} mode`);
+      config.testStorage === "memory" ? createMemoryDatabaseSet() : createTurbopufferDatabaseSet();
+    console.log(
+      `[db] initialised with ${
+        config.testStorage === "memory" ? "in-memory test transport" : "turbopuffer"
+      }`,
+    );
   }
   return _set;
 }
