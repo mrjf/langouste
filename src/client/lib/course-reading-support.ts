@@ -52,3 +52,12 @@ export function courseSentenceParts(sentence:CourseSentence,language:CourseLangu
  if(source.length!==english.length)throw new Error(`Unaligned course sentence: ${sentence.id}`);
  return source.map((text,index)=>({...sentence,id:`${sentence.id}:sentence:${index}`,text,english:english[index].trim(),transliteration:language==='ar-EG'?courseTransliteration(text.trim()):undefined}));
 }
+
+/** A complete local entry from authored course forms, without guessed dictionary data. */
+export function courseDictionaryEntry(term:string,language:CourseLanguage){
+ const entries=lexicon[language]??{};
+ const lemma=entries[term.toLocaleLowerCase(language)]?.lemma??term;
+ const forms=Object.entries(entries).filter(([,entry])=>entry.lemma===lemma).map(([surface,entry])=>({term:surface,description:entry.form,meaning:entry.gloss}));
+ const base=entries[lemma.toLocaleLowerCase(language)];
+ return {term:lemma,language,source_term:lemma,source_url:null,target_source_url:null,form_description:null,definitions:base?[base.gloss]:[],senses:[],forms};
+}

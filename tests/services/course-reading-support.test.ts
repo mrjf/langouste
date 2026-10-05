@@ -1,6 +1,6 @@
 import {describe,expect,test} from 'bun:test';
 import {loadCourseCatalog} from '../../src/services/course/catalog';
-import {courseReadingSupport,courseSentenceParts,readingWordPattern} from '../../src/client/lib/course-reading-support';
+import {courseReadingSupport,courseSentenceParts,readingWordPattern,courseDictionaryEntry} from '../../src/client/lib/course-reading-support';
 import type {CourseSentence} from '../../src/types/course';
 const lessons=await loadCourseCatalog();
 describe('offline course reading dictionary',()=>{
@@ -35,4 +35,14 @@ describe('offline course reading dictionary',()=>{
   expect(split.map(s=>s.english)).toEqual(['Who helps?','What is this?']);
   expect(()=>courseReadingSupport(row('unprovidedword'),'hu')).toThrow('Missing course reading word');
  });
+});
+
+test('full dictionary entry resolves inflections and includes authored sibling forms',()=>{
+ const entry=courseDictionaryEntry('جديدة','ar-EG');
+ expect(entry.source_term).toBe('جديد');
+ expect(entry.forms.map(f=>f.term)).toContain('جديدة');
+ expect(entry.forms.map(f=>f.term)).toContain('جديد');
+ expect(entry.definitions.length).toBeGreaterThan(0);
+ expect(courseDictionaryEntry('عندها','ar-EG').forms.map(f=>f.term)).toContain('عندي');
+ expect(courseDictionaryEntry('unprovidedword','hu').forms).toEqual([]);
 });

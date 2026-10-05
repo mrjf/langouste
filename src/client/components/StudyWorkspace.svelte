@@ -7,7 +7,7 @@ import StudyPractice from "./StudyPractice.svelte";
 import CourseAudio from "./CourseAudio.svelte";
 import DictionaryText from "./DictionaryText.svelte";
 import DictionaryPopover from "./DictionaryPopover.svelte";
-import {courseReadingSupport,courseSentenceParts} from "../lib/course-reading-support";
+import {courseReadingSupport,courseSentenceParts,courseDictionaryEntry} from "../lib/course-reading-support";
 import type {DictionaryLookupResponse} from "../lib/api-contracts";
 import type {CourseAction,CourseActionResult,CourseLanguage,CourseProgress,CourseSentence,PublicCourseLesson} from "../../types/course";
 let {route,onRouteChange}:{route:string;onRouteChange:(r:string)=>void}=$props();
@@ -27,7 +27,7 @@ let referenceUsed=false;let request=0;let requestedExercise="";let referenceClos
 async function closeReference(){inspector="";await tick();const target=referenceTrigger?.isConnected?referenceTrigger:document.getElementById("study-content");target?.focus({preventScroll:true});}
 let dictionaryEntry=$state<{term:string;headword:string;lookup:DictionaryLookupResponse|null;contextMeaning:string;anchor:HTMLElement}|null>(null);
 async function openReadingDictionary(entry:NonNullable<typeof dictionaryEntry>){
- if(!entry.anchor.closest(".inspector"))referenceTrigger=entry.anchor;dictionaryEntry=entry;inspector="dictionary";support();
+ if(!entry.anchor.closest(".inspector"))referenceTrigger=entry.anchor;const full=courseDictionaryEntry(entry.headword,language);dictionaryEntry={...entry,term:full.term,headword:full.term,lookup:full,contextMeaning:""};inspector="dictionary";support();
  await tick();referenceClose?.focus({preventScroll:true});
 }
 let reading=$derived(lesson?.readings[section]);
@@ -122,7 +122,7 @@ function exportRecords(){const data:Record<string,unknown>={};for(let i=0;i<loca
 <details class="lesson-context"><summary>Sources</summary>{#each lesson.sources as source}<article><h3><a href={source.url} target="_blank" rel="noreferrer">{source.title}</a></h3><p>{source.publisher} · {source.publishedOn??"Undated"}</p><details><summary>Details</summary><p>{source.factSummary}</p></details></article>{/each}</details>
 {/if}
 </main>
-{#if inspector&&lesson}<aside class="inspector" aria-label="Language reference"><div class="inspector-header"><button bind:this={referenceClose} aria-label="Close reference" onclick={closeReference}>Close</button></div>{#if inspector==="dictionary"&&dictionaryEntry}<DictionaryPopover showTransliteration={transliteration} inline resources={false} term={dictionaryEntry.term} headword={dictionaryEntry.headword} lookup={dictionaryEntry.lookup} contextMeaning={dictionaryEntry.contextMeaning} {language} languageLabel={label(language)} anchor={null}/>{:else if word}<h3><CourseText text={word.term} {language} showTransliteration={transliteration} transliteration={word.transliteration} block/></h3><CourseAudio {language} text={word.term} context={word.semanticConcept??""} hideMissing/><p class="meaning">{word.english}</p>{#if word.teachingNote}<p><CourseText text={word.teachingNote} {language} showTransliteration={transliteration}/></p>{/if}<h4>In a sentence</h4>{@render sentence(word.example,true)}{#if word.forms?.length}<h4>Authored forms</h4>{#each word.forms as form}<p><CourseText text={form.arabic??form.term??""} {language} showTransliteration={transliteration} transliteration={form.transliteration}/> · {form.english??""}</p>{/each}{/if}{:else if concept}<h3><CourseText text={concept.title} {language} showTransliteration={transliteration}/></h3><p><CourseText text={concept.explanation} {language} showTransliteration={transliteration}/></p>{#each concept.examples as example}{@render sentence(example,true)}{/each}{/if}</aside>{/if}
+{#if inspector&&lesson}<aside class="inspector" aria-label="Language reference"><div class="inspector-header"><button bind:this={referenceClose} aria-label="Close reference" onclick={closeReference}>Close</button></div>{#if inspector==="dictionary"&&dictionaryEntry}<DictionaryPopover showTransliteration={transliteration} inline resources term={dictionaryEntry.term} headword={dictionaryEntry.headword} lookup={dictionaryEntry.lookup} contextMeaning={dictionaryEntry.contextMeaning} {language} languageLabel={label(language)} anchor={null}/>{:else if word}<h3><CourseText text={word.term} {language} showTransliteration={transliteration} transliteration={word.transliteration} block/></h3><CourseAudio {language} text={word.term} context={word.semanticConcept??""} hideMissing/><p class="meaning">{word.english}</p>{#if word.teachingNote}<p><CourseText text={word.teachingNote} {language} showTransliteration={transliteration}/></p>{/if}<h4>In a sentence</h4>{@render sentence(word.example,true)}{#if word.forms?.length}<h4>Authored forms</h4>{#each word.forms as form}<p><CourseText text={form.arabic??form.term??""} {language} showTransliteration={transliteration} transliteration={form.transliteration}/> · {form.english??""}</p>{/each}{/if}{:else if concept}<h3><CourseText text={concept.title} {language} showTransliteration={transliteration}/></h3><p><CourseText text={concept.explanation} {language} showTransliteration={transliteration}/></p>{#each concept.examples as example}{@render sentence(example,true)}{/each}{/if}</aside>{/if}
 </div>
 </div>
 <style>

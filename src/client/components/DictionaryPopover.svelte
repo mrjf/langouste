@@ -10,6 +10,7 @@
     target_source_url: string | null;
     form_description: string | null;
     definitions: string[];
+    forms?: Array<{term:string;description:string;meaning:string}>;
     senses: Array<{ part_of_speech: string; definition: string; examples: string[] }>;
   }
 
@@ -147,7 +148,7 @@
   {onpointerleave}
 >
   <div class="dictionary-popover-head word-popover-head">
-    <strong><CourseText text={displayHeadword} {language} {showTransliteration} block/></strong>
+    <strong>{#if onopen}<button class="headword-link" type="button" onclick={onopen} aria-label={`Open full dictionary entry for ${displayHeadword}`}><CourseText text={term} {language} {showTransliteration} block/></button>{:else}<CourseText text={term} {language} {showTransliteration} block/>{/if}</strong>
     <div class="dictionary-popover-actions">
       <span>{languageLabel}</span>
       {#if onclose}<button type="button" aria-label="Close dictionary popup" onclick={onclose}>×</button>{/if}
@@ -165,7 +166,7 @@
   </div>
 
   {#if displayHeadword.toLocaleLowerCase(language) !== term.toLocaleLowerCase(language)}
-    <p class="dictionary-form">from <CourseText text={term} {language} {showTransliteration}/></p>
+    <p class="dictionary-form">from {#if onopen}<button class="headword-link" type="button" onclick={onopen} aria-label={`Open base word ${displayHeadword}`}><CourseText text={displayHeadword} {language} {showTransliteration}/></button>{:else if dictionaryHref}<a class="headword-link" href={dictionaryHref}><CourseText text={displayHeadword} {language} {showTransliteration}/></a>{:else}<CourseText text={displayHeadword} {language} {showTransliteration}/>{/if}</p>
   {/if}
   {#if lookup?.form_description}
     <div class="dictionary-form-detail">
@@ -213,10 +214,15 @@
     </section>
   {:else if error}
     <p class="dictionary-muted">{error}</p>
-  {:else}
+  {:else if !lookup?.forms?.length}
     <p class="dictionary-muted">No dictionary entry found.</p>
   {/if}
 
+  {#if inline && lookup?.forms?.length}
+    <section class="dictionary-entry"><span class="dictionary-section-label">Forms in this course</span>
+      {#each lookup.forms as form}<div class="dictionary-sense"><CourseText text={form.term} {language} {showTransliteration}/><p>{form.meaning}</p>{#if form.description}<p class="dictionary-muted"><CourseText text={form.description} {language} {showTransliteration}/></p>{/if}</div>{/each}
+    </section>
+  {/if}
   {#if audioError}<p class="dictionary-muted">{audioError}</p>{/if}
 
   {#if onopen}<button class="open-sidebar" type="button" onclick={onopen}>Open dictionary</button>{/if}
@@ -229,11 +235,17 @@
         rel={isExternal(dictionaryHref) ? "noreferrer" : undefined}
       >Langouste dictionary</a>
     {/if}
+    {#if language==='ar-EG'}
+      <a href={`https://livingarabic.com/en/search?q=${encodeURIComponent(displayHeadword)}&dc%5B%5D=2&st%5B%5D=1`} target="_blank" rel="noreferrer">LivingArabic · Egyptian ↗</a>
+      <a href={`https://eu.lisaanmasry.org/online/search.php?ui=en&language=EG&key=${encodeURIComponent(displayHeadword)}&action=s`} target="_blank" rel="noreferrer">Lisaan Masry · Egyptian ↗</a>
+      <a href={`https://www.wordreference.com/aren/${encodeURIComponent(displayHeadword)}`} target="_blank" rel="noreferrer">WordReference · Arabic–English (general / MSA) ↗</a>
+    {:else}
     <a href={englishWiktionaryHref} target="_blank" rel="noreferrer">English Wiktionary ↗</a>
     {#if showTargetWiktionary}
       <a href={targetWiktionaryHref} target="_blank" rel="noreferrer">
         {languageLabel} Wiktionary ↗
       </a>
+    {/if}
     {/if}
   </nav>{/if}
 </dialog>
@@ -256,7 +268,7 @@
     box-shadow: var(--shadow-lg, 0 12px 30px rgb(0 0 0 / 18%));
     color: var(--color-text, var(--ink, #222));
     font-family: var(--dictionary-font, var(--sans, inherit));
-    font-size: 0.78rem;
+    font-size: 16px;
     line-height: 1.35;
     text-align: start;
     white-space: normal;
@@ -274,7 +286,7 @@
   }
   .dictionary-popover-head strong {
     color: var(--color-primary, var(--accent, #a73628));
-    font-size: 0.9rem;
+    font-size: 22px;
   }
   .dictionary-popover-actions { display: flex; align-items: center; gap: 0.45rem; }
   .dictionary-popover-actions > span,
@@ -321,7 +333,7 @@
   .dictionary-context p { font-weight: 650; }
   .dictionary-section-label {
     color: var(--color-text-light, var(--muted, #74746d));
-    font-size: 0.58rem;
+    font-size: 12px;
     font-weight: 750;
     letter-spacing: 0.07em;
     text-transform: uppercase;
@@ -350,9 +362,14 @@
   }
   .dictionary-links a {
     color: var(--color-primary, var(--accent, #a73628));
-    font-size: 0.72rem;
+    font-size: 14px;
     font-weight: 700;
     text-decoration: none;
   }
-  .dictionary-links a:hover { text-decoration: underline; }
+  .dictionary-links a:hover { background:#eaf0e8; }
+  .dictionary-links a {padding:7px 9px;border:1px solid var(--line,#c7c2b8);border-radius:3px;}
+  .headword-link {font:inherit;color:inherit;text-decoration:none;border:1px solid transparent;border-radius:3px;background:transparent;padding:2px 5px;cursor:pointer;}
+  .headword-link:hover {border-color:currentColor;background:#eaf0e8;}
+  .headword-link:focus-visible,.dictionary-links a:focus-visible {outline:2px solid #245c44;outline-offset:3px;}
+  .dictionary-popover-head :global(.arabic) {font-size:34px;}
 </style>
