@@ -1,0 +1,57 @@
+name: Publish course
+
+on:
+  push:
+    branches: [main, codex/compact-course-transliteration]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: langouste-course-production
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Install locked dependencies
+        run: bun install --frozen-lockfile
+      - name: Download immutable audio snapshot
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          release=$(jq -r .release .github/course-audio.json)
+          asset=$(jq -r .asset .github/course-audio.json)
+          gh release download "$release" --repo "$GITHUB_REPOSITORY" --pattern "$asset" --dir /tmp/course-audio
+          python3 scripts/restore-course-audio.py "/tmp/course-audio/$asset"
+      - name: Check types and course behavior
+        run: |
+          bun run typecheck
+          bun run typecheck:cloudflare
+          bun test tests/services/course-display.test.ts tests/services/course-reading-support.test.ts tests/services/local-course.test.ts tests/services/course.test.ts
+      - name: Build static course
+        run: bun run build:static
+      - name: Validate publish contents
+        env:
+          TURBOPUFFER_API_KEY: static-publish-check-only
+          ANTHROPIC_API_KEY: static-publish-check-only
+          LANGOUSTE_JWT_SECRET: static-publish-check-only
+        run: bun run check:static-publish
+      - name: Require deployment access
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          test -n "$CLOUDFLARE_API_TOKEN" || { echo 'Add the approved Cloudflare Pages Edit token as the repository Actions secret CLOUDFLARE_API_TOKEN, then rerun this workflow.'; exit 1; }
+      - name: Publish to existing Cloudflare Pages project
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: 8ce2cffc47b8b76a6f1d67997bf196bf
+          command: pages deploy dist/pages --project-name=langouste-course --branch=main --commit-hash=${{ github.sha }}
