@@ -34,10 +34,11 @@ jobs:
       - name: Check types and course behavior
         run: |
           bun run typecheck
-          bun run typecheck:cloudflare
           bun test tests/services/course-display.test.ts tests/services/course-reading-support.test.ts tests/services/local-course.test.ts tests/services/course.test.ts
       - name: Build static course
-        run: bun run build:static
+        run: |
+          bun run build:static
+          bun run typecheck:cloudflare
       - name: Validate publish contents
         env:
           TURBOPUFFER_API_KEY: static-publish-check-only
