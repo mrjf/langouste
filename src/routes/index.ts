@@ -15,6 +15,8 @@ import { audioDrillRoutes } from "./api/audio-drills.ts";
 import { corpusRoutes } from "./api/corpus.ts";
 import { newsRoutes } from "./api/news.ts";
 
+import { courseRoutes } from "./api/course.ts";
+
 export const apiRoutes = new Hono();
 
 apiRoutes.route("/auth", authRoutes);
@@ -31,6 +33,7 @@ apiRoutes.route("/resources", resourcesRoutes);
 apiRoutes.route("/audio-drills", audioDrillRoutes);
 apiRoutes.route("/corpus", corpusRoutes);
 apiRoutes.route("/news", newsRoutes);
+apiRoutes.route("/course", courseRoutes);
 
 if (config.testMode) {
   // Loaded lazily so production builds don't ship test-only code.

@@ -19,6 +19,11 @@ const timestamps = (now: string) => ({ created_at: now });
  * filtering, sorting, and full-text search.
  */
 export const TABLE_DEFINITIONS = {
+  course_progress: {
+    idColumns: ["progress_id"],
+    unique: [["user_id", "lesson_id"]],
+    jsonColumns: ["read_sections", "encounters", "exercises", "sync_receipts", "reading_evidence"],
+  },
   users: {
     idColumns: ["user_id"],
     unique: [["email"]],
@@ -205,6 +210,8 @@ export type TableName = keyof typeof TABLE_DEFINITIONS;
 export const TABLE_NAMES = Object.keys(TABLE_DEFINITIONS) as TableName[];
 
 export const QUERYABLE_COLUMNS = new Set([
+  "progress_id",
+  "lesson_id",
   "assessed_at",
   "assessment_id",
   "attempt_id",

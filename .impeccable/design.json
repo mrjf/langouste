@@ -1,0 +1,438 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-04T20:57:25.138458+00:00",
+  "title": "Design System: Langouste public course workbook",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Primary",
+        "tonalRamp": [
+          "oklch(15% 0.07181 162.62)",
+          "oklch(26% 0.07181 162.62)",
+          "oklch(38% 0.07181 162.62)",
+          "oklch(49% 0.07181 162.62)",
+          "oklch(61% 0.07181 162.62)",
+          "oklch(72% 0.07181 162.62)",
+          "oklch(84% 0.07181 162.62)",
+          "oklch(95% 0.07181 162.62)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "tonalRamp": [
+          "oklch(15% 0.02759 161.14)",
+          "oklch(26% 0.02759 161.14)",
+          "oklch(38% 0.02759 161.14)",
+          "oklch(49% 0.02759 161.14)",
+          "oklch(61% 0.02759 161.14)",
+          "oklch(72% 0.02759 161.14)",
+          "oklch(84% 0.02759 161.14)",
+          "oklch(95% 0.02759 161.14)"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Muted",
+        "tonalRamp": [
+          "oklch(15% 0.02244 157.25)",
+          "oklch(26% 0.02244 157.25)",
+          "oklch(38% 0.02244 157.25)",
+          "oklch(49% 0.02244 157.25)",
+          "oklch(61% 0.02244 157.25)",
+          "oklch(72% 0.02244 157.25)",
+          "oklch(84% 0.02244 157.25)",
+          "oklch(95% 0.02244 157.25)"
+        ]
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Paper",
+        "tonalRamp": [
+          "oklch(15% 0.00526 106.50)",
+          "oklch(26% 0.00526 106.50)",
+          "oklch(38% 0.00526 106.50)",
+          "oklch(49% 0.00526 106.50)",
+          "oklch(61% 0.00526 106.50)",
+          "oklch(72% 0.00526 106.50)",
+          "oklch(84% 0.00526 106.50)",
+          "oklch(95% 0.00526 106.50)"
+        ]
+      },
+      "index-paper": {
+        "role": "neutral",
+        "displayName": "Index Paper",
+        "tonalRamp": [
+          "oklch(15% 0.00949 119.58)",
+          "oklch(26% 0.00949 119.58)",
+          "oklch(38% 0.00949 119.58)",
+          "oklch(49% 0.00949 119.58)",
+          "oklch(61% 0.00949 119.58)",
+          "oklch(72% 0.00949 119.58)",
+          "oklch(84% 0.00949 119.58)",
+          "oklch(95% 0.00949 119.58)"
+        ]
+      },
+      "reference-paper": {
+        "role": "neutral",
+        "displayName": "Reference Paper",
+        "tonalRamp": [
+          "oklch(15% 0.00930 113.16)",
+          "oklch(26% 0.00930 113.16)",
+          "oklch(38% 0.00930 113.16)",
+          "oklch(49% 0.00930 113.16)",
+          "oklch(61% 0.00930 113.16)",
+          "oklch(72% 0.00930 113.16)",
+          "oklch(84% 0.00930 113.16)",
+          "oklch(95% 0.00930 113.16)"
+        ]
+      },
+      "control": {
+        "role": "neutral",
+        "displayName": "Control",
+        "tonalRamp": [
+          "oklch(15% 0.00000 89.88)",
+          "oklch(26% 0.00000 89.88)",
+          "oklch(38% 0.00000 89.88)",
+          "oklch(49% 0.00000 89.88)",
+          "oklch(61% 0.00000 89.88)",
+          "oklch(72% 0.00000 89.88)",
+          "oklch(84% 0.00000 89.88)",
+          "oklch(95% 0.00000 89.88)"
+        ]
+      },
+      "rule": {
+        "role": "neutral",
+        "displayName": "Rule",
+        "tonalRamp": [
+          "oklch(15% 0.01260 137.79)",
+          "oklch(26% 0.01260 137.79)",
+          "oklch(38% 0.01260 137.79)",
+          "oklch(49% 0.01260 137.79)",
+          "oklch(61% 0.01260 137.79)",
+          "oklch(72% 0.01260 137.79)",
+          "oklch(84% 0.01260 137.79)",
+          "oklch(95% 0.01260 137.79)"
+        ]
+      },
+      "control-border": {
+        "role": "neutral",
+        "displayName": "Control Border",
+        "tonalRamp": [
+          "oklch(15% 0.02652 148.98)",
+          "oklch(26% 0.02652 148.98)",
+          "oklch(38% 0.02652 148.98)",
+          "oklch(49% 0.02652 148.98)",
+          "oklch(61% 0.02652 148.98)",
+          "oklch(72% 0.02652 148.98)",
+          "oklch(84% 0.02652 148.98)",
+          "oklch(95% 0.02652 148.98)"
+        ]
+      },
+      "selected": {
+        "role": "neutral",
+        "displayName": "Selected",
+        "tonalRamp": [
+          "oklch(15% 0.01948 147.84)",
+          "oklch(26% 0.01948 147.84)",
+          "oklch(38% 0.01948 147.84)",
+          "oklch(49% 0.01948 147.84)",
+          "oklch(61% 0.01948 147.84)",
+          "oklch(72% 0.01948 147.84)",
+          "oklch(84% 0.01948 147.84)",
+          "oklch(95% 0.01948 147.84)"
+        ]
+      },
+      "selected-ink": {
+        "role": "neutral",
+        "displayName": "Selected Ink",
+        "tonalRamp": [
+          "oklch(15% 0.06752 158.74)",
+          "oklch(26% 0.06752 158.74)",
+          "oklch(38% 0.06752 158.74)",
+          "oklch(49% 0.06752 158.74)",
+          "oklch(61% 0.06752 158.74)",
+          "oklch(72% 0.06752 158.74)",
+          "oklch(84% 0.06752 158.74)",
+          "oklch(95% 0.06752 158.74)"
+        ]
+      },
+      "selected-border": {
+        "role": "neutral",
+        "displayName": "Selected Border",
+        "tonalRamp": [
+          "oklch(15% 0.03643 143.93)",
+          "oklch(26% 0.03643 143.93)",
+          "oklch(38% 0.03643 143.93)",
+          "oklch(49% 0.03643 143.93)",
+          "oklch(61% 0.03643 143.93)",
+          "oklch(72% 0.03643 143.93)",
+          "oklch(84% 0.03643 143.93)",
+          "oklch(95% 0.03643 143.93)"
+        ]
+      },
+      "nav-hover": {
+        "role": "neutral",
+        "displayName": "Nav Hover",
+        "tonalRamp": [
+          "oklch(15% 0.01720 128.67)",
+          "oklch(26% 0.01720 128.67)",
+          "oklch(38% 0.01720 128.67)",
+          "oklch(49% 0.01720 128.67)",
+          "oklch(61% 0.01720 128.67)",
+          "oklch(72% 0.01720 128.67)",
+          "oklch(84% 0.01720 128.67)",
+          "oklch(95% 0.01720 128.67)"
+        ]
+      },
+      "term-hover": {
+        "role": "neutral",
+        "displayName": "Term Hover",
+        "tonalRamp": [
+          "oklch(15% 0.02093 134.09)",
+          "oklch(26% 0.02093 134.09)",
+          "oklch(38% 0.02093 134.09)",
+          "oklch(49% 0.02093 134.09)",
+          "oklch(61% 0.02093 134.09)",
+          "oklch(72% 0.02093 134.09)",
+          "oklch(84% 0.02093 134.09)",
+          "oklch(95% 0.02093 134.09)"
+        ]
+      },
+      "term-underline": {
+        "role": "neutral",
+        "displayName": "Term Underline",
+        "tonalRamp": [
+          "oklch(15% 0.03262 149.67)",
+          "oklch(26% 0.03262 149.67)",
+          "oklch(38% 0.03262 149.67)",
+          "oklch(49% 0.03262 149.67)",
+          "oklch(61% 0.03262 149.67)",
+          "oklch(72% 0.03262 149.67)",
+          "oklch(84% 0.03262 149.67)",
+          "oklch(95% 0.03262 149.67)"
+        ]
+      },
+      "feedback-paper": {
+        "role": "neutral",
+        "displayName": "Feedback Paper",
+        "tonalRamp": [
+          "oklch(15% 0.01366 92.98)",
+          "oklch(26% 0.01366 92.98)",
+          "oklch(38% 0.01366 92.98)",
+          "oklch(49% 0.01366 92.98)",
+          "oklch(61% 0.01366 92.98)",
+          "oklch(72% 0.01366 92.98)",
+          "oklch(84% 0.01366 92.98)",
+          "oklch(95% 0.01366 92.98)"
+        ]
+      },
+      "feedback-border": {
+        "role": "neutral",
+        "displayName": "Feedback Border",
+        "tonalRamp": [
+          "oklch(15% 0.03463 86.31)",
+          "oklch(26% 0.03463 86.31)",
+          "oklch(38% 0.03463 86.31)",
+          "oklch(49% 0.03463 86.31)",
+          "oklch(61% 0.03463 86.31)",
+          "oklch(72% 0.03463 86.31)",
+          "oklch(84% 0.03463 86.31)",
+          "oklch(95% 0.03463 86.31)"
+        ]
+      },
+      "correct-paper": {
+        "role": "neutral",
+        "displayName": "Correct Paper",
+        "tonalRamp": [
+          "oklch(15% 0.01017 145.50)",
+          "oklch(26% 0.01017 145.50)",
+          "oklch(38% 0.01017 145.50)",
+          "oklch(49% 0.01017 145.50)",
+          "oklch(61% 0.01017 145.50)",
+          "oklch(72% 0.01017 145.50)",
+          "oklch(84% 0.01017 145.50)",
+          "oklch(95% 0.01017 145.50)"
+        ]
+      },
+      "correct-border": {
+        "role": "neutral",
+        "displayName": "Correct Border",
+        "tonalRamp": [
+          "oklch(15% 0.03332 145.27)",
+          "oklch(26% 0.03332 145.27)",
+          "oklch(38% 0.03332 145.27)",
+          "oklch(49% 0.03332 145.27)",
+          "oklch(61% 0.03332 145.27)",
+          "oklch(72% 0.03332 145.27)",
+          "oklch(84% 0.03332 145.27)",
+          "oklch(95% 0.03332 145.27)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Self-hosted serif lesson and destination titles."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Section headings."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Default workbook prose and controls."
+      },
+      "reading": {
+        "displayName": "Reading",
+        "purpose": "Hungarian passages and inline terms."
+      },
+      "reading-arabic": {
+        "displayName": "Reading Arabic",
+        "purpose": "Arabic reading passages."
+      },
+      "lesson-label": {
+        "displayName": "Lesson Label",
+        "purpose": "Compact lesson index labels."
+      }
+    },
+    "shadows": [
+      {
+        "name": "current-lesson-outline",
+        "value": "inset 0 0 0 1px #b0c4af",
+        "purpose": "Current lesson border treatment."
+      },
+      {
+        "name": "reference-sheet",
+        "value": "0 -8px 24px #24352c18",
+        "purpose": "Reference overlay below the 1150px breakpoint."
+      },
+      {
+        "name": "lesson-drawer",
+        "value": "8px 0 24px #24352c18",
+        "purpose": "Mobile lesson navigation overlay."
+      }
+    ],
+    "motion": [
+      {
+        "name": "reference-in",
+        "value": "150ms ease-out",
+        "purpose": "translateY(8px) to translateY(0), only under prefers-reduced-motion: no-preference."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "reference-overlay",
+        "value": "1150px"
+      },
+      {
+        "name": "mobile-workbook",
+        "value": "720px"
+      },
+      {
+        "name": "compact-practice",
+        "value": "600px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Text-led workbook action.",
+      "html": "<button class=\"ds-button-primary\">Continue reading</button>",
+      "css": ".ds-button-primary{font-family:\"IBM Plex Sans\",\"Helvetica Neue\",Arial,system-ui,sans-serif;font-size:16px;line-height:1.55;min-height:44px;padding:8px 12px;border:1px solid #245c44;border-radius:3px;background:#245c44;color:#fff;cursor:pointer}.ds-button-primary:focus-visible{outline:2px solid #245c44;outline-offset:3px}.ds-button-primary:disabled{opacity:.55;cursor:default}"
+    },
+    {
+      "name": "Secondary button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Text-led workbook action.",
+      "html": "<button class=\"ds-button-secondary\">Close</button>",
+      "css": ".ds-button-secondary{font-family:\"IBM Plex Sans\",\"Helvetica Neue\",Arial,system-ui,sans-serif;font-size:16px;line-height:1.55;min-height:44px;padding:8px 12px;border:1px solid #a6b6a8;border-radius:3px;background:#fff;color:#245c44;cursor:pointer}.ds-button-secondary:focus-visible{outline:2px solid #245c44;outline-offset:3px}.ds-button-secondary:disabled{opacity:.55;cursor:default}"
+    },
+    {
+      "name": "Reference search",
+      "kind": "input",
+      "refersTo": "reference-search",
+      "description": "Full-width authored vocabulary search.",
+      "html": "<label class=\"ds-search-label\">Find a word<input class=\"ds-search\" placeholder=\"Search words\" /></label>",
+      "css": ".ds-search-label{font-family:\"IBM Plex Sans\",\"Helvetica Neue\",Arial,system-ui,sans-serif;font-size:16px;line-height:1.55;color:#24352c;display:block}.ds-search{display:block;width:100%;padding:10px;border:1px solid #a6b6a8;background:#fff;font:18px \"IBM Plex Sans\",\"Helvetica Neue\",Arial,sans-serif;margin-top:8px;border-radius:3px}.ds-search:focus-visible{outline:2px solid #245c44;outline-offset:3px}"
+    },
+    {
+      "name": "Current lesson",
+      "kind": "nav",
+      "refersTo": "lesson-navigation",
+      "description": "Numbered index row with current-page treatment.",
+      "html": "<nav aria-label=\"Lessons\"><button class=\"ds-lesson\" aria-current=\"page\"><span class=\"ds-day\">01</span><span>Lesson title<small class=\"ds-status\">In progress</small></span></button></nav>",
+      "css": ".ds-lesson{font-family:\"IBM Plex Sans\",\"Helvetica Neue\",Arial,system-ui,sans-serif;font-size:16px;line-height:1.55;display:grid;grid-template-columns:24px 1fr;gap:8px;width:100%;text-align:left;font-size:14px;line-height:1.35;min-height:44px;padding:10px 8px;border:0;border-radius:3px;background:#dde9de;color:#174830;box-shadow:inset 0 0 0 1px #b0c4af;cursor:pointer}.ds-lesson:hover{background:#e5ebdf}.ds-lesson:focus-visible{outline:2px solid #245c44;outline-offset:3px}.ds-day{font-size:13px;font-variant-numeric:tabular-nums;color:#526057;padding-top:2px}.ds-status{display:block;color:#526057;font-size:11px;margin-top:4px}"
+    },
+    {
+      "name": "Vocabulary chip",
+      "kind": "chip",
+      "refersTo": "word-chip",
+      "description": "Authored vocabulary entry in the word strip.",
+      "html": "<button class=\"ds-word\"><bdi>Authored word</bdi></button>",
+      "css": ".ds-word{font-family:\"IBM Plex Sans\",\"Helvetica Neue\",Arial,system-ui,sans-serif;font-size:16px;line-height:1.55;min-height:44px;border:1px solid #a6b6a8;padding:8px 12px;border-radius:3px;background:transparent;color:#245c44;cursor:pointer}.ds-word bdi{font-size:18px}.ds-word:focus-visible{outline:2px solid #245c44;outline-offset:3px}.ds-word.ds-open{background:#dde9de}"
+    },
+    {
+      "name": "Inline reference term",
+      "kind": "custom",
+      "refersTo": "term-link",
+      "description": "Text-sized reference trigger within a passage.",
+      "html": "<p class=\"ds-passage\">A passage with an <button class=\"ds-term\">authored term</button>.</p>",
+      "css": ".ds-passage{font-family:\"IBM Plex Sans\",\"Helvetica Neue\",Arial,system-ui,sans-serif;font-size:16px;line-height:1.55;font-size:22px;line-height:1.65;color:#24352c;max-width:64ch}.ds-term{font:inherit;color:inherit;display:inline;min-height:0;padding:0;border:0;border-radius:0;background:none;text-decoration:underline;text-decoration-color:#a2b6a5;text-decoration-thickness:1px;text-underline-offset:5px;cursor:pointer}.ds-term:hover{background:#e4eddf;text-decoration-color:#245c44}.ds-term:focus-visible{outline:2px solid #245c44;outline-offset:3px}"
+    },
+    {
+      "name": "Answer feedback",
+      "kind": "custom",
+      "refersTo": "feedback",
+      "description": "Flat bordered practice feedback, not a reusable raised card.",
+      "html": "<section class=\"ds-feedback\" role=\"status\"><p>Check the answer</p><p class=\"ds-answer\">Authored answer</p></section>",
+      "css": ".ds-feedback{font-family:\"IBM Plex Sans\",\"Helvetica Neue\",Arial,system-ui,sans-serif;font-size:16px;line-height:1.55;color:#24352c;padding:16px;margin:20px 0;background:#f2efe5;border:1px solid #d7ccb4;line-height:1.6}.ds-feedback p{margin:8px 0}.ds-answer{font-size:22px;white-space:pre-line}.ds-feedback.ds-correct{background:#edf3ed;border-color:#b9ccb9}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Reading Workbook",
+    "overview": "A compact textbook for authored Hungarian and Egyptian Arabic study. Warm paper, dark green ink, thin rules and a restrained green accent keep attention on language content. Serif titles establish the book character; reading passages and controls use the inherited sans-serif stack.\n\nThis system describes the public static workbook mounted by LocalApp, not the separate account-connected interface. It is extracted from StudyWorkspace, StudyPractice, CourseAudio and the inherited app.css base. The implemented source takes precedence over the initial direction contract.",
+    "keyCharacteristics": [
+      "Readable passages with nearby contextual reference.",
+      "Dense navigation and ruled sections rather than a card dashboard.",
+      "Explicit text controls and visible keyboard focus.",
+      "Responsive lesson drawer and bottom reference sheet."
+    ],
+    "rules": [
+      {
+        "name": "The Reading First Rule",
+        "body": "Keep introductory material compact so real study content follows the lesson heading and controls without a hero.",
+        "section": "layout"
+      },
+      {
+        "name": "The Context Rule",
+        "body": "An authored term remains part of the sentence; its underline signals reference access without changing the reading size or direction.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat Page Rule",
+        "body": "Use rules and paper tones for ordinary sections; diffuse shadows belong to overlay sheets and drawers.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do preserve the reading hierarchy, Arabic direction and mixed-language isolation.",
+      "Do keep translations sentence-level and transliteration separately controlled.",
+      "Do use text labels, green focus outlines and compact controls.",
+      "Do preserve the original reading trigger when navigating between entries inside the reference inspector.",
+      "Do describe saved completion as activity and review as latest incorrect answers."
+    ],
+    "donts": [
+      "Don't add eyebrow labels, marketing heroes or decorative glyph icons.",
+      "Don't convert ruled study sections into a card dashboard.",
+      "Don't shrink passage text to create mobile density; compact the surrounding controls.",
+      "Don't represent imported progress, a public spaced-review scheduler or lasting retention as implemented features.",
+      "Don't show audio controls without an actual prerecorded asset."
+    ]
+  }
+}

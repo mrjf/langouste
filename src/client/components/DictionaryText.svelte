@@ -4,6 +4,8 @@
   import type { DictionaryLookupResponse as DictionaryLookup } from "../lib/api-contracts";
   import type { FiloDocumentJson } from "../lib/stores.svelte";
   import DictionaryPopover from "./DictionaryPopover.svelte";
+  import SentenceGlossPopover from "./SentenceGlossPopover.svelte";
+  import type { SentenceSupport } from "../lib/course-reading-support";
 
   interface Props {
     text: string | null | undefined;
@@ -11,6 +13,9 @@
     filoDoc?: FiloDocumentJson | null;
     baseByteOffset?: number;
     tooltip?: boolean;
+    sentenceSupport?: SentenceSupport;
+    onSupportUsed?: () => void;
+    onOpenDictionary?: (entry: {term:string;headword:string;lookup:DictionaryLookup|null;contextMeaning:string;anchor:HTMLElement}) => void;
   }
 
   type TextSegment = { kind: "text"; value: string };
@@ -33,9 +38,10 @@
     sourceTerm?: string;
     formDescription?: string;
     notFound?: boolean;
+    contextMeaning?: string;
   }
 
-  let { text, language, filoDoc = null, baseByteOffset = 0, tooltip = true }: Props = $props();
+  let { text, language, filoDoc = null, baseByteOffset = 0, tooltip = true, sentenceSupport, onSupportUsed, onOpenDictionary }: Props = $props();
 
   const lookupCache = new Map<string, Promise<DictionaryLookup>>();
   let activeInstanceKey = $state<string | null>(null);
@@ -47,6 +53,48 @@
   let hideTimer: ReturnType<typeof setTimeout> | null = null;
   let rootElement: HTMLSpanElement | null = null;
   let activeAnchor = $state<HTMLElement | null>(null);
+  let hoverPart = $state<"sentence" | "word">("word");
+  let activeSegment: WordSegment | null = null;
+  let suppressFocus = false;
+  let modality = "mouse";
+  let popupHeld=false;
+  function enterPopup(){popupHeld=true;keepOpen();}
+  function leavePopup(instanceKey:string){popupHeld=false;hideSoon(instanceKey);}
+  function claimHover() { window.dispatchEvent(new CustomEvent("langouste-dictionary-hover", {detail:rootElement})); }
+  function otherHover(event:Event) { if((event as CustomEvent).detail!==rootElement)closePopover(); }
+  function pointerWord(segment:WordSegment,instanceKey:string,event:PointerEvent) {
+    if(!sentenceSupport || event.pointerType==='touch')return;
+    const anchor=event.currentTarget as HTMLElement,rect=anchor.getBoundingClientRect();
+    const next=event.clientY<rect.top+rect.height/2?'sentence':'word';
+    if(activeInstanceKey!==instanceKey||hoverPart!==next){pinnedInstanceKey=null;hoverPart=next;void show(segment,instanceKey,anchor);}
+    else keepOpen();
+  }
+  function focusWord(segment:WordSegment,instanceKey:string,event:FocusEvent){
+    if(suppressFocus){suppressFocus=false;return;}
+    if(sentenceSupport){hoverPart='sentence';pinnedInstanceKey=null;}
+    showFromEvent(segment,instanceKey,event);
+  }
+  function openDictionary(segment:WordSegment,anchor:HTMLElement){
+    if(!onOpenDictionary)return;
+    const lookup=lookupFromFilo(segment);
+    onSupportUsed?.();
+    closePopover();
+    onOpenDictionary({term:segment.value,headword:profileHeadword(segment.value,lookup,segment.lookupTerm),lookup,contextMeaning:segment.filoLookup?.contextMeaning??'',anchor});
+  }
+  function splitClick(segment:WordSegment,instanceKey:string,event:MouseEvent){
+    if(!sentenceSupport){toggleFromClick(segment,instanceKey,event);return;}
+    if(event.button!==0||event.metaKey||event.ctrlKey||event.altKey||event.shiftKey)return;
+    event.preventDefault();
+    const anchor=event.currentTarget as HTMLElement,rect=anchor.getBoundingClientRect();
+    if(event.detail===0||modality!=='touch'&&event.clientY>=rect.top+rect.height/2){openDictionary(segment,anchor);return;}
+    hoverPart='sentence';pinnedInstanceKey=instanceKey;void show(segment,instanceKey,anchor);
+  }
+  function wordKey(segment:WordSegment,instanceKey:string,event:KeyboardEvent){
+    if(!sentenceSupport)return;
+    if(event.key==='ArrowUp'||event.key==='ArrowDown'||event.key===' '){
+      event.preventDefault();hoverPart=event.key==='ArrowDown'?'word':'sentence';pinnedInstanceKey=instanceKey;void show(segment,instanceKey,event.currentTarget as HTMLElement);
+    }
+  }
 
   const segments = $derived.by(() => segmentsFor(text ?? "", language, filoDoc, baseByteOffset));
   const lowercaseLemmaLangs = new Set([
@@ -175,6 +223,9 @@
     if (anchor) {
       activeAnchor = anchor;
     }
+    claimHover();
+    activeSegment = segment;
+    onSupportUsed?.();
     const key = keyForWord(segment);
     activeInstanceKey = instanceKey;
     const seededLookup = lookupFromFilo(segment);
@@ -184,6 +235,10 @@
     if (segment.filoLookup) {
       lookups = { ...lookups, [key]: seededLookup };
       loading = { ...loading, [key]: false };
+      return;
+    }
+    if (sentenceSupport) { // Course support is offline-only, including a missing annotation.
+      lookups = {...lookups,[key]:null};
       return;
     }
     if (loading[key] || hasDictionaryEntry(lookups[key])) return;
@@ -217,7 +272,7 @@
     if (pinnedInstanceKey === instanceKey) return;
     if (hideTimer) clearTimeout(hideTimer);
     hideTimer = setTimeout(() => {
-      if (activeInstanceKey === instanceKey) {
+      if (activeInstanceKey === instanceKey && !popupHeld) {
         activeInstanceKey = null;
         activeAnchor = null;
       }
@@ -258,6 +313,7 @@
       clearTimeout(hideTimer);
       hideTimer = null;
     }
+    popupHeld=false;
     pinnedInstanceKey = null;
     activeInstanceKey = null;
     activeAnchor = null;
@@ -265,11 +321,15 @@
 
   function closePinnedFromWindow(event: MouseEvent) {
     if (event.target instanceof Node && rootElement?.contains(event.target)) return;
-    if (pinnedInstanceKey) closePopover();
+    if (activeInstanceKey) closePopover();
   }
 
   function handleWindowKeydown(event: KeyboardEvent) {
-    if (event.key === "Escape") closePopover();
+    if (event.key === "Escape" && activeInstanceKey) {
+      const anchor=activeAnchor;
+      closePopover();
+      if(anchor?.isConnected&&document.activeElement!==anchor){suppressFocus=true;anchor.focus({preventScroll:true});}
+    }
   }
 
   function keepOpen() {
@@ -279,6 +339,11 @@
     }
   }
 
+  $effect(()=>{
+    window.addEventListener('langouste-dictionary-hover',otherHover);
+    return ()=>window.removeEventListener('langouste-dictionary-hover',otherHover);
+  });
+  $effect(()=>{text;language;filoDoc;closePopover();});
   onDestroy(() => {
     if (hideTimer) clearTimeout(hideTimer);
   });
@@ -348,7 +413,7 @@
 
   function splitWords(value: string): Segment[] {
     const segments: Segment[] = [];
-    const wordRe = /[\p{Letter}\p{Mark}]+(?:['’.-][\p{Letter}\p{Mark}]+)*/gu;
+    const wordRe = /[\p{Letter}\p{Mark}\p{Number}]+(?:['’.-][\p{Letter}\p{Mark}\p{Number}]+)*/gu;
     let last = 0;
     for (const match of value.matchAll(wordRe)) {
       const index = match.index ?? 0;
@@ -400,14 +465,22 @@
       <span class="dict-wrap"><a
         class="dict-word"
         href={dictionaryHref(segment.value, lookupTerm)}
-        onmouseenter={(event) => showFromEvent(segment, instanceKey, event)}
-        onfocus={(event) => showFromEvent(segment, instanceKey, event)}
+        onmouseenter={(event) => {if(!sentenceSupport)showFromEvent(segment, instanceKey, event);}}
+        onpointermove={(event)=>pointerWord(segment,instanceKey,event)}
+        onpointerdown={(event)=>{modality=event.pointerType;}}
+        onkeydown={(event)=>wordKey(segment,instanceKey,event)}
+        onfocus={(event) => focusWord(segment, instanceKey, event)}
         onmouseleave={() => hideSoon(instanceKey)}
         onblur={() => hideSoon(instanceKey)}
-        onclick={(event) => toggleFromClick(segment, instanceKey, event)}
+        onclick={(event) => splitClick(segment, instanceKey, event)}
+        aria-label={sentenceSupport?`${segment.value}: sentence meaning; Arrow Down for dictionary; Enter to open dictionary`:undefined}
+        aria-haspopup={sentenceSupport?"dialog":undefined}
         aria-expanded={tooltip ? activeInstanceKey === instanceKey : undefined}
       >{segment.value}</a>{#if tooltip && activeInstanceKey === instanceKey}
           {#key instanceKey}
+            {#if sentenceSupport && hoverPart==='sentence'}
+              <SentenceGlossPopover support={sentenceSupport} {language} anchor={activeAnchor} onpointerenter={enterPopup} onpointerleave={()=>leavePopup(instanceKey)} onclose={closePopover} onDictionary={()=>{if(activeSegment&&activeAnchor)openDictionary(activeSegment,activeAnchor);}}/>
+            {:else}
             <DictionaryPopover
               term={segment.value}
               {language}
@@ -419,10 +492,15 @@
               anchor={activeAnchor}
               dictionaryHref={dictionaryHref(segment.value, lookupTerm)}
               profileHref={profileHref(segment.value, lookup, segment.lookupTerm)}
-              loadAudio={(word, activeLanguage) => api.fetchDictionaryAudio(word, activeLanguage)}
-              onpointerenter={keepOpen}
-              onpointerleave={() => hideSoon(instanceKey)}
+              loadAudio={sentenceSupport?undefined:(word, activeLanguage) => api.fetchDictionaryAudio(word, activeLanguage)}
+              contextMeaning={segment.filoLookup?.contextMeaning}
+              resources={!sentenceSupport}
+              onclose={sentenceSupport?closePopover:undefined}
+              onopen={sentenceSupport?()=>{if(activeAnchor)openDictionary(segment,activeAnchor);}:undefined}
+              onpointerenter={enterPopup}
+              onpointerleave={() => leavePopup(instanceKey)}
             />
+            {/if}
           {/key}
         {/if}</span>
     {:else}
@@ -447,7 +525,7 @@
     padding: 0;
     color: inherit;
     cursor: help;
-    outline: none;
+    outline-offset: 3px;
     text-decoration: none;
   }
 
@@ -456,6 +534,8 @@
     color: inherit;
     text-decoration: none;
   }
+
+  .dict-word:focus-visible { outline: 2px solid var(--accent, #245c44); }
 
   :global(a.dict-word),
   :global(a.dict-word:visited),

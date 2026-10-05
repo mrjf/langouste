@@ -1,0 +1,3945 @@
+{
+  "version": 1,
+  "provenance": "Locally authored word glosses and form notes for this course; not external dictionary lookup results.",
+  "languages": {
+    "hu": {
+      "a": {
+        "lemma": "a",
+        "gloss": "the",
+        "form": ""
+      },
+      "az": {
+        "lemma": "az",
+        "gloss": "the",
+        "form": ""
+      },
+      "egy": {
+        "lemma": "egy",
+        "gloss": "a / one",
+        "form": ""
+      },
+      "adat": {
+        "lemma": "adat",
+        "gloss": "data",
+        "form": ""
+      },
+      "adatszolgáltatásokhoz": {
+        "lemma": "adatszolgáltatás",
+        "gloss": "to data services",
+        "form": "Plural allative: -ok + -hoz (to)."
+      },
+      "bemeneti": {
+        "lemma": "bemeneti",
+        "gloss": "input / incoming",
+        "form": ""
+      },
+      "bizonyíték": {
+        "lemma": "bizonyíték",
+        "gloss": "evidence",
+        "form": ""
+      },
+      "biztonságos": {
+        "lemma": "biztonságos",
+        "gloss": "safe",
+        "form": ""
+      },
+      "csak": {
+        "lemma": "csak",
+        "gloss": "only",
+        "form": ""
+      },
+      "csapat": {
+        "lemma": "csapat",
+        "gloss": "team",
+        "form": ""
+      },
+      "csinál": {
+        "lemma": "csinál",
+        "gloss": "does / makes",
+        "form": "Third person singular, present."
+      },
+      "cég": {
+        "lemma": "cég",
+        "gloss": "company",
+        "form": ""
+      },
+      "cél": {
+        "lemma": "cél",
+        "gloss": "goal",
+        "form": ""
+      },
+      "cím": {
+        "lemma": "cím",
+        "gloss": "title",
+        "form": ""
+      },
+      "címét": {
+        "lemma": "cím",
+        "gloss": "its title",
+        "form": "Possessed form with accusative -t."
+      },
+      "de": {
+        "lemma": "de",
+        "gloss": "but",
+        "form": ""
+      },
+      "diák": {
+        "lemma": "diák",
+        "gloss": "student",
+        "form": ""
+      },
+      "dokumentum": {
+        "lemma": "dokumentum",
+        "gloss": "document",
+        "form": ""
+      },
+      "dolgozom": {
+        "lemma": "dolgozik",
+        "gloss": "I work",
+        "form": "First person singular, present."
+      },
+      "dollár": {
+        "lemma": "dollár",
+        "gloss": "dollar",
+        "form": ""
+      },
+      "drága": {
+        "lemma": "drága",
+        "gloss": "expensive",
+        "form": ""
+      },
+      "dátum": {
+        "lemma": "dátum",
+        "gloss": "date",
+        "form": ""
+      },
+      "ebben": {
+        "lemma": "ez",
+        "gloss": "in this",
+        "form": "Inessive form of ez."
+      },
+      "egymillió": {
+        "lemma": "egymillió",
+        "gloss": "one million",
+        "form": ""
+      },
+      "egyszer": {
+        "lemma": "egyszer",
+        "gloss": "once",
+        "form": ""
+      },
+      "egyszerű": {
+        "lemma": "egyszerű",
+        "gloss": "simple",
+        "form": ""
+      },
+      "ehhez": {
+        "lemma": "ez",
+        "gloss": "for this / to this",
+        "form": "Allative form of ez."
+      },
+      "ellenőriz": {
+        "lemma": "ellenőriz",
+        "gloss": "checks / verifies",
+        "form": ""
+      },
+      "ellenőrizd": {
+        "lemma": "ellenőriz",
+        "gloss": "check it",
+        "form": "Second person singular imperative, definite."
+      },
+      "ellenőrizte": {
+        "lemma": "ellenőriz",
+        "gloss": "checked it",
+        "form": "Third person singular past, definite."
+      },
+      "ellenőrizzük": {
+        "lemma": "ellenőriz",
+        "gloss": "we check it",
+        "form": "First person plural, definite; also “let us check”."
+      },
+      "ellenőrzi": {
+        "lemma": "ellenőriz",
+        "gloss": "checks it",
+        "form": "Third person singular present, definite."
+      },
+      "ellenőrzök": {
+        "lemma": "ellenőriz",
+        "gloss": "I check",
+        "form": "First person singular present, indefinite."
+      },
+      "ellenőrzöm": {
+        "lemma": "ellenőriz",
+        "gloss": "I check it",
+        "form": "First person singular present, definite."
+      },
+      "elolvashatok": {
+        "lemma": "elolvas",
+        "gloss": "I may read",
+        "form": "First person singular potential, indefinite."
+      },
+      "elolvasom": {
+        "lemma": "elolvas",
+        "gloss": "I read it through",
+        "form": "First person singular present, definite."
+      },
+      "elég": {
+        "lemma": "elég",
+        "gloss": "enough",
+        "form": ""
+      },
+      "elérhető": {
+        "lemma": "elérhető",
+        "gloss": "available",
+        "form": ""
+      },
+      "előbb": {
+        "lemma": "előbb",
+        "gloss": "first / earlier",
+        "form": ""
+      },
+      "először": {
+        "lemma": "először",
+        "gloss": "first",
+        "form": ""
+      },
+      "előtt": {
+        "lemma": "előtt",
+        "gloss": "before",
+        "form": ""
+      },
+      "ember": {
+        "lemma": "ember",
+        "gloss": "person",
+        "form": ""
+      },
+      "emberek": {
+        "lemma": "ember",
+        "gloss": "people",
+        "form": "Plural."
+      },
+      "engedély": {
+        "lemma": "engedély",
+        "gloss": "permission",
+        "form": ""
+      },
+      "eredmény": {
+        "lemma": "eredmény",
+        "gloss": "result",
+        "form": ""
+      },
+      "eszköz": {
+        "lemma": "eszköz",
+        "gloss": "tool",
+        "form": ""
+      },
+      "eszközök": {
+        "lemma": "eszköz",
+        "gloss": "tools",
+        "form": "Plural."
+      },
+      "euró": {
+        "lemma": "euró",
+        "gloss": "euro",
+        "form": ""
+      },
+      "ez": {
+        "lemma": "ez",
+        "gloss": "this",
+        "form": ""
+      },
+      "ezen": {
+        "lemma": "ez",
+        "gloss": "on this",
+        "form": "Superessive form; used in “this week”."
+      },
+      "feladathoz": {
+        "lemma": "feladat",
+        "gloss": "for the task",
+        "form": "Allative -hoz."
+      },
+      "fog": {
+        "lemma": "fog",
+        "gloss": "will",
+        "form": "Third person singular future auxiliary."
+      },
+      "fogok": {
+        "lemma": "fog",
+        "gloss": "I will",
+        "form": "First person singular future auxiliary."
+      },
+      "fogsz": {
+        "lemma": "fog",
+        "gloss": "you will",
+        "form": "Second person singular future auxiliary."
+      },
+      "folytatódik": {
+        "lemma": "folytatódik",
+        "gloss": "continues",
+        "form": ""
+      },
+      "fontos": {
+        "lemma": "fontos",
+        "gloss": "important",
+        "form": ""
+      },
+      "forrás": {
+        "lemma": "forrás",
+        "gloss": "source",
+        "form": ""
+      },
+      "funkció": {
+        "lemma": "funkció",
+        "gloss": "feature / function",
+        "form": ""
+      },
+      "funkciója": {
+        "lemma": "funkció",
+        "gloss": "its feature",
+        "form": "Third person singular possessive."
+      },
+      "fájl": {
+        "lemma": "fájl",
+        "gloss": "file",
+        "form": ""
+      },
+      "fájlokat": {
+        "lemma": "fájl",
+        "gloss": "files [object]",
+        "form": "Plural accusative."
+      },
+      "gyakorlati": {
+        "lemma": "gyakorlati",
+        "gloss": "practical",
+        "form": ""
+      },
+      "gyors": {
+        "lemma": "gyors",
+        "gloss": "fast",
+        "form": ""
+      },
+      "gyorsabb": {
+        "lemma": "gyors",
+        "gloss": "faster",
+        "form": "Comparative -abb."
+      },
+      "gyorsak": {
+        "lemma": "gyors",
+        "gloss": "fast [plural]",
+        "form": "Plural predicate adjective."
+      },
+      "ha": {
+        "lemma": "ha",
+        "gloss": "if",
+        "form": ""
+      },
+      "hang": {
+        "lemma": "hang",
+        "gloss": "voice / sound",
+        "form": ""
+      },
+      "hasznos": {
+        "lemma": "hasznos",
+        "gloss": "useful",
+        "form": ""
+      },
+      "hasznosak": {
+        "lemma": "hasznos",
+        "gloss": "useful [plural]",
+        "form": "Plural predicate adjective."
+      },
+      "használ": {
+        "lemma": "használ",
+        "gloss": "uses",
+        "form": ""
+      },
+      "használhat": {
+        "lemma": "használ",
+        "gloss": "may use",
+        "form": "Third person singular potential, indefinite."
+      },
+      "használhatja": {
+        "lemma": "használ",
+        "gloss": "may use it",
+        "form": "Third person singular potential, definite."
+      },
+      "használható": {
+        "lemma": "használ",
+        "gloss": "usable",
+        "form": "Potential passive participle."
+      },
+      "használja": {
+        "lemma": "használ",
+        "gloss": "uses it",
+        "form": "Third person singular present, definite."
+      },
+      "használok": {
+        "lemma": "használ",
+        "gloss": "I use",
+        "form": "First person singular present, indefinite."
+      },
+      "helyzethez": {
+        "lemma": "helyzet",
+        "gloss": "for the situation",
+        "form": "Allative -hez."
+      },
+      "hogy": {
+        "lemma": "hogy",
+        "gloss": "that",
+        "form": ""
+      },
+      "hol": {
+        "lemma": "hol",
+        "gloss": "where",
+        "form": ""
+      },
+      "holnap": {
+        "lemma": "holnap",
+        "gloss": "tomorrow",
+        "form": ""
+      },
+      "hozzáférés": {
+        "lemma": "hozzáférés",
+        "gloss": "access",
+        "form": ""
+      },
+      "hét": {
+        "lemma": "hét",
+        "gloss": "week / seven",
+        "form": ""
+      },
+      "héten": {
+        "lemma": "hét",
+        "gloss": "in the week",
+        "form": "Superessive -en."
+      },
+      "hírt": {
+        "lemma": "hír",
+        "gloss": "news [object]",
+        "form": "Accusative -t."
+      },
+      "hónap": {
+        "lemma": "hónap",
+        "gloss": "month",
+        "form": ""
+      },
+      "hónapban": {
+        "lemma": "hónap",
+        "gloss": "in the month",
+        "form": "Inessive -ban."
+      },
+      "húsz": {
+        "lemma": "húsz",
+        "gloss": "twenty",
+        "form": ""
+      },
+      "idő": {
+        "lemma": "idő",
+        "gloss": "time",
+        "form": ""
+      },
+      "időm": {
+        "lemma": "idő",
+        "gloss": "my time",
+        "form": "First person singular possessive."
+      },
+      "igen": {
+        "lemma": "igen",
+        "gloss": "yes",
+        "form": ""
+      },
+      "ingyenes": {
+        "lemma": "ingyenes",
+        "gloss": "free of charge",
+        "form": ""
+      },
+      "is": {
+        "lemma": "is",
+        "gloss": "also",
+        "form": ""
+      },
+      "ismeretlen": {
+        "lemma": "ismeretlen",
+        "gloss": "unknown",
+        "form": ""
+      },
+      "ismét": {
+        "lemma": "ismét",
+        "gloss": "again",
+        "form": ""
+      },
+      "itt": {
+        "lemma": "itt",
+        "gloss": "here",
+        "form": ""
+      },
+      "jelentett": {
+        "lemma": "jelent",
+        "gloss": "announced",
+        "form": "Third person singular past; with be: announced."
+      },
+      "be": {
+        "lemma": "be",
+        "gloss": "in [verbal prefix]",
+        "form": "In jelent be: announce."
+      },
+      "bejelentette": {
+        "lemma": "bejelent",
+        "gloss": "announced it",
+        "form": "Third person singular past, definite."
+      },
+      "bejelenti": {
+        "lemma": "bejelent",
+        "gloss": "announces it",
+        "form": "Third person singular present, definite."
+      },
+      "jobb": {
+        "lemma": "jó",
+        "gloss": "better",
+        "form": "Irregular comparative."
+      },
+      "jobban": {
+        "lemma": "jó",
+        "gloss": "better [adverb]",
+        "form": "Comparative adverb."
+      },
+      "jó": {
+        "lemma": "jó",
+        "gloss": "good",
+        "form": ""
+      },
+      "kapcsolódik": {
+        "lemma": "kapcsolódik",
+        "gloss": "connects",
+        "form": ""
+      },
+      "kell": {
+        "lemma": "kell",
+        "gloss": "is needed / must",
+        "form": ""
+      },
+      "keresek": {
+        "lemma": "keres",
+        "gloss": "I look for",
+        "form": "First person singular present, indefinite."
+      },
+      "keresést": {
+        "lemma": "keresés",
+        "gloss": "search [object]",
+        "form": "Accusative -t."
+      },
+      "kerül": {
+        "lemma": "kerül",
+        "gloss": "costs",
+        "form": ""
+      },
+      "kettő": {
+        "lemma": "kettő",
+        "gloss": "two",
+        "form": ""
+      },
+      "kevés": {
+        "lemma": "kevés",
+        "gloss": "little / few",
+        "form": ""
+      },
+      "ki": {
+        "lemma": "ki",
+        "gloss": "who / out",
+        "form": ""
+      },
+      "kiadta": {
+        "lemma": "kiad",
+        "gloss": "released it",
+        "form": "Third person singular past, definite."
+      },
+      "kicsi": {
+        "lemma": "kicsi",
+        "gloss": "small",
+        "form": ""
+      },
+      "kipróbál": {
+        "lemma": "kipróbál",
+        "gloss": "tries out",
+        "form": ""
+      },
+      "kipróbálok": {
+        "lemma": "kipróbál",
+        "gloss": "I try out",
+        "form": "First person singular present, indefinite."
+      },
+      "kipróbálom": {
+        "lemma": "kipróbál",
+        "gloss": "I try it out",
+        "form": "First person singular present, definite."
+      },
+      "korlát": {
+        "lemma": "korlát",
+        "gloss": "limit",
+        "form": ""
+      },
+      "korlátozott": {
+        "lemma": "korlátozott",
+        "gloss": "limited",
+        "form": ""
+      },
+      "kutató": {
+        "lemma": "kutató",
+        "gloss": "researcher",
+        "form": ""
+      },
+      "képzés": {
+        "lemma": "képzés",
+        "gloss": "training",
+        "form": ""
+      },
+      "képzésben": {
+        "lemma": "képzés",
+        "gloss": "in training",
+        "form": "Inessive -ben."
+      },
+      "képzési": {
+        "lemma": "képzés",
+        "gloss": "training [attributive]",
+        "form": "Relational adjective."
+      },
+      "képzésről": {
+        "lemma": "képzés",
+        "gloss": "about the training",
+        "form": "Delative -ről, used for the topic."
+      },
+      "kérdez": {
+        "lemma": "kérdez",
+        "gloss": "asks",
+        "form": ""
+      },
+      "kérdés": {
+        "lemma": "kérdés",
+        "gloss": "question",
+        "form": ""
+      },
+      "kérek": {
+        "lemma": "kér",
+        "gloss": "I ask for",
+        "form": "First person singular present, indefinite."
+      },
+      "kérem": {
+        "lemma": "kér",
+        "gloss": "please / I ask for it",
+        "form": "First person singular definite; polite request formula."
+      },
+      "kérhet": {
+        "lemma": "kér",
+        "gloss": "may ask for",
+        "form": "Third person singular potential."
+      },
+      "kérlek": {
+        "lemma": "kér",
+        "gloss": "please / I ask you",
+        "form": "First person subject, second person object."
+      },
+      "később": {
+        "lemma": "később",
+        "gloss": "later",
+        "form": ""
+      },
+      "két": {
+        "lemma": "kettő",
+        "gloss": "two",
+        "form": "Attributive form before a noun."
+      },
+      "köszönöm": {
+        "lemma": "köszön",
+        "gloss": "thank you",
+        "form": "First person singular, definite."
+      },
+      "következő": {
+        "lemma": "következő",
+        "gloss": "next",
+        "form": ""
+      },
+      "küld": {
+        "lemma": "küld",
+        "gloss": "sends",
+        "form": ""
+      },
+      "lassan": {
+        "lemma": "lassú",
+        "gloss": "slowly",
+        "form": "Adverb."
+      },
+      "lassú": {
+        "lemma": "lassú",
+        "gloss": "slow",
+        "form": ""
+      },
+      "lassúak": {
+        "lemma": "lassú",
+        "gloss": "slow [plural]",
+        "form": "Plural predicate adjective."
+      },
+      "lesz": {
+        "lemma": "van",
+        "gloss": "will be",
+        "form": "Future form."
+      },
+      "ma": {
+        "lemma": "ma",
+        "gloss": "today",
+        "form": ""
+      },
+      "magyarázd": {
+        "lemma": "magyaráz",
+        "gloss": "explain it",
+        "form": "Second person singular imperative, definite."
+      },
+      "mappa": {
+        "lemma": "mappa",
+        "gloss": "folder",
+        "form": ""
+      },
+      "meg": {
+        "lemma": "meg",
+        "gloss": "[completion prefix]",
+        "form": "A verbal prefix; in nézzük meg: look at / check."
+      },
+      "megnyitom": {
+        "lemma": "megnyit",
+        "gloss": "I open it",
+        "form": "First person singular present, definite."
+      },
+      "megnézem": {
+        "lemma": "megnéz",
+        "gloss": "I look at it",
+        "form": "First person singular present, definite."
+      },
+      "melyik": {
+        "lemma": "melyik",
+        "gloss": "which",
+        "form": ""
+      },
+      "mennyi": {
+        "lemma": "mennyi",
+        "gloss": "how much / how many",
+        "form": ""
+      },
+      "mennyibe": {
+        "lemma": "mennyi",
+        "gloss": "how much [cost]",
+        "form": "Used with kerül to ask the price."
+      },
+      "mert": {
+        "lemma": "mert",
+        "gloss": "because",
+        "form": ""
+      },
+      "mi": {
+        "lemma": "mi",
+        "gloss": "what",
+        "form": ""
+      },
+      "mikor": {
+        "lemma": "mikor",
+        "gloss": "when",
+        "form": ""
+      },
+      "minden": {
+        "lemma": "minden",
+        "gloss": "every",
+        "form": ""
+      },
+      "mindenki": {
+        "lemma": "mindenki",
+        "gloss": "everyone",
+        "form": ""
+      },
+      "mindennap": {
+        "lemma": "mindennap",
+        "gloss": "every day",
+        "form": ""
+      },
+      "mindent": {
+        "lemma": "minden",
+        "gloss": "everything [object]",
+        "form": "Accusative -t."
+      },
+      "mindig": {
+        "lemma": "mindig",
+        "gloss": "always",
+        "form": ""
+      },
+      "mint": {
+        "lemma": "mint",
+        "gloss": "than / as",
+        "form": ""
+      },
+      "mit": {
+        "lemma": "mi",
+        "gloss": "what [object]",
+        "form": "Accusative."
+      },
+      "miért": {
+        "lemma": "miért",
+        "gloss": "why",
+        "form": ""
+      },
+      "modell": {
+        "lemma": "modell",
+        "gloss": "model",
+        "form": ""
+      },
+      "modellek": {
+        "lemma": "modell",
+        "gloss": "models",
+        "form": "Plural."
+      },
+      "mond": {
+        "lemma": "mond",
+        "gloss": "says",
+        "form": ""
+      },
+      "mondat": {
+        "lemma": "mondat",
+        "gloss": "sentence",
+        "form": ""
+      },
+      "mondja": {
+        "lemma": "mond",
+        "gloss": "say it",
+        "form": "Formal singular imperative here; also third person singular present definite."
+      },
+      "most": {
+        "lemma": "most",
+        "gloss": "now",
+        "form": ""
+      },
+      "munka": {
+        "lemma": "munka",
+        "gloss": "work",
+        "form": ""
+      },
+      "munkában": {
+        "lemma": "munka",
+        "gloss": "in work",
+        "form": "Inessive -ban."
+      },
+      "munkához": {
+        "lemma": "munka",
+        "gloss": "for work",
+        "form": "Allative -hoz."
+      },
+      "már": {
+        "lemma": "már",
+        "gloss": "already",
+        "form": ""
+      },
+      "más": {
+        "lemma": "más",
+        "gloss": "different / other",
+        "form": ""
+      },
+      "másik": {
+        "lemma": "másik",
+        "gloss": "another / the other",
+        "form": ""
+      },
+      "másikat": {
+        "lemma": "másik",
+        "gloss": "another one [object]",
+        "form": "Accusative -at."
+      },
+      "még": {
+        "lemma": "még",
+        "gloss": "still / yet",
+        "form": ""
+      },
+      "mérnök": {
+        "lemma": "mérnök",
+        "gloss": "engineer",
+        "form": ""
+      },
+      "mérnököknek": {
+        "lemma": "mérnök",
+        "gloss": "for engineers",
+        "form": "Plural dative -ök + -nek."
+      },
+      "múlva": {
+        "lemma": "múlva",
+        "gloss": "from now / later",
+        "form": ""
+      },
+      "nehéz": {
+        "lemma": "nehéz",
+        "gloss": "difficult",
+        "form": ""
+      },
+      "neked": {
+        "lemma": "te",
+        "gloss": "for you",
+        "form": "Second person singular dative."
+      },
+      "nem": {
+        "lemma": "nem",
+        "gloss": "not",
+        "form": ""
+      },
+      "neve": {
+        "lemma": "név",
+        "gloss": "its name",
+        "form": "Third person singular possessive."
+      },
+      "nincs": {
+        "lemma": "van",
+        "gloss": "there is no",
+        "form": "Negative existential, singular."
+      },
+      "néhány": {
+        "lemma": "néhány",
+        "gloss": "some / a few",
+        "form": ""
+      },
+      "nézzük": {
+        "lemma": "néz",
+        "gloss": "let us look at it",
+        "form": "First person plural imperative, definite."
+      },
+      "olcsó": {
+        "lemma": "olcsó",
+        "gloss": "cheap",
+        "form": ""
+      },
+      "olcsóbb": {
+        "lemma": "olcsó",
+        "gloss": "cheaper",
+        "form": "Comparative -bb."
+      },
+      "olvas": {
+        "lemma": "olvas",
+        "gloss": "reads",
+        "form": ""
+      },
+      "olvasni": {
+        "lemma": "olvas",
+        "gloss": "to read",
+        "form": "Infinitive."
+      },
+      "olvasok": {
+        "lemma": "olvas",
+        "gloss": "I read",
+        "form": "First person singular present, indefinite."
+      },
+      "olvasol": {
+        "lemma": "olvas",
+        "gloss": "you read",
+        "form": "Second person singular present, indefinite."
+      },
+      "olvasom": {
+        "lemma": "olvas",
+        "gloss": "I read it",
+        "form": "First person singular present, definite."
+      },
+      "olvassa": {
+        "lemma": "olvas",
+        "gloss": "read it",
+        "form": "Formal singular imperative here; also third person singular present definite."
+      },
+      "olvastam": {
+        "lemma": "olvas",
+        "gloss": "I read [past]",
+        "form": "First person singular past."
+      },
+      "ott": {
+        "lemma": "ott",
+        "gloss": "there",
+        "form": ""
+      },
+      "probléma": {
+        "lemma": "probléma",
+        "gloss": "problem",
+        "form": ""
+      },
+      "program": {
+        "lemma": "program",
+        "gloss": "program",
+        "form": ""
+      },
+      "programozásban": {
+        "lemma": "programozás",
+        "gloss": "in programming",
+        "form": "Inessive -ban."
+      },
+      "próbáljuk": {
+        "lemma": "próbál",
+        "gloss": "let us try it",
+        "form": "First person plural imperative, definite."
+      },
+      "próbálom": {
+        "lemma": "próbál",
+        "gloss": "I try it",
+        "form": "First person singular present, definite."
+      },
+      "példa": {
+        "lemma": "példa",
+        "gloss": "example",
+        "form": ""
+      },
+      "példában": {
+        "lemma": "példa",
+        "gloss": "in the example",
+        "form": "Inessive -ban."
+      },
+      "rendszerben": {
+        "lemma": "rendszer",
+        "gloss": "in the system",
+        "form": "Inessive -ben."
+      },
+      "rövid": {
+        "lemma": "rövid",
+        "gloss": "short",
+        "form": ""
+      },
+      "segít": {
+        "lemma": "segít",
+        "gloss": "helps",
+        "form": ""
+      },
+      "sok": {
+        "lemma": "sok",
+        "gloss": "many / much",
+        "form": ""
+      },
+      "szeretem": {
+        "lemma": "szeret",
+        "gloss": "I like it",
+        "form": "First person singular present, definite."
+      },
+      "szeretnék": {
+        "lemma": "szeret",
+        "gloss": "I would like",
+        "form": "First person singular conditional, indefinite."
+      },
+      "szerint": {
+        "lemma": "szerint",
+        "gloss": "according to",
+        "form": ""
+      },
+      "szerintem": {
+        "lemma": "szerint",
+        "gloss": "in my opinion",
+        "form": "First person singular form."
+      },
+      "számítógép": {
+        "lemma": "számítógép",
+        "gloss": "computer",
+        "form": ""
+      },
+      "szól": {
+        "lemma": "szól",
+        "gloss": "is addressed / is about",
+        "form": "In mérnököknek szól: is for engineers."
+      },
+      "szót": {
+        "lemma": "szó",
+        "gloss": "word [object]",
+        "form": "Accusative, shortened stem."
+      },
+      "sürgős": {
+        "lemma": "sürgős",
+        "gloss": "urgent",
+        "form": ""
+      },
+      "talán": {
+        "lemma": "talán",
+        "gloss": "perhaps",
+        "form": ""
+      },
+      "tanul": {
+        "lemma": "tanul",
+        "gloss": "learns",
+        "form": ""
+      },
+      "tanulni": {
+        "lemma": "tanul",
+        "gloss": "to learn",
+        "form": "Infinitive."
+      },
+      "tanulok": {
+        "lemma": "tanul",
+        "gloss": "I learn",
+        "form": "First person singular present."
+      },
+      "tanulunk": {
+        "lemma": "tanul",
+        "gloss": "we learn",
+        "form": "First person plural present."
+      },
+      "tegnap": {
+        "lemma": "tegnap",
+        "gloss": "yesterday",
+        "form": ""
+      },
+      "telefon": {
+        "lemma": "telefon",
+        "gloss": "phone",
+        "form": ""
+      },
+      "teljes": {
+        "lemma": "teljes",
+        "gloss": "complete",
+        "form": ""
+      },
+      "természetes": {
+        "lemma": "természetes",
+        "gloss": "natural",
+        "form": ""
+      },
+      "természetesebb": {
+        "lemma": "természetes",
+        "gloss": "more natural",
+        "form": "Comparative -ebb."
+      },
+      "terv": {
+        "lemma": "terv",
+        "gloss": "plan",
+        "form": ""
+      },
+      "teszt": {
+        "lemma": "teszt",
+        "gloss": "test",
+        "form": ""
+      },
+      "titkosított": {
+        "lemma": "titkosít",
+        "gloss": "encrypted",
+        "form": "Past participle."
+      },
+      "tokenre": {
+        "lemma": "token",
+        "gloss": "per token / for a token",
+        "form": "Sublative -re; egymillió tokenre: per million tokens."
+      },
+      "tudjuk": {
+        "lemma": "tud",
+        "gloss": "we know it",
+        "form": "First person plural present, definite."
+      },
+      "tudok": {
+        "lemma": "tud",
+        "gloss": "I can / I know",
+        "form": "First person singular present, indefinite."
+      },
+      "tárol": {
+        "lemma": "tárol",
+        "gloss": "stores",
+        "form": ""
+      },
+      "tény": {
+        "lemma": "tény",
+        "gloss": "fact",
+        "form": ""
+      },
+      "tíz": {
+        "lemma": "tíz",
+        "gloss": "ten",
+        "form": ""
+      },
+      "túl": {
+        "lemma": "túl",
+        "gloss": "too / beyond",
+        "form": ""
+      },
+      "utasításokat": {
+        "lemma": "utasítás",
+        "gloss": "instructions [object]",
+        "form": "Plural accusative."
+      },
+      "utasítást": {
+        "lemma": "utasítás",
+        "gloss": "instruction [object]",
+        "form": "Accusative -t."
+      },
+      "után": {
+        "lemma": "után",
+        "gloss": "after",
+        "form": ""
+      },
+      "vagyok": {
+        "lemma": "van",
+        "gloss": "I am",
+        "form": "First person singular present."
+      },
+      "van": {
+        "lemma": "van",
+        "gloss": "is / there is",
+        "form": ""
+      },
+      "vannak": {
+        "lemma": "van",
+        "gloss": "are / there are",
+        "form": "Third person plural present."
+      },
+      "videó": {
+        "lemma": "videó",
+        "gloss": "video",
+        "form": ""
+      },
+      "videós": {
+        "lemma": "videó",
+        "gloss": "video [attributive]",
+        "form": "Adjective formed with -s."
+      },
+      "világos": {
+        "lemma": "világos",
+        "gloss": "clear",
+        "form": ""
+      },
+      "vizsgálat": {
+        "lemma": "vizsgálat",
+        "gloss": "examination / study",
+        "form": ""
+      },
+      "vonatkozik": {
+        "lemma": "vonatkozik",
+        "gloss": "applies to",
+        "form": ""
+      },
+      "válasz": {
+        "lemma": "válasz",
+        "gloss": "answer",
+        "form": ""
+      },
+      "állítás": {
+        "lemma": "állítás",
+        "gloss": "claim",
+        "form": ""
+      },
+      "állítással": {
+        "lemma": "állítás",
+        "gloss": "with the claim",
+        "form": "Instrumental -val with consonant assimilation."
+      },
+      "ár": {
+        "lemma": "ár",
+        "gloss": "price",
+        "form": ""
+      },
+      "ára": {
+        "lemma": "ár",
+        "gloss": "its price",
+        "form": "Third person singular possessive."
+      },
+      "én": {
+        "lemma": "én",
+        "gloss": "I",
+        "form": ""
+      },
+      "értek": {
+        "lemma": "ért",
+        "gloss": "I understand",
+        "form": "First person singular present, indefinite; with egyet: agree."
+      },
+      "értem": {
+        "lemma": "ért",
+        "gloss": "I understand it",
+        "form": "First person singular present, definite."
+      },
+      "és": {
+        "lemma": "és",
+        "gloss": "and",
+        "form": ""
+      },
+      "ír": {
+        "lemma": "ír",
+        "gloss": "writes",
+        "form": ""
+      },
+      "írjon": {
+        "lemma": "ír",
+        "gloss": "please write",
+        "form": "Formal singular imperative, indefinite."
+      },
+      "írni": {
+        "lemma": "ír",
+        "gloss": "to write",
+        "form": "Infinitive."
+      },
+      "írok": {
+        "lemma": "ír",
+        "gloss": "I write",
+        "form": "First person singular present, indefinite."
+      },
+      "új": {
+        "lemma": "új",
+        "gloss": "new",
+        "form": ""
+      },
+      "újra": {
+        "lemma": "újra",
+        "gloss": "again",
+        "form": ""
+      },
+      "el": {
+        "lemma": "el",
+        "gloss": "[completion prefix]",
+        "form": "With olvas or magyaráz: read through / explain."
+      },
+      "azt": {
+        "lemma": "az",
+        "gloss": "that [object]",
+        "form": "Accusative demonstrative."
+      },
+      "ezt": {
+        "lemma": "ez",
+        "gloss": "this [object]",
+        "form": "Accusative demonstrative."
+      },
+      "aztán": {
+        "lemma": "aztán",
+        "gloss": "then",
+        "form": ""
+      },
+      "egyet": {
+        "lemma": "egy",
+        "gloss": "one [object]",
+        "form": "In egyetértek / egyet értek: agree."
+      },
+      "egyetértek": {
+        "lemma": "egyetért",
+        "gloss": "I agree",
+        "form": "First person singular present."
+      },
+      "adatot": {
+        "lemma": "adat",
+        "gloss": "data [object]",
+        "form": "Accusative singular: the object of the verb."
+      },
+      "címet": {
+        "lemma": "cím",
+        "gloss": "title [object]",
+        "form": "Accusative singular: the object of the verb."
+      },
+      "dokumentumot": {
+        "lemma": "dokumentum",
+        "gloss": "document [object]",
+        "form": "Accusative singular: the object of the verb."
+      },
+      "dátumot": {
+        "lemma": "dátum",
+        "gloss": "date [object]",
+        "form": "Accusative singular: the object of the verb."
+      },
+      "engedélyt": {
+        "lemma": "engedély",
+        "gloss": "permission [object]",
+        "form": "Accusative singular: the object of the verb."
+      },
+      "eredményt": {
+        "lemma": "eredmény",
+        "gloss": "result [object]",
+        "form": "Accusative singular: the object of the verb."
+      },
+      "eszközt": {
+        "lemma": "eszköz",
+        "gloss": "tool [object]",
+        "form": "Accusative singular: the object of the verb."
+      },
+      "forrást": {
+        "lemma": "forrás",
+        "gloss": "source [object]",
+        "form": "Accusative singular: the object of the verb."
+      },
+      "funkciót": {
+        "lemma": "funkció",
+        "gloss": "feature / function [object]",
+        "form": "Accusative singular: the object of the verb."
+      },
+      "fájlt": {
+        "lemma": "fájl",
+        "gloss": "file [object]",
+        "form": "Accusative singular: the object of the verb."
+      },
+      "időt": {
+        "lemma": "idő",
+        "gloss": "time [object]",
+        "form": "Accusative singular: the object of the verb."
+      },
+      "korlátot": {
+        "lemma": "korlát",
+        "gloss": "limit [object]",
+        "form": "Accusative singular: the object of the verb."
+      },
+      "kutatót": {
+        "lemma": "kutató",
+        "gloss": "researcher [object]",
+        "form": "Accusative singular: the object of the verb."
+      },
+      "kérdést": {
+        "lemma": "kérdés",
+        "gloss": "question [object]",
+        "form": "Accusative singular: the object of the verb."
+      },
+      "modellt": {
+        "lemma": "modell",
+        "gloss": "model [object]",
+        "form": "Accusative singular: the object of the verb."
+      },
+      "példát": {
+        "lemma": "példa",
+        "gloss": "example [object]",
+        "form": "Accusative singular: the object of the verb."
+      },
+      "tervet": {
+        "lemma": "terv",
+        "gloss": "plan [object]",
+        "form": "Accusative singular: the object of the verb."
+      },
+      "tesztet": {
+        "lemma": "teszt",
+        "gloss": "test [object]",
+        "form": "Accusative singular: the object of the verb."
+      },
+      "választ": {
+        "lemma": "válasz",
+        "gloss": "answer [object]",
+        "form": "Accusative singular: the object of the verb."
+      },
+      "videót": {
+        "lemma": "videó",
+        "gloss": "video [object]",
+        "form": "Accusative singular: the object of the verb."
+      },
+      "dokumentumban": {
+        "lemma": "dokumentum",
+        "gloss": "in the document",
+        "form": "Inessive singular -ban / -ben."
+      },
+      "mappában": {
+        "lemma": "mappa",
+        "gloss": "in the folder",
+        "form": "Inessive singular -ban / -ben."
+      },
+      "google": {
+        "lemma": "Google",
+        "gloss": "Google",
+        "form": "Proper name / product name."
+      },
+      "vids": {
+        "lemma": "Vids",
+        "gloss": "Vids",
+        "form": "Proper name / product name."
+      },
+      "gboard": {
+        "lemma": "Gboard",
+        "gloss": "Gboard",
+        "form": "Proper name / product name."
+      },
+      "anna": {
+        "lemma": "Anna",
+        "gloss": "Anna",
+        "form": "Proper name / product name."
+      },
+      "anthropic": {
+        "lemma": "Anthropic",
+        "gloss": "Anthropic",
+        "form": "Proper name / product name."
+      },
+      "claude": {
+        "lemma": "Claude",
+        "gloss": "Claude",
+        "form": "Proper name / product name."
+      },
+      "frontier": {
+        "lemma": "Frontier",
+        "gloss": "Frontier",
+        "form": "Proper name / product name."
+      },
+      "academy": {
+        "lemma": "Academy",
+        "gloss": "Academy",
+        "form": "Proper name / product name."
+      },
+      "gemini": {
+        "lemma": "Gemini",
+        "gloss": "Gemini",
+        "form": "Proper name / product name."
+      },
+      "argon": {
+        "lemma": "Argon",
+        "gloss": "Argon",
+        "form": "Proper name / product name."
+      },
+      "openai": {
+        "lemma": "OpenAI",
+        "gloss": "OpenAI",
+        "form": "Proper name / product name."
+      },
+      "gpt-6.1": {
+        "lemma": "GPT-6.1",
+        "gloss": "GPT-6.1",
+        "form": "Proper name / product name."
+      },
+      "sol": {
+        "lemma": "Sol",
+        "gloss": "Sol",
+        "form": "Proper name / product name."
+      },
+      "sonnet": {
+        "lemma": "Sonnet",
+        "gloss": "Sonnet",
+        "form": "Proper name / product name."
+      },
+      "bence": {
+        "lemma": "Bence",
+        "gloss": "Bence",
+        "form": "Proper name / product name."
+      },
+      "éva": {
+        "lemma": "Éva",
+        "gloss": "Éva",
+        "form": "Proper name / product name."
+      },
+      "data": {
+        "lemma": "Data",
+        "gloss": "Data",
+        "form": "Proper name / product name."
+      },
+      "agent": {
+        "lemma": "Agent",
+        "gloss": "Agent",
+        "form": "Proper name / product name."
+      },
+      "kit": {
+        "lemma": "Kit",
+        "gloss": "Kit",
+        "form": "Proper name / product name."
+      },
+      "béla": {
+        "lemma": "Béla",
+        "gloss": "Béla",
+        "form": "Proper name / product name."
+      },
+      "péter": {
+        "lemma": "Péter",
+        "gloss": "Péter",
+        "form": "Proper name / product name."
+      },
+      "api": {
+        "lemma": "API",
+        "gloss": "API",
+        "form": "Abbreviation: application programming interface."
+      },
+      "skills": {
+        "lemma": "skills",
+        "gloss": "skills",
+        "form": "English product-feature label."
+      },
+      "4": {
+        "lemma": "4",
+        "gloss": "4",
+        "form": "Number in a product name or version."
+      },
+      "5.5": {
+        "lemma": "5.5",
+        "gloss": "5.5",
+        "form": "Number in a product name or version."
+      },
+      "kép": {
+        "lemma": "kép",
+        "gloss": "picture",
+        "form": "Singular noun, subject/dictionary form."
+      },
+      "képet": {
+        "lemma": "kép",
+        "gloss": "picture (object)",
+        "form": "Accusative singular: kép + linking e + t."
+      },
+      "képek": {
+        "lemma": "kép",
+        "gloss": "pictures",
+        "form": "Plural: kép + ek."
+      },
+      "képtől": {
+        "lemma": "kép",
+        "gloss": "from the picture",
+        "form": "Ablative singular: kép + től."
+      },
+      "szöveg": {
+        "lemma": "szöveg",
+        "gloss": "text",
+        "form": "Singular noun, subject/dictionary form."
+      },
+      "szöveget": {
+        "lemma": "szöveg",
+        "gloss": "text (object)",
+        "form": "Accusative singular: szöveg + et."
+      },
+      "szövegekhez": {
+        "lemma": "szöveg",
+        "gloss": "for / to texts",
+        "form": "Plural szövegek + allative ending -hez."
+      },
+      "hirdetés": {
+        "lemma": "hirdetés",
+        "gloss": "advertisement; ad",
+        "form": "Singular noun."
+      },
+      "hirdetést": {
+        "lemma": "hirdetés",
+        "gloss": "advertisement (object)",
+        "form": "Accusative singular: hirdetés + t."
+      },
+      "hirdetéseket": {
+        "lemma": "hirdetés",
+        "gloss": "advertisements (object)",
+        "form": "Plural hirdetések + accusative -et."
+      },
+      "hirdetésekben": {
+        "lemma": "hirdetés",
+        "gloss": "in advertisements",
+        "form": "Plural hirdetések + inessive -ben."
+      },
+      "hirdetések": {
+        "lemma": "hirdetés",
+        "gloss": "advertisements",
+        "form": "Plural: hirdetés + ek."
+      },
+      "tervez": {
+        "lemma": "tervez",
+        "gloss": "plans; is planning",
+        "form": "Present third-person singular indefinite verb."
+      },
+      "külön": {
+        "lemma": "külön",
+        "gloss": "separately; apart",
+        "form": "Adverb; külön van = is separate."
+      },
+      "láthatatlan": {
+        "lemma": "láthatatlan",
+        "gloss": "invisible",
+        "form": "Adjective: not capable of being seen."
+      },
+      "látható": {
+        "lemma": "látható",
+        "gloss": "visible",
+        "form": "Adjective: capable of being seen."
+      },
+      "jel": {
+        "lemma": "jel",
+        "gloss": "mark; sign",
+        "form": "Singular noun."
+      },
+      "jelet": {
+        "lemma": "jel",
+        "gloss": "mark (object)",
+        "form": "Accusative singular: jel + et."
+      },
+      "látok": {
+        "lemma": "lát",
+        "gloss": "I see",
+        "form": "Present first-person singular indefinite form."
+      },
+      "lát": {
+        "lemma": "lát",
+        "gloss": "sees",
+        "form": "Present third-person singular indefinite form."
+      },
+      "tesztelni": {
+        "lemma": "tesztel",
+        "gloss": "to test",
+        "form": "Infinitive in -ni."
+      },
+      "indul": {
+        "lemma": "indul",
+        "gloss": "starts; gets under way",
+        "form": "Present third-person singular; can refer to a scheduled future event."
+      },
+      "egyesült": {
+        "lemma": "egyesült",
+        "gloss": "united",
+        "form": "Part of Egyesült Államok, United States."
+      },
+      "államokban": {
+        "lemma": "állam",
+        "gloss": "in the States",
+        "form": "Plural államok + inessive -ban; part of the country name."
+      },
+      "lesznek": {
+        "lemma": "lesz",
+        "gloss": "will be",
+        "form": "Future/existential verb, third-person plural."
+      },
+      "képkészítés": {
+        "lemma": "képkészítés",
+        "gloss": "image creation / generation",
+        "form": "Compound noun: kép + készítés."
+      },
+      "közben": {
+        "lemma": "közben",
+        "gloss": "during; while",
+        "form": "Postposition after képkészítés."
+      },
+      "megjelenni": {
+        "lemma": "megjelenik",
+        "gloss": "to appear",
+        "form": "Infinitive with prefix meg-."
+      },
+      "elkészült": {
+        "lemma": "elkészül",
+        "gloss": "finished; completed",
+        "form": "Past participial form describing the picture."
+      },
+      "egyes": {
+        "lemma": "egyes",
+        "gloss": "some; certain",
+        "form": "Determiner before a plural noun."
+      },
+      "európai": {
+        "lemma": "európai",
+        "gloss": "European",
+        "form": "Adjective; part of Európai Unió, European Union."
+      },
+      "unióban": {
+        "lemma": "unió",
+        "gloss": "in the Union",
+        "form": "Inessive singular: unió + ban; part of the EU name."
+      },
+      "készült": {
+        "lemma": "készül",
+        "gloss": "produced; made",
+        "form": "Past participial form here, describing texts."
+      },
+      "érinti": {
+        "lemma": "érint",
+        "gloss": "concerns; affects",
+        "form": "Present third-person singular definite form."
+      },
+      "változás": {
+        "lemma": "változás",
+        "gloss": "change",
+        "form": "Singular noun."
+      },
+      "hetekben": {
+        "lemma": "hét",
+        "gloss": "in weeks",
+        "form": "Plural hetek + inessive -ben."
+      },
+      "jön": {
+        "lemma": "jön",
+        "gloss": "comes; is coming",
+        "form": "Present third-person singular verb."
+      },
+      "szünet": {
+        "lemma": "szünet",
+        "gloss": "break; pause",
+        "form": "Singular noun."
+      },
+      "chatgpt": {
+        "lemma": "ChatGPT",
+        "gloss": "ChatGPT",
+        "form": "Product name."
+      },
+      "chatgpt-ben": {
+        "lemma": "ChatGPT",
+        "gloss": "in ChatGPT",
+        "form": "Product name + inessive suffix -ben."
+      },
+      "chatgpt-": {
+        "lemma": "ChatGPT",
+        "gloss": "ChatGPT",
+        "form": "Suspended first part of ChatGPT- és Codex-szövegeket, meaning ChatGPT and Codex texts."
+      },
+      "codex": {
+        "lemma": "Codex",
+        "gloss": "Codex",
+        "form": "Product name."
+      },
+      "codex-szövegeket": {
+        "lemma": "Codex-szöveg",
+        "gloss": "Codex texts (object)",
+        "form": "Compound product name + plural noun + accusative."
+      },
+      "szövegeket": {
+        "lemma": "szöveg",
+        "gloss": "texts (object)",
+        "form": "Plural szövegek + accusative -et."
+      },
+      "egyértelmű": {
+        "lemma": "egyértelmű",
+        "gloss": "clear; unambiguous",
+        "form": "Adjective modifying jelölést."
+      },
+      "jelölést": {
+        "lemma": "jelölés",
+        "gloss": "labeling; marking (object)",
+        "form": "Accusative singular: jelölés + t."
+      },
+      "kap": {
+        "lemma": "kap",
+        "gloss": "receives; gets",
+        "form": "Present third-person singular; future reference in the announced test."
+      }
+    },
+    "ar-EG": {
+      "جوجل": {
+        "lemma": "جوجل",
+        "gloss": "Google",
+        "form": ""
+      },
+      "طوّرت": {
+        "lemma": "طوّر",
+        "gloss": "developed / improved",
+        "form": "Third person feminine singular past."
+      },
+      "صوت": {
+        "lemma": "صوت",
+        "gloss": "voice / sound",
+        "form": ""
+      },
+      "في": {
+        "lemma": "في",
+        "gloss": "in",
+        "form": ""
+      },
+      "ڤيدز": {
+        "lemma": "ڤيدز",
+        "gloss": "Vids",
+        "form": ""
+      },
+      "بتقول": {
+        "lemma": "قال",
+        "gloss": "says",
+        "form": "Third person feminine singular habitual; also “you say”."
+      },
+      "طبيعي": {
+        "lemma": "طبيعي",
+        "gloss": "natural",
+        "form": ""
+      },
+      "أكتر": {
+        "lemma": "كتير",
+        "gloss": "more",
+        "form": "Comparative."
+      },
+      "جي": {
+        "lemma": "جي",
+        "gloss": "G",
+        "form": "Letter name in a product name."
+      },
+      "بورد": {
+        "lemma": "بورد",
+        "gloss": "Board",
+        "form": "Part of the product name Gboard."
+      },
+      "بيساعد": {
+        "lemma": "ساعد",
+        "gloss": "helps",
+        "form": "Third person masculine singular habitual."
+      },
+      "موبايل": {
+        "lemma": "موبايل",
+        "gloss": "mobile phone",
+        "form": ""
+      },
+      "بيبعت": {
+        "lemma": "بعت",
+        "gloss": "sends",
+        "form": "Third person masculine singular habitual."
+      },
+      "بيانات": {
+        "lemma": "بيانات",
+        "gloss": "data",
+        "form": ""
+      },
+      "مشفّرة": {
+        "lemma": "شفّر",
+        "gloss": "encrypted",
+        "form": "Feminine adjective; also used with nonhuman plurals."
+      },
+      "دي": {
+        "lemma": "دي",
+        "gloss": "this [feminine]",
+        "form": ""
+      },
+      "شركة": {
+        "lemma": "شركة",
+        "gloss": "company",
+        "form": ""
+      },
+      "جديدة": {
+        "lemma": "جديد",
+        "gloss": "new [feminine]",
+        "form": "Feminine singular."
+      },
+      "ده": {
+        "lemma": "ده",
+        "gloss": "this [masculine]",
+        "form": ""
+      },
+      "فيديو": {
+        "lemma": "فيديو",
+        "gloss": "video",
+        "form": ""
+      },
+      "جديد": {
+        "lemma": "جديد",
+        "gloss": "new",
+        "form": ""
+      },
+      "موديل": {
+        "lemma": "موديل",
+        "gloss": "model",
+        "form": ""
+      },
+      "شغل": {
+        "lemma": "شغل",
+        "gloss": "work",
+        "form": ""
+      },
+      "أنثروبيك": {
+        "lemma": "أنثروبيك",
+        "gloss": "Anthropic",
+        "form": ""
+      },
+      "عندها": {
+        "lemma": "عند",
+        "gloss": "she / it has",
+        "form": "عند + ها; possession with a feminine possessor."
+      },
+      "برنامج": {
+        "lemma": "برنامج",
+        "gloss": "program",
+        "form": ""
+      },
+      "تدريب": {
+        "lemma": "تدريب",
+        "gloss": "training",
+        "form": ""
+      },
+      "عملي": {
+        "lemma": "عملي",
+        "gloss": "practical",
+        "form": ""
+      },
+      "هدف": {
+        "lemma": "هدف",
+        "gloss": "goal",
+        "form": ""
+      },
+      "عشر": {
+        "lemma": "عشرة",
+        "gloss": "ten",
+        "form": "Form used before a counted noun."
+      },
+      "تلاف": {
+        "lemma": "ألف",
+        "gloss": "thousand [plural]",
+        "form": "Plural used after numbers three to ten."
+      },
+      "مهندس": {
+        "lemma": "مهندس",
+        "gloss": "engineer",
+        "form": ""
+      },
+      "اسمه": {
+        "lemma": "اسم",
+        "gloss": "its name is",
+        "form": "اسم + ه, masculine possessive suffix."
+      },
+      "جيميني": {
+        "lemma": "جيميني",
+        "gloss": "Gemini",
+        "form": ""
+      },
+      "أرجون": {
+        "lemma": "أرجون",
+        "gloss": "Argon",
+        "form": ""
+      },
+      "مش": {
+        "lemma": "مش",
+        "gloss": "not",
+        "form": ""
+      },
+      "كل": {
+        "lemma": "كل",
+        "gloss": "every / all",
+        "form": ""
+      },
+      "ناس": {
+        "lemma": "ناس",
+        "gloss": "people",
+        "form": ""
+      },
+      "تقدر": {
+        "lemma": "قدر",
+        "gloss": "can",
+        "form": "Feminine third person or second person singular."
+      },
+      "تستخدمه": {
+        "lemma": "استخدم",
+        "gloss": "use it",
+        "form": "تستخدم + ه, masculine object suffix."
+      },
+      "أوبن": {
+        "lemma": "أوبن",
+        "gloss": "Open",
+        "form": "Part of the company name OpenAI."
+      },
+      "إيه": {
+        "lemma": "إيه",
+        "gloss": "A / what",
+        "form": "Letter name in OpenAI; elsewhere “what”."
+      },
+      "آي": {
+        "lemma": "آي",
+        "gloss": "I",
+        "form": "Letter name in OpenAI."
+      },
+      "بي": {
+        "lemma": "بي",
+        "gloss": "P",
+        "form": "Letter name in GPT."
+      },
+      "تي": {
+        "lemma": "تي",
+        "gloss": "T",
+        "form": "Letter name in GPT."
+      },
+      "سول": {
+        "lemma": "سول",
+        "gloss": "Sol",
+        "form": ""
+      },
+      "موجود": {
+        "lemma": "موجود",
+        "gloss": "available / present",
+        "form": ""
+      },
+      "كودكس": {
+        "lemma": "كودكس",
+        "gloss": "Codex",
+        "form": ""
+      },
+      "أعلنت": {
+        "lemma": "أعلن",
+        "gloss": "announced",
+        "form": "Third person feminine singular past."
+      },
+      "عن": {
+        "lemma": "عن",
+        "gloss": "about / of",
+        "form": ""
+      },
+      "سونيت": {
+        "lemma": "سونيت",
+        "gloss": "Sonnet",
+        "form": ""
+      },
+      "إنه": {
+        "lemma": "إن",
+        "gloss": "that it / he",
+        "form": "إن + ه, masculine pronoun suffix."
+      },
+      "أسرع": {
+        "lemma": "سريع",
+        "gloss": "faster",
+        "form": "Comparative."
+      },
+      "أداة": {
+        "lemma": "أداة",
+        "gloss": "tool",
+        "form": ""
+      },
+      "سريعة": {
+        "lemma": "سريع",
+        "gloss": "fast [feminine]",
+        "form": "Feminine singular."
+      },
+      "بطيء": {
+        "lemma": "بطيء",
+        "gloss": "slow",
+        "form": ""
+      },
+      "بس": {
+        "lemma": "بس",
+        "gloss": "but / only",
+        "form": ""
+      },
+      "صعب": {
+        "lemma": "صعب",
+        "gloss": "difficult",
+        "form": ""
+      },
+      "مفيد": {
+        "lemma": "مفيد",
+        "gloss": "useful",
+        "form": ""
+      },
+      "بطيئة": {
+        "lemma": "بطيء",
+        "gloss": "slow [feminine]",
+        "form": "Feminine singular."
+      },
+      "سكيلز": {
+        "lemma": "سكيلز",
+        "gloss": "Skills",
+        "form": "English feature name written in Arabic."
+      },
+      "جيميناي": {
+        "lemma": "جيميناي",
+        "gloss": "Gemini",
+        "form": ""
+      },
+      "ممكن": {
+        "lemma": "ممكن",
+        "gloss": "can / possible",
+        "form": ""
+      },
+      "تستخدم": {
+        "lemma": "استخدم",
+        "gloss": "use",
+        "form": "Feminine third person or second person singular."
+      },
+      "تاني": {
+        "lemma": "تاني",
+        "gloss": "again / second",
+        "form": ""
+      },
+      "بتعمل": {
+        "lemma": "عمل",
+        "gloss": "does / makes",
+        "form": "Third person feminine singular habitual; also “you do”."
+      },
+      "بتساعد": {
+        "lemma": "ساعد",
+        "gloss": "helps",
+        "form": "Third person feminine singular habitual; also “you help”."
+      },
+      "مين": {
+        "lemma": "مين",
+        "gloss": "who",
+        "form": ""
+      },
+      "سلمى": {
+        "lemma": "سلمى",
+        "gloss": "Salma",
+        "form": ""
+      },
+      "سؤال": {
+        "lemma": "سؤال",
+        "gloss": "question",
+        "form": ""
+      },
+      "لأ": {
+        "lemma": "لأ",
+        "gloss": "no",
+        "form": ""
+      },
+      "إجابة": {
+        "lemma": "إجابة",
+        "gloss": "answer",
+        "form": ""
+      },
+      "مفيدة": {
+        "lemma": "مفيد",
+        "gloss": "useful [feminine]",
+        "form": "Feminine singular."
+      },
+      "مهندسين": {
+        "lemma": "مهندس",
+        "gloss": "engineers",
+        "form": "Masculine plural."
+      },
+      "أنا": {
+        "lemma": "أنا",
+        "gloss": "I",
+        "form": ""
+      },
+      "عمر": {
+        "lemma": "عمر",
+        "gloss": "Omar",
+        "form": ""
+      },
+      "بشتغل": {
+        "lemma": "اشتغل",
+        "gloss": "I work",
+        "form": "First person singular habitual."
+      },
+      "يوم": {
+        "lemma": "يوم",
+        "gloss": "day",
+        "form": ""
+      },
+      "بستخدم": {
+        "lemma": "استخدم",
+        "gloss": "I use",
+        "form": "First person singular habitual."
+      },
+      "طالبة": {
+        "lemma": "طالب",
+        "gloss": "female student",
+        "form": "Feminine singular."
+      },
+      "بتعلم": {
+        "lemma": "اتعلم",
+        "gloss": "I learn",
+        "form": "First person singular habitual in these examples."
+      },
+      "بيقرا": {
+        "lemma": "قرا",
+        "gloss": "reads",
+        "form": "Third person masculine singular habitual."
+      },
+      "مستند": {
+        "lemma": "مستند",
+        "gloss": "document",
+        "form": ""
+      },
+      "بيستخدم": {
+        "lemma": "استخدم",
+        "gloss": "uses",
+        "form": "Third person masculine singular habitual."
+      },
+      "طالب": {
+        "lemma": "طالب",
+        "gloss": "student",
+        "form": ""
+      },
+      "فايل": {
+        "lemma": "فايل",
+        "gloss": "file",
+        "form": ""
+      },
+      "بيكتب": {
+        "lemma": "كتب",
+        "gloss": "writes",
+        "form": "Third person masculine singular habitual."
+      },
+      "سريع": {
+        "lemma": "سريع",
+        "gloss": "fast",
+        "form": ""
+      },
+      "سعر": {
+        "lemma": "سعر",
+        "gloss": "price",
+        "form": ""
+      },
+      "استخدام": {
+        "lemma": "استخدام",
+        "gloss": "use / usage",
+        "form": ""
+      },
+      "حسب": {
+        "lemma": "حسب",
+        "gloss": "according to",
+        "form": ""
+      },
+      "بكام": {
+        "lemma": "كام",
+        "gloss": "how much [price]",
+        "form": "بـ + كام, asks a price."
+      },
+      "باتنين": {
+        "lemma": "اتنين",
+        "gloss": "for two",
+        "form": "بـ price preposition + two."
+      },
+      "جنيه": {
+        "lemma": "جنيه",
+        "gloss": "pound [currency]",
+        "form": ""
+      },
+      "ببلاش": {
+        "lemma": "بلاش",
+        "gloss": "for free",
+        "form": "بـ + بلاش."
+      },
+      "واحد": {
+        "lemma": "واحد",
+        "gloss": "one",
+        "form": ""
+      },
+      "فيه": {
+        "lemma": "فيه",
+        "gloss": "there is / are",
+        "form": ""
+      },
+      "بعشرة": {
+        "lemma": "عشرة",
+        "gloss": "for ten",
+        "form": "بـ price preposition + ten."
+      },
+      "هي": {
+        "lemma": "هي",
+        "gloss": "she / it [feminine]",
+        "form": ""
+      },
+      "بتتعلم": {
+        "lemma": "اتعلم",
+        "gloss": "she learns",
+        "form": "Third person feminine singular habitual; also “you learn”."
+      },
+      "داتا": {
+        "lemma": "داتا",
+        "gloss": "Data",
+        "form": ""
+      },
+      "إيجنت": {
+        "lemma": "إيجنت",
+        "gloss": "Agent",
+        "form": ""
+      },
+      "كيت": {
+        "lemma": "كيت",
+        "gloss": "Kit",
+        "form": ""
+      },
+      "أدوات": {
+        "lemma": "أداة",
+        "gloss": "tools",
+        "form": "Plural."
+      },
+      "يبقى": {
+        "lemma": "بقي",
+        "gloss": "be / become",
+        "form": "Nonpast form used after ممكن and in future constructions."
+      },
+      "بفلوس": {
+        "lemma": "فلوس",
+        "gloss": "paid / for money",
+        "form": "بـ + فلوس."
+      },
+      "كمبيوتر": {
+        "lemma": "كمبيوتر",
+        "gloss": "computer",
+        "form": ""
+      },
+      "فين": {
+        "lemma": "فين",
+        "gloss": "where",
+        "form": ""
+      },
+      "هناك": {
+        "lemma": "هناك",
+        "gloss": "there",
+        "form": ""
+      },
+      "هنا": {
+        "lemma": "هنا",
+        "gloss": "here",
+        "form": ""
+      },
+      "فريق": {
+        "lemma": "فريق",
+        "gloss": "team",
+        "form": ""
+      },
+      "كتير": {
+        "lemma": "كتير",
+        "gloss": "many / much",
+        "form": ""
+      },
+      "عندنا": {
+        "lemma": "عند",
+        "gloss": "we have",
+        "form": "عند + نا, first person plural possessor."
+      },
+      "فايلات": {
+        "lemma": "فايل",
+        "gloss": "files",
+        "form": "Plural."
+      },
+      "شوية": {
+        "lemma": "شوية",
+        "gloss": "a few / a little",
+        "form": ""
+      },
+      "أسئلة": {
+        "lemma": "سؤال",
+        "gloss": "questions",
+        "form": "Plural."
+      },
+      "عندي": {
+        "lemma": "عند",
+        "gloss": "I have",
+        "form": "عند + ي, first person singular possessor."
+      },
+      "واحدة": {
+        "lemma": "واحد",
+        "gloss": "one [feminine]",
+        "form": "Feminine singular."
+      },
+      "عنده": {
+        "lemma": "عند",
+        "gloss": "he / it has",
+        "form": "عند + ه, masculine possessor."
+      },
+      "واضحة": {
+        "lemma": "واضح",
+        "gloss": "clear [feminine]",
+        "form": "Feminine singular."
+      },
+      "اقرا": {
+        "lemma": "قرا",
+        "gloss": "read",
+        "form": "Masculine singular imperative."
+      },
+      "من": {
+        "lemma": "من",
+        "gloss": "from / of",
+        "form": ""
+      },
+      "فضلك": {
+        "lemma": "فضل",
+        "gloss": "your favour",
+        "form": "من فضلك: please."
+      },
+      "واكتب": {
+        "lemma": "كتب",
+        "gloss": "and write",
+        "form": "و + اكتب, masculine singular imperative."
+      },
+      "قصيّرة": {
+        "lemma": "قصير",
+        "gloss": "short [feminine]",
+        "form": "Feminine singular, alternative spelling."
+      },
+      "قول": {
+        "lemma": "قال",
+        "gloss": "say",
+        "form": "Masculine singular imperative."
+      },
+      "نهارده": {
+        "lemma": "نهارده",
+        "gloss": "today",
+        "form": ""
+      },
+      "بقرا": {
+        "lemma": "قرا",
+        "gloss": "I read",
+        "form": "First person singular habitual."
+      },
+      "محتاج": {
+        "lemma": "محتاج",
+        "gloss": "needing / need",
+        "form": ""
+      },
+      "وقت": {
+        "lemma": "وقت",
+        "gloss": "time",
+        "form": ""
+      },
+      "عايز": {
+        "lemma": "عايز",
+        "gloss": "wanting / want [masculine]",
+        "form": ""
+      },
+      "أتعلم": {
+        "lemma": "اتعلم",
+        "gloss": "to learn / I learn",
+        "form": "First person singular nonpast, without habitual ب."
+      },
+      "عايزة": {
+        "lemma": "عايز",
+        "gloss": "wanting / want [feminine]",
+        "form": "Feminine singular."
+      },
+      "مستندين": {
+        "lemma": "مستند",
+        "gloss": "two documents",
+        "form": "Dual -ين."
+      },
+      "جملة": {
+        "lemma": "جملة",
+        "gloss": "sentence",
+        "form": ""
+      },
+      "مختلفة": {
+        "lemma": "مختلف",
+        "gloss": "different [feminine]",
+        "form": "Feminine singular."
+      },
+      "دايما": {
+        "lemma": "دايما",
+        "gloss": "always",
+        "form": ""
+      },
+      "أحسن": {
+        "lemma": "حسن",
+        "gloss": "better",
+        "form": "Comparative."
+      },
+      "أرخص": {
+        "lemma": "رخيص",
+        "gloss": "cheaper",
+        "form": "Comparative."
+      },
+      "بتقرا": {
+        "lemma": "قرا",
+        "gloss": "you / she read(s)",
+        "form": "Second person or feminine third person habitual."
+      },
+      "بتكتب": {
+        "lemma": "كتب",
+        "gloss": "you / she write(s)",
+        "form": "Second person or feminine third person habitual."
+      },
+      "مستندات": {
+        "lemma": "مستند",
+        "gloss": "documents",
+        "form": "Plural."
+      },
+      "قليلة": {
+        "lemma": "قليل",
+        "gloss": "few / little [feminine]",
+        "form": "Feminine singular; also with nonhuman plurals."
+      },
+      "مختلفين": {
+        "lemma": "مختلف",
+        "gloss": "different [plural / dual]",
+        "form": "Plural/dual predicate."
+      },
+      "أنهي": {
+        "lemma": "أنهي",
+        "gloss": "which",
+        "form": ""
+      },
+      "واضح": {
+        "lemma": "واضح",
+        "gloss": "clear",
+        "form": ""
+      },
+      "براجع": {
+        "lemma": "راجع",
+        "gloss": "I check / review",
+        "form": "First person singular habitual."
+      },
+      "مصدر": {
+        "lemma": "مصدر",
+        "gloss": "source",
+        "form": ""
+      },
+      "بعرف": {
+        "lemma": "عرف",
+        "gloss": "I know how / can",
+        "form": "First person singular habitual."
+      },
+      "أقرا": {
+        "lemma": "قرا",
+        "gloss": "to read / I read",
+        "form": "First person singular nonpast."
+      },
+      "إذن": {
+        "lemma": "إذن",
+        "gloss": "permission",
+        "form": ""
+      },
+      "آمنة": {
+        "lemma": "آمن",
+        "gloss": "safe [feminine]",
+        "form": "Feminine singular."
+      },
+      "راجع": {
+        "lemma": "راجع",
+        "gloss": "check / review",
+        "form": "Masculine singular imperative."
+      },
+      "اقراه": {
+        "lemma": "قرا",
+        "gloss": "read it",
+        "form": "Masculine imperative + ه, masculine object."
+      },
+      "أداتين": {
+        "lemma": "أداة",
+        "gloss": "two tools",
+        "form": "Dual -تين."
+      },
+      "آمن": {
+        "lemma": "آمن",
+        "gloss": "safe",
+        "form": ""
+      },
+      "تحتاج": {
+        "lemma": "احتاج",
+        "gloss": "need",
+        "form": "Feminine third person or second person nonpast."
+      },
+      "برضه": {
+        "lemma": "برضه",
+        "gloss": "also / too",
+        "form": ""
+      },
+      "محتاجة": {
+        "lemma": "محتاج",
+        "gloss": "needing [feminine]",
+        "form": "Feminine singular."
+      },
+      "تاريخ": {
+        "lemma": "تاريخ",
+        "gloss": "date",
+        "form": ""
+      },
+      "قريت": {
+        "lemma": "قرا",
+        "gloss": "I read [past]",
+        "form": "First or second person singular past; first person in these sentences."
+      },
+      "خبر": {
+        "lemma": "خبر",
+        "gloss": "news",
+        "form": ""
+      },
+      "امبارح": {
+        "lemma": "امبارح",
+        "gloss": "yesterday",
+        "form": ""
+      },
+      "نزّلت": {
+        "lemma": "نزّل",
+        "gloss": "released / put out",
+        "form": "Third person feminine singular past."
+      },
+      "إمتى": {
+        "lemma": "إمتى",
+        "gloss": "when",
+        "form": ""
+      },
+      "أسبوع": {
+        "lemma": "أسبوع",
+        "gloss": "week",
+        "form": ""
+      },
+      "هنراجع": {
+        "lemma": "راجع",
+        "gloss": "we will check",
+        "form": "هـ future + first person plural."
+      },
+      "بعدين": {
+        "lemma": "بعدين",
+        "gloss": "later",
+        "form": ""
+      },
+      "بيتعلم": {
+        "lemma": "اتعلم",
+        "gloss": "learns",
+        "form": "Third person masculine singular habitual."
+      },
+      "قليل": {
+        "lemma": "قليل",
+        "gloss": "little / few",
+        "form": ""
+      },
+      "هراجع": {
+        "lemma": "راجع",
+        "gloss": "I will check",
+        "form": "هـ future + first person singular."
+      },
+      "شهر": {
+        "lemma": "شهر",
+        "gloss": "month",
+        "form": ""
+      },
+      "هقرا": {
+        "lemma": "قرا",
+        "gloss": "I will read",
+        "form": "هـ future + first person singular."
+      },
+      "خطة": {
+        "lemma": "خطة",
+        "gloss": "plan",
+        "form": ""
+      },
+      "قصيرة": {
+        "lemma": "قصير",
+        "gloss": "short [feminine]",
+        "form": "Feminine singular."
+      },
+      "جاي": {
+        "lemma": "جاي",
+        "gloss": "coming / next",
+        "form": ""
+      },
+      "هتعلم": {
+        "lemma": "اتعلم",
+        "gloss": "I will learn",
+        "form": "هـ future + first person singular in these examples."
+      },
+      "هكتب": {
+        "lemma": "كتب",
+        "gloss": "I will write",
+        "form": "هـ future + first person singular."
+      },
+      "قصير": {
+        "lemma": "قصير",
+        "gloss": "short",
+        "form": ""
+      },
+      "هتقرا": {
+        "lemma": "قرا",
+        "gloss": "you will read",
+        "form": "هـ future + second person singular in these examples."
+      },
+      "عشان": {
+        "lemma": "عشان",
+        "gloss": "because / in order to",
+        "form": ""
+      },
+      "مهم": {
+        "lemma": "مهم",
+        "gloss": "important",
+        "form": ""
+      },
+      "كمان": {
+        "lemma": "كمان",
+        "gloss": "also",
+        "form": ""
+      },
+      "معنديش": {
+        "lemma": "عند",
+        "gloss": "I do not have",
+        "form": "Negative ما + عندي + ش."
+      },
+      "باحث": {
+        "lemma": "باحث",
+        "gloss": "researcher",
+        "form": ""
+      },
+      "نتيجة": {
+        "lemma": "نتيجة",
+        "gloss": "result",
+        "form": ""
+      },
+      "معروفة": {
+        "lemma": "معروف",
+        "gloss": "known [feminine]",
+        "form": "Feminine singular."
+      },
+      "اختبار": {
+        "lemma": "اختبار",
+        "gloss": "test",
+        "form": ""
+      },
+      "مختلف": {
+        "lemma": "مختلف",
+        "gloss": "different",
+        "form": ""
+      },
+      "بيراجع": {
+        "lemma": "راجع",
+        "gloss": "checks / reviews",
+        "form": "Third person masculine singular habitual."
+      },
+      "لسه": {
+        "lemma": "لسه",
+        "gloss": "still / yet",
+        "form": ""
+      },
+      "منعرفش": {
+        "lemma": "عرف",
+        "gloss": "we do not know",
+        "form": "Negative ما + نعرف + ش."
+      },
+      "بيقول": {
+        "lemma": "قال",
+        "gloss": "says",
+        "form": "Third person masculine singular habitual."
+      },
+      "إن": {
+        "lemma": "إن",
+        "gloss": "that",
+        "form": ""
+      },
+      "يمكن": {
+        "lemma": "يمكن",
+        "gloss": "maybe",
+        "form": ""
+      },
+      "هنتعلم": {
+        "lemma": "اتعلم",
+        "gloss": "we will learn",
+        "form": "هـ future + first person plural."
+      },
+      "منى": {
+        "lemma": "منى",
+        "gloss": "Mona",
+        "form": ""
+      },
+      "فاهم": {
+        "lemma": "فاهم",
+        "gloss": "understanding [masculine]",
+        "form": ""
+      },
+      "مثال": {
+        "lemma": "مثال",
+        "gloss": "example",
+        "form": ""
+      },
+      "يساعد": {
+        "lemma": "ساعد",
+        "gloss": "help",
+        "form": "Third person masculine nonpast, without habitual ب."
+      },
+      "كريم": {
+        "lemma": "كريم",
+        "gloss": "Karim",
+        "form": ""
+      },
+      "بسيطة": {
+        "lemma": "بسيط",
+        "gloss": "simple [feminine]",
+        "form": "Feminine singular."
+      },
+      "إنت": {
+        "lemma": "إنت",
+        "gloss": "you [singular]",
+        "form": ""
+      },
+      "بالراحة": {
+        "lemma": "راحة",
+        "gloss": "slowly / gently",
+        "form": "Fixed adverbial phrase بـ + الراحة."
+      },
+      "ليه": {
+        "lemma": "ليه",
+        "gloss": "why",
+        "form": ""
+      },
+      "ادّعاء": {
+        "lemma": "ادّعاء",
+        "gloss": "claim",
+        "form": ""
+      },
+      "بفتح": {
+        "lemma": "فتح",
+        "gloss": "I open",
+        "form": "First person singular habitual."
+      },
+      "ملف": {
+        "lemma": "ملف",
+        "gloss": "file",
+        "form": ""
+      },
+      "بعد": {
+        "lemma": "بعد",
+        "gloss": "after",
+        "form": ""
+      },
+      "قبل": {
+        "lemma": "قبل",
+        "gloss": "before",
+        "form": ""
+      },
+      "بكتب": {
+        "lemma": "كتب",
+        "gloss": "I write",
+        "form": "First person singular habitual."
+      },
+      "لو": {
+        "lemma": "لو",
+        "gloss": "if",
+        "form": ""
+      },
+      "متاح": {
+        "lemma": "متاح",
+        "gloss": "available",
+        "form": ""
+      },
+      "هقراه": {
+        "lemma": "قرا",
+        "gloss": "I will read it",
+        "form": "Future first person singular + ه object suffix."
+      },
+      "هجرّب": {
+        "lemma": "جرّب",
+        "gloss": "I will try",
+        "form": "هـ future + first person singular."
+      },
+      "مشكلة": {
+        "lemma": "مشكلة",
+        "gloss": "problem",
+        "form": ""
+      },
+      "مستعجلة": {
+        "lemma": "مستعجل",
+        "gloss": "urgent [feminine]",
+        "form": "Feminine singular."
+      },
+      "هيبقى": {
+        "lemma": "بقي",
+        "gloss": "will be",
+        "form": "هـ future + third person masculine singular."
+      },
+      "يجرّب": {
+        "lemma": "جرّب",
+        "gloss": "try",
+        "form": "Third person masculine nonpast."
+      },
+      "تانية": {
+        "lemma": "تاني",
+        "gloss": "other / second [feminine]",
+        "form": "Feminine singular."
+      },
+      "هيستخدمها": {
+        "lemma": "استخدم",
+        "gloss": "he will use it",
+        "form": "Future third person masculine + ها feminine object."
+      },
+      "هيسأل": {
+        "lemma": "سأل",
+        "gloss": "he will ask",
+        "form": "Future third person masculine singular."
+      },
+      "بفضّل": {
+        "lemma": "فضّل",
+        "gloss": "I prefer",
+        "form": "First person singular habitual."
+      },
+      "غالية": {
+        "lemma": "غالي",
+        "gloss": "expensive [feminine]",
+        "form": "Feminine singular."
+      },
+      "كفاية": {
+        "lemma": "كفاية",
+        "gloss": "enough",
+        "form": ""
+      },
+      "للمهمة": {
+        "lemma": "مهمة",
+        "gloss": "for the task",
+        "form": "لـ + الـ + مهمة."
+      },
+      "بكرة": {
+        "lemma": "بكرة",
+        "gloss": "tomorrow",
+        "form": ""
+      },
+      "متاحة": {
+        "lemma": "متاح",
+        "gloss": "available [feminine]",
+        "form": "Feminine singular."
+      },
+      "هجرّبها": {
+        "lemma": "جرّب",
+        "gloss": "I will try it",
+        "form": "Future first person singular + ها feminine object."
+      },
+      "قوي": {
+        "lemma": "قوي",
+        "gloss": "very / too",
+        "form": ""
+      },
+      "هدوّر": {
+        "lemma": "دوّر",
+        "gloss": "I will look",
+        "form": "Future first person singular; دوّر على: look for."
+      },
+      "على": {
+        "lemma": "على",
+        "gloss": "on / for",
+        "form": ""
+      },
+      "غيرها": {
+        "lemma": "غير",
+        "gloss": "another one",
+        "form": "غير + ها, feminine suffix."
+      },
+      "دلوقتي": {
+        "lemma": "دلوقتي",
+        "gloss": "now",
+        "form": ""
+      },
+      "كلمة": {
+        "lemma": "كلمة",
+        "gloss": "word",
+        "form": ""
+      },
+      "اشرح": {
+        "lemma": "شرح",
+        "gloss": "explain",
+        "form": "Masculine singular imperative."
+      },
+      "لي": {
+        "lemma": "لـ",
+        "gloss": "to me",
+        "form": "Preposition + first person singular suffix."
+      },
+      "ببص": {
+        "lemma": "بص",
+        "gloss": "I look",
+        "form": "First person singular habitual."
+      },
+      "بتعلّم": {
+        "lemma": "اتعلّم",
+        "gloss": "I learn",
+        "form": "First person singular habitual in this course spelling."
+      },
+      "فاهمة": {
+        "lemma": "فاهم",
+        "gloss": "understanding [feminine]",
+        "form": "Feminine singular."
+      },
+      "عنوان": {
+        "lemma": "عنوان",
+        "gloss": "title",
+        "form": ""
+      },
+      "بسيط": {
+        "lemma": "بسيط",
+        "gloss": "simple",
+        "form": ""
+      },
+      "فهمت": {
+        "lemma": "فهم",
+        "gloss": "I understood",
+        "form": "First or second person singular past; first person here."
+      },
+      "ملفات": {
+        "lemma": "ملف",
+        "gloss": "files",
+        "form": "Plural."
+      },
+      "حد": {
+        "lemma": "حد",
+        "gloss": "limit",
+        "form": ""
+      },
+      "بعض": {
+        "lemma": "بعض",
+        "gloss": "some",
+        "form": ""
+      },
+      "باحثين": {
+        "lemma": "باحث",
+        "gloss": "researchers",
+        "form": "Plural."
+      },
+      "بيراجعوا": {
+        "lemma": "راجع",
+        "gloss": "they check / review",
+        "form": "Third person plural habitual."
+      },
+      "كاملة": {
+        "lemma": "كامل",
+        "gloss": "complete [feminine]",
+        "form": "Feminine singular."
+      },
+      "نبص": {
+        "lemma": "بص",
+        "gloss": "let us look",
+        "form": "First person plural nonpast."
+      },
+      "رأيي": {
+        "lemma": "رأي",
+        "gloss": "my opinion",
+        "form": "First person singular possessive."
+      },
+      "موافق": {
+        "lemma": "موافق",
+        "gloss": "agreeing [masculine]",
+        "form": ""
+      },
+      "موافقة": {
+        "lemma": "موافق",
+        "gloss": "agreeing [feminine]",
+        "form": "Feminine singular."
+      },
+      "اشرحي": {
+        "lemma": "شرح",
+        "gloss": "explain",
+        "form": "Feminine singular imperative."
+      },
+      "شكرًا": {
+        "lemma": "شكرًا",
+        "gloss": "thank you",
+        "form": ""
+      },
+      "كويسة": {
+        "lemma": "كويس",
+        "gloss": "good [feminine]",
+        "form": "Feminine singular."
+      },
+      "يلا": {
+        "lemma": "يلا",
+        "gloss": "let us / come on",
+        "form": ""
+      },
+      "نجرّبها": {
+        "lemma": "جرّب",
+        "gloss": "let us try it",
+        "form": "First person plural + ها feminine object."
+      },
+      "كله": {
+        "lemma": "كل",
+        "gloss": "all of it",
+        "form": "كل + ه, masculine suffix."
+      },
+      "حقايق": {
+        "lemma": "حقيقة",
+        "gloss": "facts",
+        "form": "Plural."
+      },
+      "دليل": {
+        "lemma": "دليل",
+        "gloss": "evidence",
+        "form": ""
+      },
+      "ما": {
+        "lemma": "ما",
+        "gloss": "[subordinator]",
+        "form": "Before a verb after قبل: before (doing…)."
+      },
+      "أردّ": {
+        "lemma": "ردّ",
+        "gloss": "I respond",
+        "form": "First person singular nonpast."
+      },
+      "اختبارين": {
+        "lemma": "اختبار",
+        "gloss": "two tests",
+        "form": "Dual -ين."
+      },
+      "حالات": {
+        "lemma": "حالة",
+        "gloss": "cases / situations",
+        "form": "Plural."
+      },
+      "حقيقة": {
+        "lemma": "حقيقة",
+        "gloss": "fact / truth",
+        "form": ""
+      },
+      "مهمة": {
+        "lemma": "مهم",
+        "gloss": "important [feminine] / task",
+        "form": "Feminine adjective; also the noun “task”."
+      },
+      "بحث": {
+        "lemma": "بحث",
+        "gloss": "search / research",
+        "form": ""
+      },
+      "ليك": {
+        "lemma": "لـ",
+        "gloss": "for you",
+        "form": "Preposition + second person masculine suffix."
+      },
+      "كتابة": {
+        "lemma": "كتابة",
+        "gloss": "writing",
+        "form": ""
+      },
+      "برمجة": {
+        "lemma": "برمجة",
+        "gloss": "programming",
+        "form": ""
+      },
+      "تعليمات": {
+        "lemma": "تعليمات",
+        "gloss": "instructions",
+        "form": "Plural."
+      },
+      "توكنز": {
+        "lemma": "توكن",
+        "gloss": "tokens",
+        "form": "Plural loanword."
+      },
+      "كلاود": {
+        "lemma": "كلاود",
+        "gloss": "cloud",
+        "form": ""
+      },
+      "أول": {
+        "lemma": "أول",
+        "gloss": "first",
+        "form": ""
+      },
+      "عدد": {
+        "lemma": "عدد",
+        "gloss": "number / count",
+        "form": ""
+      },
+      "مع": {
+        "lemma": "مع",
+        "gloss": "with",
+        "form": ""
+      },
+      "معروف": {
+        "lemma": "معروف",
+        "gloss": "known",
+        "form": ""
+      },
+      "رخيص": {
+        "lemma": "رخيص",
+        "gloss": "cheap",
+        "form": ""
+      },
+      "غالي": {
+        "lemma": "غالي",
+        "gloss": "expensive",
+        "form": ""
+      },
+      "مهندسة": {
+        "lemma": "مهندس",
+        "gloss": "female engineer",
+        "form": "Feminine singular."
+      },
+      "أيوه": {
+        "lemma": "أيوه",
+        "gloss": "yes",
+        "form": ""
+      },
+      "اتنين": {
+        "lemma": "اتنين",
+        "gloss": "two",
+        "form": ""
+      },
+      "عشرة": {
+        "lemma": "عشرة",
+        "gloss": "ten",
+        "form": ""
+      },
+      "قصيّر": {
+        "lemma": "قصير",
+        "gloss": "short",
+        "form": "Alternative spelling."
+      },
+      "قولي": {
+        "lemma": "قال",
+        "gloss": "say",
+        "form": "Feminine singular imperative."
+      },
+      "اقري": {
+        "lemma": "قرا",
+        "gloss": "read",
+        "form": "Feminine singular imperative."
+      },
+      "اكتب": {
+        "lemma": "كتب",
+        "gloss": "write",
+        "form": "Masculine singular imperative."
+      },
+      "اكتبي": {
+        "lemma": "كتب",
+        "gloss": "write",
+        "form": "Feminine singular imperative."
+      },
+      "للشغل": {
+        "lemma": "شغل",
+        "gloss": "for work",
+        "form": "لـ + الـ + شغل."
+      },
+      "هو": {
+        "lemma": "هو",
+        "gloss": "he / it [masculine]",
+        "form": ""
+      },
+      "و": {
+        "lemma": "و",
+        "gloss": "and",
+        "form": ""
+      },
+      "يقدر": {
+        "lemma": "قدر",
+        "gloss": "can",
+        "form": "Third person masculine nonpast."
+      },
+      "يستخدمه": {
+        "lemma": "استخدم",
+        "gloss": "use it",
+        "form": "Third person masculine nonpast + ه object."
+      },
+      "أصوات": {
+        "lemma": "صوت",
+        "gloss": "voices / sounds",
+        "form": "Plural."
+      },
+      "خريجين": {
+        "lemma": "خريج",
+        "gloss": "graduates",
+        "form": "Plural."
+      },
+      "بتعلن": {
+        "lemma": "أعلن",
+        "gloss": "announces",
+        "form": "Third person feminine habitual."
+      },
+      "بيتعلّم": {
+        "lemma": "اتعلّم",
+        "gloss": "learns",
+        "form": "Third person masculine habitual."
+      },
+      "محدّش": {
+        "lemma": "حد",
+        "gloss": "nobody",
+        "form": "Negative indefinite pronoun."
+      },
+      "الصوت": {
+        "lemma": "صوت",
+        "gloss": "the voice / sound",
+        "form": "Definite article الـ. "
+      },
+      "الكتابة": {
+        "lemma": "كتابة",
+        "gloss": "the writing",
+        "form": "Definite article الـ. "
+      },
+      "الموبايل": {
+        "lemma": "موبايل",
+        "gloss": "the mobile phone",
+        "form": "Definite article الـ. "
+      },
+      "الموديل": {
+        "lemma": "موديل",
+        "gloss": "the model",
+        "form": "Definite article الـ. "
+      },
+      "الشغل": {
+        "lemma": "شغل",
+        "gloss": "the work",
+        "form": "Definite article الـ. "
+      },
+      "التدريب": {
+        "lemma": "تدريب",
+        "gloss": "the training",
+        "form": "Definite article الـ. "
+      },
+      "الهدف": {
+        "lemma": "هدف",
+        "gloss": "the goal",
+        "form": "Definite article الـ. "
+      },
+      "البرمجة": {
+        "lemma": "برمجة",
+        "gloss": "the programming",
+        "form": "Definite article الـ. "
+      },
+      "الناس": {
+        "lemma": "ناس",
+        "gloss": "the people",
+        "form": "Definite article الـ. "
+      },
+      "الشركة": {
+        "lemma": "شركة",
+        "gloss": "the company",
+        "form": "Definite article الـ. "
+      },
+      "الأداة": {
+        "lemma": "أداة",
+        "gloss": "the tool",
+        "form": "Definite article الـ. "
+      },
+      "التعليمات": {
+        "lemma": "تعليمات",
+        "gloss": "the instructions",
+        "form": "Definite article الـ. Plural."
+      },
+      "السؤال": {
+        "lemma": "سؤال",
+        "gloss": "the question",
+        "form": "Definite article الـ. "
+      },
+      "الإجابة": {
+        "lemma": "إجابة",
+        "gloss": "the answer",
+        "form": "Definite article الـ. "
+      },
+      "المهندس": {
+        "lemma": "مهندس",
+        "gloss": "the engineer",
+        "form": "Definite article الـ. "
+      },
+      "المستند": {
+        "lemma": "مستند",
+        "gloss": "the document",
+        "form": "Definite article الـ. "
+      },
+      "الطالب": {
+        "lemma": "طالب",
+        "gloss": "the student",
+        "form": "Definite article الـ. "
+      },
+      "الفايل": {
+        "lemma": "فايل",
+        "gloss": "the file",
+        "form": "Definite article الـ. "
+      },
+      "الجديد": {
+        "lemma": "جديد",
+        "gloss": "the new",
+        "form": "Definite article الـ. "
+      },
+      "الاستخدام": {
+        "lemma": "استخدام",
+        "gloss": "the use / usage",
+        "form": "Definite article الـ. "
+      },
+      "التوكنز": {
+        "lemma": "توكن",
+        "gloss": "the tokens",
+        "form": "Definite article الـ. Plural loanword."
+      },
+      "الأدوات": {
+        "lemma": "أداة",
+        "gloss": "the tools",
+        "form": "Definite article الـ. Plural."
+      },
+      "الكلاود": {
+        "lemma": "كلاود",
+        "gloss": "the cloud",
+        "form": "Definite article الـ. "
+      },
+      "الكمبيوتر": {
+        "lemma": "كمبيوتر",
+        "gloss": "the computer",
+        "form": "Definite article الـ. "
+      },
+      "الفريق": {
+        "lemma": "فريق",
+        "gloss": "the team",
+        "form": "Definite article الـ. "
+      },
+      "التاني": {
+        "lemma": "تاني",
+        "gloss": "the again / second",
+        "form": "Definite article الـ. "
+      },
+      "النهارده": {
+        "lemma": "نهارده",
+        "gloss": "today",
+        "form": "Definite article الـ. "
+      },
+      "الجملة": {
+        "lemma": "جملة",
+        "gloss": "the sentence",
+        "form": "Definite article الـ. "
+      },
+      "الأسرع": {
+        "lemma": "سريع",
+        "gloss": "the faster",
+        "form": "Definite article الـ. Comparative."
+      },
+      "فايلين": {
+        "lemma": "فايل",
+        "gloss": "two files",
+        "form": "Dual -ين."
+      },
+      "الفايلين": {
+        "lemma": "فايل",
+        "gloss": "the two files",
+        "form": "Definite article الـ. Dual -ين."
+      },
+      "المصدر": {
+        "lemma": "مصدر",
+        "gloss": "the source",
+        "form": "Definite article الـ. "
+      },
+      "الأول": {
+        "lemma": "أول",
+        "gloss": "the first",
+        "form": "Definite article الـ. "
+      },
+      "التاريخ": {
+        "lemma": "تاريخ",
+        "gloss": "the date",
+        "form": "Definite article الـ. "
+      },
+      "الخبر": {
+        "lemma": "خبر",
+        "gloss": "the news",
+        "form": "Definite article الـ. "
+      },
+      "الأسبوع": {
+        "lemma": "أسبوع",
+        "gloss": "the week",
+        "form": "Definite article الـ. "
+      },
+      "الشهر": {
+        "lemma": "شهر",
+        "gloss": "the month",
+        "form": "Definite article الـ. "
+      },
+      "الخطة": {
+        "lemma": "خطة",
+        "gloss": "the plan",
+        "form": "Definite article الـ. "
+      },
+      "الجاي": {
+        "lemma": "جاي",
+        "gloss": "the coming / next",
+        "form": "Definite article الـ. "
+      },
+      "الباحث": {
+        "lemma": "باحث",
+        "gloss": "the researcher",
+        "form": "Definite article الـ. "
+      },
+      "النتيجة": {
+        "lemma": "نتيجة",
+        "gloss": "the result",
+        "form": "Definite article الـ. "
+      },
+      "الاختبار": {
+        "lemma": "اختبار",
+        "gloss": "the test",
+        "form": "Definite article الـ. "
+      },
+      "المثال": {
+        "lemma": "مثال",
+        "gloss": "the example",
+        "form": "Definite article الـ. "
+      },
+      "الملف": {
+        "lemma": "ملف",
+        "gloss": "the file",
+        "form": "Definite article الـ. "
+      },
+      "البسيطة": {
+        "lemma": "بسيط",
+        "gloss": "the simple [feminine]",
+        "form": "Definite article الـ. Feminine singular."
+      },
+      "التانية": {
+        "lemma": "تاني",
+        "gloss": "the other / second [feminine]",
+        "form": "Definite article الـ. Feminine singular."
+      },
+      "الكلمة": {
+        "lemma": "كلمة",
+        "gloss": "the word",
+        "form": "Definite article الـ. "
+      },
+      "العنوان": {
+        "lemma": "عنوان",
+        "gloss": "the title",
+        "form": "Definite article الـ. "
+      },
+      "الملفات": {
+        "lemma": "ملف",
+        "gloss": "the files",
+        "form": "Definite article الـ. Plural."
+      },
+      "الحد": {
+        "lemma": "حد",
+        "gloss": "the limit",
+        "form": "Definite article الـ. "
+      },
+      "الباحثين": {
+        "lemma": "باحث",
+        "gloss": "the researchers",
+        "form": "Definite article الـ. Plural."
+      },
+      "الكاملة": {
+        "lemma": "كامل",
+        "gloss": "the complete [feminine]",
+        "form": "Definite article الـ. Feminine singular."
+      },
+      "القصيرة": {
+        "lemma": "قصير",
+        "gloss": "the short [feminine]",
+        "form": "Definite article الـ. Feminine singular."
+      },
+      "الحقايق": {
+        "lemma": "حقيقة",
+        "gloss": "the facts",
+        "form": "Definite article الـ. Plural."
+      },
+      "الدليل": {
+        "lemma": "دليل",
+        "gloss": "the evidence",
+        "form": "Definite article الـ. "
+      },
+      "الحالات": {
+        "lemma": "حالة",
+        "gloss": "the cases / situations",
+        "form": "Definite article الـ. Plural."
+      },
+      "الحقيقة": {
+        "lemma": "حقيقة",
+        "gloss": "the fact / truth",
+        "form": "Definite article الـ. "
+      },
+      "البرنامج": {
+        "lemma": "برنامج",
+        "gloss": "the program",
+        "form": "Definite article الـ. "
+      },
+      "السعر": {
+        "lemma": "سعر",
+        "gloss": "the price",
+        "form": "Definite article الـ. "
+      },
+      "الفيديو": {
+        "lemma": "فيديو",
+        "gloss": "the video",
+        "form": "Definite article الـ. "
+      },
+      "الخريجين": {
+        "lemma": "خريج",
+        "gloss": "the graduates",
+        "form": "Definite article الـ. Plural."
+      },
+      "ومفيدة": {
+        "lemma": "مفيد",
+        "gloss": "and useful [feminine]",
+        "form": "Conjunction و attached to the following word. Feminine singular."
+      },
+      "والمستند": {
+        "lemma": "مستند",
+        "gloss": "and the document",
+        "form": "Conjunction و attached to the following word. Definite article الـ. "
+      },
+      "ودي": {
+        "lemma": "دي",
+        "gloss": "and this [feminine]",
+        "form": "Conjunction و attached to the following word. "
+      },
+      "والأداة": {
+        "lemma": "أداة",
+        "gloss": "and the tool",
+        "form": "Conjunction و attached to the following word. Definite article الـ. "
+      },
+      "وفيه": {
+        "lemma": "فيه",
+        "gloss": "and there is / are",
+        "form": "Conjunction و attached to the following word. "
+      },
+      "والسؤال": {
+        "lemma": "سؤال",
+        "gloss": "and the question",
+        "form": "Conjunction و attached to the following word. Definite article الـ. "
+      },
+      "وبشتغل": {
+        "lemma": "اشتغل",
+        "gloss": "and I work",
+        "form": "Conjunction و attached to the following word. First person singular habitual."
+      },
+      "وعنده": {
+        "lemma": "عند",
+        "gloss": "and he / it has",
+        "form": "Conjunction و attached to the following word. عند + ه, masculine possessor."
+      },
+      "٤": {
+        "lemma": "٤",
+        "gloss": "4",
+        "form": "Number in a product name or version."
+      },
+      "٥": {
+        "lemma": "٥",
+        "gloss": "5",
+        "form": "Number in a product name or version."
+      },
+      "٦.١": {
+        "lemma": "٦.١",
+        "gloss": "6.1",
+        "form": "Number in a product name or version."
+      },
+      "اللي": {
+        "gloss": "that / which",
+        "lemma": "اللي",
+        "form": "Relative pronoun."
+      },
+      "حـ": {
+        "gloss": "will",
+        "lemma": "حـ",
+        "form": "Future prefix."
+      },
+      "هـ": {
+        "gloss": "will",
+        "lemma": "هـ",
+        "form": "Future prefix."
+      },
+      "صورة": {
+        "lemma": "صورة",
+        "gloss": "picture; image",
+        "form": "feminine singular noun"
+      },
+      "ونص": {
+        "lemma": "نص",
+        "gloss": "and text",
+        "form": "وـ (and) + masculine singular noun نص"
+      },
+      "ش": {
+        "lemma": "ش",
+        "gloss": "the letter sheen: sh",
+        "form": "letter used in the pronunciation key"
+      },
+      "خ": {
+        "lemma": "خ",
+        "gloss": "the letter khaa: kh",
+        "form": "letter used in the pronunciation key"
+      },
+      "غ": {
+        "lemma": "غ",
+        "gloss": "the letter ghayn: gh",
+        "form": "letter used in the pronunciation key"
+      },
+      "ع": {
+        "lemma": "ع",
+        "gloss": "the letter ʿayn: ʿ",
+        "form": "letter used in the pronunciation key"
+      },
+      "ج": {
+        "lemma": "ج",
+        "gloss": "the letter geem: Egyptian g",
+        "form": "letter used in the pronunciation key"
+      },
+      "بشوف": {
+        "lemma": "شاف",
+        "gloss": "I see",
+        "form": "present, first-person singular; بـ marks the present form"
+      },
+      "نص": {
+        "lemma": "نص",
+        "gloss": "text",
+        "form": "masculine singular noun"
+      },
+      "إعلان": {
+        "lemma": "إعلان",
+        "gloss": "advertisement; ad",
+        "form": "masculine singular noun"
+      },
+      "النص": {
+        "lemma": "نص",
+        "gloss": "the text",
+        "form": "definite masculine singular noun: الـ + نص"
+      },
+      "منفصل": {
+        "lemma": "منفصل",
+        "gloss": "separate; separated",
+        "form": "masculine singular adjective; followed by عن for separate from"
+      },
+      "الإعلان": {
+        "lemma": "إعلان",
+        "gloss": "the advertisement",
+        "form": "definite masculine singular noun: الـ + إعلان"
+      },
+      "الصورة": {
+        "lemma": "صورة",
+        "gloss": "the picture; the image",
+        "form": "definite feminine singular noun: الـ + صورة"
+      },
+      "منفصلة": {
+        "lemma": "منفصل",
+        "gloss": "separate; separated",
+        "form": "feminine singular adjective"
+      },
+      "باين": {
+        "lemma": "باين",
+        "gloss": "visible; showing",
+        "form": "masculine singular adjective/active participle"
+      },
+      "باينة": {
+        "lemma": "باين",
+        "gloss": "visible; showing",
+        "form": "feminine singular adjective/active participle"
+      },
+      "التجربة": {
+        "lemma": "تجربة",
+        "gloss": "the test; the trial",
+        "form": "definite feminine singular noun: الـ + تجربة"
+      },
+      "هتبدأ": {
+        "lemma": "بدأ",
+        "gloss": "it will start",
+        "form": "future هـ + third-person feminine singular تبدأ; agrees with التجربة"
+      },
+      "بيشوف": {
+        "lemma": "شاف",
+        "gloss": "he sees",
+        "form": "present, third-person masculine singular"
+      },
+      "إعلانات": {
+        "lemma": "إعلان",
+        "gloss": "advertisements; ads",
+        "form": "plural noun"
+      },
+      "هتجرّب": {
+        "lemma": "جرّب",
+        "gloss": "it will test; it will try",
+        "form": "future هـ + third-person feminine singular تجرّب; company treated as feminine"
+      },
+      "هتجرب": {
+        "lemma": "جرّب",
+        "gloss": "it will test; it will try",
+        "form": "same future form as هتجرّب, written without the doubling mark"
+      },
+      "الولايات": {
+        "lemma": "ولاية",
+        "gloss": "the states",
+        "form": "definite feminine plural noun; part of الولايات المتحدة, the United States"
+      },
+      "المتحدة": {
+        "lemma": "متحد",
+        "gloss": "united",
+        "form": "definite feminine adjective agreeing with the nonhuman plural الولايات"
+      },
+      "صور": {
+        "lemma": "صورة",
+        "gloss": "pictures; images",
+        "form": "broken plural of صورة"
+      },
+      "الإعلانات": {
+        "lemma": "إعلان",
+        "gloss": "the advertisements; the ads",
+        "form": "definite plural noun: الـ + إعلانات"
+      },
+      "هيظهر": {
+        "lemma": "ظهر",
+        "gloss": "it will appear",
+        "form": "future هـ + third-person masculine singular يظهر"
+      },
+      "وإنت": {
+        "lemma": "إنت",
+        "gloss": "and you; while you",
+        "form": "وـ + second-person masculine singular pronoun; while in this sentence"
+      },
+      "تجربة": {
+        "lemma": "تجربة",
+        "gloss": "test; trial",
+        "form": "feminine singular noun"
+      },
+      "علامة": {
+        "lemma": "علامة",
+        "gloss": "mark; sign",
+        "form": "feminine singular noun"
+      },
+      "لبعض": {
+        "lemma": "بعض",
+        "gloss": "for some",
+        "form": "لـ (for) + بعض (some)"
+      },
+      "النصوص": {
+        "lemma": "نص",
+        "gloss": "the texts",
+        "form": "definite broken plural noun: الـ + نصوص"
+      },
+      "نصوص": {
+        "lemma": "نص",
+        "gloss": "texts",
+        "form": "broken plural of نص"
+      },
+      "وcodex": {
+        "lemma": "Codex",
+        "gloss": "and Codex",
+        "form": "وـ (and) attached to the product name Codex"
+      },
+      "الاتحاد": {
+        "lemma": "اتحاد",
+        "gloss": "the union",
+        "form": "definite masculine singular noun; part of الاتحاد الأوروبي, the European Union"
+      },
+      "الأوروبي": {
+        "lemma": "أوروبي",
+        "gloss": "European",
+        "form": "definite masculine singular adjective modifying الاتحاد"
+      },
+      "فيها": {
+        "lemma": "في",
+        "gloss": "in it; in them",
+        "form": "في + ـها; here ـها refers to the nonhuman plural texts"
+      },
+      "هيبدأ": {
+        "lemma": "بدأ",
+        "gloss": "it will start",
+        "form": "future هـ + third-person masculine singular يبدأ"
+      },
+      "الأسابيع": {
+        "lemma": "أسبوع",
+        "gloss": "the weeks",
+        "form": "definite broken plural noun: الـ + أسابيع"
+      },
+      "الجاية": {
+        "lemma": "جاي",
+        "gloss": "coming; next",
+        "form": "definite feminine adjective/participle; agrees with the nonhuman plural weeks"
+      },
+      "العلامة": {
+        "lemma": "علامة",
+        "gloss": "the mark; the sign",
+        "form": "definite feminine singular noun: الـ + علامة"
+      },
+      "صح": {
+        "lemma": "صح",
+        "gloss": "true; correct",
+        "form": "adjective used in a description"
+      },
+      "استراحة": {
+        "lemma": "استراحة",
+        "gloss": "break; rest",
+        "form": "feminine singular noun"
+      },
+      "صغيرة": {
+        "lemma": "صغير",
+        "gloss": "small; short",
+        "form": "feminine singular adjective; a short break in this title"
+      },
+      "يا": {
+        "lemma": "يا",
+        "gloss": "vocative: used when addressing someone",
+        "form": "particle before a person’s name"
+      },
+      "عنها": {
+        "lemma": "عن",
+        "gloss": "from it; from her",
+        "form": "عن + ـها, here referring to the feminine noun picture"
+      },
+      "آه": {
+        "lemma": "آه",
+        "gloss": "ah; yes",
+        "form": "response or acknowledgment"
+      },
+      "الـ": {
+        "lemma": "الـ",
+        "gloss": "the",
+        "form": "definite article shown by itself; attaches to the following noun/adjective"
+      },
+      "ال": {
+        "lemma": "الـ",
+        "gloss": "the",
+        "form": "definite article without the extension mark"
+      },
+      "شايفة": {
+        "lemma": "شايف",
+        "gloss": "seeing; can see",
+        "form": "feminine singular active participle; here Mona says I can see"
+      },
+      "شايف": {
+        "lemma": "شايف",
+        "gloss": "seeing; can see",
+        "form": "masculine singular active participle"
+      },
+      "معناها": {
+        "lemma": "معنى",
+        "gloss": "its meaning; what it means",
+        "form": "معنى + ـها; مش معناها إن means does not mean that"
+      },
+      "وهيبقى": {
+        "lemma": "بقى",
+        "gloss": "and it will be",
+        "form": "وـ (and) + future masculine singular هيبقى"
+      },
+      "مكتوب": {
+        "lemma": "مكتوب",
+        "gloss": "written; labeled",
+        "form": "masculine singular passive participle/adjective"
+      },
+      "عليه": {
+        "lemma": "على",
+        "gloss": "on it; on him",
+        "form": "على + ـه, here referring to the advertisement"
+      },
+      "openai": {
+        "lemma": "OpenAI",
+        "gloss": "OpenAI",
+        "form": "Proper company or product name, written in Latin script."
+      },
+      "chatgpt": {
+        "lemma": "ChatGPT",
+        "gloss": "ChatGPT",
+        "form": "Proper company or product name, written in Latin script."
+      }
+    }
+  }
+}

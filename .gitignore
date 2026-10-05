@@ -12,3 +12,7 @@ supabase/.temp/
 test-results/
 playwright-report/
 data/
+
+.wrangler/
+.dev.vars*
+cloudflare/generated/

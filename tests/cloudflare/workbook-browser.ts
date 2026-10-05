@@ -1,0 +1,54 @@
+import {chromium,expect} from "@playwright/test";
+import {loadCourseCatalog} from "../../src/services/course/catalog.ts";
+import {emptyCourseProgress} from "../../src/services/course/state.ts";
+import {mkdir} from "node:fs/promises";
+const base=Bun.argv[2]??"http://localhost:8792";
+const root="/tmp/langouste-workbook-browser";await mkdir(root,{recursive:true});
+const lessons=await loadCourseCatalog();
+const browser=await chromium.launch({channel:"chrome",headless:true});
+const context=await browser.newContext({viewport:{width:1440,height:1000}});
+const page=await context.newPage();const errors:string[]=[];const privateRequests:string[]=[];
+page.on("pageerror",e=>errors.push(e.message));page.on("request",r=>{if(new URL(r.url()).pathname.startsWith("/api/"))privateRequests.push(r.url());});
+await page.goto(`${base}/#/course/hu`);
+await expect(page.locator(".syllabus-row")).toHaveCount(31);
+await expect(page.getByRole("button",{name:"Sign in",exact:true})).toHaveCount(0);
+await page.screenshot({path:`${root}/desktop-index.png`});
+const seedLesson=lessons.find(l=>l.language==="hu"&&l.day===15)!;
+const seed=emptyCourseProgress(seedLesson);seed.completed_at="2026-10-01T12:00:00.000Z";seed.updated_at=seed.completed_at;seed.exercises[seedLesson.exercises[0].id]={hinted:true,revealed:true,attempts:[{id:"legacy-keep",answer:"My original answer",correct:false,scored:false,at:seed.completed_at}]};
+const original=JSON.stringify(seed);
+await page.evaluate(({id,raw})=>localStorage.setItem(`langouste-course-local:v1:${id}`,raw),{id:seed.lesson_id,raw:original});
+await page.goto(`${base}/#/course/hu/${seed.lesson_id}`);await expect(page.getByRole("heading",{name:seedLesson.title,exact:true})).toBeVisible();
+expect(await page.evaluate(id=>localStorage.getItem(`langouste-course-local:v1:${id}`),seed.lesson_id)).toBe(original);
+for(const lang of ["hu","ar-EG"]){for(const day of [1,15,30,31]){
+const lesson=lessons.find(l=>l.language===lang&&l.day===day)!;
+await page.goto(`${base}/#/course/${lang}/${lesson.id}`);
+await expect(page.getByRole("heading",{name:lesson.title,exact:true})).toBeVisible();
+await page.getByRole("button",{name:"Read",exact:true}).click();
+await expect(page.locator(".reading .translation")).toHaveCount(0);
+await page.locator(".reading .sentence-reveal").first().click();await expect(page.locator(".reading .translation")).toHaveCount(1);
+await page.locator(".reading .sentence-reveal").first().click();await expect(page.locator(".reading .translation")).toHaveCount(0);
+if(lang==="ar-EG"){await expect(page.locator(".reading .target").first()).toHaveAttribute("dir","rtl");await page.getByLabel("Transliteration",{exact:true}).check();await expect(page.locator(".reading .transliteration").first()).toBeVisible();await page.getByLabel("Transliteration",{exact:true}).uncheck();await expect(page.locator(".reading .transliteration")).toHaveCount(0);}
+await page.locator(".word-strip button").first().click();await expect(page.locator(".inspector")).toBeVisible();await expect(page.getByRole("button",{name:"Close reference"})).toBeFocused();
+if(day===1)await page.evaluate(()=>window.scrollTo(0,0));
+if(day===1)await page.screenshot({path:`${root}/${lang}-desktop-reading.png`});
+await page.keyboard.press("Escape");await expect(page.locator(".inspector")).toHaveCount(0);await expect(page.locator(".word-strip button").first()).toBeFocused();
+await page.getByRole("button",{name:"Practise",exact:true}).click();await expect(page.locator(".quiz")).toBeVisible();
+const i=lesson.exercises.findIndex(e=>e.type==="recall");await page.getByLabel("Question",{exact:true}).selectOption(String(i));
+await page.getByLabel("Your answer",{exact:true}).fill(lesson.exercises[i].acceptedAnswers[0]);await page.getByRole("button",{name:/^Check (practice )?answer$/}).click();await expect(page.locator(".feedback")).toBeVisible();
+const saved=await page.evaluate(({id,e})=>JSON.parse(localStorage.getItem(`langouste-course-local:v1:${id}`)!).exercises[e].attempts.at(-1),{id:lesson.id,e:lesson.exercises[i].id});expect(saved.scored).toBe(false);expect(saved.evidenceVersion).toBe(2);expect(saved.supportUsed).toBe(true);
+await page.reload();await expect(page.locator(".quiz")).toBeVisible();await expect(page.getByLabel("Question",{exact:true})).toHaveValue(String(i));
+await page.setViewportSize({width:390,height:844});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2)).toBe(true);
+await page.screenshot({path:`${root}/${lang}-${day}-mobile.png`,fullPage:false});
+await page.getByRole("button",{name:"Read",exact:true}).click();await page.locator(".word-strip button").first().click();await expect(page.getByRole("button",{name:"Close reference"})).toBeInViewport();await page.getByRole("button",{name:"Close reference"}).click();
+await page.setViewportSize({width:1440,height:1000});console.log(`PASS ${lang} day ${day}: meaning, RTL, inspector focus, practice evidence, reload, mobile`);
+}}
+// Each language resumes its own last-opened lesson.
+await page.getByRole("button",{name:"Hungarian",exact:true}).click();await expect(page).toHaveURL(/hu\/ai-news-2026-10-04-hu/);
+await page.getByRole("button",{name:"Egyptian Arabic",exact:true}).click();await expect(page).toHaveURL(/ar-EG\/ai-news-2026-10-04-ar-EG/);
+await page.goto(`${base}/#/course/hu/review`);await expect(page.getByRole("heading",{name:"Review difficult items"})).toBeVisible();await expect(page.locator(".review-list li")).toHaveCount(1);await page.locator(".review-list button").click();await expect(page.getByLabel("Question",{exact:true})).toHaveValue("0");
+await page.goto(`${base}/#/course/ar-EG/reference`);await expect(page.locator(".reference-list details").first()).toBeVisible();await page.getByRole("searchbox").fill("gedeed");await expect(page.locator(".reference-list details").first()).toBeVisible();
+await page.goto(`${base}/#/course/hu/settings`);const download=page.waitForEvent("download");await page.getByRole("button",{name:"Export progress"}).click();expect((await download).suggestedFilename()).toBe("langouste-progress.json");
+const legacy=await page.evaluate(id=>JSON.parse(localStorage.getItem(`langouste-course-local:v1:${id}`)!),seed.lesson_id);expect(legacy.exercises[seedLesson.exercises[0].id]).toEqual(seed.exercises[seedLesson.exercises[0].id]);expect(legacy.completed_at).toBe(seed.completed_at);
+await page.setViewportSize({width:720,height:500});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2)).toBe(true);
+const clean=await browser.newContext();const fresh=await clean.newPage();await fresh.goto(base);expect(await fresh.evaluate(()=>Object.keys(localStorage).filter(k=>k.startsWith("langouste-course-local:v1:")).length)).toBe(0);
+expect(errors).toEqual([]);expect(privateRequests).toEqual([]);console.log("PASS legacy history, separate language resume, difficult review, reference, backup, fresh browser, no API/auth, no console errors");await browser.close();

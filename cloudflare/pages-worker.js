@@ -1,0 +1,1 @@
+export default { async fetch(request, env) { const url=new URL(request.url); if(url.pathname.startsWith("/api/")){ if(!env.COURSE_API)return Response.json({error:"Account service is not configured"},{status:503}); return env.COURSE_API.fetch(request); } return env.ASSETS.fetch(request); } };

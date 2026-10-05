@@ -48,7 +48,12 @@
     "migrate": "bun scripts/migrate.ts",
     "import:turbopuffer": "bun scripts/import-turbopuffer.ts",
     "backfill:filo": "bun scripts/backfill-filo-docs.ts",
-    "build:audio-drill-tape": "bun scripts/build-audio-drill-tape.ts"
+    "build:audio-drill-tape": "bun scripts/build-audio-drill-tape.ts",
+    "build:cloudflare": "bun scripts/build-cloudflare.ts",
+    "typecheck:cloudflare": "tsc --project tsconfig.cloudflare.json",
+    "audio:course": "bun scripts/course-audio.ts",
+    "build:static": "bun scripts/build-cloudflare.ts --static",
+    "check:static-publish": "bun scripts/check-static-publish.ts"
   },
   "dependencies": {
     "@anthropic-ai/claude-agent-sdk": "^0.2.112",
@@ -57,6 +62,7 @@
     "@mozilla/readability": "^0.6.0",
     "@piper-plus/g2p": "^0.4.0",
     "@turbopuffer/turbopuffer": "^2.6.0",
+    "bcryptjs": "^3.0.3",
     "dictionary-de": "^3.0.0",
     "dictionary-es": "^4.0.0",
     "dictionary-fr": "^3.0.0",
@@ -78,6 +84,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.15",
+    "@cloudflare/workers-types": "^5.20261004.1",
     "@playwright/test": "^1.59.1",
     "@sveltejs/vite-plugin-svelte": "^5",
     "@types/sanitize-html": "^2.16.1",

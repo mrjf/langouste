@@ -11,6 +11,7 @@ export const LANGUAGES: Record<string, { name: string; flag: string }> = {
   zh: { name: "Chinese", flag: "\u{1F1E8}\u{1F1F3}" },
   ja: { name: "Japanese", flag: "\u{1F1EF}\u{1F1F5}" },
   ko: { name: "Korean", flag: "\u{1F1F0}\u{1F1F7}" },
+  "ar-EG": { name: "Egyptian Arabic", flag: "🇪🇬" },
   ar: { name: "Arabic", flag: "\u{1F1F8}\u{1F1E6}" },
   he: { name: "Hebrew", flag: "\u{1F1EE}\u{1F1F1}" },
   tr: { name: "Turkish", flag: "\u{1F1F9}\u{1F1F7}" },

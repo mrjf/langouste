@@ -1,0 +1,1 @@
+{"extends":"./tsconfig.check.json","compilerOptions":{"types":["@cloudflare/workers-types","bun-types"]},"include":["cloudflare/**/*.ts","scripts/build-cloudflare.ts","scripts/course-audio.ts"],"exclude":["node_modules","dist"]}

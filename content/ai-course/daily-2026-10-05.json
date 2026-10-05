@@ -1,0 +1,2004 @@
+{
+  "schemaVersion": 1,
+  "sourceRegistry": [
+    {
+      "id": "openai_visual_ads_2026_10_05",
+      "title": "Building advertising for the way people use AI",
+      "url": "https://openai.com/index/new-chatgpt-ads-format-and-measurement/",
+      "publishedOn": "2026-10-05",
+      "publisher": "OpenAI",
+      "verifiedAsOf": "2026-10-05",
+      "factSummary": "OpenAI announced visual ads for ChatGPT. Testing is planned to begin later in October 2026 in the United States. Ads will appear during image generation, be clearly labeled, and remain separate from the generated image."
+    },
+    {
+      "id": "openai_eu_text_provenance_2026_10_05",
+      "title": "Our approach to EU text provenance rules",
+      "url": "https://openai.com/index/eu-text-provenance/",
+      "publishedOn": "2026-10-05",
+      "publisher": "OpenAI",
+      "verifiedAsOf": "2026-10-05",
+      "factSummary": "Invisible watermarks are planned for eligible ChatGPT and Codex text output in the EU over coming weeks. The mark signals OpenAI involvement in producing or processing the text. The mark does not identify the user or establish the truth of the text."
+    }
+  ],
+  "lessons": [
+    {
+      "schemaVersion": 1,
+      "id": "ai-news-2026-10-05-ar-EG",
+      "courseId": "ai-news-daily-2026-10-05",
+      "day": 32,
+      "language": "ar-EG",
+      "title": "صورة ونص",
+      "subtitle": "October 5, 2026 · Pictures, text, and a new plan",
+      "estimatedMinutes": 40,
+      "objectives": [
+        "Read short Egyptian Arabic passages with script and transliteration.",
+        "Say what you see and what you read.",
+        "Make a simple description agree with a masculine or feminine noun."
+      ],
+      "readings": [
+        {
+          "id": "ai-news-2026-10-05-ar-EG-ar_ads",
+          "title": "إعلانات جديدة",
+          "sentences": [
+            {
+              "id": "ai-news-2026-10-05-ar-EG-ar_ads-1",
+              "text": "OpenAI هتجرّب إعلانات جديدة في ChatGPT.",
+              "english": "OpenAI will test new advertisements in ChatGPT.",
+              "kind": "source-summary",
+              "sourceIds": [
+                "openai_visual_ads_2026_10_05"
+              ],
+              "transliteration": "OpenAI hatgarrab eʿlanaat gedeeda fi ChatGPT."
+            },
+            {
+              "id": "ai-news-2026-10-05-ar-EG-ar_ads-2",
+              "text": "التجربة هتبدأ الشهر ده في الولايات المتحدة.",
+              "english": "The test will start this month in the United States.",
+              "kind": "source-summary",
+              "sourceIds": [
+                "openai_visual_ads_2026_10_05"
+              ],
+              "transliteration": "et-tagriba hatibdaʾ esh-shahr da fi el-wilaayaat el-mottaheda."
+            },
+            {
+              "id": "ai-news-2026-10-05-ar-EG-ar_ads-3",
+              "text": "هيبقى فيه صور في الإعلانات.",
+              "english": "There will be pictures in the advertisements.",
+              "kind": "source-summary",
+              "sourceIds": [
+                "openai_visual_ads_2026_10_05"
+              ],
+              "transliteration": "hayebʾa feeh sowar fi el-eʿlanaat."
+            },
+            {
+              "id": "ai-news-2026-10-05-ar-EG-ar_ads-4",
+              "text": "الإعلان هيظهر وإنت بتعمل صورة.",
+              "english": "The advertisement will appear while you are making an image.",
+              "kind": "source-summary",
+              "sourceIds": [
+                "openai_visual_ads_2026_10_05"
+              ],
+              "transliteration": "el-eʿlaan hayezhar wi-enta betʿmel soora."
+            },
+            {
+              "id": "ai-news-2026-10-05-ar-EG-ar_ads-5",
+              "text": "الإعلان هيبقى منفصل عن الصورة.",
+              "english": "The advertisement will be separate from the image.",
+              "kind": "source-summary",
+              "sourceIds": [
+                "openai_visual_ads_2026_10_05"
+              ],
+              "transliteration": "el-eʿlaan hayebʾa monfasel ʿan es-soora."
+            },
+            {
+              "id": "ai-news-2026-10-05-ar-EG-ar_ads-6",
+              "text": "وهيبقى مكتوب عليه إنه إعلان.",
+              "english": "It will be labeled as an advertisement.",
+              "kind": "source-summary",
+              "sourceIds": [
+                "openai_visual_ads_2026_10_05"
+              ],
+              "transliteration": "wi-hayebʾa maktoob ʿaleeh enno eʿlaan."
+            }
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-05-ar-EG-ar_watermark",
+          "title": "علامة مش باينة",
+          "sentences": [
+            {
+              "id": "ai-news-2026-10-05-ar-EG-ar_watermark-1",
+              "text": "OpenAI عندها خطة جديدة لبعض النصوص.",
+              "english": "OpenAI has a new plan for some texts.",
+              "kind": "source-summary",
+              "sourceIds": [
+                "openai_eu_text_provenance_2026_10_05"
+              ],
+              "transliteration": "OpenAI ʿandaha khetta gedeeda le-baʿd en-nosoos."
+            },
+            {
+              "id": "ai-news-2026-10-05-ar-EG-ar_watermark-2",
+              "text": "بعض نصوص ChatGPT وCodex في الاتحاد الأوروبي هيبقى فيها علامة مش باينة.",
+              "english": "Some ChatGPT and Codex texts in the European Union will have an invisible mark.",
+              "kind": "source-summary",
+              "sourceIds": [
+                "openai_eu_text_provenance_2026_10_05"
+              ],
+              "transliteration": "baʿd nosoos ChatGPT wi-Codex fi el-ettihaad el-oroobbi hayebʾa feeha ʿalaama mesh baayna."
+            },
+            {
+              "id": "ai-news-2026-10-05-ar-EG-ar_watermark-3",
+              "text": "ده هيبدأ في الأسابيع الجاية.",
+              "english": "This will start in the coming weeks.",
+              "kind": "source-summary",
+              "sourceIds": [
+                "openai_eu_text_provenance_2026_10_05"
+              ],
+              "transliteration": "da hayibdaʾ fi el-asaabeeʿ el-gayya."
+            },
+            {
+              "id": "ai-news-2026-10-05-ar-EG-ar_watermark-4",
+              "text": "العلامة مش معناها إن النص صح.",
+              "english": "The mark does not mean that the text is true.",
+              "kind": "source-summary",
+              "sourceIds": [
+                "openai_eu_text_provenance_2026_10_05"
+              ],
+              "transliteration": "el-ʿalaama mesh maʿnaaha enn en-nass sahh."
+            }
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-05-ar-EG-ar_desk",
+          "title": "استراحة صغيرة · Fictional dialogue",
+          "sentences": [
+            {
+              "id": "ai-news-2026-10-05-ar-EG-ar_desk-1",
+              "text": "منى: بتقرا إيه يا كريم؟",
+              "english": "Mona: What are you reading, Karim?",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "Mona: betʾra eeh ya Kareem?"
+            },
+            {
+              "id": "ai-news-2026-10-05-ar-EG-ar_desk-2",
+              "text": "كريم: بقرا نص قصير.",
+              "english": "Karim: I am reading a short text.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "Kareem: baʾra nass ʾosayyar."
+            },
+            {
+              "id": "ai-news-2026-10-05-ar-EG-ar_desk-3",
+              "text": "منى: أنا شايفة صورة جديدة.",
+              "english": "Mona: I can see a new picture.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "Mona: ana shaayfa soora gedeeda."
+            },
+            {
+              "id": "ai-news-2026-10-05-ar-EG-ar_desk-4",
+              "text": "كريم: ده إعلان؟",
+              "english": "Karim: Is that an advertisement?",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "Kareem: da eʿlaan?"
+            },
+            {
+              "id": "ai-news-2026-10-05-ar-EG-ar_desk-5",
+              "text": "منى: لأ، دي صورة. الإعلان منفصل عنها.",
+              "english": "Mona: No, this is a picture. The advertisement is separate from it.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "Mona: laʾ, di soora. el-eʿlaan monfasel ʿanha."
+            },
+            {
+              "id": "ai-news-2026-10-05-ar-EG-ar_desk-6",
+              "text": "كريم: آه، النص كمان قصير.",
+              "english": "Karim: Ah, the text is short too.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "Kareem: aah, en-nass kamaan ʾosayyar."
+            }
+          ]
+        }
+      ],
+      "vocabulary": [
+        {
+          "id": "ar_egy_picture",
+          "term": "صورة",
+          "english": "picture",
+          "semanticConcept": "picture",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-05-ar-EG-vocab-picture",
+            "text": "بشوف صورة.",
+            "english": "I see a picture.",
+            "kind": "teaching-example",
+            "sourceIds": [],
+            "transliteration": "bashoof soora."
+          },
+          "transliteration": "soora",
+          "note": "Feminine noun; “a new picture” is صورة جديدة.",
+          "lexicalTerm": "صورة"
+        },
+        {
+          "id": "ar_egy_text",
+          "term": "نص",
+          "english": "text",
+          "semanticConcept": "text",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-05-ar-EG-vocab-text",
+            "text": "بقرا نص.",
+            "english": "I am reading a text.",
+            "kind": "teaching-example",
+            "sourceIds": [],
+            "transliteration": "baʾra nass."
+          },
+          "transliteration": "nass",
+          "note": "Masculine noun; “a new text” is نص جديد.",
+          "lexicalTerm": "نص"
+        },
+        {
+          "id": "ar_egy_advertisement",
+          "term": "إعلان",
+          "english": "advertisement; ad",
+          "semanticConcept": "advertisement",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-05-ar-EG-vocab-advertisement",
+            "text": "بشوف إعلان.",
+            "english": "I see an advertisement.",
+            "kind": "teaching-example",
+            "sourceIds": [],
+            "transliteration": "bashoof eʿlaan."
+          },
+          "transliteration": "eʿlaan",
+          "note": "Masculine noun.",
+          "lexicalTerm": "إعلان"
+        },
+        {
+          "id": "ar_egy_plan",
+          "term": "خطة",
+          "english": "plan",
+          "semanticConcept": "plan",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-05-ar-EG-vocab-plan",
+            "text": "دي خطة جديدة.",
+            "english": "This is a new plan.",
+            "kind": "teaching-example",
+            "sourceIds": [],
+            "transliteration": "di khetta gedeeda."
+          },
+          "transliteration": "khetta",
+          "note": "Feminine noun.",
+          "lexicalTerm": "خطة"
+        },
+        {
+          "id": "ar_egy_new",
+          "term": "جديد",
+          "english": "new (masculine)",
+          "semanticConcept": "new",
+          "plannedRole": "review",
+          "example": {
+            "id": "ai-news-2026-10-05-ar-EG-vocab-new",
+            "text": "النص جديد.",
+            "english": "The text is new.",
+            "kind": "teaching-example",
+            "sourceIds": [],
+            "transliteration": "en-nass gedeed."
+          },
+          "transliteration": "gedeed",
+          "note": "Feminine: جديدة, gedeeda.",
+          "lexicalTerm": "جديد"
+        },
+        {
+          "id": "ar_egy_separate",
+          "term": "منفصل عن",
+          "english": "separate from",
+          "semanticConcept": "separate",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-05-ar-EG-vocab-separate",
+            "text": "الإعلان منفصل عن الصورة.",
+            "english": "The advertisement is separate from the picture.",
+            "kind": "teaching-example",
+            "sourceIds": [],
+            "transliteration": "el-eʿlaan monfasel ʿan es-soora."
+          },
+          "transliteration": "monfasel ʿan",
+          "note": "Use عن (ʿan) after منفصل; feminine منفصلة (monfasla).",
+          "lexicalTerm": "منفصل عن"
+        },
+        {
+          "id": "ar_egy_not_visible",
+          "term": "مش باين",
+          "english": "not visible (masculine)",
+          "semanticConcept": "not_visible",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-05-ar-EG-vocab-not_visible",
+            "text": "النص مش باين.",
+            "english": "The text is not visible.",
+            "kind": "teaching-example",
+            "sourceIds": [],
+            "transliteration": "en-nass mesh baayen."
+          },
+          "transliteration": "mesh baayen",
+          "note": "Feminine: مش باينة, mesh baayna.",
+          "lexicalTerm": "مش باين"
+        },
+        {
+          "id": "ar_egy_this_month",
+          "term": "الشهر ده",
+          "english": "this month",
+          "semanticConcept": "this_month",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-05-ar-EG-vocab-this_month",
+            "text": "التجربة هتبدأ الشهر ده.",
+            "english": "The test will start this month.",
+            "kind": "teaching-example",
+            "sourceIds": [],
+            "transliteration": "et-tagriba hatibdaʾ esh-shahr da."
+          },
+          "transliteration": "esh-shahr da",
+          "note": "Literally “the month this”; learn the whole time phrase.",
+          "lexicalTerm": "الشهر ده"
+        },
+        {
+          "id": "ar_egy_i_read",
+          "term": "بقرا",
+          "english": "I read; I am reading",
+          "semanticConcept": "i_read",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-05-ar-EG-vocab-i_read",
+            "text": "بقرا نص جديد.",
+            "english": "I am reading a new text.",
+            "kind": "teaching-example",
+            "sourceIds": [],
+            "transliteration": "baʾra nass gedeed."
+          },
+          "transliteration": "baʾra",
+          "note": "أنا (ana, I) can be added, but the verb already tells you who is reading.",
+          "lexicalTerm": "بقرا"
+        },
+        {
+          "id": "ar_egy_i_see",
+          "term": "بشوف",
+          "english": "I see",
+          "semanticConcept": "i_see",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-05-ar-EG-vocab-i_see",
+            "text": "بشوف صورة جديدة.",
+            "english": "I see a new picture.",
+            "kind": "teaching-example",
+            "sourceIds": [],
+            "transliteration": "bashoof soora gedeeda."
+          },
+          "transliteration": "bashoof",
+          "note": "This is the first-person form; “he sees” is بيشوف (beyshoof).",
+          "lexicalTerm": "بشوف"
+        },
+        {
+          "id": "ar_egy_model",
+          "term": "موديل",
+          "english": "model",
+          "semanticConcept": "model",
+          "plannedRole": "review",
+          "example": {
+            "id": "ai-news-2026-10-05-ar-EG-vocab-model",
+            "text": "الموديل بيساعد.",
+            "english": "The model helps.",
+            "kind": "teaching-example",
+            "sourceIds": [],
+            "transliteration": "el-moodeel beysaaʿed."
+          },
+          "transliteration": "moodeel",
+          "note": "Review: previously authored vocabulary. Try it from memory if familiar.",
+          "lexicalTerm": "موديل"
+        },
+        {
+          "id": "ar_egy_helps",
+          "term": "بيساعد",
+          "english": "he/it helps",
+          "semanticConcept": "helps",
+          "plannedRole": "review",
+          "example": {
+            "id": "ai-news-2026-10-05-ar-EG-vocab-helps",
+            "text": "الموديل بيساعد.",
+            "english": "The model helps.",
+            "kind": "teaching-example",
+            "sourceIds": [],
+            "transliteration": "el-moodeel beysaaʿed."
+          },
+          "transliteration": "beysaaʿed",
+          "note": "The masculine third-person form; the subject here is موديل.",
+          "lexicalTerm": "بيساعد"
+        }
+      ],
+      "concepts": [
+        {
+          "id": "ar_egy_oct05_grammar_1",
+          "title": "Keep the noun and adjective together.",
+          "explanation": "Egyptian adjectives normally follow the noun. A masculine noun takes the masculine form: نص جديد (nass gedeed, a new text). A feminine noun takes the feminine form: صورة جديدة (soora gedeeda, a new picture). Compare خطة جديدة (khetta gedeeda, a new plan). In a simple present description there is no separate word for “is”: الصورة جديدة means “The picture is new”.",
+          "examples": [
+            {
+              "id": "ai-news-2026-10-05-ar-EG-grammar-1-1",
+              "text": "نص جديد",
+              "english": "a new text",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "nass gedeed"
+            },
+            {
+              "id": "ai-news-2026-10-05-ar-EG-grammar-1-2",
+              "text": "صورة جديدة",
+              "english": "a new picture",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "soora gedeeda"
+            },
+            {
+              "id": "ai-news-2026-10-05-ar-EG-grammar-1-3",
+              "text": "الصورة جديدة.",
+              "english": "The picture is new.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "es-soora gedeeda."
+            }
+          ]
+        },
+        {
+          "id": "ar_egy_oct05_grammar_2",
+          "title": "Say what you are doing.",
+          "explanation": "بقرا (baʾra) means “I read/am reading”, and بشوف (bashoof) means “I see”. أنا (ana, I) is optional because the verb already carries the person. Put the thing read or seen after the verb. Unlike Hungarian, Egyptian Arabic does not add an object ending to these nouns: نص stays نص. Use الـ for a specific “the”: نص is “a text”, النص is “the text”.",
+          "examples": [
+            {
+              "id": "ai-news-2026-10-05-ar-EG-grammar-2-1",
+              "text": "بقرا نص.",
+              "english": "I am reading a text.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "baʾra nass."
+            },
+            {
+              "id": "ai-news-2026-10-05-ar-EG-grammar-2-2",
+              "text": "بقرا النص.",
+              "english": "I am reading the text.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "baʾra en-nass."
+            },
+            {
+              "id": "ai-news-2026-10-05-ar-EG-grammar-2-3",
+              "text": "أنا بشوف صورة جديدة.",
+              "english": "I see a new picture.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "ana bashoof soora gedeeda."
+            }
+          ]
+        },
+        {
+          "id": "ar_egy_oct05_reading_1",
+          "title": "Read the future forms",
+          "explanation": "The future prefix ha- points forward: هتبدأ (hatibdaʾ) is “will start”; هيظهر (hayezhar) is “will appear”. After ha-, t- agrees with the feminine تجربة (tagriba, test/trial), and y- agrees with the masculine إعلان (eʿlaan). Learn the time phrase الشهر ده (esh-shahr da, this month) as one chunk.",
+          "examples": [
+            {
+              "id": "ai-news-2026-10-05-ar-EG-support-1-1",
+              "text": "تجربة",
+              "english": "test; trial",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "tagriba"
+            },
+            {
+              "id": "ai-news-2026-10-05-ar-EG-support-1-2",
+              "text": "الولايات المتحدة",
+              "english": "the United States",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "el-wilaayaat el-mottaheda"
+            },
+            {
+              "id": "ai-news-2026-10-05-ar-EG-support-1-3",
+              "text": "هيبقى فيه",
+              "english": "there will be",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "hayebʾa feeh"
+            },
+            {
+              "id": "ai-news-2026-10-05-ar-EG-support-1-4",
+              "text": "صور",
+              "english": "pictures",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "sowar"
+            },
+            {
+              "id": "ai-news-2026-10-05-ar-EG-support-1-5",
+              "text": "وإنت بتعمل صورة",
+              "english": "while you are making an image",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "wi-enta betʿmel soora"
+            },
+            {
+              "id": "ai-news-2026-10-05-ar-EG-support-1-6",
+              "text": "مكتوب عليه",
+              "english": "written on it; labeled",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "maktoob ʿaleeh"
+            }
+          ]
+        },
+        {
+          "id": "ar_egy_oct05_reading_2",
+          "title": "Describe the mark",
+          "explanation": "علامة (ʿalaama, mark) is feminine, so “not visible” becomes مش باينة (mesh baayna). Compare النص مش باين (the text is not visible) with العلامة مش باينة (the mark is not visible). عندها (ʿandaha) means “she/it has”; here it refers to the company. The long second line is supported reading: recognise نصوص (texts), علامة (mark), and the EU place name.",
+          "examples": [
+            {
+              "id": "ai-news-2026-10-05-ar-EG-support-2-1",
+              "text": "بعض",
+              "english": "some",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "baʿd"
+            },
+            {
+              "id": "ai-news-2026-10-05-ar-EG-support-2-2",
+              "text": "نصوص",
+              "english": "texts",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "nosoos"
+            },
+            {
+              "id": "ai-news-2026-10-05-ar-EG-support-2-3",
+              "text": "الاتحاد الأوروبي",
+              "english": "the European Union",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "el-ettihaad el-oroobbi"
+            },
+            {
+              "id": "ai-news-2026-10-05-ar-EG-support-2-4",
+              "text": "علامة",
+              "english": "mark; sign",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "ʿalaama"
+            },
+            {
+              "id": "ai-news-2026-10-05-ar-EG-support-2-5",
+              "text": "في الأسابيع الجاية",
+              "english": "in the coming weeks",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "fi el-asaabeeʿ el-gayya"
+            },
+            {
+              "id": "ai-news-2026-10-05-ar-EG-support-2-6",
+              "text": "صح",
+              "english": "true; correct",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "sahh"
+            },
+            {
+              "id": "ai-news-2026-10-05-ar-EG-support-2-7",
+              "text": "مش معناها",
+              "english": "does not mean",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "mesh maʿnaaha"
+            }
+          ]
+        },
+        {
+          "id": "ar_egy_oct05_reading_3",
+          "title": "Ask what someone is reading",
+          "explanation": "بتقرا إيه؟ (betʾra eeh?) asks a man “What are you reading?” إيه (eeh, what) comes after the verb in this natural question. بقرا (baʾra) answers “I read/am reading”. Use ده (da) with the masculine إعلان and دي (di) with the feminine صورة. عنها (ʿanha) means “from it/her” and refers back to the picture. Mona uses شايفة (shaayfa) for what she can see right now; a man would say شايف (shaayef). The chunk بشوف (bashoof) is common for seeing in general or habitually.",
+          "examples": [
+            {
+              "id": "ai-news-2026-10-05-ar-EG-support-3-1",
+              "text": "بتقرا إيه؟",
+              "english": "What are you reading? (to a man)",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "betʾra eeh?"
+            },
+            {
+              "id": "ai-news-2026-10-05-ar-EG-support-3-2",
+              "text": "قصير",
+              "english": "short (masculine)",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "ʾosayyar"
+            },
+            {
+              "id": "ai-news-2026-10-05-ar-EG-support-3-3",
+              "text": "أنا",
+              "english": "I",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "ana"
+            },
+            {
+              "id": "ai-news-2026-10-05-ar-EG-support-3-4",
+              "text": "ده / دي",
+              "english": "this/that (masculine / feminine)",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "da / di"
+            },
+            {
+              "id": "ai-news-2026-10-05-ar-EG-support-3-5",
+              "text": "كمان",
+              "english": "also; too",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "kamaan"
+            },
+            {
+              "id": "ai-news-2026-10-05-ar-EG-support-3-6",
+              "text": "عنها",
+              "english": "from it/her",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "ʿanha"
+            },
+            {
+              "id": "ai-news-2026-10-05-ar-EG-support-3-7",
+              "text": "أنا شايفة",
+              "english": "I can see (female speaker)",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "ana shaayfa"
+            }
+          ]
+        },
+        {
+          "id": "ar_egy_oct05_pronunciation",
+          "title": "Read the sounds",
+          "explanation": "Transliteration: aa, ee, and oo are long vowels; sh is ش; kh is خ; gh is غ; ʿ is ع; ʾ is the glottal stop. Egyptian ج is usually g. The article is written el-, or with its assimilated sound in forms such as en-nass. Read the script first if you can, then use transliteration as support.",
+          "examples": []
+        },
+        {
+          "id": "ar_egy_oct05_review",
+          "title": "Review tomorrow, then after a gap",
+          "explanation": "Tomorrow: recall “The model helps” first. Then recall picture, text, and advertisement without the word list. In three days: pair each with “new” and check its gender. In seven days: rebuild a two-line reading conversation. If a form is unfamiliar, learn it now and revisit it later; no previous completion is assumed.",
+          "examples": []
+        }
+      ],
+      "exercises": [
+        {
+          "id": "ai-news-2026-10-05-ar-EG-ar_q00",
+          "type": "self-check",
+          "prompt": "Before opening the chunk list, try “model” and “helps”. Then put them together as “The model helps.” If these are unfamiliar, use the hint and learn the sentence now.",
+          "acceptedAnswers": [
+            "موديل — moodeel; بيساعد — beysaaʿed. الموديل بيساعد. — el-moodeel beysaaʿed."
+          ],
+          "hint": "The word for model is similar to English. Look at the final two chunks only if you need support.",
+          "explanation": "This returns to vocabulary from an earlier authored lesson. A successful answer without help is recall; reading the model is useful practice, but is not independent recall.",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar_egy_model"
+          },
+          "trackInSrs": false,
+          "assessmentMode": "semanticSelfCheck",
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "موديل — moodeel; بيساعد — beysaaʿed. الموديل بيساعد. — el-moodeel beysaaʿed.",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-05-ar-EG-ar_q01",
+          "type": "matching",
+          "prompt": "Match 1–4 to A–D: 1 صورة (soora); 2 نص (nass); 3 إعلان (eʿlaan); 4 خطة (khetta). A plan; B text; C advertisement; D picture.",
+          "acceptedAnswers": [
+            "{\"0\": \"picture\", \"1\": \"text\", \"2\": \"advertisement\", \"3\": \"plan\"}"
+          ],
+          "hint": "Start with صورة: you can see one.",
+          "explanation": "صورة is picture, نص is text, إعلان is advertisement, and خطة is plan.",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar_egy_picture"
+          },
+          "trackInSrs": false,
+          "matchingPairs": [
+            {
+              "id": "0",
+              "text": "صورة",
+              "answer": "picture",
+              "target": {
+                "type": "vocabulary",
+                "id": "ar_egy_picture"
+              },
+              "transliteration": "soora"
+            },
+            {
+              "id": "1",
+              "text": "نص",
+              "answer": "text",
+              "target": {
+                "type": "vocabulary",
+                "id": "ar_egy_text"
+              },
+              "transliteration": "nass"
+            },
+            {
+              "id": "2",
+              "text": "إعلان",
+              "answer": "advertisement",
+              "target": {
+                "type": "vocabulary",
+                "id": "ar_egy_advertisement"
+              },
+              "transliteration": "eʿlaan"
+            },
+            {
+              "id": "3",
+              "text": "خطة",
+              "answer": "plan",
+              "target": {
+                "type": "vocabulary",
+                "id": "ar_egy_plan"
+              },
+              "transliteration": "khetta"
+            }
+          ],
+          "choices": [
+            "plan",
+            "advertisement",
+            "picture",
+            "text"
+          ],
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "{\"0\": \"picture\", \"1\": \"text\", \"2\": \"advertisement\", \"3\": \"plan\"}",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-05-ar-EG-ar_q02",
+          "type": "choice",
+          "prompt": "Which sentence means “I am reading a text”?",
+          "acceptedAnswers": [
+            "بقرا نص. — baʾra nass."
+          ],
+          "hint": "Look for the verb baʾra.",
+          "explanation": "بقرا carries the first-person meaning. No separate word for “am” is needed.",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar_egy_i_read"
+          },
+          "trackInSrs": false,
+          "choices": [
+            "بقرا نص. — baʾra nass.",
+            "النص جديد. — en-nass gedeed.",
+            "بشوف صورة. — bashoof soora."
+          ],
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "بقرا نص. — baʾra nass.",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-05-ar-EG-ar_q03",
+          "type": "self-check",
+          "prompt": "Complete “a new picture”: صورة ___ (soora ___).",
+          "acceptedAnswers": [
+            "جديدة — gedeeda"
+          ],
+          "hint": "صورة is feminine.",
+          "explanation": "The adjective comes after the noun and takes the feminine form: صورة جديدة (soora gedeeda).",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar_egy_new"
+          },
+          "trackInSrs": false,
+          "assessmentMode": "semanticSelfCheck",
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "جديدة — gedeeda",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-05-ar-EG-ar_q04",
+          "type": "self-check",
+          "prompt": "Complete “the text is not visible”: النص مش ___ (en-nass mesh ___).",
+          "acceptedAnswers": [
+            "باين — baayen"
+          ],
+          "hint": "نص is masculine.",
+          "explanation": "Use مش باين (mesh baayen) with نص. With علامة, use مش باينة (mesh baayna).",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar_egy_not_visible"
+          },
+          "trackInSrs": false,
+          "assessmentMode": "semanticSelfCheck",
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "باين — baayen",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-05-ar-EG-ar_q05",
+          "type": "order",
+          "prompt": "Order these chunks: نص جديد (nass gedeed) / بقرا (baʾra).",
+          "acceptedAnswers": [
+            "بقرا نص جديد."
+          ],
+          "hint": "Put the verb before the thing you read.",
+          "explanation": "Keep noun + adjective together: نص جديد (a new text).",
+          "target": {
+            "type": "grammar",
+            "id": "ar_egy_oct05_grammar_2"
+          },
+          "trackInSrs": false,
+          "tokens": [
+            "بقرا",
+            "نص جديد."
+          ],
+          "options": [
+            "نص جديد.",
+            "بقرا"
+          ],
+          "tokenAtoms": [
+            {
+              "text": "نص جديد.",
+              "transliteration": "nass gedeed.",
+              "english": "a new text"
+            },
+            {
+              "text": "بقرا",
+              "transliteration": "baʾra",
+              "english": "I read"
+            }
+          ],
+          "choices": [
+            "نص جديد.",
+            "بقرا"
+          ],
+          "choiceSupport": {
+            "نص جديد.": {
+              "transliteration": "nass gedeed.",
+              "english": "a new text"
+            },
+            "بقرا": {
+              "transliteration": "baʾra",
+              "english": "I read"
+            }
+          },
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "بقرا نص جديد.",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-05-ar-EG-ar_q06",
+          "type": "self-check",
+          "prompt": "Correct one word: دي صورة جديد. (di soora gedeed.)",
+          "acceptedAnswers": [
+            "دي صورة جديدة. — di soora gedeeda."
+          ],
+          "hint": "The noun and adjective need matching gender.",
+          "explanation": "صورة is feminine, so جديد becomes جديدة. دي already matches the feminine noun.",
+          "target": {
+            "type": "grammar",
+            "id": "ar_egy_oct05_grammar_1"
+          },
+          "trackInSrs": false,
+          "assessmentMode": "semanticSelfCheck",
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "دي صورة جديدة. — di soora gedeeda.",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-05-ar-EG-ar_q07",
+          "type": "self-check",
+          "prompt": "In the advertisements reading, where will the test start? Answer in English.",
+          "acceptedAnswers": [
+            "In the United States."
+          ],
+          "hint": "Look for الولايات المتحدة (el-wilaayaat el-mottaheda).",
+          "explanation": "في (fi) means “in”. The complete place phrase is في الولايات المتحدة.",
+          "target": {
+            "type": "grammar",
+            "id": "ar_egy_oct05_reading_1"
+          },
+          "trackInSrs": false,
+          "assessmentMode": "semanticSelfCheck",
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "In the United States.",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-05-ar-EG-ar_q08",
+          "type": "self-check",
+          "prompt": "What does الشهر ده (esh-shahr da) mean? Which month is meant in this reading?",
+          "acceptedAnswers": [
+            "This month; October 2026."
+          ],
+          "hint": "The passage is dated October 5, 2026.",
+          "explanation": "The phrase literally follows the order “the month this”. Its date stays tied to the dated reading.",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar_egy_this_month"
+          },
+          "trackInSrs": false,
+          "assessmentMode": "semanticSelfCheck",
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "This month; October 2026.",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-05-ar-EG-ar_q09",
+          "type": "choice",
+          "prompt": "Which is future: هيظهر (hayezhar) or بشوف (bashoof)?",
+          "acceptedAnswers": [
+            "هيظهر — hayezhar"
+          ],
+          "hint": "The future prefix is ha-.",
+          "explanation": "هيظهر points to a future action. بشوف is “I see”.",
+          "target": {
+            "type": "grammar",
+            "id": "ar_egy_oct05_reading_1"
+          },
+          "trackInSrs": false,
+          "choices": [
+            "هيظهر — hayezhar",
+            "بشوف — bashoof"
+          ],
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "هيظهر — hayezhar",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-05-ar-EG-ar_q10",
+          "type": "self-check",
+          "prompt": "Say “I see a new advertisement.” Script or transliteration is fine.",
+          "acceptedAnswers": [
+            "بشوف إعلان جديد. — bashoof eʿlaan gedeed."
+          ],
+          "hint": "Use bashoof, then the noun, then the masculine adjective.",
+          "explanation": "إعلان is masculine, so use جديد (gedeed). أنا can be added at the start.",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar_egy_advertisement"
+          },
+          "trackInSrs": false,
+          "assessmentMode": "semanticSelfCheck",
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "بشوف إعلان جديد. — bashoof eʿlaan gedeed.",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-05-ar-EG-ar_q11",
+          "type": "self-check",
+          "prompt": "Cover the chunk list. Recall: a new plan; this month; I am reading.",
+          "acceptedAnswers": [
+            "خطة جديدة — khetta gedeeda; الشهر ده — esh-shahr da; بقرا — baʾra"
+          ],
+          "hint": "Think feminine noun + adjective, then the time phrase, then the first-person verb.",
+          "explanation": "Check the -a ending in gedeeda and the glottal stop ʾ in baʾra.",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar_egy_this_month"
+          },
+          "trackInSrs": false,
+          "assessmentMode": "semanticSelfCheck",
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "خطة جديدة — khetta gedeeda; الشهر ده — esh-shahr da; بقرا — baʾra",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-05-ar-EG-ar_q12",
+          "type": "self-check",
+          "prompt": "Write two sentences: you are reading a text; the text is new. Script or transliteration is fine.",
+          "acceptedAnswers": [
+            "بقرا نص. النص جديد. — baʾra nass. en-nass gedeed."
+          ],
+          "hint": "Use baʾra first, then a noun + adjective description.",
+          "explanation": "No word for “is” is needed. Add the article to refer back to the text: نص → النص.",
+          "target": {
+            "type": "grammar",
+            "id": "ar_egy_oct05_grammar_2"
+          },
+          "trackInSrs": false,
+          "assessmentMode": "semanticSelfCheck",
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "بقرا نص. النص جديد. — baʾra nass. en-nass gedeed.",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-05-ar-EG-transfer",
+          "type": "self-check",
+          "prompt": "Without looking back, say “I see a picture”; “I am reading a text”; and “The advertisement is separate from the picture.” Then answer بتقرا إيه؟ (betʾra eeh?).",
+          "acceptedAnswers": [
+            "بشوف صورة. — bashoof soora.\nبقرا نص. — baʾra nass.\nالإعلان منفصل عن الصورة. — el-eʿlaan monfasel ʿan es-soora.\nبقرا نص قصير. — baʾra nass ʾosayyar."
+          ],
+          "hint": "Build one sentence at a time from the chunks. Then close the list and try again.",
+          "explanation": "Check noun–adjective gender, first-person verbs, and the article when referring back to the same thing.",
+          "target": {
+            "type": "grammar",
+            "id": "ar_egy_oct05_grammar_1"
+          },
+          "trackInSrs": false,
+          "assessmentMode": "semanticSelfCheck",
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "بشوف صورة. — bashoof soora.\nبقرا نص. — baʾra nass.\nالإعلان منفصل عن الصورة. — el-eʿlaan monfasel ʿan es-soora.\nبقرا نص قصير. — baʾra nass ʾosayyar.",
+          "answerAtoms": []
+        }
+      ],
+      "sourceIds": [
+        "openai_visual_ads_2026_10_05",
+        "openai_eu_text_provenance_2026_10_05"
+      ],
+      "route": [],
+      "instructionBlocks": [],
+      "optionalDialogue": []
+    },
+    {
+      "schemaVersion": 1,
+      "id": "ai-news-2026-10-05-hu",
+      "courseId": "ai-news-daily-2026-10-05",
+      "day": 32,
+      "language": "hu",
+      "title": "Kép és szöveg",
+      "subtitle": "October 5, 2026 · Pictures, text, and a new plan",
+      "estimatedMinutes": 40,
+      "objectives": [
+        "Read a short news passage with support.",
+        "Say what you see and what you read.",
+        "Distinguish a picture, an advertisement, and a text."
+      ],
+      "readings": [
+        {
+          "id": "ai-news-2026-10-05-hu-hu_ads",
+          "title": "Új hirdetések",
+          "sentences": [
+            {
+              "id": "ai-news-2026-10-05-hu-hu_ads-1",
+              "text": "Az OpenAI új hirdetéseket fog tesztelni a ChatGPT-ben.",
+              "english": "OpenAI will test new advertisements in ChatGPT.",
+              "kind": "source-summary",
+              "sourceIds": [
+                "openai_visual_ads_2026_10_05"
+              ]
+            },
+            {
+              "id": "ai-news-2026-10-05-hu-hu_ads-2",
+              "text": "A teszt ebben a hónapban indul az Egyesült Államokban.",
+              "english": "The test starts this month in the United States.",
+              "kind": "source-summary",
+              "sourceIds": [
+                "openai_visual_ads_2026_10_05"
+              ]
+            },
+            {
+              "id": "ai-news-2026-10-05-hu-hu_ads-3",
+              "text": "A hirdetésekben képek is lesznek.",
+              "english": "There will also be pictures in the advertisements.",
+              "kind": "source-summary",
+              "sourceIds": [
+                "openai_visual_ads_2026_10_05"
+              ]
+            },
+            {
+              "id": "ai-news-2026-10-05-hu-hu_ads-4",
+              "text": "A hirdetés képkészítés közben fog megjelenni.",
+              "english": "The advertisement will appear during image generation.",
+              "kind": "source-summary",
+              "sourceIds": [
+                "openai_visual_ads_2026_10_05"
+              ]
+            },
+            {
+              "id": "ai-news-2026-10-05-hu-hu_ads-5",
+              "text": "A hirdetés külön lesz az elkészült képtől.",
+              "english": "The advertisement will be separate from the finished picture.",
+              "kind": "source-summary",
+              "sourceIds": [
+                "openai_visual_ads_2026_10_05"
+              ]
+            },
+            {
+              "id": "ai-news-2026-10-05-hu-hu_ads-6",
+              "text": "A hirdetés egyértelmű jelölést kap.",
+              "english": "The advertisement will be clearly labeled.",
+              "kind": "source-summary",
+              "sourceIds": [
+                "openai_visual_ads_2026_10_05"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-05-hu-hu_watermark",
+          "title": "Egy láthatatlan jel",
+          "sentences": [
+            {
+              "id": "ai-news-2026-10-05-hu-hu_watermark-1",
+              "text": "Az OpenAI láthatatlan jelet tervez egyes szövegekhez.",
+              "english": "OpenAI plans an invisible mark for some texts.",
+              "kind": "source-summary",
+              "sourceIds": [
+                "openai_eu_text_provenance_2026_10_05"
+              ]
+            },
+            {
+              "id": "ai-news-2026-10-05-hu-hu_watermark-2",
+              "text": "A terv az Európai Unióban készült ChatGPT- és Codex-szövegeket érinti.",
+              "english": "The plan concerns ChatGPT and Codex texts produced in the European Union.",
+              "kind": "source-summary",
+              "sourceIds": [
+                "openai_eu_text_provenance_2026_10_05"
+              ]
+            },
+            {
+              "id": "ai-news-2026-10-05-hu-hu_watermark-3",
+              "text": "A változás a következő hetekben jön.",
+              "english": "The change is coming in the next few weeks.",
+              "kind": "source-summary",
+              "sourceIds": [
+                "openai_eu_text_provenance_2026_10_05"
+              ]
+            },
+            {
+              "id": "ai-news-2026-10-05-hu-hu_watermark-4",
+              "text": "A jel nem látható.",
+              "english": "The mark is not visible.",
+              "kind": "source-summary",
+              "sourceIds": [
+                "openai_eu_text_provenance_2026_10_05"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-05-hu-hu_desk",
+          "title": "Egy rövid szünet · Fictional dialogue",
+          "sentences": [
+            {
+              "id": "ai-news-2026-10-05-hu-hu_desk-1",
+              "text": "Anna: Mit olvasol?",
+              "english": "Anna: What are you reading?",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-05-hu-hu_desk-2",
+              "text": "Bence: Egy rövid szöveget olvasok.",
+              "english": "Bence: I am reading a short text.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-05-hu-hu_desk-3",
+              "text": "Anna: Én egy új képet látok.",
+              "english": "Anna: I see a new picture.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-05-hu-hu_desk-4",
+              "text": "Bence: Ez egy hirdetés?",
+              "english": "Bence: Is this an advertisement?",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-05-hu-hu_desk-5",
+              "text": "Anna: Nem. Ez egy kép. A hirdetés külön van.",
+              "english": "Anna: No. This is a picture. The advertisement is separate.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-05-hu-hu_desk-6",
+              "text": "Bence: Értem. A szöveg is rövid.",
+              "english": "Bence: I see. The text is short too.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            }
+          ]
+        }
+      ],
+      "vocabulary": [
+        {
+          "id": "hu_picture",
+          "term": "kép",
+          "english": "picture",
+          "semanticConcept": "picture",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-05-hu-vocab-picture",
+            "text": "Látok egy képet.",
+            "english": "I see a picture.",
+            "kind": "teaching-example",
+            "sourceIds": []
+          },
+          "note": "Object form: képet.",
+          "lexicalTerm": "kép"
+        },
+        {
+          "id": "hu_text",
+          "term": "szöveg",
+          "english": "text",
+          "semanticConcept": "text",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-05-hu-vocab-text",
+            "text": "Egy szöveget olvasok.",
+            "english": "I am reading a text.",
+            "kind": "teaching-example",
+            "sourceIds": []
+          },
+          "note": "Object form: szöveget.",
+          "lexicalTerm": "szöveg"
+        },
+        {
+          "id": "hu_advertisement",
+          "term": "hirdetés",
+          "english": "advertisement; ad",
+          "semanticConcept": "advertisement",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-05-hu-vocab-advertisement",
+            "text": "Látok egy hirdetést.",
+            "english": "I see an advertisement.",
+            "kind": "teaching-example",
+            "sourceIds": []
+          },
+          "note": "Object form: hirdetést.",
+          "lexicalTerm": "hirdetés"
+        },
+        {
+          "id": "hu_plan",
+          "term": "terv",
+          "english": "plan",
+          "semanticConcept": "plan",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-05-hu-vocab-plan",
+            "text": "Ez egy új terv.",
+            "english": "This is a new plan.",
+            "kind": "teaching-example",
+            "sourceIds": []
+          },
+          "note": "",
+          "lexicalTerm": "terv"
+        },
+        {
+          "id": "hu_new",
+          "term": "új",
+          "english": "new",
+          "semanticConcept": "new",
+          "plannedRole": "review",
+          "example": {
+            "id": "ai-news-2026-10-05-hu-vocab-new",
+            "text": "A kép új.",
+            "english": "The picture is new.",
+            "kind": "teaching-example",
+            "sourceIds": []
+          },
+          "note": "The adjective does not change before these singular nouns: új kép, új szöveg.",
+          "lexicalTerm": "új"
+        },
+        {
+          "id": "hu_separate",
+          "term": "külön",
+          "english": "separately; apart",
+          "semanticConcept": "separate",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-05-hu-vocab-separate",
+            "text": "A kép és a szöveg külön van.",
+            "english": "The picture and the text are separate.",
+            "kind": "teaching-example",
+            "sourceIds": []
+          },
+          "note": "Learn külön van as “is separate”; use külön lesz for “will be separate”.",
+          "lexicalTerm": "külön"
+        },
+        {
+          "id": "hu_invisible",
+          "term": "láthatatlan",
+          "english": "invisible",
+          "semanticConcept": "invisible",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-05-hu-vocab-invisible",
+            "text": "A jel láthatatlan.",
+            "english": "The mark is invisible.",
+            "kind": "teaching-example",
+            "sourceIds": []
+          },
+          "note": "jel = mark/sign; recognition support.",
+          "lexicalTerm": "láthatatlan"
+        },
+        {
+          "id": "hu_this_month",
+          "term": "ebben a hónapban",
+          "english": "this month",
+          "semanticConcept": "this_month",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-05-hu-vocab-this_month",
+            "text": "A teszt ebben a hónapban indul.",
+            "english": "The test starts this month.",
+            "kind": "teaching-example",
+            "sourceIds": []
+          },
+          "note": "Learn the whole time phrase; the endings need not be built from scratch.",
+          "lexicalTerm": "ebben a hónapban"
+        },
+        {
+          "id": "hu_i_read",
+          "term": "olvasok",
+          "english": "I read; I am reading",
+          "semanticConcept": "i_read",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-05-hu-vocab-i_read",
+            "text": "Egy új szöveget olvasok.",
+            "english": "I am reading a new text.",
+            "kind": "teaching-example",
+            "sourceIds": []
+          },
+          "note": "Use this form with an indefinite object such as egy szöveget.",
+          "lexicalTerm": "olvasok"
+        },
+        {
+          "id": "hu_i_see",
+          "term": "látok",
+          "english": "I see",
+          "semanticConcept": "i_see",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-05-hu-vocab-i_see",
+            "text": "Látok egy új képet.",
+            "english": "I see a new picture.",
+            "kind": "teaching-example",
+            "sourceIds": []
+          },
+          "note": "Use this form with an indefinite object such as egy képet.",
+          "lexicalTerm": "látok"
+        },
+        {
+          "id": "hu_model",
+          "term": "modell",
+          "english": "model",
+          "semanticConcept": "model",
+          "plannedRole": "review",
+          "example": {
+            "id": "ai-news-2026-10-05-hu-vocab-model",
+            "text": "A modell segít.",
+            "english": "The model helps.",
+            "kind": "teaching-example",
+            "sourceIds": []
+          },
+          "note": "Review: previously authored vocabulary. Try it from memory if familiar.",
+          "lexicalTerm": "modell"
+        },
+        {
+          "id": "hu_helps",
+          "term": "segít",
+          "english": "helps / is helping",
+          "semanticConcept": "helps",
+          "plannedRole": "review",
+          "example": {
+            "id": "ai-news-2026-10-05-hu-vocab-helps",
+            "text": "A modell segít.",
+            "english": "The model helps.",
+            "kind": "teaching-example",
+            "sourceIds": []
+          },
+          "note": "Third-person singular present. The subject can come before the verb.",
+          "lexicalTerm": "segít"
+        }
+      ],
+      "concepts": [
+        {
+          "id": "hu_oct05_grammar_1",
+          "title": "What do you see? Mark the object.",
+          "explanation": "The object is the thing you see or read. Hungarian usually marks it with -t. Sometimes a vowel comes before the -t: kép → képet, szöveg → szöveget, hirdetés → hirdetést. Learn these three forms as chunks. Compare A kép új (“The picture is new”) with Látok egy képet (“I see a picture”): the first picture is the subject, the second is the object. Keep egy (“a/an”) in today’s production examples, because a definite object uses a different verb form.",
+          "examples": [
+            {
+              "id": "ai-news-2026-10-05-hu-grammar-1-1",
+              "text": "Egy képet látok.",
+              "english": "I see a picture.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-05-hu-grammar-1-2",
+              "text": "Egy új szöveget olvasok.",
+              "english": "I am reading a new text.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-05-hu-grammar-1-3",
+              "text": "Látok egy hirdetést.",
+              "english": "I see an advertisement.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            }
+          ]
+        },
+        {
+          "id": "hu_oct05_grammar_2",
+          "title": "Describe something now; place it in the future.",
+          "explanation": "For a present-tense statement about what one thing is like, use noun + adjective: A kép új. There is no van between them. But van is used in the learned expression külön van (“is separate”). To speak about the future, külön lesz means “will be separate”. The news also uses fog + infinitive: fog tesztelni, “will test”. Recognise this future pattern today; your own sentences can stay in the present.",
+          "examples": [
+            {
+              "id": "ai-news-2026-10-05-hu-grammar-2-1",
+              "text": "A szöveg új.",
+              "english": "The text is new.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-05-hu-grammar-2-2",
+              "text": "A hirdetés külön van.",
+              "english": "The advertisement is separate.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-05-hu-grammar-2-3",
+              "text": "A hirdetés külön lesz.",
+              "english": "The advertisement will be separate.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            }
+          ]
+        },
+        {
+          "id": "hu_oct05_reading_1",
+          "title": "Read the future forms",
+          "explanation": "Start with the familiar nouns: hirdetés is an ad, kép is a picture. In hirdetések, -ek marks the plural. Fog tesztelni means “will test”: fog + an infinitive in -ni expresses a future action. Ebben a hónapban gives the time, so indul (“starts”) can describe the planned future test. Treat the longer place and time expressions below as reading support.",
+          "examples": [
+            {
+              "id": "ai-news-2026-10-05-hu-support-1-1",
+              "text": "az Egyesült Államokban",
+              "english": "in the United States",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-05-hu-support-1-2",
+              "text": "képkészítés közben",
+              "english": "during image generation",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-05-hu-support-1-3",
+              "text": "fog megjelenni",
+              "english": "will appear",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-05-hu-support-1-4",
+              "text": "az elkészült képtől",
+              "english": "from the finished picture",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-05-hu-support-1-5",
+              "text": "képek is lesznek",
+              "english": "there will also be pictures",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-05-hu-support-1-6",
+              "text": "egyértelmű jelölést kap",
+              "english": "receives clear labeling; will be clearly labeled in this future context",
+              "kind": "teaching-example",
+              "sourceIds": []
+            }
+          ]
+        },
+        {
+          "id": "hu_oct05_reading_2",
+          "title": "Describe the mark",
+          "explanation": "Láthatatlan means “invisible”; nem látható means “not visible”. Both describe the mark. In a simple present description such as A jel láthatatlan, Hungarian has no separate word for “is”. Egyes means “some” here. You do not need to produce the long second sentence: use its English support and recognise ChatGPT, Codex, and Európai Unió.",
+          "examples": [
+            {
+              "id": "ai-news-2026-10-05-hu-support-2-1",
+              "text": "jel / jelet",
+              "english": "mark / mark as object",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-05-hu-support-2-2",
+              "text": "egyes szövegekhez",
+              "english": "for some texts",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-05-hu-support-2-3",
+              "text": "az Európai Unióban",
+              "english": "in the European Union",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-05-hu-support-2-4",
+              "text": "érinti",
+              "english": "concerns; affects",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-05-hu-support-2-5",
+              "text": "a következő hetekben",
+              "english": "in the coming weeks",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-05-hu-support-2-6",
+              "text": "nem látható",
+              "english": "not visible",
+              "kind": "teaching-example",
+              "sourceIds": []
+            }
+          ]
+        },
+        {
+          "id": "hu_oct05_reading_3",
+          "title": "Ask what someone is reading",
+          "explanation": "Mit olvasol? asks “What are you reading?” Compare olvasol (“you read”) with olvasok (“I read”). The ending tells you who is reading, so Bence does not need én (“I”). In A szöveg is rövid, is means “too/also”, not the English verb “is”.",
+          "examples": [
+            {
+              "id": "ai-news-2026-10-05-hu-support-3-1",
+              "text": "Mit olvasol?",
+              "english": "What are you reading?",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-05-hu-support-3-2",
+              "text": "rövid",
+              "english": "short",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-05-hu-support-3-3",
+              "text": "én",
+              "english": "I",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-05-hu-support-3-4",
+              "text": "Értem.",
+              "english": "I understand. / I see.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-05-hu-support-3-5",
+              "text": "is",
+              "english": "also; too",
+              "kind": "teaching-example",
+              "sourceIds": []
+            }
+          ]
+        },
+        {
+          "id": "hu_oct05_pronunciation",
+          "title": "Read the sounds",
+          "explanation": "Hungarian stress falls on the first syllable. Accents matter: kép has a long é, and hír has a long í. Read sz as English s (szöveg) and s as English sh (olvasok). Say each chunk slowly, then say its whole example.",
+          "examples": []
+        },
+        {
+          "id": "hu_oct05_review",
+          "title": "Review tomorrow, then after a gap",
+          "explanation": "Tomorrow: recall “The model helps” first. Then recall kép, szöveg, and hirdetés with their object forms. In three days: rebuild the three sentences without a word bank. In seven days: describe a different picture and text. If a form is unfamiliar, learn it now and revisit it later; no previous completion is assumed.",
+          "examples": []
+        }
+      ],
+      "exercises": [
+        {
+          "id": "ai-news-2026-10-05-hu-hu_q00",
+          "type": "self-check",
+          "prompt": "Before opening the chunk list, try “model” and “helps”. Then put them together as “The model helps.” If these are unfamiliar, use the hint and learn the sentence now.",
+          "acceptedAnswers": [
+            "modell; segít. A modell segít."
+          ],
+          "hint": "The word for model is similar to English. Look at the final two chunks only if you need support.",
+          "explanation": "This returns to vocabulary from an earlier authored lesson. A successful answer without help is recall; reading the model is useful practice, but is not independent recall.",
+          "target": {
+            "type": "vocabulary",
+            "id": "hu_model"
+          },
+          "trackInSrs": false,
+          "assessmentMode": "semanticSelfCheck",
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "modell; segít. A modell segít.",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-05-hu-hu_q01",
+          "type": "matching",
+          "prompt": "Match 1–4 to A–D: 1 kép; 2 szöveg; 3 hirdetés; 4 terv. A plan; B advertisement; C picture; D text.",
+          "acceptedAnswers": [
+            "{\"0\": \"picture\", \"1\": \"text\", \"2\": \"advertisement\", \"3\": \"plan\"}"
+          ],
+          "hint": "Start with kép; its example is about seeing.",
+          "explanation": "Kép is picture, szöveg is text, hirdetés is advertisement, and terv is plan.",
+          "target": {
+            "type": "vocabulary",
+            "id": "hu_picture"
+          },
+          "trackInSrs": false,
+          "matchingPairs": [
+            {
+              "id": "0",
+              "text": "kép",
+              "answer": "picture",
+              "target": {
+                "type": "vocabulary",
+                "id": "hu_picture"
+              }
+            },
+            {
+              "id": "1",
+              "text": "szöveg",
+              "answer": "text",
+              "target": {
+                "type": "vocabulary",
+                "id": "hu_text"
+              }
+            },
+            {
+              "id": "2",
+              "text": "hirdetés",
+              "answer": "advertisement",
+              "target": {
+                "type": "vocabulary",
+                "id": "hu_advertisement"
+              }
+            },
+            {
+              "id": "3",
+              "text": "terv",
+              "answer": "plan",
+              "target": {
+                "type": "vocabulary",
+                "id": "hu_plan"
+              }
+            }
+          ],
+          "choices": [
+            "plan",
+            "advertisement",
+            "picture",
+            "text"
+          ],
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "{\"0\": \"picture\", \"1\": \"text\", \"2\": \"advertisement\", \"3\": \"plan\"}",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-05-hu-hu_q02",
+          "type": "choice",
+          "prompt": "Which sentence says “I am reading a text”?",
+          "acceptedAnswers": [
+            "Egy szöveget olvasok."
+          ],
+          "hint": "The ending -ok identifies “I” in olvasok.",
+          "explanation": "Olvasok means “I read/am reading”; szöveget has the object ending.",
+          "target": {
+            "type": "vocabulary",
+            "id": "hu_i_read"
+          },
+          "trackInSrs": false,
+          "choices": [
+            "Egy szöveget olvasok.",
+            "A szöveg új.",
+            "Egy képet látok."
+          ],
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "Egy szöveget olvasok.",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-05-hu-hu_q03",
+          "type": "self-check",
+          "prompt": "Complete: Látok egy ___. (picture)",
+          "acceptedAnswers": [
+            "képet"
+          ],
+          "hint": "The object is what you see. The learned object form has -et.",
+          "explanation": "Kép becomes képet as the object of látok. Use Látok egy képet.",
+          "target": {
+            "type": "vocabulary",
+            "id": "hu_picture"
+          },
+          "trackInSrs": false,
+          "assessmentMode": "semanticSelfCheck",
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "képet",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-05-hu-hu_q04",
+          "type": "self-check",
+          "prompt": "Complete: Egy új ___ olvasok. (text)",
+          "acceptedAnswers": [
+            "szöveget"
+          ],
+          "hint": "Start with szöveg and add the learned object ending.",
+          "explanation": "Szöveget is the object form. Új stays unchanged: egy új szöveget.",
+          "target": {
+            "type": "vocabulary",
+            "id": "hu_text"
+          },
+          "trackInSrs": false,
+          "assessmentMode": "semanticSelfCheck",
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "szöveget",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-05-hu-hu_q05",
+          "type": "order",
+          "prompt": "Put these chunks in order: olvasok / egy rövid szöveget.",
+          "acceptedAnswers": [
+            "Egy rövid szöveget olvasok.",
+            "Olvasok egy rövid szöveget."
+          ],
+          "hint": "Keep egy rövid szöveget together as one object phrase.",
+          "explanation": "This is the order used in the dialogue. Olvasok egy rövid szöveget is also grammatical, with a different emphasis.",
+          "target": {
+            "type": "grammar",
+            "id": "hu_oct05_grammar_1"
+          },
+          "trackInSrs": false,
+          "tokens": [
+            "olvasok.",
+            "Egy rövid szöveget"
+          ],
+          "choices": [
+            "olvasok.",
+            "Egy rövid szöveget"
+          ],
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "Egy rövid szöveget olvasok. / Olvasok egy rövid szöveget.",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-05-hu-hu_q06",
+          "type": "self-check",
+          "prompt": "Remove one unnecessary word: A kép van új.",
+          "acceptedAnswers": [
+            "A kép új."
+          ],
+          "hint": "In this present-tense description, Hungarian leaves out “is”.",
+          "explanation": "Do not use van between a third-person singular subject and an adjective in this pattern.",
+          "target": {
+            "type": "grammar",
+            "id": "hu_oct05_grammar_2"
+          },
+          "trackInSrs": false,
+          "assessmentMode": "semanticSelfCheck",
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "A kép új.",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-05-hu-hu_q07",
+          "type": "self-check",
+          "prompt": "In the advertisements reading, where will the test start? Answer in English.",
+          "acceptedAnswers": [
+            "In the United States."
+          ],
+          "hint": "Look for Egyesült Államok.",
+          "explanation": "Az Egyesült Államokban means “in the United States”; -ban is part of the location phrase.",
+          "target": {
+            "type": "grammar",
+            "id": "hu_oct05_reading_1"
+          },
+          "trackInSrs": false,
+          "assessmentMode": "semanticSelfCheck",
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "In the United States.",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-05-hu-hu_q08",
+          "type": "self-check",
+          "prompt": "What does ebben a hónapban mean? When is the test planned?",
+          "acceptedAnswers": [
+            "This month; October 2026."
+          ],
+          "hint": "Hónap means month. The reading is dated October 5, 2026.",
+          "explanation": "The time phrase is relative to this dated reading, not whichever month you revisit it.",
+          "target": {
+            "type": "vocabulary",
+            "id": "hu_this_month"
+          },
+          "trackInSrs": false,
+          "assessmentMode": "semanticSelfCheck",
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "This month; October 2026.",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-05-hu-hu_q09",
+          "type": "choice",
+          "prompt": "Which means “will be separate”: külön van or külön lesz?",
+          "acceptedAnswers": [
+            "külön lesz"
+          ],
+          "hint": "Compare now with later.",
+          "explanation": "Van gives the present in this expression; lesz gives the future.",
+          "target": {
+            "type": "grammar",
+            "id": "hu_oct05_reading_1"
+          },
+          "trackInSrs": false,
+          "choices": [
+            "külön van",
+            "külön lesz"
+          ],
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "külön lesz",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-05-hu-hu_q10",
+          "type": "self-check",
+          "prompt": "Say “I see a new advertisement.”",
+          "acceptedAnswers": [
+            "Látok egy új hirdetést."
+          ],
+          "hint": "Use látok + egy új + the object form of hirdetés.",
+          "explanation": "Egy új hirdetést látok is also acceptable. Keep the long é in hirdetést.",
+          "target": {
+            "type": "vocabulary",
+            "id": "hu_advertisement"
+          },
+          "trackInSrs": false,
+          "assessmentMode": "semanticSelfCheck",
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "Látok egy új hirdetést.",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-05-hu-hu_q11",
+          "type": "self-check",
+          "prompt": "Cover the chunk list. Write Hungarian for new, invisible, this month.",
+          "acceptedAnswers": [
+            "új; láthatatlan; ebben a hónapban"
+          ],
+          "hint": "First recall the picture, then the mark, then the date of the test.",
+          "explanation": "Say each once in a full phrase: új kép; láthatatlan jel; ebben a hónapban.",
+          "target": {
+            "type": "vocabulary",
+            "id": "hu_this_month"
+          },
+          "trackInSrs": false,
+          "assessmentMode": "semanticSelfCheck",
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "új; láthatatlan; ebben a hónapban",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-05-hu-hu_q12",
+          "type": "self-check",
+          "prompt": "Write two sentences: say you are reading a text, then describe the text as new.",
+          "acceptedAnswers": [
+            "Egy szöveget olvasok. A szöveg új."
+          ],
+          "hint": "The text needs -t only when it is the object of “read”.",
+          "explanation": "Other correct word orders are fine. Check olvasok, szöveget in sentence 1, and no van in sentence 2.",
+          "target": {
+            "type": "grammar",
+            "id": "hu_oct05_grammar_1"
+          },
+          "trackInSrs": false,
+          "assessmentMode": "semanticSelfCheck",
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "Egy szöveget olvasok. A szöveg új.",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-05-hu-transfer",
+          "type": "self-check",
+          "prompt": "Without looking back, say three things: “I see a picture”; “I am reading a text”; “The advertisement will be separate.” Then write your own two-line exchange using Mit olvasol?",
+          "acceptedAnswers": [
+            "Látok egy képet. Egy szöveget olvasok. A hirdetés külön lesz.\n— Mit olvasol?\n— Egy rövid szöveget olvasok."
+          ],
+          "hint": "Build one sentence at a time from the chunks. Then close the list and try again.",
+          "explanation": "Check the learned object forms and the first-person verbs.",
+          "target": {
+            "type": "grammar",
+            "id": "hu_oct05_grammar_1"
+          },
+          "trackInSrs": false,
+          "assessmentMode": "semanticSelfCheck",
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "Látok egy képet. Egy szöveget olvasok. A hirdetés külön lesz.\n— Mit olvasol?\n— Egy rövid szöveget olvasok.",
+          "answerAtoms": []
+        }
+      ],
+      "sourceIds": [
+        "openai_visual_ads_2026_10_05",
+        "openai_eu_text_provenance_2026_10_05"
+      ],
+      "route": [],
+      "instructionBlocks": [],
+      "optionalDialogue": []
+    }
+  ]
+}

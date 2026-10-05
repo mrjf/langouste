@@ -16,6 +16,7 @@
   import ExercisePanel from "./ExercisePanel.svelte";
   import ResourcesPanel from "./ResourcesPanel.svelte";
   import ParallelReader from "./ParallelReader.svelte";
+  import CoursePanel from "./CoursePanel.svelte";
   import NewsPanel from "./NewsPanel.svelte";
   import NewChatDialog from "./NewChatDialog.svelte";
   import IpaToggle from "./IpaToggle.svelte";
@@ -41,6 +42,7 @@
     | "news"
     | "audio-drills"
     | "exercises"
+    | "course"
     | "resources" = $state("chat");
   // Profile route after #/profile. Examples:
   //   fr
@@ -50,6 +52,7 @@
   let dictionaryRoute = $state("");
   let workbenchRoute = $state("");
   let newsRoute = $state("");
+  let courseRoute = $state("");
   let audioDrillRoute = $state("");
   const loggedIn = $derived(!!user.value && !!profile.value);
   let updatingHash = false;
@@ -128,6 +131,8 @@
       target = workbenchHash(workbenchRoute);
     } else if (view === "reader") {
       target = "#/reader";
+    } else if (view === "course") {
+      target = courseRoute ? `#/course/${courseRoute}` : "#/course";
     } else if (view === "news") {
       target = newsRoute ? `#/news/${newsRoute}` : "#/news";
     } else if (view === "audio-drills") {
@@ -198,7 +203,8 @@
         view = "reader";
         return;
       }
-      if (location.hash.startsWith("#/news")) {
+      if (location.hash.startsWith("#/course")) { view = "course"; courseRoute = location.hash.replace(/^#\/course\/?/, ""); return; }
+    if (location.hash.startsWith("#/news")) {
         view = "news";
         newsRoute = newsRouteFromHash(location.hash);
         return;
@@ -252,6 +258,7 @@
       view = "reader";
       return;
     }
+    if (location.hash.startsWith("#/course")) { view = "course"; courseRoute = location.hash.replace(/^#\/course\/?/, ""); return; }
     if (location.hash.startsWith("#/news")) {
       view = "news";
       newsRoute = newsRouteFromHash(location.hash);
@@ -381,6 +388,7 @@
           active={view === "resources"}
           onclick={() => { view = "resources"; chatStore.setActive(null); }}
         />
+        <SidebarNavButton index="11" label="AI course" active={view === "course"} onclick={() => { view = "course"; chatStore.setActive(null); }} />
       </nav>
       <!-- Sidebar list is always mounted: working/unread indicators must
            stay visible no matter which main view (chat/profile/connections)
@@ -411,6 +419,8 @@
         <WorkbenchPanel route={workbenchRoute} onRouteChange={(route) => (workbenchRoute = route)} />
       {:else if view === "reader"}
         <ParallelReader />
+      {:else if view === "course"}
+        <CoursePanel route={courseRoute} onRouteChange={(route) => (courseRoute = route)} />
       {:else if view === "news"}
         <NewsPanel
           route={newsRoute}

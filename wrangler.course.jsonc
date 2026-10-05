@@ -1,0 +1,1 @@
+{"name":"langouste-course-api","main":"cloudflare/worker.ts","compatibility_date":"2026-06-23","compatibility_flags":["nodejs_compat"],"workers_dev":false,"preview_urls":false,"durable_objects":{"bindings":[{"name":"ACCOUNTS","class_name":"AccountCoordinator"}]},"migrations":[{"tag":"v1","new_sqlite_classes":["AccountCoordinator"]}],"observability":{"enabled":false}}

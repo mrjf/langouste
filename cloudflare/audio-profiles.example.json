@@ -1,0 +1,18 @@
+{
+  "hu": {
+    "voiceId": "REPLACE_WITH_REVIEWED_NATIVE_HUNGARIAN_VOICE",
+    "model": "eleven_v4",
+    "dialectVerified": false,
+    "sampleApproved": false,
+    "creditsPerCharacter": 1,
+    "voiceSettings": { "stability": 0.5, "similarity_boost": 0.75 }
+  },
+  "ar-EG": {
+    "voiceId": "REPLACE_WITH_REVIEWED_EGYPTIAN_VOICE",
+    "model": "eleven_v4",
+    "dialectVerified": false,
+    "sampleApproved": false,
+    "creditsPerCharacter": 1,
+    "voiceSettings": { "stability": 0.5, "similarity_boost": 0.75 }
+  }
+}

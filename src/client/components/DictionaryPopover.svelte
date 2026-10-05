@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
+  import {readingPopoverStyle} from "../lib/popover-position";
   import { isCurrent, playExclusive, stopCurrent } from "../lib/audio-player";
 
   interface DictionaryCardLookup {
@@ -11,16 +12,12 @@
     senses: Array<{ part_of_speech: string; definition: string; examples: string[] }>;
   }
 
-  interface PopoverPosition {
-    left: number;
-    width: number;
-    maxHeight: number;
-    top?: number;
-    bottom?: number;
-  }
-
   interface Props {
     term: string;
+    inline?: boolean;
+    resources?: boolean;
+    onopen?: () => void;
+    onclose?: () => void;
     language: string;
     languageLabel?: string;
     headword?: string;
@@ -39,6 +36,7 @@
 
   let {
     term,
+    inline=false, resources=true, onopen, onclose,
     language,
     languageLabel = language,
     headword,
@@ -55,7 +53,7 @@
     onpointerleave,
   }: Props = $props();
 
-  let position = $state<PopoverPosition | null>(null);
+  let position = $state("");
   let audioLoading = $state(false);
   let audioError = $state("");
   let audioPlaying = $state(false);
@@ -83,36 +81,7 @@
     if (anchor) position = positionPopover(anchor);
   }
 
-  function positionPopover(target: HTMLElement): PopoverPosition {
-    const rect = target.getBoundingClientRect();
-    const margin = 12;
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
-    const width = Math.min(320, Math.max(180, viewportWidth - margin * 2));
-    const left = Math.min(
-      Math.max(rect.left + rect.width / 2 - width / 2, margin),
-      viewportWidth - width - margin,
-    );
-    const spaceAbove = rect.top - margin;
-    const spaceBelow = viewportHeight - rect.bottom - margin;
-    if (spaceBelow >= 180 || spaceBelow >= spaceAbove) {
-      return { left, width, top: rect.bottom, maxHeight: Math.max(120, spaceBelow) };
-    }
-    return {
-      left,
-      width,
-      bottom: viewportHeight - rect.top,
-      maxHeight: Math.max(120, spaceAbove),
-    };
-  }
-
-  function popoverStyle(value: PopoverPosition | null): string {
-    if (!value) return "";
-    const vertical = value.top === undefined
-      ? `bottom: ${value.bottom ?? 12}px;`
-      : `top: ${value.top}px;`;
-    return `left: ${value.left}px; width: ${value.width}px; max-height: ${value.maxHeight}px; ${vertical}`;
-  }
+  function positionPopover(target:HTMLElement):string { return readingPopoverStyle(target); }
 
   async function playPronunciation(event: MouseEvent): Promise<void> {
     event.preventDefault();
@@ -166,16 +135,20 @@
 <dialog
   open
   class="dictionary-popover word-popover"
+  class:inline
+  onfocusin={()=>onpointerenter?.(new PointerEvent("pointerenter"))}
+  onfocusout={()=>onpointerleave?.(new PointerEvent("pointerleave"))}
   aria-label={`Dictionary entry for ${term}`}
   data-dictionary-interactive
-  style={popoverStyle(position)}
+  style={inline?undefined:position}
   {onpointerenter}
   {onpointerleave}
 >
   <div class="dictionary-popover-head word-popover-head">
-    <strong>{displayHeadword}</strong>
+    <strong><bdi lang={language}>{displayHeadword}</bdi></strong>
     <div class="dictionary-popover-actions">
       <span>{languageLabel}</span>
+      {#if onclose}<button type="button" aria-label="Close dictionary popup" onclick={onclose}>×</button>{/if}
       {#if loadAudio}
         <button
           type="button"
@@ -244,7 +217,8 @@
 
   {#if audioError}<p class="dictionary-muted">{audioError}</p>{/if}
 
-  <nav class="dictionary-links" aria-label="Dictionary resources">
+  {#if onopen}<button class="open-sidebar" type="button" onclick={onopen}>Open dictionary</button>{/if}
+  {#if resources}<nav class="dictionary-links" aria-label="Dictionary resources">
     {#if profileHref}<a href={profileHref}>My word</a>{/if}
     {#if dictionaryHref}
       <a
@@ -259,7 +233,7 @@
         {languageLabel} Wiktionary ↗
       </a>
     {/if}
-  </nav>
+  </nav>{/if}
 </dialog>
 
 <style>
@@ -287,6 +261,8 @@
     direction: ltr;
   }
 
+  .dictionary-popover.inline {position:static;width:100%;max-height:none;padding:0;border:0;background:transparent;box-shadow:none;font-size:15px;z-index:auto;}
+  .open-sidebar {font:inherit;min-height:36px;padding:6px 10px;border:1px solid #a6b6a8;background:white;color:#245c44;border-radius:3px;}
   .dictionary-popover p { margin: 0; }
   .dictionary-popover-head {
     display: flex;

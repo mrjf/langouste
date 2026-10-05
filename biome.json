@@ -10,9 +10,11 @@
       "src/**/*.ts",
       "tests/**/*.ts",
       "scripts/**/*.ts",
+      "cloudflare/**/*.ts",
       "!src/client/**/*.svelte",
       "!dist/**",
-      "!node_modules/**"
+      "!node_modules/**",
+      "!cloudflare/generated/**"
     ]
   },
   "formatter": {
