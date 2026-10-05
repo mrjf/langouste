@@ -14,6 +14,7 @@
     baseByteOffset?: number;
     tooltip?: boolean;
     sentenceSupport?: SentenceSupport;
+    showTransliteration?:boolean;
     onSupportUsed?: () => void;
     onOpenDictionary?: (entry: {term:string;headword:string;lookup:DictionaryLookup|null;contextMeaning:string;anchor:HTMLElement}) => void;
   }
@@ -41,7 +42,7 @@
     contextMeaning?: string;
   }
 
-  let { text, language, filoDoc = null, baseByteOffset = 0, tooltip = true, sentenceSupport, onSupportUsed, onOpenDictionary }: Props = $props();
+  let { text, language, filoDoc = null, baseByteOffset = 0, tooltip = true, showTransliteration=true, sentenceSupport, onSupportUsed, onOpenDictionary }: Props = $props();
 
   const lookupCache = new Map<string, Promise<DictionaryLookup>>();
   let activeInstanceKey = $state<string | null>(null);
@@ -479,9 +480,10 @@
       >{segment.value}</a>{#if tooltip && activeInstanceKey === instanceKey}
           {#key instanceKey}
             {#if sentenceSupport && hoverPart==='sentence'}
-              <SentenceGlossPopover support={sentenceSupport} {language} anchor={activeAnchor} onpointerenter={enterPopup} onpointerleave={()=>leavePopup(instanceKey)} onclose={closePopover} onDictionary={()=>{if(activeSegment&&activeAnchor)openDictionary(activeSegment,activeAnchor);}}/>
+              <SentenceGlossPopover {showTransliteration} support={sentenceSupport} {language} anchor={activeAnchor} onpointerenter={enterPopup} onpointerleave={()=>leavePopup(instanceKey)} onclose={closePopover} onDictionary={()=>{if(activeSegment&&activeAnchor)openDictionary(activeSegment,activeAnchor);}}/>
             {:else}
             <DictionaryPopover
+              {showTransliteration}
               term={segment.value}
               {language}
               languageLabel={language.toUpperCase()}

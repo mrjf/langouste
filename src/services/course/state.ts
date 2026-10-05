@@ -2,6 +2,8 @@ import type { CourseExercise, CourseLesson, CourseProgress } from "../../types/c
 export function courseExerciseFeedback(exercise: CourseExercise) {
   return {
     text: exercise.explanation,
+    matchingAnswers: exercise.type==="matching" ? Object.fromEntries((exercise.matchingPairs??[]).map(p=>[p.id,p.answer])) : undefined,
+    correctChoices: exercise.type==="choice" ? exercise.choices?.filter(choice=>exercise.acceptedAnswers.some(answer=>answer.normalize("NFC").trim()===choice.normalize("NFC").trim())) : undefined,
     answer: exercise.modelAnswer || exercise.acceptedAnswers[0],
     choiceSupport: exercise.choiceSupport,
     answerAtoms: exercise.answerAtoms,

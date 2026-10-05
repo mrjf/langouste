@@ -22,3 +22,11 @@ The build and service tests reject missing word entries or unaligned sentences.
 Hover records only a conservative session support flag. It creates no encounter,
 recall, or mastery event and does not rewrite saved learner records. Existing
 practice reads that flag so assisted attempts cannot receive unaided recall credit.
+
+The workbook's Arabic support is on by default. A versioned preference preserves
+only deliberate opt-outs made in the updated UI; no progress keys are removed.
+`transliteration.json` contains exact authored phrases and enumerated word forms
+for inline prompts, dictionary lemmas, and grammar notes. It is a local course
+lexicon, not a general Arabic transliterator. `CourseText` isolates Arabic RTL
+and Latin LTR within one aligned unit. The full-catalog display test rejects
+uncovered Arabic runs and answer-bearing choice glosses before submission.

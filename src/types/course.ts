@@ -175,6 +175,8 @@ export type CourseAction =
 export interface CourseActionResult {
   progress: CourseProgress;
   feedback?: {
+    correctChoices?:string[];
+    matchingAnswers?:Record<string,string>;
     correct?: boolean | null;
     scored?: boolean;
     text: string;

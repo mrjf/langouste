@@ -1,8 +1,9 @@
+import {courseTransliteration} from './course-transliteration';
 import authored from '../../../content/ai-course/reading-support/lexicon.json';
 import type { CourseSentence, CourseLanguage } from '../../types/course';
 import type { FiloDocumentJson } from './stores.svelte';
 
-export interface ReadingWord { surface: string; gloss: string; lemma: string; form: string; }
+export interface ReadingWord { surface: string; gloss: string; lemma: string; form: string; transliteration?:string; }
 export interface SentenceSupport { words: ReadingWord[]; english: string; }
 type Entry = {lemma:string;gloss:string;form:string};
 const lexicon: Record<string,Record<string,Entry>> = authored.languages;
@@ -33,7 +34,7 @@ export function courseReadingSupport(sentence:CourseSentence,language:CourseLang
    if(key==='عن'&&sentence.text.includes('منفصل عن')){gloss='from';form='Preposition in منفصل عن: separate from.';}
    if(key==='بتعمل'&&sentence.text.includes('وإنت بتعمل')){gloss='you are making';form='Second person singular habitual, with explicit إنت subject.';}
   }
-  const word={surface,lemma:entry.lemma,gloss,form};words.push(word);
+  const word={surface,lemma:entry.lemma,gloss,form,transliteration:language==='ar-EG'?courseTransliteration(surface):undefined};words.push(word);
   const id=`word-${words.length-1}`,start=encoder.encode(sentence.text.slice(0,match.index)).length,end=start+encoder.encode(surface).length;
   doc.tiers[0].annotations.push({id,tierId:'word',kind:'word',start,end,payload:{text:surface},source:'course-authored'});
   doc.tiers[1].annotations.push({id:`dictionary-${id}`,tierId:'dictionary',kind:'dictionary',start,end,payload:{wordAnnotationId:id,surface,lemma:entry.lemma,language,definitions:[entry.gloss],senses:[],formDescription:form,contextMeaning:gloss},source:'course-authored'});
@@ -49,5 +50,5 @@ export function courseSentenceParts(sentence:CourseSentence,language:CourseLangu
  if(source.length===1)return [sentence];
  while(english.length>source.length && /^\s*\[/.test(english.at(-1)??'')){const tail=english.pop();english[english.length-1]+=tail;}
  if(source.length!==english.length)throw new Error(`Unaligned course sentence: ${sentence.id}`);
- return source.map((text,index)=>({...sentence,id:`${sentence.id}:sentence:${index}`,text,english:english[index].trim()}));
+ return source.map((text,index)=>({...sentence,id:`${sentence.id}:sentence:${index}`,text,english:english[index].trim(),transliteration:language==='ar-EG'?courseTransliteration(text.trim()):undefined}));
 }

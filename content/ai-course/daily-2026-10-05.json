@@ -673,8 +673,8 @@
         },
         {
           "id": "ar_egy_oct05_review",
-          "title": "Review tomorrow, then after a gap",
-          "explanation": "Tomorrow: recall “The model helps” first. Then recall picture, text, and advertisement without the word list. In three days: pair each with “new” and check its gender. In seven days: rebuild a two-line reading conversation. If a form is unfamiliar, learn it now and revisit it later; no previous completion is assumed.",
+          "title": "Nouns and descriptions",
+          "explanation": "Match the adjective to the noun: picture and advertisement are feminine; text is masculine.",
           "examples": []
         }
       ],
@@ -682,12 +682,12 @@
         {
           "id": "ai-news-2026-10-05-ar-EG-ar_q00",
           "type": "self-check",
-          "prompt": "Before opening the chunk list, try “model” and “helps”. Then put them together as “The model helps.” If these are unfamiliar, use the hint and learn the sentence now.",
+          "prompt": "Write “The model helps.”",
           "acceptedAnswers": [
             "موديل — moodeel; بيساعد — beysaaʿed. الموديل بيساعد. — el-moodeel beysaaʿed."
           ],
-          "hint": "The word for model is similar to English. Look at the final two chunks only if you need support.",
-          "explanation": "This returns to vocabulary from an earlier authored lesson. A successful answer without help is recall; reading the model is useful practice, but is not independent recall.",
+          "hint": "The word for model is similar to English.",
+          "explanation": "",
           "target": {
             "type": "vocabulary",
             "id": "ar_egy_model"
@@ -787,11 +787,22 @@
             "النص جديد. — en-nass gedeed.",
             "بشوف صورة. — bashoof soora."
           ],
-          "choiceSupport": {},
+          "choiceSupport": {
+            "بقرا نص. — baʾra nass.": {
+              "english": "I read a text."
+            },
+            "النص جديد. — en-nass gedeed.": {
+              "english": "The text is new."
+            },
+            "بشوف صورة. — bashoof soora.": {
+              "english": "I see a picture."
+            }
+          },
           "supportAtoms": [],
           "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
           "modelAnswer": "بقرا نص. — baʾra nass.",
-          "answerAtoms": []
+          "answerAtoms": [],
+          "showChoiceEnglish": false
         },
         {
           "id": "ai-news-2026-10-05-ar-EG-ar_q03",
@@ -969,11 +980,19 @@
             "هيظهر — hayezhar",
             "بشوف — bashoof"
           ],
-          "choiceSupport": {},
+          "choiceSupport": {
+            "هيظهر — hayezhar": {
+              "english": "It will appear."
+            },
+            "بشوف — bashoof": {
+              "english": "I see."
+            }
+          },
           "supportAtoms": [],
           "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
           "modelAnswer": "هيظهر — hayezhar",
-          "answerAtoms": []
+          "answerAtoms": [],
+          "showChoiceEnglish": false
         },
         {
           "id": "ai-news-2026-10-05-ar-EG-ar_q10",
@@ -999,7 +1018,7 @@
         {
           "id": "ai-news-2026-10-05-ar-EG-ar_q11",
           "type": "self-check",
-          "prompt": "Cover the chunk list. Recall: a new plan; this month; I am reading.",
+          "prompt": "Write the equivalents: a new plan; this month; I am reading.",
           "acceptedAnswers": [
             "خطة جديدة — khetta gedeeda; الشهر ده — esh-shahr da; بقرا — baʾra"
           ],
@@ -1045,7 +1064,7 @@
           "acceptedAnswers": [
             "بشوف صورة. — bashoof soora.\nبقرا نص. — baʾra nass.\nالإعلان منفصل عن الصورة. — el-eʿlaan monfasel ʿan es-soora.\nبقرا نص قصير. — baʾra nass ʾosayyar."
           ],
-          "hint": "Build one sentence at a time from the chunks. Then close the list and try again.",
+          "hint": "Build one sentence at a time from the chunks.",
           "explanation": "Check noun–adjective gender, first-person verbs, and the article when referring back to the same thing.",
           "target": {
             "type": "grammar",
@@ -1633,8 +1652,8 @@
         },
         {
           "id": "hu_oct05_review",
-          "title": "Review tomorrow, then after a gap",
-          "explanation": "Tomorrow: recall “The model helps” first. Then recall kép, szöveg, and hirdetés with their object forms. In three days: rebuild the three sentences without a word bank. In seven days: describe a different picture and text. If a form is unfamiliar, learn it now and revisit it later; no previous completion is assumed.",
+          "title": "Objects of seeing and reading",
+          "explanation": "Use the object form after látok and olvasok. A simple description keeps the noun in its base form.",
           "examples": []
         }
       ],
@@ -1642,12 +1661,12 @@
         {
           "id": "ai-news-2026-10-05-hu-hu_q00",
           "type": "self-check",
-          "prompt": "Before opening the chunk list, try “model” and “helps”. Then put them together as “The model helps.” If these are unfamiliar, use the hint and learn the sentence now.",
+          "prompt": "Write “The model helps.”",
           "acceptedAnswers": [
             "modell; segít. A modell segít."
           ],
-          "hint": "The word for model is similar to English. Look at the final two chunks only if you need support.",
-          "explanation": "This returns to vocabulary from an earlier authored lesson. A successful answer without help is recall; reading the model is useful practice, but is not independent recall.",
+          "hint": "The word for model is similar to English.",
+          "explanation": "",
           "target": {
             "type": "vocabulary",
             "id": "hu_model"
@@ -1747,7 +1766,8 @@
           "supportAtoms": [],
           "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
           "modelAnswer": "Egy szöveget olvasok.",
-          "answerAtoms": []
+          "answerAtoms": [],
+          "showChoiceEnglish": false
         },
         {
           "id": "ai-news-2026-10-05-hu-hu_q03",
@@ -1905,7 +1925,8 @@
           "supportAtoms": [],
           "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
           "modelAnswer": "külön lesz",
-          "answerAtoms": []
+          "answerAtoms": [],
+          "showChoiceEnglish": false
         },
         {
           "id": "ai-news-2026-10-05-hu-hu_q10",
@@ -1931,11 +1952,11 @@
         {
           "id": "ai-news-2026-10-05-hu-hu_q11",
           "type": "self-check",
-          "prompt": "Cover the chunk list. Write Hungarian for new, invisible, this month.",
+          "prompt": "Write Hungarian for new, invisible, this month.",
           "acceptedAnswers": [
             "új; láthatatlan; ebben a hónapban"
           ],
-          "hint": "First recall the picture, then the mark, then the date of the test.",
+          "hint": "Include the picture, the mark, and the test date.",
           "explanation": "Say each once in a full phrase: új kép; láthatatlan jel; ebben a hónapban.",
           "target": {
             "type": "vocabulary",
@@ -1977,7 +1998,7 @@
           "acceptedAnswers": [
             "Látok egy képet. Egy szöveget olvasok. A hirdetés külön lesz.\n— Mit olvasol?\n— Egy rövid szöveget olvasok."
           ],
-          "hint": "Build one sentence at a time from the chunks. Then close the list and try again.",
+          "hint": "Build one sentence at a time from the chunks.",
           "explanation": "Check the learned object forms and the first-person verbs.",
           "target": {
             "type": "grammar",

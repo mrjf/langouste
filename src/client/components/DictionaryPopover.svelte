@@ -1,4 +1,5 @@
 <script lang="ts">
+  import CourseText from "./CourseText.svelte";
   import { onDestroy } from "svelte";
   import {readingPopoverStyle} from "../lib/popover-position";
   import { isCurrent, playExclusive, stopCurrent } from "../lib/audio-player";
@@ -14,6 +15,7 @@
 
   interface Props {
     term: string;
+    showTransliteration?:boolean;
     inline?: boolean;
     resources?: boolean;
     onopen?: () => void;
@@ -35,7 +37,7 @@
   }
 
   let {
-    term,
+    term, showTransliteration=true,
     inline=false, resources=true, onopen, onclose,
     language,
     languageLabel = language,
@@ -145,7 +147,7 @@
   {onpointerleave}
 >
   <div class="dictionary-popover-head word-popover-head">
-    <strong><bdi lang={language}>{displayHeadword}</bdi></strong>
+    <strong><CourseText text={displayHeadword} {language} {showTransliteration} block/></strong>
     <div class="dictionary-popover-actions">
       <span>{languageLabel}</span>
       {#if onclose}<button type="button" aria-label="Close dictionary popup" onclick={onclose}>×</button>{/if}
@@ -163,12 +165,12 @@
   </div>
 
   {#if displayHeadword.toLocaleLowerCase(language) !== term.toLocaleLowerCase(language)}
-    <p class="dictionary-form">from <em>{term}</em></p>
+    <p class="dictionary-form">from <CourseText text={term} {language} {showTransliteration}/></p>
   {/if}
   {#if lookup?.form_description}
     <div class="dictionary-form-detail">
       <span class="dictionary-section-label">Form</span>
-      <p>{lookup.form_description}</p>
+      <p><CourseText text={lookup.form_description} {language} {showTransliteration}/></p>
     </div>
   {/if}
 
@@ -194,7 +196,7 @@
             {#if sense.part_of_speech}<span class="dictionary-pos">{sense.part_of_speech}</span>{/if}
             <p>{sense.definition}</p>
             {#each sense.examples as example}
-              <p class="dictionary-example">{example}</p>
+              <p class="dictionary-example"><CourseText text={example} {language} {showTransliteration}/></p>
             {/each}
           </div>
         {/each}

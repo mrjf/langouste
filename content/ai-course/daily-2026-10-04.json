@@ -671,7 +671,7 @@
         {
           "id": "ai-news-2026-10-04-hu-q01",
           "type": "recall",
-          "prompt": "Day-1 bridge: without a word bank, say the Hungarian word for new. If you have never studied it, reopen its teaching card first.",
+          "prompt": "Write the Hungarian word for new.",
           "acceptedAnswers": [
             "új"
           ],
@@ -748,7 +748,7 @@
         {
           "id": "ai-news-2026-10-04-hu-q02",
           "type": "recall",
-          "prompt": "Day-1 bridge: give the Hungarian noun meaning company.",
+          "prompt": "Write the Hungarian word for new.",
           "acceptedAnswers": [
             "cég"
           ],
@@ -966,7 +966,8 @@
           "supportAtoms": [],
           "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
           "modelAnswer": "hang",
-          "answerAtoms": []
+          "answerAtoms": [],
+          "showChoiceEnglish": false
         },
         {
           "id": "ai-news-2026-10-04-hu-q04",
@@ -1203,7 +1204,7 @@
           "acceptedAnswers": [
             "természetes"
           ],
-          "hint": "Look at the vocabulary card once if needed, then cover it.",
+          "hint": "Starts with “te…”.",
           "explanation": "Természetes means natural. You do not need the comparative természetesebb here.",
           "target": {
             "type": "vocabulary",
@@ -1431,7 +1432,8 @@
           "supportAtoms": [],
           "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
           "modelAnswer": "A telefon új.",
-          "answerAtoms": []
+          "answerAtoms": [],
+          "showChoiceEnglish": false
         },
         {
           "id": "ai-news-2026-10-04-hu-q07",
@@ -1819,7 +1821,8 @@
           "supportAtoms": [],
           "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
           "modelAnswer": "Anna",
-          "answerAtoms": []
+          "answerAtoms": [],
+          "showChoiceEnglish": false
         },
         {
           "id": "ai-news-2026-10-04-hu-q10",
@@ -2404,7 +2407,8 @@
           "supportAtoms": [],
           "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
           "modelAnswer": "September 29, 2026",
-          "answerAtoms": []
+          "answerAtoms": [],
+          "showChoiceEnglish": false
         },
         {
           "id": "ai-news-2026-10-04-hu-q16",
@@ -2489,7 +2493,8 @@
           "supportAtoms": [],
           "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
           "modelAnswer": "No",
-          "answerAtoms": []
+          "answerAtoms": [],
+          "showChoiceEnglish": false
         },
         {
           "id": "ai-news-2026-10-04-hu-q17",
@@ -2722,11 +2727,11 @@
         {
           "id": "ai-news-2026-10-04-hu-q19",
           "type": "self-check",
-          "prompt": "Cover the cards and recall the Hungarian for phone, voice and sends. Say them before looking.",
+          "prompt": "Write the Hungarian for phone, voice and sends.",
           "acceptedAnswers": [
             "telefon · phone\nhang · voice\nküld · sends"
           ],
-          "hint": "If one fails, reveal just that word, cover it, and retry later.",
+          "hint": "Starts with “te…”.",
           "explanation": "Telefon = phone; hang = voice; küld = sends.",
           "target": {
             "type": "vocabulary",
@@ -3890,9 +3895,9 @@
         {
           "id": "ar_eg_20261004_q01",
           "type": "matching",
-          "prompt": "Match the four Arabic items to the English meaning bank. Transliteration is available if needed.",
+          "prompt": "Match the four Arabic items to the English meaning bank.",
           "hint": "Start with the familiar loanword video.",
-          "explanation": "Matching shows recognition. Correct pairs do not prove unaided recall.",
+          "explanation": "",
           "feedback": {
             "correct": "Matching shows recognition. Correct pairs do not prove unaided recall.",
             "incorrect": "Compare your answer with the model and explanation, then try again. Matching shows recognition. Correct pairs do not prove unaided recall."
@@ -4478,7 +4483,8 @@
               "sourceIds": [],
               "transliteration": "tabeeʿi"
             }
-          ]
+          ],
+          "showChoiceEnglish": false
         },
         {
           "id": "ar_eg_20261004_q03",
@@ -5207,7 +5213,8 @@
               "sourceIds": [],
               "transliteration": "dee"
             }
-          ]
+          ],
+          "showChoiceEnglish": false
         },
         {
           "id": "ar_eg_20261004_q07",
@@ -6246,7 +6253,7 @@
         {
           "id": "ar_eg_20261004_q09",
           "type": "recall",
-          "prompt": "Say or type: a model. This is the same Day-1 word.",
+          "prompt": "Say or type: a model.",
           "hint": "The Egyptian loanword is moodeel.",
           "explanation": "Moodeel means “model”.",
           "feedback": {
@@ -6741,7 +6748,8 @@
               "sourceIds": [],
               "transliteration": "beyebʿat"
             }
-          ]
+          ],
+          "showChoiceEnglish": false
         },
         {
           "id": "ar_eg_20261004_q12",
