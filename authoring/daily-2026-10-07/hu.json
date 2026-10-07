@@ -1,0 +1,912 @@
+{
+  "schemaVersion": 1,
+  "id": "ai-news-2026-10-07-hu",
+  "courseId": "ai-news-daily-2026-10-07",
+  "day": 34,
+  "language": "hu",
+  "title": "Képek, gombok és számok",
+  "subtitle": "October 7, 2026 · Pictures, buttons and numbers",
+  "estimatedMinutes": 40,
+  "objectives": [
+    "Name parts of an interactive answer.",
+    "Say what you see and change.",
+    "Compare two simple answers."
+  ],
+  "sources": [
+    {
+      "id": "openai_interactive_chat_2026_10_07",
+      "title": "GPT-6 and Intelligent UI for everyone",
+      "url": "https://openai.com/index/gpt-6-for-everyone/",
+      "publishedOn": "2026-10-07",
+      "verifiedAsOf": "2026-10-07",
+      "publisher": "OpenAI",
+      "factSummary": "OpenAI announced visual, interactive Chat answers. Paid-tier rollout starts October 7; Free and Go start October 8. Enterprise access depends on administrators. Work and Codex models are unchanged."
+    }
+  ],
+  "route": [
+    "Read · 10 min",
+    "Words and grammar · 8 min",
+    "Practise · 17 min",
+    "Say or write your own example · 5 min"
+  ],
+  "readings": [
+    {
+      "id": "ai-news-2026-10-07-hu-r1",
+      "title": "Képek és gombok · News",
+      "sentences": [
+        {
+          "id": "ai-news-2026-10-07-hu-s001",
+          "text": "Az OpenAI új válaszokat mutat be.",
+          "english": "OpenAI is introducing new responses.",
+          "kind": "source-summary",
+          "sourceIds": [
+            "openai_interactive_chat_2026_10_07"
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-07-hu-s002",
+          "text": "A válaszban kép és gomb is lehet.",
+          "english": "A response can also contain a picture and a button.",
+          "kind": "source-summary",
+          "sourceIds": [
+            "openai_interactive_chat_2026_10_07"
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-07-hu-s003",
+          "text": "A bevezetés fokozatos.",
+          "english": "The rollout is gradual.",
+          "kind": "source-summary",
+          "sourceIds": [
+            "openai_interactive_chat_2026_10_07"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-07-hu-r2",
+      "title": "Egy kis számoló · Fictional scene",
+      "sentences": [
+        {
+          "id": "ai-news-2026-10-07-hu-s004",
+          "text": "Anna: Ez egy egyszerű számoló.",
+          "english": "Anna: This is a simple calculator.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-07-hu-s005",
+          "text": "Bence: Hol van a gomb?",
+          "english": "Bence: Where is the button?",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-07-hu-s006",
+          "text": "Anna: Itt van.",
+          "english": "Anna: Here it is.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-07-hu-s007",
+          "text": "Bence: Látom a számot.",
+          "english": "Bence: I see the number.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-07-hu-s008",
+          "text": "Anna: Megváltoztatom a számot.",
+          "english": "Anna: I change the number.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-07-hu-s009",
+          "text": "Bence: Most más az eredmény.",
+          "english": "Bence: Now the result is different.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        }
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-07-hu-r3",
+      "title": "Melyik válasz jobb? · Fictional scene",
+      "sentences": [
+        {
+          "id": "ai-news-2026-10-07-hu-s010",
+          "text": "Anna: A rövid válasz elég?",
+          "english": "Anna: Is the short answer enough?",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-07-hu-s011",
+          "text": "Bence: Igen, de egy kép is segít.",
+          "english": "Bence: Yes, but a picture helps too.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-07-hu-s012",
+          "text": "Anna: A gomb kicsi.",
+          "english": "Anna: The button is small.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-07-hu-s013",
+          "text": "Bence: Ez a gomb nagyobb.",
+          "english": "Bence: This button is bigger.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-07-hu-s014",
+          "text": "Anna: Most látom.",
+          "english": "Anna: Now I see it.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-07-hu-s015",
+          "text": "Bence: Jó, próbáljuk ki!",
+          "english": "Bence: Good, let’s try it!",
+          "kind": "teaching-example",
+          "sourceIds": []
+        }
+      ]
+    }
+  ],
+  "vocabulary": [
+    {
+      "id": "hu_answer",
+      "term": "válasz",
+      "english": "answer",
+      "semanticConcept": "answer",
+      "plannedRole": "review",
+      "example": {
+        "id": "ai-news-2026-10-07-hu-s016",
+        "text": "A válasz rövid.",
+        "english": "The answer is short.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      },
+      "teachingNote": ""
+    },
+    {
+      "id": "hu-oct07-word-2",
+      "term": "gomb",
+      "english": "button",
+      "semanticConcept": "button",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-07-hu-s017",
+        "text": "A gomb kicsi.",
+        "english": "The button is small.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      },
+      "teachingNote": ""
+    },
+    {
+      "id": "hu-oct07-word-3",
+      "term": "szám",
+      "english": "number",
+      "semanticConcept": "number",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-07-hu-s018",
+        "text": "Ez egy szám.",
+        "english": "This is a number.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      },
+      "teachingNote": ""
+    },
+    {
+      "id": "hu-oct07-word-4",
+      "term": "számoló",
+      "english": "calculator",
+      "semanticConcept": "calculator",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-07-hu-s019",
+        "text": "Ez egy egyszerű számoló.",
+        "english": "This is a simple calculator.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      },
+      "teachingNote": ""
+    },
+    {
+      "id": "hu_result",
+      "term": "eredmény",
+      "english": "result",
+      "semanticConcept": "result",
+      "plannedRole": "review",
+      "example": {
+        "id": "ai-news-2026-10-07-hu-s020",
+        "text": "Az eredmény más.",
+        "english": "The result is different.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      },
+      "teachingNote": ""
+    },
+    {
+      "id": "hu-oct07-word-6",
+      "term": "megváltoztatom",
+      "english": "I change it",
+      "semanticConcept": "I change it",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-07-hu-s021",
+        "text": "Megváltoztatom a számot.",
+        "english": "I change the number.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      },
+      "teachingNote": ""
+    },
+    {
+      "id": "hu-oct07-word-7",
+      "term": "itt van",
+      "english": "here it is",
+      "semanticConcept": "here it is",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-07-hu-s022",
+        "text": "Itt van a gomb.",
+        "english": "Here is the button.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      },
+      "teachingNote": ""
+    },
+    {
+      "id": "hu_picture",
+      "term": "kép",
+      "english": "picture",
+      "semanticConcept": "picture",
+      "plannedRole": "review",
+      "example": {
+        "id": "ai-news-2026-10-07-hu-s023",
+        "text": "A kép nagy.",
+        "english": "The picture is big.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      },
+      "teachingNote": "Review from an earlier lesson."
+    },
+    {
+      "id": "hu_new",
+      "term": "új",
+      "english": "new",
+      "semanticConcept": "new",
+      "plannedRole": "review",
+      "example": {
+        "id": "ai-news-2026-10-07-hu-s024",
+        "text": "Ez egy új kép.",
+        "english": "This is a new picture.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      },
+      "teachingNote": "Review from an earlier lesson."
+    },
+    {
+      "id": "hu_helps",
+      "term": "segít",
+      "english": "helps",
+      "semanticConcept": "helps",
+      "plannedRole": "review",
+      "example": {
+        "id": "ai-news-2026-10-07-hu-s025",
+        "text": "A kép segít.",
+        "english": "The picture helps.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      },
+      "teachingNote": "Review from an earlier lesson."
+    }
+  ],
+  "concepts": [
+    {
+      "id": "hu-oct07-grammar-1",
+      "title": "A specific object: -t",
+      "explanation": "Add an object ending when something is seen or changed. Szám becomes számot; kép becomes képet. With a specific object, learn the complete verb forms látom (“I see it”) and megváltoztatom (“I change it”). The object ending and the verb ending do different jobs.",
+      "examples": [
+        {
+          "id": "ai-news-2026-10-07-hu-s026",
+          "text": "Látom a számot.",
+          "english": "I see the number.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-07-hu-s027",
+          "text": "Megváltoztatom a számot.",
+          "english": "I change the number.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-07-hu-s028",
+          "text": "Látom a képet.",
+          "english": "I see the picture.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        }
+      ]
+    },
+    {
+      "id": "hu-oct07-grammar-2",
+      "title": "Where it is; what it is like",
+      "explanation": "Van appears when saying where something is: Itt van a gomb. For a third-person present description with an adjective, omit van: A gomb kicsi. Is means “also/too” and follows the item it includes.",
+      "examples": [
+        {
+          "id": "ai-news-2026-10-07-hu-s029",
+          "text": "Itt van a gomb.",
+          "english": "Here is the button.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-07-hu-s030",
+          "text": "A gomb kicsi.",
+          "english": "The button is small.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-07-hu-s031",
+          "text": "Egy kép is segít.",
+          "english": "A picture helps too.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        }
+      ]
+    }
+  ],
+  "exercises": [
+    {
+      "id": "ai-news-2026-10-07-hu-e01",
+      "type": "choice",
+      "prompt": "Choose “answer”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu_answer"
+      },
+      "acceptedAnswers": [
+        "válasz"
+      ],
+      "hint": "Look at the example for “answer” if you need help.",
+      "explanation": "válasz means “answer”.",
+      "trackInSrs": false,
+      "choiceAtoms": [
+        {
+          "text": "válasz",
+          "english": "answer"
+        },
+        {
+          "text": "számoló",
+          "english": "calculator"
+        },
+        {
+          "text": "itt van",
+          "english": "here it is"
+        }
+      ],
+      "showChoiceEnglish": false,
+      "choices": [
+        "válasz",
+        "számoló",
+        "itt van"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-07-hu-e02",
+      "type": "choice",
+      "prompt": "Choose “button”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu-oct07-word-2"
+      },
+      "acceptedAnswers": [
+        "gomb"
+      ],
+      "hint": "Look at the example for “button” if you need help.",
+      "explanation": "gomb means “button”.",
+      "trackInSrs": false,
+      "choiceAtoms": [
+        {
+          "text": "eredmény",
+          "english": "result"
+        },
+        {
+          "text": "kép",
+          "english": "picture"
+        },
+        {
+          "text": "gomb",
+          "english": "button"
+        }
+      ],
+      "showChoiceEnglish": false,
+      "choices": [
+        "eredmény",
+        "kép",
+        "gomb"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-07-hu-e03",
+      "type": "choice",
+      "prompt": "Choose “number”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu-oct07-word-3"
+      },
+      "acceptedAnswers": [
+        "szám"
+      ],
+      "hint": "Look at the example for “number” if you need help.",
+      "explanation": "szám means “number”.",
+      "trackInSrs": false,
+      "choiceAtoms": [
+        {
+          "text": "új",
+          "english": "new"
+        },
+        {
+          "text": "szám",
+          "english": "number"
+        },
+        {
+          "text": "megváltoztatom",
+          "english": "I change it"
+        }
+      ],
+      "showChoiceEnglish": false,
+      "choices": [
+        "új",
+        "szám",
+        "megváltoztatom"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-07-hu-e04",
+      "type": "choice",
+      "prompt": "Choose “result”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu_result"
+      },
+      "acceptedAnswers": [
+        "eredmény"
+      ],
+      "hint": "Look at the example for “result” if you need help.",
+      "explanation": "eredmény means “result”.",
+      "trackInSrs": false,
+      "choiceAtoms": [
+        {
+          "text": "kép",
+          "english": "picture"
+        },
+        {
+          "text": "válasz",
+          "english": "answer"
+        },
+        {
+          "text": "eredmény",
+          "english": "result"
+        }
+      ],
+      "showChoiceEnglish": false,
+      "choices": [
+        "kép",
+        "válasz",
+        "eredmény"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-07-hu-e05",
+      "type": "choice",
+      "prompt": "Choose “here it is”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu-oct07-word-7"
+      },
+      "acceptedAnswers": [
+        "itt van"
+      ],
+      "hint": "Look at the example for “here it is” if you need help.",
+      "explanation": "itt van means “here it is”.",
+      "trackInSrs": false,
+      "choiceAtoms": [
+        {
+          "text": "itt van",
+          "english": "here it is"
+        },
+        {
+          "text": "segít",
+          "english": "helps"
+        },
+        {
+          "text": "szám",
+          "english": "number"
+        }
+      ],
+      "showChoiceEnglish": false,
+      "choices": [
+        "itt van",
+        "segít",
+        "szám"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-07-hu-e06",
+      "type": "recall",
+      "prompt": "Write “answer” in Hungarian.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu_answer"
+      },
+      "acceptedAnswers": [
+        "válasz"
+      ],
+      "hint": "The example is: A válasz rövid.",
+      "explanation": "válasz means “answer”.",
+      "trackInSrs": true
+    },
+    {
+      "id": "ai-news-2026-10-07-hu-e07",
+      "type": "recall",
+      "prompt": "Write “number” in Hungarian.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu-oct07-word-3"
+      },
+      "acceptedAnswers": [
+        "szám"
+      ],
+      "hint": "The example is: Ez egy szám.",
+      "explanation": "szám means “number”.",
+      "trackInSrs": true
+    },
+    {
+      "id": "ai-news-2026-10-07-hu-e08",
+      "type": "recall",
+      "prompt": "Write “calculator” in Hungarian.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu-oct07-word-4"
+      },
+      "acceptedAnswers": [
+        "számoló"
+      ],
+      "hint": "The example is: Ez egy egyszerű számoló.",
+      "explanation": "számoló means “calculator”.",
+      "trackInSrs": true
+    },
+    {
+      "id": "ai-news-2026-10-07-hu-e09",
+      "type": "recall",
+      "prompt": "Write “I change it” in Hungarian.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu-oct07-word-6"
+      },
+      "acceptedAnswers": [
+        "megváltoztatom"
+      ],
+      "hint": "The example is: Megváltoztatom a számot.",
+      "explanation": "megváltoztatom means “I change it”.",
+      "trackInSrs": true
+    },
+    {
+      "id": "ai-news-2026-10-07-hu-e10",
+      "type": "order",
+      "prompt": "Put the words in order: Here is the button.",
+      "target": {
+        "type": "grammar",
+        "id": "hu-oct07-grammar-2"
+      },
+      "acceptedAnswers": [
+        "Itt van a gomb"
+      ],
+      "hint": "Use the complete pattern from Grammar.",
+      "explanation": "Itt van a gomb. — Here is the button.",
+      "trackInSrs": false,
+      "tokens": [
+        "gomb",
+        "a",
+        "van",
+        "Itt"
+      ],
+      "modelAnswers": [
+        {
+          "text": "Itt van a gomb.",
+          "english": "Here is the button."
+        }
+      ],
+      "choices": [
+        "gomb",
+        "a",
+        "van",
+        "Itt"
+      ],
+      "answerData": [
+        {
+          "text": "Itt van a gomb.",
+          "english": "Here is the button."
+        }
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-07-hu-e11",
+      "type": "order",
+      "prompt": "Put the words in order: I see the number.",
+      "target": {
+        "type": "grammar",
+        "id": "hu-oct07-grammar-1"
+      },
+      "acceptedAnswers": [
+        "Látom a számot"
+      ],
+      "hint": "Use the complete pattern from Grammar.",
+      "explanation": "Látom a számot. — I see the number.",
+      "trackInSrs": false,
+      "tokens": [
+        "számot",
+        "a",
+        "Látom"
+      ],
+      "modelAnswers": [
+        {
+          "text": "Látom a számot.",
+          "english": "I see the number."
+        }
+      ],
+      "choices": [
+        "számot",
+        "a",
+        "Látom"
+      ],
+      "answerData": [
+        {
+          "text": "Látom a számot.",
+          "english": "I see the number."
+        }
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-07-hu-e12",
+      "type": "order",
+      "prompt": "Put the words in order: The button is small.",
+      "target": {
+        "type": "grammar",
+        "id": "hu-oct07-grammar-2"
+      },
+      "acceptedAnswers": [
+        "A gomb kicsi"
+      ],
+      "hint": "Use the complete pattern from Grammar.",
+      "explanation": "A gomb kicsi. — The button is small.",
+      "trackInSrs": false,
+      "tokens": [
+        "kicsi",
+        "gomb",
+        "A"
+      ],
+      "modelAnswers": [
+        {
+          "text": "A gomb kicsi.",
+          "english": "The button is small."
+        }
+      ],
+      "choices": [
+        "kicsi",
+        "gomb",
+        "A"
+      ],
+      "answerData": [
+        {
+          "text": "A gomb kicsi.",
+          "english": "The button is small."
+        }
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-07-hu-e13",
+      "type": "matching",
+      "prompt": "Match each word to its meaning.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu_answer"
+      },
+      "acceptedAnswers": [
+        "{\"0\": \"answer\", \"1\": \"number\", \"2\": \"calculator\", \"3\": \"here it is\"}"
+      ],
+      "hint": "Compare the vocabulary examples.",
+      "explanation": "Read each complete pair aloud.",
+      "trackInSrs": false,
+      "matchingPairs": [
+        {
+          "id": "0",
+          "text": "válasz",
+          "answer": "answer",
+          "transliteration": null,
+          "target": {
+            "type": "vocabulary",
+            "id": "hu_answer"
+          }
+        },
+        {
+          "id": "1",
+          "text": "szám",
+          "answer": "number",
+          "transliteration": null,
+          "target": {
+            "type": "vocabulary",
+            "id": "hu-oct07-word-3"
+          }
+        },
+        {
+          "id": "2",
+          "text": "számoló",
+          "answer": "calculator",
+          "transliteration": null,
+          "target": {
+            "type": "vocabulary",
+            "id": "hu-oct07-word-4"
+          }
+        },
+        {
+          "id": "3",
+          "text": "itt van",
+          "answer": "here it is",
+          "transliteration": null,
+          "target": {
+            "type": "vocabulary",
+            "id": "hu-oct07-word-7"
+          }
+        }
+      ],
+      "choices": [
+        "here it is",
+        "calculator",
+        "number",
+        "answer"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-07-hu-e14",
+      "type": "self-check",
+      "prompt": "Say that you see the number, then say you change it.",
+      "target": {
+        "type": "grammar",
+        "id": "hu-oct07-grammar-1"
+      },
+      "acceptedAnswers": [
+        "Látom a számot. Megváltoztatom a számot."
+      ],
+      "hint": "Use the vocabulary and grammar examples if needed.",
+      "explanation": "Compare meaning and word order with the model; other natural answers can work.",
+      "trackInSrs": false,
+      "modelAnswers": [
+        {
+          "text": "Látom a számot. Megváltoztatom a számot.",
+          "english": "I see the number. I change the number."
+        }
+      ],
+      "rubric": {
+        "criteria": "Include all requested meanings. Check the noun and verb forms, then choose how closely your answer matches."
+      },
+      "answerData": [
+        {
+          "text": "Látom a számot. Megváltoztatom a számot.",
+          "english": "I see the number. I change the number."
+        }
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-07-hu-e15",
+      "type": "self-check",
+      "prompt": "Describe a fictional small button, then say where it is.",
+      "target": {
+        "type": "grammar",
+        "id": "hu-oct07-grammar-2"
+      },
+      "acceptedAnswers": [
+        "A gomb kicsi. Itt van."
+      ],
+      "hint": "Use the vocabulary and grammar examples if needed.",
+      "explanation": "Compare meaning and word order with the model; other natural answers can work.",
+      "trackInSrs": false,
+      "modelAnswers": [
+        {
+          "text": "A gomb kicsi. Itt van.",
+          "english": "The button is small. Here it is."
+        }
+      ],
+      "rubric": {
+        "criteria": "Include all requested meanings. Check the noun and verb forms, then choose how closely your answer matches."
+      },
+      "answerData": [
+        {
+          "text": "A gomb kicsi. Itt van.",
+          "english": "The button is small. Here it is."
+        }
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-07-hu-e16",
+      "type": "self-check",
+      "prompt": "Say that an answer is short and a picture helps too.",
+      "target": {
+        "type": "grammar",
+        "id": "hu-oct07-grammar-2"
+      },
+      "acceptedAnswers": [
+        "A válasz rövid. Egy kép is segít."
+      ],
+      "hint": "Use the vocabulary and grammar examples if needed.",
+      "explanation": "Compare meaning and word order with the model; other natural answers can work.",
+      "trackInSrs": false,
+      "modelAnswers": [
+        {
+          "text": "A válasz rövid. Egy kép is segít.",
+          "english": "The answer is short. A picture helps too."
+        }
+      ],
+      "rubric": {
+        "criteria": "Include all requested meanings. Check the noun and verb forms, then choose how closely your answer matches."
+      },
+      "answerData": [
+        {
+          "text": "A válasz rövid. Egy kép is segít.",
+          "english": "The answer is short. A picture helps too."
+        }
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-07-hu-e17",
+      "type": "recall",
+      "prompt": "Review: write “picture”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu_picture"
+      },
+      "acceptedAnswers": [
+        "kép"
+      ],
+      "hint": "Use this example: A kép nagy.",
+      "explanation": "kép means “picture”.",
+      "trackInSrs": true
+    },
+    {
+      "id": "ai-news-2026-10-07-hu-e18",
+      "type": "recall",
+      "prompt": "Review: write “new”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu_new"
+      },
+      "acceptedAnswers": [
+        "új"
+      ],
+      "hint": "Use this example: Ez egy új kép.",
+      "explanation": "új means “new”.",
+      "trackInSrs": true
+    }
+  ],
+  "review": {
+    "instructions": "If these earlier words are familiar, try the review questions before opening the hint. Otherwise use the examples.",
+    "prompts": [
+      "Say “picture”, “new”, and “helps”."
+    ]
+  }
+}

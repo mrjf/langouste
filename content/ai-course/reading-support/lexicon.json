@@ -1777,6 +1777,76 @@
         "lemma": "kap",
         "gloss": "receives; gets",
         "form": "Present third-person singular; future reference in the announced test."
+      },
+      "válaszokat": {
+        "lemma": "válasz",
+        "gloss": "answers [object]",
+        "form": "Plural accusative: válasz + ok + at."
+      },
+      "mutat": {
+        "lemma": "mutat",
+        "gloss": "shows / presents",
+        "form": "Third person singular; with be, introduces."
+      },
+      "válaszban": {
+        "lemma": "válasz",
+        "gloss": "in an answer",
+        "form": "Inessive -ban."
+      },
+      "gomb": {
+        "lemma": "gomb",
+        "gloss": "button",
+        "form": ""
+      },
+      "lehet": {
+        "lemma": "lehet",
+        "gloss": "can be / may be",
+        "form": "Possibility."
+      },
+      "bevezetés": {
+        "lemma": "bevezetés",
+        "gloss": "introduction / rollout",
+        "form": "Noun."
+      },
+      "fokozatos": {
+        "lemma": "fokozatos",
+        "gloss": "gradual",
+        "form": "Adjective."
+      },
+      "számoló": {
+        "lemma": "számoló",
+        "gloss": "calculator",
+        "form": "Noun used here for a simple calculator."
+      },
+      "látom": {
+        "lemma": "lát",
+        "gloss": "I see it",
+        "form": "First person singular definite present."
+      },
+      "számot": {
+        "lemma": "szám",
+        "gloss": "number [object]",
+        "form": "Accusative -ot."
+      },
+      "megváltoztatom": {
+        "lemma": "megváltoztat",
+        "gloss": "I change it",
+        "form": "First person singular definite present."
+      },
+      "nagyobb": {
+        "lemma": "nagy",
+        "gloss": "bigger",
+        "form": "Comparative -obb."
+      },
+      "szám": {
+        "lemma": "szám",
+        "gloss": "number",
+        "form": ""
+      },
+      "nagy": {
+        "lemma": "nagy",
+        "gloss": "big",
+        "form": ""
       }
     },
     "ar-EG": {
@@ -3939,6 +4009,136 @@
         "lemma": "ChatGPT",
         "gloss": "ChatGPT",
         "form": "Proper company or product name, written in Latin script."
+      },
+      "لأداة": {
+        "lemma": "أداة",
+        "gloss": "for a tool",
+        "form": "Attached preposition le-, for."
+      },
+      "للطلاب": {
+        "lemma": "طالب",
+        "gloss": "for students",
+        "form": "Attached le- + definite article; plural of student."
+      },
+      "اسم": {
+        "lemma": "اسم",
+        "gloss": "name",
+        "form": "Noun."
+      },
+      "college": {
+        "lemma": "College",
+        "gloss": "College [English name]",
+        "form": "Part of the product name."
+      },
+      "planner": {
+        "lemma": "Planner",
+        "gloss": "Planner [English name]",
+        "form": "Part of the product name."
+      },
+      "مفيش": {
+        "lemma": "مفيش",
+        "gloss": "there is not / there are no",
+        "form": "Egyptian negative existential."
+      },
+      "ميعاد": {
+        "lemma": "ميعاد",
+        "gloss": "date / appointment / deadline",
+        "form": "Context here is a due date; it can also mean appointment."
+      },
+      "محدد": {
+        "lemma": "محدد",
+        "gloss": "fixed / specified",
+        "form": "Masculine adjective."
+      },
+      "مواعيد": {
+        "lemma": "ميعاد",
+        "gloss": "dates / appointments / deadlines",
+        "form": "Irregular plural; deadlines in the planning scene."
+      },
+      "نعمل": {
+        "lemma": "عمل",
+        "gloss": "we do / make; let’s do / make",
+        "form": "First person plural; used as a suggestion here."
+      },
+      "نكتب": {
+        "lemma": "كتب",
+        "gloss": "we write / let’s write",
+        "form": "First person plural."
+      },
+      "قائمة": {
+        "lemma": "قائمة",
+        "gloss": "list",
+        "form": "Feminine noun."
+      },
+      "وبعدين": {
+        "lemma": "بعدين",
+        "gloss": "and then",
+        "form": "Attached conjunction wi-."
+      },
+      "نرتّب": {
+        "lemma": "رتّب",
+        "gloss": "we arrange / let’s arrange",
+        "form": "First person plural."
+      },
+      "المواعيد": {
+        "lemma": "ميعاد",
+        "gloss": "the dates / deadlines",
+        "form": "Definite plural."
+      },
+      "الميعاد": {
+        "lemma": "ميعاد",
+        "gloss": "the date / deadline",
+        "form": "Definite singular."
+      },
+      "طيب": {
+        "lemma": "طيب",
+        "gloss": "okay / well",
+        "form": "Conversation marker here."
+      },
+      "نبدأ": {
+        "lemma": "بدأ",
+        "gloss": "we start / let’s start",
+        "form": "First person plural."
+      },
+      "بده": {
+        "lemma": "ده",
+        "gloss": "with this one",
+        "form": "Preposition bi- + masculine demonstrative da."
+      },
+      "القائمة": {
+        "lemma": "قائمة",
+        "gloss": "the list",
+        "form": "Definite feminine noun."
+      },
+      "طويلة": {
+        "lemma": "طويل",
+        "gloss": "long",
+        "form": "Feminine adjective."
+      },
+      "خطوة": {
+        "lemma": "خطوة",
+        "gloss": "step",
+        "form": "Feminine noun."
+      },
+      "وبعد": {
+        "lemma": "بعد",
+        "gloss": "and after",
+        "form": "Attached conjunction wi-."
+      },
+      "كده": {
+        "lemma": "كده",
+        "gloss": "that / like this",
+        "form": "In baʿd keda: after that."
+      },
+      "نراجع": {
+        "lemma": "راجع",
+        "gloss": "we check / let’s check",
+        "form": "First person plural."
+      },
+      "حاجة": {
+        "lemma": "حاجة",
+        "gloss": "thing",
+        "form": "Koll haaga: everything."
       }
     }
   }

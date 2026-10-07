@@ -1,0 +1,20 @@
+[
+  {
+    "id": "openai_interactive_chat_2026_10_07",
+    "title": "GPT-6 and Intelligent UI for everyone",
+    "url": "https://openai.com/index/gpt-6-for-everyone/",
+    "publishedOn": "2026-10-07",
+    "verifiedAsOf": "2026-10-07",
+    "publisher": "OpenAI",
+    "factSummary": "OpenAI announced visual, interactive Chat answers. Paid-tier rollout starts October 7; Free and Go start October 8. Enterprise access depends on administrators. Work and Codex models are unchanged."
+  },
+  {
+    "id": "openai_college_planner_2026_10_07",
+    "title": "Helping teens learn, plan, and shape the future of AI",
+    "url": "https://openai.com/index/teens-learn-and-plan/",
+    "publishedOn": "2026-10-07",
+    "verifiedAsOf": "2026-10-07",
+    "publisher": "OpenAI",
+    "factSummary": "College Planner is planned to organize application tasks and deadlines. It is coming soon without a launch date, initially for US grades 10–12 applying to four-year colleges; wider coverage is planned."
+  }
+]

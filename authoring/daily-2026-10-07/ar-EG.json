@@ -1,0 +1,970 @@
+{
+  "schemaVersion": 1,
+  "id": "ai-news-2026-10-07-ar-EG",
+  "courseId": "ai-news-daily-2026-10-07",
+  "day": 34,
+  "language": "ar-EG",
+  "title": "خطوة بخطوة",
+  "subtitle": "October 7, 2026 · One step at a time",
+  "estimatedMinutes": 40,
+  "objectives": [
+    "Describe a short list and a deadline.",
+    "Suggest a simple sequence of actions.",
+    "Distinguish a planned tool from a tool already available."
+  ],
+  "sources": [
+    {
+      "id": "openai_college_planner_2026_10_07",
+      "title": "Helping teens learn, plan, and shape the future of AI",
+      "url": "https://openai.com/index/teens-learn-and-plan/",
+      "publishedOn": "2026-10-07",
+      "verifiedAsOf": "2026-10-07",
+      "publisher": "OpenAI",
+      "factSummary": "College Planner is planned to organize application tasks and deadlines. It is coming soon without a launch date, initially for US grades 10–12 applying to four-year colleges; wider coverage is planned."
+    }
+  ],
+  "route": [
+    "Read · 10 min",
+    "Words and grammar · 8 min",
+    "Practise · 17 min",
+    "Say or write your own example · 5 min"
+  ],
+  "readings": [
+    {
+      "id": "ai-news-2026-10-07-ar-EG-r1",
+      "title": "A tool for planning · News",
+      "sentences": [
+        {
+          "id": "ai-news-2026-10-07-ar-EG-s001",
+          "text": "OpenAI عندها خطة لأداة للطلاب.",
+          "english": "OpenAI has a plan for a student tool.",
+          "kind": "source-summary",
+          "sourceIds": [
+            "openai_college_planner_2026_10_07"
+          ],
+          "transliteration": "OpenAI ʿandaha khetta le-adaa let-tollaab."
+        },
+        {
+          "id": "ai-news-2026-10-07-ar-EG-s002",
+          "text": "اسم الأداة College Planner.",
+          "english": "The tool is called College Planner.",
+          "kind": "source-summary",
+          "sourceIds": [
+            "openai_college_planner_2026_10_07"
+          ],
+          "transliteration": "esm el-adaa College Planner."
+        },
+        {
+          "id": "ai-news-2026-10-07-ar-EG-s003",
+          "text": "لسه مفيش ميعاد محدد.",
+          "english": "There is no fixed date yet.",
+          "kind": "source-summary",
+          "sourceIds": [
+            "openai_college_planner_2026_10_07"
+          ],
+          "transliteration": "lissa mafeesh meeʿaad mohaddad."
+        }
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-07-ar-EG-r2",
+      "title": "A busy week · Fictional dialogue",
+      "sentences": [
+        {
+          "id": "ai-news-2026-10-07-ar-EG-s004",
+          "text": "منى: عندي مواعيد كتير.",
+          "english": "Mona: I have lots of deadlines.",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "Mona: ʿandi mawaaʿeed kiteer."
+        },
+        {
+          "id": "ai-news-2026-10-07-ar-EG-s005",
+          "text": "كريم: نعمل خطة؟",
+          "english": "Karim: Shall we make a plan?",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "Kareem: neʿmel khetta?"
+        },
+        {
+          "id": "ai-news-2026-10-07-ar-EG-s006",
+          "text": "منى: أيوه، الأول نكتب قائمة.",
+          "english": "Mona: Yes, first we write a list.",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "Mona: aywa, el-awwal nekteb ʾaayma."
+        },
+        {
+          "id": "ai-news-2026-10-07-ar-EG-s007",
+          "text": "كريم: وبعدين نرتّب المواعيد.",
+          "english": "Karim: And then we arrange the deadlines.",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "Kareem: wi-baʿdeen neratteb el-mawaaʿeed."
+        },
+        {
+          "id": "ai-news-2026-10-07-ar-EG-s008",
+          "text": "منى: الميعاد ده بكرة.",
+          "english": "Mona: This deadline is tomorrow.",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "Mona: el-meeʿaad da bokra."
+        },
+        {
+          "id": "ai-news-2026-10-07-ar-EG-s009",
+          "text": "كريم: طيب، نبدأ بده.",
+          "english": "Karim: Okay, let’s start with this one.",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "Kareem: tayyeb, nebdaʾ be-da."
+        }
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-07-ar-EG-r3",
+      "title": "One step at a time · Fictional dialogue",
+      "sentences": [
+        {
+          "id": "ai-news-2026-10-07-ar-EG-s010",
+          "text": "منى: القائمة طويلة.",
+          "english": "Mona: The list is long.",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "Mona: el-ʾaayma taweela."
+        },
+        {
+          "id": "ai-news-2026-10-07-ar-EG-s011",
+          "text": "كريم: نعمل خطوة واحدة دلوقتي.",
+          "english": "Karim: Let’s do one step now.",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "Kareem: neʿmel khatwa waahda delwaʾti."
+        },
+        {
+          "id": "ai-news-2026-10-07-ar-EG-s012",
+          "text": "منى: وبعد كده؟",
+          "english": "Mona: And after that?",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "Mona: wi-baʿd keda?"
+        },
+        {
+          "id": "ai-news-2026-10-07-ar-EG-s013",
+          "text": "كريم: نراجع الميعاد.",
+          "english": "Karim: We check the deadline.",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "Kareem: neraageʿ el-meeʿaad."
+        },
+        {
+          "id": "ai-news-2026-10-07-ar-EG-s014",
+          "text": "منى: الخطة دي بسيطة.",
+          "english": "Mona: This plan is simple.",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "Mona: el-khetta di baseeta."
+        },
+        {
+          "id": "ai-news-2026-10-07-ar-EG-s015",
+          "text": "كريم: أيوه، بس نراجع كل حاجة.",
+          "english": "Karim: Yes, but we check everything.",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "Kareem: aywa, bass neraageʿ koll haaga."
+        }
+      ]
+    }
+  ],
+  "vocabulary": [
+    {
+      "id": "ar-EG-oct07-word-1",
+      "term": "ميعاد",
+      "english": "date / appointment / deadline",
+      "semanticConcept": "date / appointment / deadline",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-07-ar-EG-s016",
+        "text": "عندي ميعاد.",
+        "english": "I have an appointment.",
+        "kind": "teaching-example",
+        "sourceIds": [],
+        "transliteration": "ʿandi meeʿaad."
+      },
+      "teachingNote": "",
+      "transliteration": "meeʿaad"
+    },
+    {
+      "id": "ar-EG-oct07-word-2",
+      "term": "مواعيد",
+      "english": "dates / appointments / deadlines",
+      "semanticConcept": "dates / appointments / deadlines",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-07-ar-EG-s017",
+        "text": "عندي مواعيد كتير.",
+        "english": "I have lots of deadlines.",
+        "kind": "teaching-example",
+        "sourceIds": [],
+        "transliteration": "ʿandi mawaaʿeed kiteer."
+      },
+      "teachingNote": "",
+      "transliteration": "mawaaʿeed"
+    },
+    {
+      "id": "ar-EG-oct07-word-3",
+      "term": "قائمة",
+      "english": "list",
+      "semanticConcept": "list",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-07-ar-EG-s018",
+        "text": "القائمة طويلة.",
+        "english": "The list is long.",
+        "kind": "teaching-example",
+        "sourceIds": [],
+        "transliteration": "el-ʾaayma taweela."
+      },
+      "teachingNote": "",
+      "transliteration": "ʾaayma"
+    },
+    {
+      "id": "ar-EG-oct07-word-4",
+      "term": "خطوة",
+      "english": "step",
+      "semanticConcept": "step",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-07-ar-EG-s019",
+        "text": "دي خطوة بسيطة.",
+        "english": "This is a simple step.",
+        "kind": "teaching-example",
+        "sourceIds": [],
+        "transliteration": "di khatwa baseeta."
+      },
+      "teachingNote": "",
+      "transliteration": "khatwa"
+    },
+    {
+      "id": "ar_egy_first",
+      "term": "الأول",
+      "english": "first",
+      "semanticConcept": "first",
+      "plannedRole": "review",
+      "example": {
+        "id": "ai-news-2026-10-07-ar-EG-s020",
+        "text": "الأول نكتب قائمة.",
+        "english": "First we write a list.",
+        "kind": "teaching-example",
+        "sourceIds": [],
+        "transliteration": "el-awwal nekteb ʾaayma."
+      },
+      "teachingNote": "",
+      "transliteration": "el-awwal"
+    },
+    {
+      "id": "ar-EG-oct07-word-6",
+      "term": "وبعدين",
+      "english": "and then",
+      "semanticConcept": "and then",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-07-ar-EG-s021",
+        "text": "وبعدين نراجع الميعاد.",
+        "english": "And then we check the deadline.",
+        "kind": "teaching-example",
+        "sourceIds": [],
+        "transliteration": "wi-baʿdeen neraageʿ el-meeʿaad."
+      },
+      "teachingNote": "",
+      "transliteration": "wi-baʿdeen"
+    },
+    {
+      "id": "ar-EG-oct07-word-7",
+      "term": "نرتّب",
+      "english": "we arrange / let’s arrange",
+      "semanticConcept": "we arrange / let’s arrange",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-07-ar-EG-s022",
+        "text": "نرتّب المواعيد.",
+        "english": "Let’s arrange the deadlines.",
+        "kind": "teaching-example",
+        "sourceIds": [],
+        "transliteration": "neratteb el-mawaaʿeed."
+      },
+      "teachingNote": "",
+      "transliteration": "neratteb"
+    },
+    {
+      "id": "ar_egy_plan",
+      "term": "خطة",
+      "english": "plan",
+      "semanticConcept": "plan",
+      "plannedRole": "review",
+      "example": {
+        "id": "ai-news-2026-10-07-ar-EG-s023",
+        "text": "دي خطة بسيطة.",
+        "english": "This is a simple plan.",
+        "kind": "teaching-example",
+        "sourceIds": [],
+        "transliteration": "di khetta baseeta."
+      },
+      "teachingNote": "Review from an earlier lesson.",
+      "transliteration": "khetta"
+    },
+    {
+      "id": "ar-EG-oct07-word-9",
+      "term": "بكرة",
+      "english": "tomorrow",
+      "semanticConcept": "tomorrow",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-07-ar-EG-s024",
+        "text": "الميعاد بكرة.",
+        "english": "The deadline is tomorrow.",
+        "kind": "teaching-example",
+        "sourceIds": [],
+        "transliteration": "el-meeʿaad bokra."
+      },
+      "teachingNote": "",
+      "transliteration": "bokra"
+    },
+    {
+      "id": "ar-EG-oct07-word-10",
+      "term": "نراجع",
+      "english": "we check / let’s check",
+      "semanticConcept": "we check / let’s check",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-07-ar-EG-s025",
+        "text": "نراجع كل حاجة.",
+        "english": "We check everything.",
+        "kind": "teaching-example",
+        "sourceIds": [],
+        "transliteration": "neraageʿ koll haaga."
+      },
+      "teachingNote": "",
+      "transliteration": "neraageʿ"
+    }
+  ],
+  "concepts": [
+    {
+      "id": "ar-EG-oct07-grammar-1",
+      "title": "Suggest a shared action",
+      "explanation": "With these verbs, n- marks “we”: nekteb, “we write”, and neratteb, “we arrange”. In a question or suggestion, the same forms can mean “shall we…?” or “let’s…”. Put el-awwal (“first”) before the first action and wi-baʿdeen (“and then”) before the next.",
+      "examples": [
+        {
+          "id": "ai-news-2026-10-07-ar-EG-s026",
+          "text": "الأول نكتب قائمة.",
+          "english": "First we write a list.",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "el-awwal nekteb ʾaayma."
+        },
+        {
+          "id": "ai-news-2026-10-07-ar-EG-s027",
+          "text": "وبعدين نرتّب المواعيد.",
+          "english": "And then we arrange the deadlines.",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "wi-baʿdeen neratteb el-mawaaʿeed."
+        }
+      ]
+    },
+    {
+      "id": "ar-EG-oct07-grammar-2",
+      "title": "This one and one step",
+      "explanation": "Put da after a definite masculine noun and di after a definite feminine noun. With a feminine noun, “one” is waahda and normally follows it. There is no separate present-tense word for “is” in these descriptions.",
+      "examples": [
+        {
+          "id": "ai-news-2026-10-07-ar-EG-s028",
+          "text": "الميعاد ده بكرة.",
+          "english": "This deadline is tomorrow.",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "el-meeʿaad da bokra."
+        },
+        {
+          "id": "ai-news-2026-10-07-ar-EG-s029",
+          "text": "الخطة دي بسيطة.",
+          "english": "This plan is simple.",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "el-khetta di baseeta."
+        },
+        {
+          "id": "ai-news-2026-10-07-ar-EG-s030",
+          "text": "خطوة واحدة",
+          "english": "one step",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "khatwa waahda"
+        }
+      ]
+    }
+  ],
+  "exercises": [
+    {
+      "id": "ai-news-2026-10-07-ar-EG-e01",
+      "type": "choice",
+      "prompt": "Choose “date / appointment / deadline”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "ar-EG-oct07-word-1"
+      },
+      "acceptedAnswers": [
+        "ميعاد"
+      ],
+      "hint": "Look at the example for “date / appointment / deadline” if you need help.",
+      "explanation": "ميعاد means “date / appointment / deadline”.",
+      "trackInSrs": false,
+      "choiceAtoms": [
+        {
+          "text": "ميعاد",
+          "english": "date / appointment / deadline",
+          "transliteration": "meeʿaad"
+        },
+        {
+          "text": "خطوة",
+          "english": "step",
+          "transliteration": "khatwa"
+        },
+        {
+          "text": "نرتّب",
+          "english": "we arrange / let’s arrange",
+          "transliteration": "neratteb"
+        }
+      ],
+      "showChoiceEnglish": false,
+      "choices": [
+        "ميعاد",
+        "خطوة",
+        "نرتّب"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-07-ar-EG-e02",
+      "type": "choice",
+      "prompt": "Choose “dates / appointments / deadlines”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "ar-EG-oct07-word-2"
+      },
+      "acceptedAnswers": [
+        "مواعيد"
+      ],
+      "hint": "Look at the example for “dates / appointments / deadlines” if you need help.",
+      "explanation": "مواعيد means “dates / appointments / deadlines”.",
+      "trackInSrs": false,
+      "choiceAtoms": [
+        {
+          "text": "الأول",
+          "english": "first",
+          "transliteration": "el-awwal"
+        },
+        {
+          "text": "خطة",
+          "english": "plan",
+          "transliteration": "khetta"
+        },
+        {
+          "text": "مواعيد",
+          "english": "dates / appointments / deadlines",
+          "transliteration": "mawaaʿeed"
+        }
+      ],
+      "showChoiceEnglish": false,
+      "choices": [
+        "الأول",
+        "خطة",
+        "مواعيد"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-07-ar-EG-e03",
+      "type": "choice",
+      "prompt": "Choose “list”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "ar-EG-oct07-word-3"
+      },
+      "acceptedAnswers": [
+        "قائمة"
+      ],
+      "hint": "Look at the example for “list” if you need help.",
+      "explanation": "قائمة means “list”.",
+      "trackInSrs": false,
+      "choiceAtoms": [
+        {
+          "text": "بكرة",
+          "english": "tomorrow",
+          "transliteration": "bokra"
+        },
+        {
+          "text": "قائمة",
+          "english": "list",
+          "transliteration": "ʾaayma"
+        },
+        {
+          "text": "وبعدين",
+          "english": "and then",
+          "transliteration": "wi-baʿdeen"
+        }
+      ],
+      "showChoiceEnglish": false,
+      "choices": [
+        "بكرة",
+        "قائمة",
+        "وبعدين"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-07-ar-EG-e04",
+      "type": "choice",
+      "prompt": "Choose “first”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "ar_egy_first"
+      },
+      "acceptedAnswers": [
+        "الأول"
+      ],
+      "hint": "Look at the example for “first” if you need help.",
+      "explanation": "الأول means “first”.",
+      "trackInSrs": false,
+      "choiceAtoms": [
+        {
+          "text": "خطة",
+          "english": "plan",
+          "transliteration": "khetta"
+        },
+        {
+          "text": "ميعاد",
+          "english": "date / appointment / deadline",
+          "transliteration": "meeʿaad"
+        },
+        {
+          "text": "الأول",
+          "english": "first",
+          "transliteration": "el-awwal"
+        }
+      ],
+      "showChoiceEnglish": false,
+      "choices": [
+        "خطة",
+        "ميعاد",
+        "الأول"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-07-ar-EG-e05",
+      "type": "choice",
+      "prompt": "Choose “we arrange / let’s arrange”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "ar-EG-oct07-word-7"
+      },
+      "acceptedAnswers": [
+        "نرتّب"
+      ],
+      "hint": "Look at the example for “we arrange / let’s arrange” if you need help.",
+      "explanation": "نرتّب means “we arrange / let’s arrange”.",
+      "trackInSrs": false,
+      "choiceAtoms": [
+        {
+          "text": "نرتّب",
+          "english": "we arrange / let’s arrange",
+          "transliteration": "neratteb"
+        },
+        {
+          "text": "نراجع",
+          "english": "we check / let’s check",
+          "transliteration": "neraageʿ"
+        },
+        {
+          "text": "قائمة",
+          "english": "list",
+          "transliteration": "ʾaayma"
+        }
+      ],
+      "showChoiceEnglish": false,
+      "choices": [
+        "نرتّب",
+        "نراجع",
+        "قائمة"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-07-ar-EG-e06",
+      "type": "recall",
+      "prompt": "Write “date / appointment / deadline” in Arabic script.",
+      "target": {
+        "type": "vocabulary",
+        "id": "ar-EG-oct07-word-1"
+      },
+      "acceptedAnswers": [
+        "ميعاد"
+      ],
+      "hint": "The example is: عندي ميعاد.",
+      "explanation": "ميعاد means “date / appointment / deadline”.",
+      "trackInSrs": true
+    },
+    {
+      "id": "ai-news-2026-10-07-ar-EG-e07",
+      "type": "recall",
+      "prompt": "Write “list” in Arabic script.",
+      "target": {
+        "type": "vocabulary",
+        "id": "ar-EG-oct07-word-3"
+      },
+      "acceptedAnswers": [
+        "قائمة"
+      ],
+      "hint": "The example is: القائمة طويلة.",
+      "explanation": "قائمة means “list”.",
+      "trackInSrs": true
+    },
+    {
+      "id": "ai-news-2026-10-07-ar-EG-e08",
+      "type": "recall",
+      "prompt": "Write “step” in Arabic script.",
+      "target": {
+        "type": "vocabulary",
+        "id": "ar-EG-oct07-word-4"
+      },
+      "acceptedAnswers": [
+        "خطوة"
+      ],
+      "hint": "The example is: دي خطوة بسيطة.",
+      "explanation": "خطوة means “step”.",
+      "trackInSrs": true
+    },
+    {
+      "id": "ai-news-2026-10-07-ar-EG-e09",
+      "type": "recall",
+      "prompt": "Write “and then” in Arabic script.",
+      "target": {
+        "type": "vocabulary",
+        "id": "ar-EG-oct07-word-6"
+      },
+      "acceptedAnswers": [
+        "وبعدين"
+      ],
+      "hint": "The example is: وبعدين نراجع الميعاد.",
+      "explanation": "وبعدين means “and then”.",
+      "trackInSrs": true
+    },
+    {
+      "id": "ai-news-2026-10-07-ar-EG-e10",
+      "type": "order",
+      "prompt": "Put the words in order: First we write a list.",
+      "target": {
+        "type": "grammar",
+        "id": "ar-EG-oct07-grammar-1"
+      },
+      "acceptedAnswers": [
+        "الأول نكتب قائمة"
+      ],
+      "hint": "Use the complete pattern from Grammar.",
+      "explanation": "الأول نكتب قائمة. — First we write a list.",
+      "trackInSrs": false,
+      "tokens": [
+        "قائمة",
+        "نكتب",
+        "الأول"
+      ],
+      "modelAnswers": [
+        {
+          "arabic": "الأول نكتب قائمة.",
+          "transliteration": "el-awwal nekteb ʾaayma.",
+          "english": "First we write a list."
+        }
+      ],
+      "choices": [
+        "قائمة",
+        "نكتب",
+        "الأول"
+      ],
+      "answerData": [
+        {
+          "arabic": "الأول نكتب قائمة.",
+          "transliteration": "el-awwal nekteb ʾaayma.",
+          "english": "First we write a list."
+        }
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-07-ar-EG-e11",
+      "type": "order",
+      "prompt": "Put the words in order: And then we arrange the deadlines.",
+      "target": {
+        "type": "grammar",
+        "id": "ar-EG-oct07-grammar-1"
+      },
+      "acceptedAnswers": [
+        "وبعدين نرتّب المواعيد"
+      ],
+      "hint": "Use the complete pattern from Grammar.",
+      "explanation": "وبعدين نرتّب المواعيد. — And then we arrange the deadlines.",
+      "trackInSrs": false,
+      "tokens": [
+        "المواعيد",
+        "نرتّب",
+        "وبعدين"
+      ],
+      "modelAnswers": [
+        {
+          "arabic": "وبعدين نرتّب المواعيد.",
+          "transliteration": "wi-baʿdeen neratteb el-mawaaʿeed.",
+          "english": "And then we arrange the deadlines."
+        }
+      ],
+      "choices": [
+        "المواعيد",
+        "نرتّب",
+        "وبعدين"
+      ],
+      "answerData": [
+        {
+          "arabic": "وبعدين نرتّب المواعيد.",
+          "transliteration": "wi-baʿdeen neratteb el-mawaaʿeed.",
+          "english": "And then we arrange the deadlines."
+        }
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-07-ar-EG-e12",
+      "type": "order",
+      "prompt": "Put the words in order: This plan is simple.",
+      "target": {
+        "type": "grammar",
+        "id": "ar-EG-oct07-grammar-2"
+      },
+      "acceptedAnswers": [
+        "الخطة دي بسيطة"
+      ],
+      "hint": "Use the complete pattern from Grammar.",
+      "explanation": "الخطة دي بسيطة. — This plan is simple.",
+      "trackInSrs": false,
+      "tokens": [
+        "بسيطة",
+        "دي",
+        "الخطة"
+      ],
+      "modelAnswers": [
+        {
+          "arabic": "الخطة دي بسيطة.",
+          "transliteration": "el-khetta di baseeta.",
+          "english": "This plan is simple."
+        }
+      ],
+      "choices": [
+        "بسيطة",
+        "دي",
+        "الخطة"
+      ],
+      "answerData": [
+        {
+          "arabic": "الخطة دي بسيطة.",
+          "transliteration": "el-khetta di baseeta.",
+          "english": "This plan is simple."
+        }
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-07-ar-EG-e13",
+      "type": "matching",
+      "prompt": "Match each word to its meaning.",
+      "target": {
+        "type": "vocabulary",
+        "id": "ar-EG-oct07-word-1"
+      },
+      "acceptedAnswers": [
+        "{\"0\": \"date / appointment / deadline\", \"1\": \"list\", \"2\": \"step\", \"3\": \"we arrange / let’s arrange\"}"
+      ],
+      "hint": "Compare the vocabulary examples.",
+      "explanation": "Read each complete pair aloud.",
+      "trackInSrs": false,
+      "matchingPairs": [
+        {
+          "id": "0",
+          "text": "ميعاد",
+          "answer": "date / appointment / deadline",
+          "transliteration": "meeʿaad",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar-EG-oct07-word-1"
+          }
+        },
+        {
+          "id": "1",
+          "text": "قائمة",
+          "answer": "list",
+          "transliteration": "ʾaayma",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar-EG-oct07-word-3"
+          }
+        },
+        {
+          "id": "2",
+          "text": "خطوة",
+          "answer": "step",
+          "transliteration": "khatwa",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar-EG-oct07-word-4"
+          }
+        },
+        {
+          "id": "3",
+          "text": "نرتّب",
+          "answer": "we arrange / let’s arrange",
+          "transliteration": "neratteb",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar-EG-oct07-word-7"
+          }
+        }
+      ],
+      "choices": [
+        "we arrange / let’s arrange",
+        "step",
+        "list",
+        "date / appointment / deadline"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-07-ar-EG-e14",
+      "type": "self-check",
+      "prompt": "Suggest two actions: first write a list, then arrange the deadlines.",
+      "target": {
+        "type": "grammar",
+        "id": "ar-EG-oct07-grammar-1"
+      },
+      "acceptedAnswers": [
+        "الأول نكتب قائمة. وبعدين نرتّب المواعيد."
+      ],
+      "hint": "Use the vocabulary and grammar examples if needed.",
+      "explanation": "Compare meaning and word order with the model; other natural answers can work.",
+      "trackInSrs": false,
+      "modelAnswers": [
+        {
+          "arabic": "الأول نكتب قائمة. وبعدين نرتّب المواعيد.",
+          "transliteration": "el-awwal nekteb ʾaayma. wi-baʿdeen neratteb el-mawaaʿeed.",
+          "english": "First we write a list. And then we arrange the deadlines."
+        }
+      ],
+      "rubric": {
+        "criteria": "Include all requested meanings. Check the noun and verb forms, then choose how closely your answer matches."
+      },
+      "answerData": [
+        {
+          "arabic": "الأول نكتب قائمة. وبعدين نرتّب المواعيد.",
+          "transliteration": "el-awwal nekteb ʾaayma. wi-baʿdeen neratteb el-mawaaʿeed.",
+          "english": "First we write a list. And then we arrange the deadlines."
+        }
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-07-ar-EG-e15",
+      "type": "self-check",
+      "prompt": "Your fictional deadline is tomorrow. Tell a friend in one short sentence.",
+      "target": {
+        "type": "grammar",
+        "id": "ar-EG-oct07-grammar-2"
+      },
+      "acceptedAnswers": [
+        "الميعاد بكرة."
+      ],
+      "hint": "Use the vocabulary and grammar examples if needed.",
+      "explanation": "Compare meaning and word order with the model; other natural answers can work.",
+      "trackInSrs": false,
+      "modelAnswers": [
+        {
+          "arabic": "الميعاد بكرة.",
+          "transliteration": "el-meeʿaad bokra.",
+          "english": "The deadline is tomorrow."
+        }
+      ],
+      "rubric": {
+        "criteria": "Include all requested meanings. Check the noun and verb forms, then choose how closely your answer matches."
+      },
+      "answerData": [
+        {
+          "arabic": "الميعاد بكرة.",
+          "transliteration": "el-meeʿaad bokra.",
+          "english": "The deadline is tomorrow."
+        }
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-07-ar-EG-e16",
+      "type": "self-check",
+      "prompt": "Describe a simple plan, then suggest one step now.",
+      "target": {
+        "type": "grammar",
+        "id": "ar-EG-oct07-grammar-2"
+      },
+      "acceptedAnswers": [
+        "الخطة بسيطة. نعمل خطوة واحدة دلوقتي."
+      ],
+      "hint": "Use the vocabulary and grammar examples if needed.",
+      "explanation": "Compare meaning and word order with the model; other natural answers can work.",
+      "trackInSrs": false,
+      "modelAnswers": [
+        {
+          "arabic": "الخطة بسيطة. نعمل خطوة واحدة دلوقتي.",
+          "transliteration": "el-khetta baseeta. neʿmel khatwa waahda delwaʾti.",
+          "english": "The plan is simple. Let’s do one step now."
+        }
+      ],
+      "rubric": {
+        "criteria": "Include all requested meanings. Check the noun and verb forms, then choose how closely your answer matches."
+      },
+      "answerData": [
+        {
+          "arabic": "الخطة بسيطة. نعمل خطوة واحدة دلوقتي.",
+          "transliteration": "el-khetta baseeta. neʿmel khatwa waahda delwaʾti.",
+          "english": "The plan is simple. Let’s do one step now."
+        }
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-07-ar-EG-e17",
+      "type": "recall",
+      "prompt": "Review: write “plan”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "ar_egy_plan"
+      },
+      "acceptedAnswers": [
+        "خطة"
+      ],
+      "hint": "Use this example: دي خطة بسيطة.",
+      "explanation": "خطة means “plan”.",
+      "trackInSrs": true
+    },
+    {
+      "id": "ai-news-2026-10-07-ar-EG-e18",
+      "type": "recall",
+      "prompt": "Review: write “first”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "ar_egy_first"
+      },
+      "acceptedAnswers": [
+        "الأول"
+      ],
+      "hint": "Use the phrase for the first action in a sequence.",
+      "explanation": "الأول means “first”.",
+      "trackInSrs": true
+    }
+  ],
+  "review": {
+    "instructions": "If these earlier words are familiar, try the review questions before opening the hint. Otherwise use the examples.",
+    "prompts": [
+      "Say “plan” and “first”; then put them in a new sentence."
+    ]
+  }
+}

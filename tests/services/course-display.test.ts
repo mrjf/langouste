@@ -15,5 +15,15 @@ describe('course display coverage',()=>{
  test('choice meanings and correct markers are revealed only in feedback',()=>{
   for(const lesson of lessons){const visible=publicCourseLesson(lesson);for(const e of lesson.exercises.filter(e=>e.type==='choice')){const initial=visible.exercises.find(v=>v.id===e.id)!;expect(Object.values(initial.choiceSupport??{}).every(v=>!v.english)).toBe(true);const feedback=courseExerciseFeedback(e);expect(feedback.correctChoices?.length).toBeGreaterThan(0);for(const c of e.choices??[])if(/[\u0621-\u065f]/u.test(c))expect(feedback.choiceSupport?.[c]?.english).toBeTruthy();}}
  });
- test('all course counts and lesson identities remain stable',()=>{expect(lessons.length).toBe(64);expect(new Set(lessons.map(l=>l.id)).size).toBe(64);expect(lessons.reduce((n,l)=>n+l.exercises.length,0)).toBe(1148);});
+ test('all course counts and lesson identities remain stable',()=>{const prior=lessons.filter(l=>l.day<=32);expect(prior.length).toBe(64);expect(new Set(lessons.map(l=>l.id)).size).toBe(lessons.length);expect(prior.reduce((n,l)=>n+l.exercises.length,0)).toBe(1148);const ids=lessons.flatMap(l=>l.exercises.map(e=>e.id));expect(new Set(ids).size).toBe(ids.length);});
+});
+
+test('October 7 provides complete beginner lessons with grounded facts and varied tasks',()=>{
+ const daily=lessons.filter(l=>l.id.includes('2026-10-07'));expect(daily.length).toBe(2);
+ for(const l of daily){expect(l.day).toBe(34);expect(l.estimatedMinutes).toBeGreaterThanOrEqual(30);expect(l.estimatedMinutes).toBeLessThanOrEqual(45);expect(l.vocabulary.length).toBe(10);expect(l.exercises.length).toBe(18);expect(new Set(l.exercises.map(e=>e.type)).size).toBe(5);
+ for(const v of l.vocabulary){expect(v.term).toBeTruthy();expect(v.english).toBeTruthy();expect(v.example.english).toBeTruthy();if(v.plannedRole==='review')expect(lessons.some(old=>old.day<l.day&&old.language===l.language&&old.vocabulary.some(w=>w.id===v.id))).toBe(true);}
+ for(const e of l.exercises){const target=(e.target.type==='vocabulary'?l.vocabulary:l.concepts).find(t=>t.id===e.target.id);expect(target).toBeDefined();expect(e.hint).toBeTruthy();expect(e.explanation).toBeTruthy();}
+ expect(l.readings.filter(r=>r.sentences.some(s=>s.kind==='teaching-example')).every(r=>r.title.includes('Fictional'))).toBe(true);
+ for(const s of l.sources)expect(s.publishedOn).toBe('2026-10-07');
+ }
 });

@@ -1,0 +1,2327 @@
+{
+  "schemaVersion": 1,
+  "sourceRegistry": [
+    {
+      "id": "openai_interactive_chat_2026_10_07",
+      "title": "GPT-6 and Intelligent UI for everyone",
+      "url": "https://openai.com/index/gpt-6-for-everyone/",
+      "publishedOn": "2026-10-07",
+      "verifiedAsOf": "2026-10-07",
+      "publisher": "OpenAI",
+      "factSummary": "OpenAI announced visual, interactive Chat answers. Paid-tier rollout starts October 7; Free and Go start October 8. Enterprise access depends on administrators. Work and Codex models are unchanged."
+    },
+    {
+      "id": "openai_college_planner_2026_10_07",
+      "title": "Helping teens learn, plan, and shape the future of AI",
+      "url": "https://openai.com/index/teens-learn-and-plan/",
+      "publishedOn": "2026-10-07",
+      "verifiedAsOf": "2026-10-07",
+      "publisher": "OpenAI",
+      "factSummary": "College Planner is planned to organize application tasks and deadlines. It is coming soon without a launch date, initially for US grades 10–12 applying to four-year colleges; wider coverage is planned."
+    }
+  ],
+  "lessons": [
+    {
+      "schemaVersion": 1,
+      "id": "ai-news-2026-10-07-ar-EG",
+      "courseId": "ai-news-daily-2026-10-07",
+      "day": 34,
+      "language": "ar-EG",
+      "title": "خطوة بخطوة",
+      "subtitle": "October 7, 2026 · One step at a time",
+      "estimatedMinutes": 40,
+      "objectives": [
+        "Describe a short list and a deadline.",
+        "Suggest a simple sequence of actions.",
+        "Distinguish a planned tool from a tool already available."
+      ],
+      "route": [
+        "Read · 10 min",
+        "Words and grammar · 8 min",
+        "Practise · 17 min",
+        "Say or write your own example · 5 min"
+      ],
+      "readings": [
+        {
+          "id": "ai-news-2026-10-07-ar-EG-r1",
+          "title": "A tool for planning · News",
+          "sentences": [
+            {
+              "id": "ai-news-2026-10-07-ar-EG-s001",
+              "text": "OpenAI عندها خطة لأداة للطلاب.",
+              "english": "OpenAI has a plan for a student tool.",
+              "kind": "source-summary",
+              "sourceIds": [
+                "openai_college_planner_2026_10_07"
+              ],
+              "transliteration": "OpenAI ʿandaha khetta le-adaa let-tollaab."
+            },
+            {
+              "id": "ai-news-2026-10-07-ar-EG-s002",
+              "text": "اسم الأداة College Planner.",
+              "english": "The tool is called College Planner.",
+              "kind": "source-summary",
+              "sourceIds": [
+                "openai_college_planner_2026_10_07"
+              ],
+              "transliteration": "esm el-adaa College Planner."
+            },
+            {
+              "id": "ai-news-2026-10-07-ar-EG-s003",
+              "text": "لسه مفيش ميعاد محدد.",
+              "english": "There is no fixed date yet.",
+              "kind": "source-summary",
+              "sourceIds": [
+                "openai_college_planner_2026_10_07"
+              ],
+              "transliteration": "lissa mafeesh meeʿaad mohaddad."
+            }
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-07-ar-EG-r2",
+          "title": "A busy week · Fictional dialogue",
+          "sentences": [
+            {
+              "id": "ai-news-2026-10-07-ar-EG-s004",
+              "text": "منى: عندي مواعيد كتير.",
+              "english": "Mona: I have lots of deadlines.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "Mona: ʿandi mawaaʿeed kiteer."
+            },
+            {
+              "id": "ai-news-2026-10-07-ar-EG-s005",
+              "text": "كريم: نعمل خطة؟",
+              "english": "Karim: Shall we make a plan?",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "Kareem: neʿmel khetta?"
+            },
+            {
+              "id": "ai-news-2026-10-07-ar-EG-s006",
+              "text": "منى: أيوه، الأول نكتب قائمة.",
+              "english": "Mona: Yes, first we write a list.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "Mona: aywa, el-awwal nekteb ʾaayma."
+            },
+            {
+              "id": "ai-news-2026-10-07-ar-EG-s007",
+              "text": "كريم: وبعدين نرتّب المواعيد.",
+              "english": "Karim: And then we arrange the deadlines.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "Kareem: wi-baʿdeen neratteb el-mawaaʿeed."
+            },
+            {
+              "id": "ai-news-2026-10-07-ar-EG-s008",
+              "text": "منى: الميعاد ده بكرة.",
+              "english": "Mona: This deadline is tomorrow.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "Mona: el-meeʿaad da bokra."
+            },
+            {
+              "id": "ai-news-2026-10-07-ar-EG-s009",
+              "text": "كريم: طيب، نبدأ بده.",
+              "english": "Karim: Okay, let’s start with this one.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "Kareem: tayyeb, nebdaʾ be-da."
+            }
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-07-ar-EG-r3",
+          "title": "One step at a time · Fictional dialogue",
+          "sentences": [
+            {
+              "id": "ai-news-2026-10-07-ar-EG-s010",
+              "text": "منى: القائمة طويلة.",
+              "english": "Mona: The list is long.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "Mona: el-ʾaayma taweela."
+            },
+            {
+              "id": "ai-news-2026-10-07-ar-EG-s011",
+              "text": "كريم: نعمل خطوة واحدة دلوقتي.",
+              "english": "Karim: Let’s do one step now.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "Kareem: neʿmel khatwa waahda delwaʾti."
+            },
+            {
+              "id": "ai-news-2026-10-07-ar-EG-s012",
+              "text": "منى: وبعد كده؟",
+              "english": "Mona: And after that?",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "Mona: wi-baʿd keda?"
+            },
+            {
+              "id": "ai-news-2026-10-07-ar-EG-s013",
+              "text": "كريم: نراجع الميعاد.",
+              "english": "Karim: We check the deadline.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "Kareem: neraageʿ el-meeʿaad."
+            },
+            {
+              "id": "ai-news-2026-10-07-ar-EG-s014",
+              "text": "منى: الخطة دي بسيطة.",
+              "english": "Mona: This plan is simple.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "Mona: el-khetta di baseeta."
+            },
+            {
+              "id": "ai-news-2026-10-07-ar-EG-s015",
+              "text": "كريم: أيوه، بس نراجع كل حاجة.",
+              "english": "Karim: Yes, but we check everything.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "Kareem: aywa, bass neraageʿ koll haaga."
+            }
+          ]
+        }
+      ],
+      "vocabulary": [
+        {
+          "id": "ar-EG-oct07-word-1",
+          "term": "ميعاد",
+          "english": "date / appointment / deadline",
+          "semanticConcept": "date / appointment / deadline",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-07-ar-EG-s016",
+            "text": "عندي ميعاد.",
+            "english": "I have an appointment.",
+            "kind": "teaching-example",
+            "sourceIds": [],
+            "transliteration": "ʿandi meeʿaad."
+          },
+          "teachingNote": "",
+          "transliteration": "meeʿaad",
+          "lexicalTerm": "ميعاد"
+        },
+        {
+          "id": "ar-EG-oct07-word-2",
+          "term": "مواعيد",
+          "english": "dates / appointments / deadlines",
+          "semanticConcept": "dates / appointments / deadlines",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-07-ar-EG-s017",
+            "text": "عندي مواعيد كتير.",
+            "english": "I have lots of deadlines.",
+            "kind": "teaching-example",
+            "sourceIds": [],
+            "transliteration": "ʿandi mawaaʿeed kiteer."
+          },
+          "teachingNote": "",
+          "transliteration": "mawaaʿeed",
+          "lexicalTerm": "مواعيد"
+        },
+        {
+          "id": "ar-EG-oct07-word-3",
+          "term": "قائمة",
+          "english": "list",
+          "semanticConcept": "list",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-07-ar-EG-s018",
+            "text": "القائمة طويلة.",
+            "english": "The list is long.",
+            "kind": "teaching-example",
+            "sourceIds": [],
+            "transliteration": "el-ʾaayma taweela."
+          },
+          "teachingNote": "",
+          "transliteration": "ʾaayma",
+          "lexicalTerm": "قائمة"
+        },
+        {
+          "id": "ar-EG-oct07-word-4",
+          "term": "خطوة",
+          "english": "step",
+          "semanticConcept": "step",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-07-ar-EG-s019",
+            "text": "دي خطوة بسيطة.",
+            "english": "This is a simple step.",
+            "kind": "teaching-example",
+            "sourceIds": [],
+            "transliteration": "di khatwa baseeta."
+          },
+          "teachingNote": "",
+          "transliteration": "khatwa",
+          "lexicalTerm": "خطوة"
+        },
+        {
+          "id": "ar_egy_first",
+          "term": "الأول",
+          "english": "first",
+          "semanticConcept": "first",
+          "plannedRole": "review",
+          "example": {
+            "id": "ai-news-2026-10-07-ar-EG-s020",
+            "text": "الأول نكتب قائمة.",
+            "english": "First we write a list.",
+            "kind": "teaching-example",
+            "sourceIds": [],
+            "transliteration": "el-awwal nekteb ʾaayma."
+          },
+          "teachingNote": "",
+          "transliteration": "el-awwal",
+          "lexicalTerm": "الأول"
+        },
+        {
+          "id": "ar-EG-oct07-word-6",
+          "term": "وبعدين",
+          "english": "and then",
+          "semanticConcept": "and then",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-07-ar-EG-s021",
+            "text": "وبعدين نراجع الميعاد.",
+            "english": "And then we check the deadline.",
+            "kind": "teaching-example",
+            "sourceIds": [],
+            "transliteration": "wi-baʿdeen neraageʿ el-meeʿaad."
+          },
+          "teachingNote": "",
+          "transliteration": "wi-baʿdeen",
+          "lexicalTerm": "وبعدين"
+        },
+        {
+          "id": "ar-EG-oct07-word-7",
+          "term": "نرتّب",
+          "english": "we arrange / let’s arrange",
+          "semanticConcept": "we arrange / let’s arrange",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-07-ar-EG-s022",
+            "text": "نرتّب المواعيد.",
+            "english": "Let’s arrange the deadlines.",
+            "kind": "teaching-example",
+            "sourceIds": [],
+            "transliteration": "neratteb el-mawaaʿeed."
+          },
+          "teachingNote": "",
+          "transliteration": "neratteb",
+          "lexicalTerm": "نرتّب"
+        },
+        {
+          "id": "ar_egy_plan",
+          "term": "خطة",
+          "english": "plan",
+          "semanticConcept": "plan",
+          "plannedRole": "review",
+          "example": {
+            "id": "ai-news-2026-10-07-ar-EG-s023",
+            "text": "دي خطة بسيطة.",
+            "english": "This is a simple plan.",
+            "kind": "teaching-example",
+            "sourceIds": [],
+            "transliteration": "di khetta baseeta."
+          },
+          "teachingNote": "Review from an earlier lesson.",
+          "transliteration": "khetta",
+          "lexicalTerm": "خطة"
+        },
+        {
+          "id": "ar-EG-oct07-word-9",
+          "term": "بكرة",
+          "english": "tomorrow",
+          "semanticConcept": "tomorrow",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-07-ar-EG-s024",
+            "text": "الميعاد بكرة.",
+            "english": "The deadline is tomorrow.",
+            "kind": "teaching-example",
+            "sourceIds": [],
+            "transliteration": "el-meeʿaad bokra."
+          },
+          "teachingNote": "",
+          "transliteration": "bokra",
+          "lexicalTerm": "بكرة"
+        },
+        {
+          "id": "ar-EG-oct07-word-10",
+          "term": "نراجع",
+          "english": "we check / let’s check",
+          "semanticConcept": "we check / let’s check",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-07-ar-EG-s025",
+            "text": "نراجع كل حاجة.",
+            "english": "We check everything.",
+            "kind": "teaching-example",
+            "sourceIds": [],
+            "transliteration": "neraageʿ koll haaga."
+          },
+          "teachingNote": "",
+          "transliteration": "neraageʿ",
+          "lexicalTerm": "نراجع"
+        }
+      ],
+      "concepts": [
+        {
+          "id": "ar-EG-oct07-grammar-1",
+          "title": "Suggest a shared action",
+          "explanation": "With these verbs, n- marks “we”: nekteb, “we write”, and neratteb, “we arrange”. In a question or suggestion, the same forms can mean “shall we…?” or “let’s…”. Put el-awwal (“first”) before the first action and wi-baʿdeen (“and then”) before the next.",
+          "examples": [
+            {
+              "id": "ai-news-2026-10-07-ar-EG-s026",
+              "text": "الأول نكتب قائمة.",
+              "english": "First we write a list.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "el-awwal nekteb ʾaayma."
+            },
+            {
+              "id": "ai-news-2026-10-07-ar-EG-s027",
+              "text": "وبعدين نرتّب المواعيد.",
+              "english": "And then we arrange the deadlines.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "wi-baʿdeen neratteb el-mawaaʿeed."
+            }
+          ]
+        },
+        {
+          "id": "ar-EG-oct07-grammar-2",
+          "title": "This one and one step",
+          "explanation": "Put da after a definite masculine noun and di after a definite feminine noun. With a feminine noun, “one” is waahda and normally follows it. There is no separate present-tense word for “is” in these descriptions.",
+          "examples": [
+            {
+              "id": "ai-news-2026-10-07-ar-EG-s028",
+              "text": "الميعاد ده بكرة.",
+              "english": "This deadline is tomorrow.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "el-meeʿaad da bokra."
+            },
+            {
+              "id": "ai-news-2026-10-07-ar-EG-s029",
+              "text": "الخطة دي بسيطة.",
+              "english": "This plan is simple.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "el-khetta di baseeta."
+            },
+            {
+              "id": "ai-news-2026-10-07-ar-EG-s030",
+              "text": "خطوة واحدة",
+              "english": "one step",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "khatwa waahda"
+            }
+          ]
+        }
+      ],
+      "exercises": [
+        {
+          "id": "ai-news-2026-10-07-ar-EG-e01",
+          "type": "choice",
+          "prompt": "Choose “date / appointment / deadline”.",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar-EG-oct07-word-1"
+          },
+          "acceptedAnswers": [
+            "ميعاد"
+          ],
+          "hint": "Look at the example for “date / appointment / deadline” if you need help.",
+          "explanation": "ميعاد means “date / appointment / deadline”.",
+          "trackInSrs": false,
+          "choiceAtoms": [
+            {
+              "text": "ميعاد",
+              "english": "date / appointment / deadline",
+              "transliteration": "meeʿaad"
+            },
+            {
+              "text": "خطوة",
+              "english": "step",
+              "transliteration": "khatwa"
+            },
+            {
+              "text": "نرتّب",
+              "english": "we arrange / let’s arrange",
+              "transliteration": "neratteb"
+            }
+          ],
+          "showChoiceEnglish": false,
+          "choices": [
+            "ميعاد",
+            "خطوة",
+            "نرتّب"
+          ],
+          "choiceSupport": {
+            "ميعاد": {
+              "transliteration": "meeʿaad",
+              "english": "date / appointment / deadline"
+            },
+            "خطوة": {
+              "transliteration": "khatwa",
+              "english": "step"
+            },
+            "نرتّب": {
+              "transliteration": "neratteb",
+              "english": "we arrange / let’s arrange"
+            }
+          },
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "ميعاد",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-07-ar-EG-e02",
+          "type": "choice",
+          "prompt": "Choose “dates / appointments / deadlines”.",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar-EG-oct07-word-2"
+          },
+          "acceptedAnswers": [
+            "مواعيد"
+          ],
+          "hint": "Look at the example for “dates / appointments / deadlines” if you need help.",
+          "explanation": "مواعيد means “dates / appointments / deadlines”.",
+          "trackInSrs": false,
+          "choiceAtoms": [
+            {
+              "text": "الأول",
+              "english": "first",
+              "transliteration": "el-awwal"
+            },
+            {
+              "text": "خطة",
+              "english": "plan",
+              "transliteration": "khetta"
+            },
+            {
+              "text": "مواعيد",
+              "english": "dates / appointments / deadlines",
+              "transliteration": "mawaaʿeed"
+            }
+          ],
+          "showChoiceEnglish": false,
+          "choices": [
+            "الأول",
+            "خطة",
+            "مواعيد"
+          ],
+          "choiceSupport": {
+            "الأول": {
+              "transliteration": "el-awwal",
+              "english": "first"
+            },
+            "خطة": {
+              "transliteration": "khetta",
+              "english": "plan"
+            },
+            "مواعيد": {
+              "transliteration": "mawaaʿeed",
+              "english": "dates / appointments / deadlines"
+            }
+          },
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "مواعيد",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-07-ar-EG-e03",
+          "type": "choice",
+          "prompt": "Choose “list”.",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar-EG-oct07-word-3"
+          },
+          "acceptedAnswers": [
+            "قائمة"
+          ],
+          "hint": "Look at the example for “list” if you need help.",
+          "explanation": "قائمة means “list”.",
+          "trackInSrs": false,
+          "choiceAtoms": [
+            {
+              "text": "بكرة",
+              "english": "tomorrow",
+              "transliteration": "bokra"
+            },
+            {
+              "text": "قائمة",
+              "english": "list",
+              "transliteration": "ʾaayma"
+            },
+            {
+              "text": "وبعدين",
+              "english": "and then",
+              "transliteration": "wi-baʿdeen"
+            }
+          ],
+          "showChoiceEnglish": false,
+          "choices": [
+            "بكرة",
+            "قائمة",
+            "وبعدين"
+          ],
+          "choiceSupport": {
+            "بكرة": {
+              "transliteration": "bokra",
+              "english": "tomorrow"
+            },
+            "قائمة": {
+              "transliteration": "ʾaayma",
+              "english": "list"
+            },
+            "وبعدين": {
+              "transliteration": "wi-baʿdeen",
+              "english": "and then"
+            }
+          },
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "قائمة",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-07-ar-EG-e04",
+          "type": "choice",
+          "prompt": "Choose “first”.",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar_egy_first"
+          },
+          "acceptedAnswers": [
+            "الأول"
+          ],
+          "hint": "Look at the example for “first” if you need help.",
+          "explanation": "الأول means “first”.",
+          "trackInSrs": false,
+          "choiceAtoms": [
+            {
+              "text": "خطة",
+              "english": "plan",
+              "transliteration": "khetta"
+            },
+            {
+              "text": "ميعاد",
+              "english": "date / appointment / deadline",
+              "transliteration": "meeʿaad"
+            },
+            {
+              "text": "الأول",
+              "english": "first",
+              "transliteration": "el-awwal"
+            }
+          ],
+          "showChoiceEnglish": false,
+          "choices": [
+            "خطة",
+            "ميعاد",
+            "الأول"
+          ],
+          "choiceSupport": {
+            "خطة": {
+              "transliteration": "khetta",
+              "english": "plan"
+            },
+            "ميعاد": {
+              "transliteration": "meeʿaad",
+              "english": "date / appointment / deadline"
+            },
+            "الأول": {
+              "transliteration": "el-awwal",
+              "english": "first"
+            }
+          },
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "الأول",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-07-ar-EG-e05",
+          "type": "choice",
+          "prompt": "Choose “we arrange / let’s arrange”.",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar-EG-oct07-word-7"
+          },
+          "acceptedAnswers": [
+            "نرتّب"
+          ],
+          "hint": "Look at the example for “we arrange / let’s arrange” if you need help.",
+          "explanation": "نرتّب means “we arrange / let’s arrange”.",
+          "trackInSrs": false,
+          "choiceAtoms": [
+            {
+              "text": "نرتّب",
+              "english": "we arrange / let’s arrange",
+              "transliteration": "neratteb"
+            },
+            {
+              "text": "نراجع",
+              "english": "we check / let’s check",
+              "transliteration": "neraageʿ"
+            },
+            {
+              "text": "قائمة",
+              "english": "list",
+              "transliteration": "ʾaayma"
+            }
+          ],
+          "showChoiceEnglish": false,
+          "choices": [
+            "نرتّب",
+            "نراجع",
+            "قائمة"
+          ],
+          "choiceSupport": {
+            "نرتّب": {
+              "transliteration": "neratteb",
+              "english": "we arrange / let’s arrange"
+            },
+            "نراجع": {
+              "transliteration": "neraageʿ",
+              "english": "we check / let’s check"
+            },
+            "قائمة": {
+              "transliteration": "ʾaayma",
+              "english": "list"
+            }
+          },
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "نرتّب",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-07-ar-EG-e06",
+          "type": "recall",
+          "prompt": "Write “date / appointment / deadline” in Arabic script.",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar-EG-oct07-word-1"
+          },
+          "acceptedAnswers": [
+            "ميعاد"
+          ],
+          "hint": "The example is: عندي ميعاد.",
+          "explanation": "ميعاد means “date / appointment / deadline”.",
+          "trackInSrs": true,
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "ميعاد",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-07-ar-EG-e07",
+          "type": "recall",
+          "prompt": "Write “list” in Arabic script.",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar-EG-oct07-word-3"
+          },
+          "acceptedAnswers": [
+            "قائمة"
+          ],
+          "hint": "The example is: القائمة طويلة.",
+          "explanation": "قائمة means “list”.",
+          "trackInSrs": true,
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "قائمة",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-07-ar-EG-e08",
+          "type": "recall",
+          "prompt": "Write “step” in Arabic script.",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar-EG-oct07-word-4"
+          },
+          "acceptedAnswers": [
+            "خطوة"
+          ],
+          "hint": "The example is: دي خطوة بسيطة.",
+          "explanation": "خطوة means “step”.",
+          "trackInSrs": true,
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "خطوة",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-07-ar-EG-e09",
+          "type": "recall",
+          "prompt": "Write “and then” in Arabic script.",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar-EG-oct07-word-6"
+          },
+          "acceptedAnswers": [
+            "وبعدين"
+          ],
+          "hint": "The example is: وبعدين نراجع الميعاد.",
+          "explanation": "وبعدين means “and then”.",
+          "trackInSrs": true,
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "وبعدين",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-07-ar-EG-e10",
+          "type": "order",
+          "prompt": "Put the words in order: First we write a list.",
+          "target": {
+            "type": "grammar",
+            "id": "ar-EG-oct07-grammar-1"
+          },
+          "acceptedAnswers": [
+            "الأول نكتب قائمة"
+          ],
+          "hint": "Use the complete pattern from Grammar.",
+          "explanation": "الأول نكتب قائمة. — First we write a list.",
+          "trackInSrs": false,
+          "tokens": [
+            "قائمة",
+            "نكتب",
+            "الأول"
+          ],
+          "modelAnswers": [
+            {
+              "arabic": "الأول نكتب قائمة.",
+              "transliteration": "el-awwal nekteb ʾaayma.",
+              "english": "First we write a list."
+            }
+          ],
+          "choices": [
+            "قائمة",
+            "نكتب",
+            "الأول"
+          ],
+          "answerData": [
+            {
+              "arabic": "الأول نكتب قائمة.",
+              "transliteration": "el-awwal nekteb ʾaayma.",
+              "english": "First we write a list."
+            }
+          ],
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "الأول نكتب قائمة. · el-awwal nekteb ʾaayma. · First we write a list.",
+          "answerAtoms": [
+            {
+              "id": "ai-news-2026-10-07-ar-EG-e10-model",
+              "text": "الأول نكتب قائمة.",
+              "english": "First we write a list.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "el-awwal nekteb ʾaayma."
+            }
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-07-ar-EG-e11",
+          "type": "order",
+          "prompt": "Put the words in order: And then we arrange the deadlines.",
+          "target": {
+            "type": "grammar",
+            "id": "ar-EG-oct07-grammar-1"
+          },
+          "acceptedAnswers": [
+            "وبعدين نرتّب المواعيد"
+          ],
+          "hint": "Use the complete pattern from Grammar.",
+          "explanation": "وبعدين نرتّب المواعيد. — And then we arrange the deadlines.",
+          "trackInSrs": false,
+          "tokens": [
+            "المواعيد",
+            "نرتّب",
+            "وبعدين"
+          ],
+          "modelAnswers": [
+            {
+              "arabic": "وبعدين نرتّب المواعيد.",
+              "transliteration": "wi-baʿdeen neratteb el-mawaaʿeed.",
+              "english": "And then we arrange the deadlines."
+            }
+          ],
+          "choices": [
+            "المواعيد",
+            "نرتّب",
+            "وبعدين"
+          ],
+          "answerData": [
+            {
+              "arabic": "وبعدين نرتّب المواعيد.",
+              "transliteration": "wi-baʿdeen neratteb el-mawaaʿeed.",
+              "english": "And then we arrange the deadlines."
+            }
+          ],
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "وبعدين نرتّب المواعيد. · wi-baʿdeen neratteb el-mawaaʿeed. · And then we arrange the deadlines.",
+          "answerAtoms": [
+            {
+              "id": "ai-news-2026-10-07-ar-EG-e11-model",
+              "text": "وبعدين نرتّب المواعيد.",
+              "english": "And then we arrange the deadlines.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "wi-baʿdeen neratteb el-mawaaʿeed."
+            }
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-07-ar-EG-e12",
+          "type": "order",
+          "prompt": "Put the words in order: This plan is simple.",
+          "target": {
+            "type": "grammar",
+            "id": "ar-EG-oct07-grammar-2"
+          },
+          "acceptedAnswers": [
+            "الخطة دي بسيطة"
+          ],
+          "hint": "Use the complete pattern from Grammar.",
+          "explanation": "الخطة دي بسيطة. — This plan is simple.",
+          "trackInSrs": false,
+          "tokens": [
+            "بسيطة",
+            "دي",
+            "الخطة"
+          ],
+          "modelAnswers": [
+            {
+              "arabic": "الخطة دي بسيطة.",
+              "transliteration": "el-khetta di baseeta.",
+              "english": "This plan is simple."
+            }
+          ],
+          "choices": [
+            "بسيطة",
+            "دي",
+            "الخطة"
+          ],
+          "answerData": [
+            {
+              "arabic": "الخطة دي بسيطة.",
+              "transliteration": "el-khetta di baseeta.",
+              "english": "This plan is simple."
+            }
+          ],
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "الخطة دي بسيطة. · el-khetta di baseeta. · This plan is simple.",
+          "answerAtoms": [
+            {
+              "id": "ai-news-2026-10-07-ar-EG-e12-model",
+              "text": "الخطة دي بسيطة.",
+              "english": "This plan is simple.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "el-khetta di baseeta."
+            }
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-07-ar-EG-e13",
+          "type": "matching",
+          "prompt": "Match each word to its meaning.",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar-EG-oct07-word-1"
+          },
+          "acceptedAnswers": [
+            "{\"0\": \"date / appointment / deadline\", \"1\": \"list\", \"2\": \"step\", \"3\": \"we arrange / let’s arrange\"}"
+          ],
+          "hint": "Compare the vocabulary examples.",
+          "explanation": "Read each complete pair aloud.",
+          "trackInSrs": false,
+          "matchingPairs": [
+            {
+              "id": "0",
+              "text": "ميعاد",
+              "answer": "date / appointment / deadline",
+              "transliteration": "meeʿaad",
+              "target": {
+                "type": "vocabulary",
+                "id": "ar-EG-oct07-word-1"
+              }
+            },
+            {
+              "id": "1",
+              "text": "قائمة",
+              "answer": "list",
+              "transliteration": "ʾaayma",
+              "target": {
+                "type": "vocabulary",
+                "id": "ar-EG-oct07-word-3"
+              }
+            },
+            {
+              "id": "2",
+              "text": "خطوة",
+              "answer": "step",
+              "transliteration": "khatwa",
+              "target": {
+                "type": "vocabulary",
+                "id": "ar-EG-oct07-word-4"
+              }
+            },
+            {
+              "id": "3",
+              "text": "نرتّب",
+              "answer": "we arrange / let’s arrange",
+              "transliteration": "neratteb",
+              "target": {
+                "type": "vocabulary",
+                "id": "ar-EG-oct07-word-7"
+              }
+            }
+          ],
+          "choices": [
+            "we arrange / let’s arrange",
+            "step",
+            "list",
+            "date / appointment / deadline"
+          ],
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "{\"0\": \"date / appointment / deadline\", \"1\": \"list\", \"2\": \"step\", \"3\": \"we arrange / let’s arrange\"}",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-07-ar-EG-e14",
+          "type": "self-check",
+          "prompt": "Suggest two actions: first write a list, then arrange the deadlines.",
+          "target": {
+            "type": "grammar",
+            "id": "ar-EG-oct07-grammar-1"
+          },
+          "acceptedAnswers": [
+            "الأول نكتب قائمة. وبعدين نرتّب المواعيد."
+          ],
+          "hint": "Use the vocabulary and grammar examples if needed.",
+          "explanation": "Compare meaning and word order with the model; other natural answers can work.",
+          "trackInSrs": false,
+          "modelAnswers": [
+            {
+              "arabic": "الأول نكتب قائمة. وبعدين نرتّب المواعيد.",
+              "transliteration": "el-awwal nekteb ʾaayma. wi-baʿdeen neratteb el-mawaaʿeed.",
+              "english": "First we write a list. And then we arrange the deadlines."
+            }
+          ],
+          "rubric": {
+            "criteria": "Include all requested meanings. Check the noun and verb forms, then choose how closely your answer matches."
+          },
+          "answerData": [
+            {
+              "arabic": "الأول نكتب قائمة. وبعدين نرتّب المواعيد.",
+              "transliteration": "el-awwal nekteb ʾaayma. wi-baʿdeen neratteb el-mawaaʿeed.",
+              "english": "First we write a list. And then we arrange the deadlines."
+            }
+          ],
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Include all requested meanings. Check the noun and verb forms, then choose how closely your answer matches.",
+          "modelAnswer": "الأول نكتب قائمة. وبعدين نرتّب المواعيد. · el-awwal nekteb ʾaayma. wi-baʿdeen neratteb el-mawaaʿeed. · First we write a list. And then we arrange the deadlines.",
+          "answerAtoms": [
+            {
+              "id": "ai-news-2026-10-07-ar-EG-e14-model",
+              "text": "الأول نكتب قائمة. وبعدين نرتّب المواعيد.",
+              "english": "First we write a list. And then we arrange the deadlines.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "el-awwal nekteb ʾaayma. wi-baʿdeen neratteb el-mawaaʿeed."
+            }
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-07-ar-EG-e15",
+          "type": "self-check",
+          "prompt": "Your fictional deadline is tomorrow. Tell a friend in one short sentence.",
+          "target": {
+            "type": "grammar",
+            "id": "ar-EG-oct07-grammar-2"
+          },
+          "acceptedAnswers": [
+            "الميعاد بكرة."
+          ],
+          "hint": "Use the vocabulary and grammar examples if needed.",
+          "explanation": "Compare meaning and word order with the model; other natural answers can work.",
+          "trackInSrs": false,
+          "modelAnswers": [
+            {
+              "arabic": "الميعاد بكرة.",
+              "transliteration": "el-meeʿaad bokra.",
+              "english": "The deadline is tomorrow."
+            }
+          ],
+          "rubric": {
+            "criteria": "Include all requested meanings. Check the noun and verb forms, then choose how closely your answer matches."
+          },
+          "answerData": [
+            {
+              "arabic": "الميعاد بكرة.",
+              "transliteration": "el-meeʿaad bokra.",
+              "english": "The deadline is tomorrow."
+            }
+          ],
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Include all requested meanings. Check the noun and verb forms, then choose how closely your answer matches.",
+          "modelAnswer": "الميعاد بكرة. · el-meeʿaad bokra. · The deadline is tomorrow.",
+          "answerAtoms": [
+            {
+              "id": "ai-news-2026-10-07-ar-EG-e15-model",
+              "text": "الميعاد بكرة.",
+              "english": "The deadline is tomorrow.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "el-meeʿaad bokra."
+            }
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-07-ar-EG-e16",
+          "type": "self-check",
+          "prompt": "Describe a simple plan, then suggest one step now.",
+          "target": {
+            "type": "grammar",
+            "id": "ar-EG-oct07-grammar-2"
+          },
+          "acceptedAnswers": [
+            "الخطة بسيطة. نعمل خطوة واحدة دلوقتي."
+          ],
+          "hint": "Use the vocabulary and grammar examples if needed.",
+          "explanation": "Compare meaning and word order with the model; other natural answers can work.",
+          "trackInSrs": false,
+          "modelAnswers": [
+            {
+              "arabic": "الخطة بسيطة. نعمل خطوة واحدة دلوقتي.",
+              "transliteration": "el-khetta baseeta. neʿmel khatwa waahda delwaʾti.",
+              "english": "The plan is simple. Let’s do one step now."
+            }
+          ],
+          "rubric": {
+            "criteria": "Include all requested meanings. Check the noun and verb forms, then choose how closely your answer matches."
+          },
+          "answerData": [
+            {
+              "arabic": "الخطة بسيطة. نعمل خطوة واحدة دلوقتي.",
+              "transliteration": "el-khetta baseeta. neʿmel khatwa waahda delwaʾti.",
+              "english": "The plan is simple. Let’s do one step now."
+            }
+          ],
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Include all requested meanings. Check the noun and verb forms, then choose how closely your answer matches.",
+          "modelAnswer": "الخطة بسيطة. نعمل خطوة واحدة دلوقتي. · el-khetta baseeta. neʿmel khatwa waahda delwaʾti. · The plan is simple. Let’s do one step now.",
+          "answerAtoms": [
+            {
+              "id": "ai-news-2026-10-07-ar-EG-e16-model",
+              "text": "الخطة بسيطة. نعمل خطوة واحدة دلوقتي.",
+              "english": "The plan is simple. Let’s do one step now.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "el-khetta baseeta. neʿmel khatwa waahda delwaʾti."
+            }
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-07-ar-EG-e17",
+          "type": "recall",
+          "prompt": "Review: write “plan”.",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar_egy_plan"
+          },
+          "acceptedAnswers": [
+            "خطة"
+          ],
+          "hint": "Use this example: دي خطة بسيطة.",
+          "explanation": "خطة means “plan”.",
+          "trackInSrs": true,
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "خطة",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-07-ar-EG-e18",
+          "type": "recall",
+          "prompt": "Review: write “first”.",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar_egy_first"
+          },
+          "acceptedAnswers": [
+            "الأول"
+          ],
+          "hint": "Use the phrase for the first action in a sequence.",
+          "explanation": "الأول means “first”.",
+          "trackInSrs": true,
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "الأول",
+          "answerAtoms": []
+        }
+      ],
+      "review": {
+        "instructions": "If these earlier words are familiar, try the review questions before opening the hint. Otherwise use the examples.",
+        "prompts": [
+          "Say “plan” and “first”; then put them in a new sentence."
+        ]
+      },
+      "sourceIds": [
+        "openai_college_planner_2026_10_07"
+      ],
+      "instructionBlocks": [],
+      "optionalDialogue": []
+    },
+    {
+      "schemaVersion": 1,
+      "id": "ai-news-2026-10-07-hu",
+      "courseId": "ai-news-daily-2026-10-07",
+      "day": 34,
+      "language": "hu",
+      "title": "Képek, gombok és számok",
+      "subtitle": "October 7, 2026 · Pictures, buttons and numbers",
+      "estimatedMinutes": 40,
+      "objectives": [
+        "Name parts of an interactive answer.",
+        "Say what you see and change.",
+        "Compare two simple answers."
+      ],
+      "route": [
+        "Read · 10 min",
+        "Words and grammar · 8 min",
+        "Practise · 17 min",
+        "Say or write your own example · 5 min"
+      ],
+      "readings": [
+        {
+          "id": "ai-news-2026-10-07-hu-r1",
+          "title": "Képek és gombok · News",
+          "sentences": [
+            {
+              "id": "ai-news-2026-10-07-hu-s001",
+              "text": "Az OpenAI új válaszokat mutat be.",
+              "english": "OpenAI is introducing new responses.",
+              "kind": "source-summary",
+              "sourceIds": [
+                "openai_interactive_chat_2026_10_07"
+              ]
+            },
+            {
+              "id": "ai-news-2026-10-07-hu-s002",
+              "text": "A válaszban kép és gomb is lehet.",
+              "english": "A response can also contain a picture and a button.",
+              "kind": "source-summary",
+              "sourceIds": [
+                "openai_interactive_chat_2026_10_07"
+              ]
+            },
+            {
+              "id": "ai-news-2026-10-07-hu-s003",
+              "text": "A bevezetés fokozatos.",
+              "english": "The rollout is gradual.",
+              "kind": "source-summary",
+              "sourceIds": [
+                "openai_interactive_chat_2026_10_07"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-07-hu-r2",
+          "title": "Egy kis számoló · Fictional scene",
+          "sentences": [
+            {
+              "id": "ai-news-2026-10-07-hu-s004",
+              "text": "Anna: Ez egy egyszerű számoló.",
+              "english": "Anna: This is a simple calculator.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-07-hu-s005",
+              "text": "Bence: Hol van a gomb?",
+              "english": "Bence: Where is the button?",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-07-hu-s006",
+              "text": "Anna: Itt van.",
+              "english": "Anna: Here it is.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-07-hu-s007",
+              "text": "Bence: Látom a számot.",
+              "english": "Bence: I see the number.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-07-hu-s008",
+              "text": "Anna: Megváltoztatom a számot.",
+              "english": "Anna: I change the number.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-07-hu-s009",
+              "text": "Bence: Most más az eredmény.",
+              "english": "Bence: Now the result is different.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            }
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-07-hu-r3",
+          "title": "Melyik válasz jobb? · Fictional scene",
+          "sentences": [
+            {
+              "id": "ai-news-2026-10-07-hu-s010",
+              "text": "Anna: A rövid válasz elég?",
+              "english": "Anna: Is the short answer enough?",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-07-hu-s011",
+              "text": "Bence: Igen, de egy kép is segít.",
+              "english": "Bence: Yes, but a picture helps too.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-07-hu-s012",
+              "text": "Anna: A gomb kicsi.",
+              "english": "Anna: The button is small.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-07-hu-s013",
+              "text": "Bence: Ez a gomb nagyobb.",
+              "english": "Bence: This button is bigger.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-07-hu-s014",
+              "text": "Anna: Most látom.",
+              "english": "Anna: Now I see it.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-07-hu-s015",
+              "text": "Bence: Jó, próbáljuk ki!",
+              "english": "Bence: Good, let’s try it!",
+              "kind": "teaching-example",
+              "sourceIds": []
+            }
+          ]
+        }
+      ],
+      "vocabulary": [
+        {
+          "id": "hu_answer",
+          "term": "válasz",
+          "english": "answer",
+          "semanticConcept": "answer",
+          "plannedRole": "review",
+          "example": {
+            "id": "ai-news-2026-10-07-hu-s016",
+            "text": "A válasz rövid.",
+            "english": "The answer is short.",
+            "kind": "teaching-example",
+            "sourceIds": []
+          },
+          "teachingNote": "",
+          "lexicalTerm": "válasz"
+        },
+        {
+          "id": "hu-oct07-word-2",
+          "term": "gomb",
+          "english": "button",
+          "semanticConcept": "button",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-07-hu-s017",
+            "text": "A gomb kicsi.",
+            "english": "The button is small.",
+            "kind": "teaching-example",
+            "sourceIds": []
+          },
+          "teachingNote": "",
+          "lexicalTerm": "gomb"
+        },
+        {
+          "id": "hu-oct07-word-3",
+          "term": "szám",
+          "english": "number",
+          "semanticConcept": "number",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-07-hu-s018",
+            "text": "Ez egy szám.",
+            "english": "This is a number.",
+            "kind": "teaching-example",
+            "sourceIds": []
+          },
+          "teachingNote": "",
+          "lexicalTerm": "szám"
+        },
+        {
+          "id": "hu-oct07-word-4",
+          "term": "számoló",
+          "english": "calculator",
+          "semanticConcept": "calculator",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-07-hu-s019",
+            "text": "Ez egy egyszerű számoló.",
+            "english": "This is a simple calculator.",
+            "kind": "teaching-example",
+            "sourceIds": []
+          },
+          "teachingNote": "",
+          "lexicalTerm": "számoló"
+        },
+        {
+          "id": "hu_result",
+          "term": "eredmény",
+          "english": "result",
+          "semanticConcept": "result",
+          "plannedRole": "review",
+          "example": {
+            "id": "ai-news-2026-10-07-hu-s020",
+            "text": "Az eredmény más.",
+            "english": "The result is different.",
+            "kind": "teaching-example",
+            "sourceIds": []
+          },
+          "teachingNote": "",
+          "lexicalTerm": "eredmény"
+        },
+        {
+          "id": "hu-oct07-word-6",
+          "term": "megváltoztatom",
+          "english": "I change it",
+          "semanticConcept": "I change it",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-07-hu-s021",
+            "text": "Megváltoztatom a számot.",
+            "english": "I change the number.",
+            "kind": "teaching-example",
+            "sourceIds": []
+          },
+          "teachingNote": "",
+          "lexicalTerm": "megváltoztatom"
+        },
+        {
+          "id": "hu-oct07-word-7",
+          "term": "itt van",
+          "english": "here it is",
+          "semanticConcept": "here it is",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-07-hu-s022",
+            "text": "Itt van a gomb.",
+            "english": "Here is the button.",
+            "kind": "teaching-example",
+            "sourceIds": []
+          },
+          "teachingNote": "",
+          "lexicalTerm": "itt van"
+        },
+        {
+          "id": "hu_picture",
+          "term": "kép",
+          "english": "picture",
+          "semanticConcept": "picture",
+          "plannedRole": "review",
+          "example": {
+            "id": "ai-news-2026-10-07-hu-s023",
+            "text": "A kép nagy.",
+            "english": "The picture is big.",
+            "kind": "teaching-example",
+            "sourceIds": []
+          },
+          "teachingNote": "Review from an earlier lesson.",
+          "lexicalTerm": "kép"
+        },
+        {
+          "id": "hu_new",
+          "term": "új",
+          "english": "new",
+          "semanticConcept": "new",
+          "plannedRole": "review",
+          "example": {
+            "id": "ai-news-2026-10-07-hu-s024",
+            "text": "Ez egy új kép.",
+            "english": "This is a new picture.",
+            "kind": "teaching-example",
+            "sourceIds": []
+          },
+          "teachingNote": "Review from an earlier lesson.",
+          "lexicalTerm": "új"
+        },
+        {
+          "id": "hu_helps",
+          "term": "segít",
+          "english": "helps",
+          "semanticConcept": "helps",
+          "plannedRole": "review",
+          "example": {
+            "id": "ai-news-2026-10-07-hu-s025",
+            "text": "A kép segít.",
+            "english": "The picture helps.",
+            "kind": "teaching-example",
+            "sourceIds": []
+          },
+          "teachingNote": "Review from an earlier lesson.",
+          "lexicalTerm": "segít"
+        }
+      ],
+      "concepts": [
+        {
+          "id": "hu-oct07-grammar-1",
+          "title": "A specific object: -t",
+          "explanation": "Add an object ending when something is seen or changed. Szám becomes számot; kép becomes képet. With a specific object, learn the complete verb forms látom (“I see it”) and megváltoztatom (“I change it”). The object ending and the verb ending do different jobs.",
+          "examples": [
+            {
+              "id": "ai-news-2026-10-07-hu-s026",
+              "text": "Látom a számot.",
+              "english": "I see the number.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-07-hu-s027",
+              "text": "Megváltoztatom a számot.",
+              "english": "I change the number.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-07-hu-s028",
+              "text": "Látom a képet.",
+              "english": "I see the picture.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            }
+          ]
+        },
+        {
+          "id": "hu-oct07-grammar-2",
+          "title": "Where it is; what it is like",
+          "explanation": "Van appears when saying where something is: Itt van a gomb. For a third-person present description with an adjective, omit van: A gomb kicsi. Is means “also/too” and follows the item it includes.",
+          "examples": [
+            {
+              "id": "ai-news-2026-10-07-hu-s029",
+              "text": "Itt van a gomb.",
+              "english": "Here is the button.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-07-hu-s030",
+              "text": "A gomb kicsi.",
+              "english": "The button is small.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-07-hu-s031",
+              "text": "Egy kép is segít.",
+              "english": "A picture helps too.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            }
+          ]
+        }
+      ],
+      "exercises": [
+        {
+          "id": "ai-news-2026-10-07-hu-e01",
+          "type": "choice",
+          "prompt": "Choose “answer”.",
+          "target": {
+            "type": "vocabulary",
+            "id": "hu_answer"
+          },
+          "acceptedAnswers": [
+            "válasz"
+          ],
+          "hint": "Look at the example for “answer” if you need help.",
+          "explanation": "válasz means “answer”.",
+          "trackInSrs": false,
+          "choiceAtoms": [
+            {
+              "text": "válasz",
+              "english": "answer"
+            },
+            {
+              "text": "számoló",
+              "english": "calculator"
+            },
+            {
+              "text": "itt van",
+              "english": "here it is"
+            }
+          ],
+          "showChoiceEnglish": false,
+          "choices": [
+            "válasz",
+            "számoló",
+            "itt van"
+          ],
+          "choiceSupport": {
+            "válasz": {
+              "transliteration": null,
+              "english": "answer"
+            },
+            "számoló": {
+              "transliteration": null,
+              "english": "calculator"
+            },
+            "itt van": {
+              "transliteration": null,
+              "english": "here it is"
+            }
+          },
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "válasz",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-07-hu-e02",
+          "type": "choice",
+          "prompt": "Choose “button”.",
+          "target": {
+            "type": "vocabulary",
+            "id": "hu-oct07-word-2"
+          },
+          "acceptedAnswers": [
+            "gomb"
+          ],
+          "hint": "Look at the example for “button” if you need help.",
+          "explanation": "gomb means “button”.",
+          "trackInSrs": false,
+          "choiceAtoms": [
+            {
+              "text": "eredmény",
+              "english": "result"
+            },
+            {
+              "text": "kép",
+              "english": "picture"
+            },
+            {
+              "text": "gomb",
+              "english": "button"
+            }
+          ],
+          "showChoiceEnglish": false,
+          "choices": [
+            "eredmény",
+            "kép",
+            "gomb"
+          ],
+          "choiceSupport": {
+            "eredmény": {
+              "transliteration": null,
+              "english": "result"
+            },
+            "kép": {
+              "transliteration": null,
+              "english": "picture"
+            },
+            "gomb": {
+              "transliteration": null,
+              "english": "button"
+            }
+          },
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "gomb",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-07-hu-e03",
+          "type": "choice",
+          "prompt": "Choose “number”.",
+          "target": {
+            "type": "vocabulary",
+            "id": "hu-oct07-word-3"
+          },
+          "acceptedAnswers": [
+            "szám"
+          ],
+          "hint": "Look at the example for “number” if you need help.",
+          "explanation": "szám means “number”.",
+          "trackInSrs": false,
+          "choiceAtoms": [
+            {
+              "text": "új",
+              "english": "new"
+            },
+            {
+              "text": "szám",
+              "english": "number"
+            },
+            {
+              "text": "megváltoztatom",
+              "english": "I change it"
+            }
+          ],
+          "showChoiceEnglish": false,
+          "choices": [
+            "új",
+            "szám",
+            "megváltoztatom"
+          ],
+          "choiceSupport": {
+            "új": {
+              "transliteration": null,
+              "english": "new"
+            },
+            "szám": {
+              "transliteration": null,
+              "english": "number"
+            },
+            "megváltoztatom": {
+              "transliteration": null,
+              "english": "I change it"
+            }
+          },
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "szám",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-07-hu-e04",
+          "type": "choice",
+          "prompt": "Choose “result”.",
+          "target": {
+            "type": "vocabulary",
+            "id": "hu_result"
+          },
+          "acceptedAnswers": [
+            "eredmény"
+          ],
+          "hint": "Look at the example for “result” if you need help.",
+          "explanation": "eredmény means “result”.",
+          "trackInSrs": false,
+          "choiceAtoms": [
+            {
+              "text": "kép",
+              "english": "picture"
+            },
+            {
+              "text": "válasz",
+              "english": "answer"
+            },
+            {
+              "text": "eredmény",
+              "english": "result"
+            }
+          ],
+          "showChoiceEnglish": false,
+          "choices": [
+            "kép",
+            "válasz",
+            "eredmény"
+          ],
+          "choiceSupport": {
+            "kép": {
+              "transliteration": null,
+              "english": "picture"
+            },
+            "válasz": {
+              "transliteration": null,
+              "english": "answer"
+            },
+            "eredmény": {
+              "transliteration": null,
+              "english": "result"
+            }
+          },
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "eredmény",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-07-hu-e05",
+          "type": "choice",
+          "prompt": "Choose “here it is”.",
+          "target": {
+            "type": "vocabulary",
+            "id": "hu-oct07-word-7"
+          },
+          "acceptedAnswers": [
+            "itt van"
+          ],
+          "hint": "Look at the example for “here it is” if you need help.",
+          "explanation": "itt van means “here it is”.",
+          "trackInSrs": false,
+          "choiceAtoms": [
+            {
+              "text": "itt van",
+              "english": "here it is"
+            },
+            {
+              "text": "segít",
+              "english": "helps"
+            },
+            {
+              "text": "szám",
+              "english": "number"
+            }
+          ],
+          "showChoiceEnglish": false,
+          "choices": [
+            "itt van",
+            "segít",
+            "szám"
+          ],
+          "choiceSupport": {
+            "itt van": {
+              "transliteration": null,
+              "english": "here it is"
+            },
+            "segít": {
+              "transliteration": null,
+              "english": "helps"
+            },
+            "szám": {
+              "transliteration": null,
+              "english": "number"
+            }
+          },
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "itt van",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-07-hu-e06",
+          "type": "recall",
+          "prompt": "Write “answer” in Hungarian.",
+          "target": {
+            "type": "vocabulary",
+            "id": "hu_answer"
+          },
+          "acceptedAnswers": [
+            "válasz"
+          ],
+          "hint": "The example is: A válasz rövid.",
+          "explanation": "válasz means “answer”.",
+          "trackInSrs": true,
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "válasz",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-07-hu-e07",
+          "type": "recall",
+          "prompt": "Write “number” in Hungarian.",
+          "target": {
+            "type": "vocabulary",
+            "id": "hu-oct07-word-3"
+          },
+          "acceptedAnswers": [
+            "szám"
+          ],
+          "hint": "The example is: Ez egy szám.",
+          "explanation": "szám means “number”.",
+          "trackInSrs": true,
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "szám",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-07-hu-e08",
+          "type": "recall",
+          "prompt": "Write “calculator” in Hungarian.",
+          "target": {
+            "type": "vocabulary",
+            "id": "hu-oct07-word-4"
+          },
+          "acceptedAnswers": [
+            "számoló"
+          ],
+          "hint": "The example is: Ez egy egyszerű számoló.",
+          "explanation": "számoló means “calculator”.",
+          "trackInSrs": true,
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "számoló",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-07-hu-e09",
+          "type": "recall",
+          "prompt": "Write “I change it” in Hungarian.",
+          "target": {
+            "type": "vocabulary",
+            "id": "hu-oct07-word-6"
+          },
+          "acceptedAnswers": [
+            "megváltoztatom"
+          ],
+          "hint": "The example is: Megváltoztatom a számot.",
+          "explanation": "megváltoztatom means “I change it”.",
+          "trackInSrs": true,
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "megváltoztatom",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-07-hu-e10",
+          "type": "order",
+          "prompt": "Put the words in order: Here is the button.",
+          "target": {
+            "type": "grammar",
+            "id": "hu-oct07-grammar-2"
+          },
+          "acceptedAnswers": [
+            "Itt van a gomb"
+          ],
+          "hint": "Use the complete pattern from Grammar.",
+          "explanation": "Itt van a gomb. — Here is the button.",
+          "trackInSrs": false,
+          "tokens": [
+            "gomb",
+            "a",
+            "van",
+            "Itt"
+          ],
+          "modelAnswers": [
+            {
+              "text": "Itt van a gomb.",
+              "english": "Here is the button."
+            }
+          ],
+          "choices": [
+            "gomb",
+            "a",
+            "van",
+            "Itt"
+          ],
+          "answerData": [
+            {
+              "text": "Itt van a gomb.",
+              "english": "Here is the button."
+            }
+          ],
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "Itt van a gomb. · Here is the button.",
+          "answerAtoms": [
+            {
+              "id": "ai-news-2026-10-07-hu-e10-model",
+              "text": "Itt van a gomb.",
+              "english": "Here is the button.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            }
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-07-hu-e11",
+          "type": "order",
+          "prompt": "Put the words in order: I see the number.",
+          "target": {
+            "type": "grammar",
+            "id": "hu-oct07-grammar-1"
+          },
+          "acceptedAnswers": [
+            "Látom a számot"
+          ],
+          "hint": "Use the complete pattern from Grammar.",
+          "explanation": "Látom a számot. — I see the number.",
+          "trackInSrs": false,
+          "tokens": [
+            "számot",
+            "a",
+            "Látom"
+          ],
+          "modelAnswers": [
+            {
+              "text": "Látom a számot.",
+              "english": "I see the number."
+            }
+          ],
+          "choices": [
+            "számot",
+            "a",
+            "Látom"
+          ],
+          "answerData": [
+            {
+              "text": "Látom a számot.",
+              "english": "I see the number."
+            }
+          ],
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "Látom a számot. · I see the number.",
+          "answerAtoms": [
+            {
+              "id": "ai-news-2026-10-07-hu-e11-model",
+              "text": "Látom a számot.",
+              "english": "I see the number.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            }
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-07-hu-e12",
+          "type": "order",
+          "prompt": "Put the words in order: The button is small.",
+          "target": {
+            "type": "grammar",
+            "id": "hu-oct07-grammar-2"
+          },
+          "acceptedAnswers": [
+            "A gomb kicsi"
+          ],
+          "hint": "Use the complete pattern from Grammar.",
+          "explanation": "A gomb kicsi. — The button is small.",
+          "trackInSrs": false,
+          "tokens": [
+            "kicsi",
+            "gomb",
+            "A"
+          ],
+          "modelAnswers": [
+            {
+              "text": "A gomb kicsi.",
+              "english": "The button is small."
+            }
+          ],
+          "choices": [
+            "kicsi",
+            "gomb",
+            "A"
+          ],
+          "answerData": [
+            {
+              "text": "A gomb kicsi.",
+              "english": "The button is small."
+            }
+          ],
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "A gomb kicsi. · The button is small.",
+          "answerAtoms": [
+            {
+              "id": "ai-news-2026-10-07-hu-e12-model",
+              "text": "A gomb kicsi.",
+              "english": "The button is small.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            }
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-07-hu-e13",
+          "type": "matching",
+          "prompt": "Match each word to its meaning.",
+          "target": {
+            "type": "vocabulary",
+            "id": "hu_answer"
+          },
+          "acceptedAnswers": [
+            "{\"0\": \"answer\", \"1\": \"number\", \"2\": \"calculator\", \"3\": \"here it is\"}"
+          ],
+          "hint": "Compare the vocabulary examples.",
+          "explanation": "Read each complete pair aloud.",
+          "trackInSrs": false,
+          "matchingPairs": [
+            {
+              "id": "0",
+              "text": "válasz",
+              "answer": "answer",
+              "transliteration": null,
+              "target": {
+                "type": "vocabulary",
+                "id": "hu_answer"
+              }
+            },
+            {
+              "id": "1",
+              "text": "szám",
+              "answer": "number",
+              "transliteration": null,
+              "target": {
+                "type": "vocabulary",
+                "id": "hu-oct07-word-3"
+              }
+            },
+            {
+              "id": "2",
+              "text": "számoló",
+              "answer": "calculator",
+              "transliteration": null,
+              "target": {
+                "type": "vocabulary",
+                "id": "hu-oct07-word-4"
+              }
+            },
+            {
+              "id": "3",
+              "text": "itt van",
+              "answer": "here it is",
+              "transliteration": null,
+              "target": {
+                "type": "vocabulary",
+                "id": "hu-oct07-word-7"
+              }
+            }
+          ],
+          "choices": [
+            "here it is",
+            "calculator",
+            "number",
+            "answer"
+          ],
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "{\"0\": \"answer\", \"1\": \"number\", \"2\": \"calculator\", \"3\": \"here it is\"}",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-07-hu-e14",
+          "type": "self-check",
+          "prompt": "Say that you see the number, then say you change it.",
+          "target": {
+            "type": "grammar",
+            "id": "hu-oct07-grammar-1"
+          },
+          "acceptedAnswers": [
+            "Látom a számot. Megváltoztatom a számot."
+          ],
+          "hint": "Use the vocabulary and grammar examples if needed.",
+          "explanation": "Compare meaning and word order with the model; other natural answers can work.",
+          "trackInSrs": false,
+          "modelAnswers": [
+            {
+              "text": "Látom a számot. Megváltoztatom a számot.",
+              "english": "I see the number. I change the number."
+            }
+          ],
+          "rubric": {
+            "criteria": "Include all requested meanings. Check the noun and verb forms, then choose how closely your answer matches."
+          },
+          "answerData": [
+            {
+              "text": "Látom a számot. Megváltoztatom a számot.",
+              "english": "I see the number. I change the number."
+            }
+          ],
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Include all requested meanings. Check the noun and verb forms, then choose how closely your answer matches.",
+          "modelAnswer": "Látom a számot. Megváltoztatom a számot. · I see the number. I change the number.",
+          "answerAtoms": [
+            {
+              "id": "ai-news-2026-10-07-hu-e14-model",
+              "text": "Látom a számot. Megváltoztatom a számot.",
+              "english": "I see the number. I change the number.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            }
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-07-hu-e15",
+          "type": "self-check",
+          "prompt": "Describe a fictional small button, then say where it is.",
+          "target": {
+            "type": "grammar",
+            "id": "hu-oct07-grammar-2"
+          },
+          "acceptedAnswers": [
+            "A gomb kicsi. Itt van."
+          ],
+          "hint": "Use the vocabulary and grammar examples if needed.",
+          "explanation": "Compare meaning and word order with the model; other natural answers can work.",
+          "trackInSrs": false,
+          "modelAnswers": [
+            {
+              "text": "A gomb kicsi. Itt van.",
+              "english": "The button is small. Here it is."
+            }
+          ],
+          "rubric": {
+            "criteria": "Include all requested meanings. Check the noun and verb forms, then choose how closely your answer matches."
+          },
+          "answerData": [
+            {
+              "text": "A gomb kicsi. Itt van.",
+              "english": "The button is small. Here it is."
+            }
+          ],
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Include all requested meanings. Check the noun and verb forms, then choose how closely your answer matches.",
+          "modelAnswer": "A gomb kicsi. Itt van. · The button is small. Here it is.",
+          "answerAtoms": [
+            {
+              "id": "ai-news-2026-10-07-hu-e15-model",
+              "text": "A gomb kicsi. Itt van.",
+              "english": "The button is small. Here it is.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            }
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-07-hu-e16",
+          "type": "self-check",
+          "prompt": "Say that an answer is short and a picture helps too.",
+          "target": {
+            "type": "grammar",
+            "id": "hu-oct07-grammar-2"
+          },
+          "acceptedAnswers": [
+            "A válasz rövid. Egy kép is segít."
+          ],
+          "hint": "Use the vocabulary and grammar examples if needed.",
+          "explanation": "Compare meaning and word order with the model; other natural answers can work.",
+          "trackInSrs": false,
+          "modelAnswers": [
+            {
+              "text": "A válasz rövid. Egy kép is segít.",
+              "english": "The answer is short. A picture helps too."
+            }
+          ],
+          "rubric": {
+            "criteria": "Include all requested meanings. Check the noun and verb forms, then choose how closely your answer matches."
+          },
+          "answerData": [
+            {
+              "text": "A válasz rövid. Egy kép is segít.",
+              "english": "The answer is short. A picture helps too."
+            }
+          ],
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Include all requested meanings. Check the noun and verb forms, then choose how closely your answer matches.",
+          "modelAnswer": "A válasz rövid. Egy kép is segít. · The answer is short. A picture helps too.",
+          "answerAtoms": [
+            {
+              "id": "ai-news-2026-10-07-hu-e16-model",
+              "text": "A válasz rövid. Egy kép is segít.",
+              "english": "The answer is short. A picture helps too.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            }
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-07-hu-e17",
+          "type": "recall",
+          "prompt": "Review: write “picture”.",
+          "target": {
+            "type": "vocabulary",
+            "id": "hu_picture"
+          },
+          "acceptedAnswers": [
+            "kép"
+          ],
+          "hint": "Use this example: A kép nagy.",
+          "explanation": "kép means “picture”.",
+          "trackInSrs": true,
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "kép",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-07-hu-e18",
+          "type": "recall",
+          "prompt": "Review: write “new”.",
+          "target": {
+            "type": "vocabulary",
+            "id": "hu_new"
+          },
+          "acceptedAnswers": [
+            "új"
+          ],
+          "hint": "Use this example: Ez egy új kép.",
+          "explanation": "új means “new”.",
+          "trackInSrs": true,
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "új",
+          "answerAtoms": []
+        }
+      ],
+      "review": {
+        "instructions": "If these earlier words are familiar, try the review questions before opening the hint. Otherwise use the examples.",
+        "prompts": [
+          "Say “picture”, “new”, and “helps”."
+        ]
+      },
+      "sourceIds": [
+        "openai_interactive_chat_2026_10_07"
+      ],
+      "instructionBlocks": [],
+      "optionalDialogue": []
+    }
+  ]
+}
