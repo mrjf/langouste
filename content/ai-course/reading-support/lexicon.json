@@ -1847,6 +1847,111 @@
         "lemma": "nagy",
         "gloss": "big",
         "form": ""
+      },
+      "oracle": {
+        "lemma": "Oracle",
+        "gloss": "Oracle [company name]",
+        "form": "Proper name."
+      },
+      "munkájáról": {
+        "lemma": "munka",
+        "gloss": "about its work",
+        "form": "Possessed noun plus -ról: about."
+      },
+      "dolgozói": {
+        "lemma": "dolgozó",
+        "gloss": "its employees",
+        "form": "Possessed plural."
+      },
+      "chatgpt-t": {
+        "lemma": "ChatGPT",
+        "gloss": "ChatGPT [object]",
+        "form": "Accusative -t attached to a product name."
+      },
+      "codexet": {
+        "lemma": "Codex",
+        "gloss": "Codex [object]",
+        "form": "Accusative -et."
+      },
+      "használnak": {
+        "lemma": "használ",
+        "gloss": "they use",
+        "form": "Third person plural present, indefinite."
+      },
+      "cikk": {
+        "lemma": "cikk",
+        "gloss": "article",
+        "form": "Noun."
+      },
+      "feladat": {
+        "lemma": "feladat",
+        "gloss": "task",
+        "form": "Singular after néhány, some."
+      },
+      "kérdezek": {
+        "lemma": "kérdez",
+        "gloss": "I ask",
+        "form": "First person singular indefinite present."
+      },
+      "kollégát": {
+        "lemma": "kolléga",
+        "gloss": "colleague [object]",
+        "form": "Accusative -t; final a lengthens to á."
+      },
+      "perc": {
+        "lemma": "perc",
+        "gloss": "minute",
+        "form": "Singular after a number."
+      },
+      "jelentés": {
+        "lemma": "jelentés",
+        "gloss": "report",
+        "form": "Noun."
+      },
+      "kérdésem": {
+        "lemma": "kérdés",
+        "gloss": "my question",
+        "form": "First person singular possessive ending."
+      },
+      "helyes": {
+        "lemma": "helyes",
+        "gloss": "correct",
+        "form": "Adjective."
+      },
+      "tudom": {
+        "lemma": "tud",
+        "gloss": "I know it",
+        "form": "First person singular definite present."
+      },
+      "jelentést": {
+        "lemma": "jelentés",
+        "gloss": "report [object]",
+        "form": "Accusative -t."
+      },
+      "utána": {
+        "lemma": "utána",
+        "gloss": "after that",
+        "form": "Time adverb here."
+      },
+      "válaszolok": {
+        "lemma": "válaszol",
+        "gloss": "I answer",
+        "form": "First person singular present."
+      },
+      "kolléga": {
+        "lemma": "kolléga",
+        "gloss": "colleague",
+        "form": "Noun."
+      },
+      "kevesebb": {
+        "lemma": "kevés",
+        "gloss": "less / fewer",
+        "form": "Comparative."
+      },
+      "igényel": {
+        "lemma": "igényel",
+        "gloss": "requires",
+        "form": "Third person singular present."
       }
     },
     "ar-EG": {
@@ -4139,6 +4244,146 @@
         "lemma": "حاجة",
         "gloss": "thing",
         "form": "Koll haaga: everything."
+      },
+      "نشرت": {
+        "lemma": "نشر",
+        "gloss": "published",
+        "form": "Third person feminine singular past; company is feminine."
+      },
+      "تقرير": {
+        "lemma": "تقرير",
+        "gloss": "report",
+        "form": "Masculine noun."
+      },
+      "التقرير": {
+        "lemma": "تقرير",
+        "gloss": "the report",
+        "form": "Definite article."
+      },
+      "مقالات": {
+        "lemma": "مقال",
+        "gloss": "articles",
+        "form": "Plural."
+      },
+      "بأسامي": {
+        "lemma": "اسم",
+        "gloss": "under names",
+        "form": "Attached be- plus colloquial plural asaami."
+      },
+      "مزيفة": {
+        "lemma": "مزيف",
+        "gloss": "false / fabricated",
+        "form": "Feminine singular adjective used with a nonhuman plural."
+      },
+      "قفلت": {
+        "lemma": "قفل",
+        "gloss": "closed / shut down",
+        "form": "Third person feminine singular past."
+      },
+      "حسابات": {
+        "lemma": "حساب",
+        "gloss": "accounts",
+        "form": "Plural, online accounts here."
+      },
+      "مرتبطة": {
+        "lemma": "مرتبط",
+        "gloss": "linked / connected",
+        "form": "Feminine singular adjective with a nonhuman plural."
+      },
+      "بالموضوع": {
+        "lemma": "موضوع",
+        "gloss": "to the matter",
+        "form": "Preposition be- plus definite article."
+      },
+      "مقال": {
+        "lemma": "مقال",
+        "gloss": "article",
+        "form": "Masculine noun."
+      },
+      "كتب": {
+        "lemma": "كتب",
+        "gloss": "wrote",
+        "form": "Third person masculine singular past."
+      },
+      "المقال": {
+        "lemma": "مقال",
+        "gloss": "the article",
+        "form": "Definite article."
+      },
+      "الكاتب": {
+        "lemma": "كاتب",
+        "gloss": "the writer",
+        "form": "Definite article; masculine noun."
+      },
+      "والمصدر": {
+        "lemma": "مصدر",
+        "gloss": "and the source",
+        "form": "Conjunction we- plus definite article."
+      },
+      "لينك": {
+        "lemma": "لينك",
+        "gloss": "link",
+        "form": "Colloquial loanword."
+      },
+      "تحت": {
+        "lemma": "تحت",
+        "gloss": "below / under",
+        "form": "Preposition."
+      },
+      "نتأكد": {
+        "lemma": "اتأكد",
+        "gloss": "we check / let’s make sure",
+        "form": "First person plural; followed by men."
+      },
+      "غريب": {
+        "lemma": "غريب",
+        "gloss": "strange / unusual",
+        "form": "Masculine adjective."
+      },
+      "غلط": {
+        "lemma": "غلط",
+        "gloss": "wrong",
+        "form": "Predicate adjective here."
+      },
+      "ونقارن": {
+        "lemma": "قارن",
+        "gloss": "and we compare",
+        "form": "Conjunction we- plus first person plural verb."
+      },
+      "التفاصيل": {
+        "lemma": "تفاصيل",
+        "gloss": "the details",
+        "form": "Definite plural."
+      },
+      "متأكدة": {
+        "lemma": "متأكد",
+        "gloss": "sure",
+        "form": "Feminine form for a female speaker."
+      },
+      "عادي": {
+        "lemma": "عادي",
+        "gloss": "okay / normal",
+        "form": "Reassurance here: that is okay."
+      },
+      "نقرأ": {
+        "lemma": "قرأ",
+        "gloss": "we read / let’s read",
+        "form": "First person plural, pronounced neʾra in Egyptian."
+      },
+      "كاتب": {
+        "lemma": "كاتب",
+        "gloss": "writer",
+        "form": "Masculine noun."
+      },
+      "اللينك": {
+        "lemma": "لينك",
+        "gloss": "the link",
+        "form": "Definite article."
+      },
+      "متأكد": {
+        "lemma": "متأكد",
+        "gloss": "sure",
+        "form": "Masculine form for a male speaker."
       }
     }
   }

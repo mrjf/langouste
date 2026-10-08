@@ -1,0 +1,2255 @@
+{
+  "schemaVersion": 1,
+  "sourceRegistry": [
+    {
+      "id": "openai_oracle_work_2026_10_08",
+      "title": "How Oracle turns days of work into minutes with ChatGPT and Codex",
+      "url": "https://openai.com/index/oracle/",
+      "publishedOn": "2026-10-08",
+      "verifiedAsOf": "2026-10-08",
+      "publisher": "OpenAI",
+      "factSummary": "OpenAI’s Oracle customer story describes staff using ChatGPT Work and Codex for research and business questions. Reported time savings are customer examples, not a guarantee for every task; people remain responsible for outputs."
+    },
+    {
+      "id": "openai_false_fronts_2026_10_08",
+      "title": "Disrupting AI-enabled “false front” operations",
+      "url": "https://openai.com/index/disrupting-ai-enabled-false-front-operations/",
+      "publishedOn": "2026-10-08",
+      "verifiedAsOf": "2026-10-08",
+      "publisher": "OpenAI",
+      "factSummary": "OpenAI reports banning accounts linked to two covert influence operations. One used fabricated journalist identities to submit articles. These findings concern identified operations, not all online writers or AI-assisted text."
+    }
+  ],
+  "lessons": [
+    {
+      "schemaVersion": 1,
+      "id": "ai-news-2026-10-08-ar-EG",
+      "courseId": "ai-news-daily-2026-10-08",
+      "day": 35,
+      "language": "ar-EG",
+      "title": "مين كتب المقال؟",
+      "subtitle": "October 8, 2026 · Who wrote the article?",
+      "estimatedMinutes": 40,
+      "objectives": [
+        "Ask who wrote an article and where its source is.",
+        "Say what you are reading and checking.",
+        "Say that you are not sure yet."
+      ],
+      "readings": [
+        {
+          "id": "ai-news-2026-10-08-ar-EG-r1",
+          "title": "False names online · News",
+          "sentences": [
+            {
+              "id": "ai-news-2026-10-08-ar-EG-s001",
+              "text": "OpenAI نشرت تقرير جديد.",
+              "english": "OpenAI published a new report.",
+              "kind": "source-summary",
+              "sourceIds": [
+                "openai_false_fronts_2026_10_08"
+              ],
+              "transliteration": "OpenAI nasharet taʾreer gedeed."
+            },
+            {
+              "id": "ai-news-2026-10-08-ar-EG-s002",
+              "text": "حسب التقرير، فيه مقالات بأسامي مزيفة.",
+              "english": "According to the report, there are articles under false names.",
+              "kind": "source-summary",
+              "sourceIds": [
+                "openai_false_fronts_2026_10_08"
+              ],
+              "transliteration": "hasab et-taʾreer, feeh maʾalaat be-asaami mozayyafa."
+            },
+            {
+              "id": "ai-news-2026-10-08-ar-EG-s003",
+              "text": "الشركة قفلت حسابات مرتبطة بالموضوع.",
+              "english": "The company closed accounts linked to the matter.",
+              "kind": "source-summary",
+              "sourceIds": [
+                "openai_false_fronts_2026_10_08"
+              ],
+              "transliteration": "esh-sherka ʾafalet hesaabaat mortabta bel-mawdooʿ."
+            }
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-08-ar-EG-r2",
+          "title": "Who wrote it? · Fictional dialogue",
+          "sentences": [
+            {
+              "id": "ai-news-2026-10-08-ar-EG-s004",
+              "text": "منى: بقرا مقال قصير.",
+              "english": "Mona: I am reading a short article.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "Mona: baʾra maʾaal ʾosayyar."
+            },
+            {
+              "id": "ai-news-2026-10-08-ar-EG-s005",
+              "text": "كريم: مين كتب المقال؟",
+              "english": "Karim: Who wrote the article?",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "Kareem: meen katab el-maʾaal?"
+            },
+            {
+              "id": "ai-news-2026-10-08-ar-EG-s006",
+              "text": "منى: اسم الكاتب مكتوب هنا.",
+              "english": "Mona: The writer’s name is written here.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "Mona: esm el-kaateb maktoob hena."
+            },
+            {
+              "id": "ai-news-2026-10-08-ar-EG-s007",
+              "text": "كريم: والمصدر فين؟",
+              "english": "Karim: And where is the source?",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "Kareem: wel-masdar feen?"
+            },
+            {
+              "id": "ai-news-2026-10-08-ar-EG-s008",
+              "text": "منى: فيه لينك تحت المقال.",
+              "english": "Mona: There is a link below the article.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "Mona: feeh link taht el-maʾaal."
+            },
+            {
+              "id": "ai-news-2026-10-08-ar-EG-s009",
+              "text": "كريم: طيب، نتأكد من المصدر.",
+              "english": "Karim: Okay, let’s check the source.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "Kareem: tayyeb, netʾakked men el-masdar."
+            }
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-08-ar-EG-r3",
+          "title": "Read a second source · Fictional dialogue",
+          "sentences": [
+            {
+              "id": "ai-news-2026-10-08-ar-EG-s010",
+              "text": "منى: العنوان غريب.",
+              "english": "Mona: The headline is strange.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "Mona: el-ʿenwaan ghareeb."
+            },
+            {
+              "id": "ai-news-2026-10-08-ar-EG-s011",
+              "text": "كريم: مش كل خبر غريب غلط.",
+              "english": "Karim: Not every strange news story is wrong.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "Kareem: mesh koll khabar ghareeb ghalat."
+            },
+            {
+              "id": "ai-news-2026-10-08-ar-EG-s012",
+              "text": "منى: نراجع خبر تاني؟",
+              "english": "Mona: Shall we check another news story?",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "Mona: neraageʿ khabar taani?"
+            },
+            {
+              "id": "ai-news-2026-10-08-ar-EG-s013",
+              "text": "كريم: أيوه، ونقارن التفاصيل.",
+              "english": "Karim: Yes, and we compare the details.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "Kareem: aywa, we-nʾaaren et-tafaaseel."
+            },
+            {
+              "id": "ai-news-2026-10-08-ar-EG-s014",
+              "text": "منى: لسه مش متأكدة.",
+              "english": "Mona: I am still not sure.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "Mona: lissa mesh metʾakkeda."
+            },
+            {
+              "id": "ai-news-2026-10-08-ar-EG-s015",
+              "text": "كريم: عادي، نقرأ الأول.",
+              "english": "Karim: That’s okay, let’s read first.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "Kareem: ʿaadi, neʾra el-awwal."
+            }
+          ]
+        }
+      ],
+      "vocabulary": [
+        {
+          "id": "ar-EG-oct08-word-1",
+          "term": "مقال",
+          "english": "article",
+          "semanticConcept": "article",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-08-ar-EG-s016",
+            "text": "بقرا مقال.",
+            "english": "I am reading an article.",
+            "kind": "teaching-example",
+            "sourceIds": [],
+            "transliteration": "baʾra maʾaal."
+          },
+          "transliteration": "maʾaal",
+          "lexicalTerm": "مقال"
+        },
+        {
+          "id": "ar-EG-oct08-word-2",
+          "term": "كاتب",
+          "english": "writer",
+          "semanticConcept": "writer",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-08-ar-EG-s017",
+            "text": "ده كاتب.",
+            "english": "This is a writer.",
+            "kind": "teaching-example",
+            "sourceIds": [],
+            "transliteration": "da kaateb."
+          },
+          "transliteration": "kaateb",
+          "lexicalTerm": "كاتب"
+        },
+        {
+          "id": "ar_egy_source",
+          "term": "مصدر",
+          "english": "source",
+          "semanticConcept": "source",
+          "plannedRole": "review",
+          "example": {
+            "id": "ai-news-2026-10-08-ar-EG-s018",
+            "text": "ده مصدر تاني.",
+            "english": "This is another source.",
+            "kind": "teaching-example",
+            "sourceIds": [],
+            "transliteration": "da masdar taani."
+          },
+          "transliteration": "masdar",
+          "lexicalTerm": "مصدر"
+        },
+        {
+          "id": "ar-EG-oct08-word-4",
+          "term": "خبر",
+          "english": "news story",
+          "semanticConcept": "news story",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-08-ar-EG-s019",
+            "text": "ده خبر جديد.",
+            "english": "This is a new news story.",
+            "kind": "teaching-example",
+            "sourceIds": [],
+            "transliteration": "da khabar gedeed."
+          },
+          "transliteration": "khabar",
+          "lexicalTerm": "خبر"
+        },
+        {
+          "id": "ar-EG-oct08-word-5",
+          "term": "لينك",
+          "english": "link",
+          "semanticConcept": "link",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-08-ar-EG-s020",
+            "text": "فيه لينك هنا.",
+            "english": "There is a link here.",
+            "kind": "teaching-example",
+            "sourceIds": [],
+            "transliteration": "feeh link hena."
+          },
+          "transliteration": "link",
+          "lexicalTerm": "لينك"
+        },
+        {
+          "id": "ar-EG-oct08-word-6",
+          "term": "نتأكد من",
+          "english": "we check / let’s make sure of",
+          "semanticConcept": "we check / let’s make sure of",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-08-ar-EG-s021",
+            "text": "نتأكد من المصدر.",
+            "english": "Let’s check the source.",
+            "kind": "teaching-example",
+            "sourceIds": [],
+            "transliteration": "netʾakked men el-masdar."
+          },
+          "transliteration": "netʾakked men",
+          "lexicalTerm": "نتأكد من"
+        },
+        {
+          "id": "ar-EG-oct08-word-7",
+          "term": "تحت",
+          "english": "below / under",
+          "semanticConcept": "below / under",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-08-ar-EG-s022",
+            "text": "اللينك تحت المقال.",
+            "english": "The link is below the article.",
+            "kind": "teaching-example",
+            "sourceIds": [],
+            "transliteration": "el-link taht el-maʾaal."
+          },
+          "transliteration": "taht",
+          "lexicalTerm": "تحت"
+        },
+        {
+          "id": "ar_egy_i_read",
+          "term": "بقرا",
+          "english": "I read / I am reading",
+          "semanticConcept": "i_read",
+          "plannedRole": "review",
+          "example": {
+            "id": "ai-news-2026-10-08-ar-EG-s023",
+            "text": "بقرا مقال قصير.",
+            "english": "I am reading a short article.",
+            "kind": "teaching-example",
+            "sourceIds": [],
+            "transliteration": "baʾra maʾaal ʾosayyar."
+          },
+          "transliteration": "baʾra",
+          "lexicalTerm": "بقرا"
+        },
+        {
+          "id": "ar_egy_first",
+          "term": "الأول",
+          "english": "first",
+          "semanticConcept": "first",
+          "plannedRole": "review",
+          "example": {
+            "id": "ai-news-2026-10-08-ar-EG-s024",
+            "text": "نقرأ الأول.",
+            "english": "Let’s read first.",
+            "kind": "teaching-example",
+            "sourceIds": [],
+            "transliteration": "neʾra el-awwal."
+          },
+          "transliteration": "el-awwal",
+          "lexicalTerm": "الأول"
+        },
+        {
+          "id": "ar_egy_new",
+          "term": "جديد",
+          "english": "new (masculine)",
+          "semanticConcept": "new",
+          "plannedRole": "review",
+          "example": {
+            "id": "ai-news-2026-10-08-ar-EG-s025",
+            "text": "ده مقال جديد.",
+            "english": "This is a new article.",
+            "kind": "teaching-example",
+            "sourceIds": [],
+            "transliteration": "da maʾaal gedeed."
+          },
+          "transliteration": "gedeed",
+          "lexicalTerm": "جديد"
+        }
+      ],
+      "concepts": [
+        {
+          "id": "ar-EG-oct08-grammar-1",
+          "title": "Ask who and where",
+          "explanation": "Meen asks “who”. In meen katab el-maʾaal?, katab is “wrote”. Feen asks “where” and often comes after the noun in a short question. No separate word for “is” is needed.",
+          "examples": [
+            {
+              "id": "ai-news-2026-10-08-ar-EG-s026",
+              "text": "مين كتب المقال؟",
+              "english": "Who wrote the article?",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "meen katab el-maʾaal?"
+            },
+            {
+              "id": "ai-news-2026-10-08-ar-EG-s027",
+              "text": "المصدر فين؟",
+              "english": "Where is the source?",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "el-masdar feen?"
+            }
+          ]
+        },
+        {
+          "id": "ar-EG-oct08-grammar-2",
+          "title": "Make sure of something",
+          "explanation": "Learn netʾakked men as a complete phrase: “we check / let’s make sure of”. Men introduces what you check. Lissa mesh means “still not”; a female speaker says metʾakkeda, and a male speaker says metʾakked.",
+          "examples": [
+            {
+              "id": "ai-news-2026-10-08-ar-EG-s028",
+              "text": "نتأكد من المصدر.",
+              "english": "Let’s check the source.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "netʾakked men el-masdar."
+            },
+            {
+              "id": "ai-news-2026-10-08-ar-EG-s029",
+              "text": "لسه مش متأكدة.",
+              "english": "I am still not sure.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "lissa mesh metʾakkeda."
+            },
+            {
+              "id": "ai-news-2026-10-08-ar-EG-s030",
+              "text": "لسه مش متأكد.",
+              "english": "I am still not sure.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "lissa mesh metʾakked."
+            }
+          ]
+        }
+      ],
+      "exercises": [
+        {
+          "id": "ai-news-2026-10-08-ar-EG-e01",
+          "type": "choice",
+          "prompt": "Choose “article”.",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar-EG-oct08-word-1"
+          },
+          "acceptedAnswers": [
+            "مقال"
+          ],
+          "hint": "Use the vocabulary example if needed.",
+          "explanation": "مقال means “article”.",
+          "trackInSrs": false,
+          "choiceAtoms": [
+            {
+              "text": "مقال",
+              "english": "article",
+              "transliteration": "maʾaal"
+            },
+            {
+              "text": "خبر",
+              "english": "news story",
+              "transliteration": "khabar"
+            },
+            {
+              "text": "تحت",
+              "english": "below / under",
+              "transliteration": "taht"
+            }
+          ],
+          "showChoiceEnglish": false,
+          "choices": [
+            "مقال",
+            "خبر",
+            "تحت"
+          ],
+          "choiceSupport": {
+            "مقال": {
+              "transliteration": "maʾaal",
+              "english": "article"
+            },
+            "خبر": {
+              "transliteration": "khabar",
+              "english": "news story"
+            },
+            "تحت": {
+              "transliteration": "taht",
+              "english": "below / under"
+            }
+          },
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "مقال",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-08-ar-EG-e02",
+          "type": "choice",
+          "prompt": "Choose “writer”.",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar-EG-oct08-word-2"
+          },
+          "acceptedAnswers": [
+            "كاتب"
+          ],
+          "hint": "Use the vocabulary example if needed.",
+          "explanation": "كاتب means “writer”.",
+          "trackInSrs": false,
+          "choiceAtoms": [
+            {
+              "text": "لينك",
+              "english": "link",
+              "transliteration": "link"
+            },
+            {
+              "text": "بقرا",
+              "english": "I read / I am reading",
+              "transliteration": "baʾra"
+            },
+            {
+              "text": "كاتب",
+              "english": "writer",
+              "transliteration": "kaateb"
+            }
+          ],
+          "showChoiceEnglish": false,
+          "choices": [
+            "لينك",
+            "بقرا",
+            "كاتب"
+          ],
+          "choiceSupport": {
+            "لينك": {
+              "transliteration": "link",
+              "english": "link"
+            },
+            "بقرا": {
+              "transliteration": "baʾra",
+              "english": "I read / I am reading"
+            },
+            "كاتب": {
+              "transliteration": "kaateb",
+              "english": "writer"
+            }
+          },
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "كاتب",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-08-ar-EG-e03",
+          "type": "choice",
+          "prompt": "Choose “source”.",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar_egy_source"
+          },
+          "acceptedAnswers": [
+            "مصدر"
+          ],
+          "hint": "Use the vocabulary example if needed.",
+          "explanation": "مصدر means “source”.",
+          "trackInSrs": false,
+          "choiceAtoms": [
+            {
+              "text": "الأول",
+              "english": "first",
+              "transliteration": "el-awwal"
+            },
+            {
+              "text": "مصدر",
+              "english": "source",
+              "transliteration": "masdar"
+            },
+            {
+              "text": "نتأكد من",
+              "english": "we check / let’s make sure of",
+              "transliteration": "netʾakked men"
+            }
+          ],
+          "showChoiceEnglish": false,
+          "choices": [
+            "الأول",
+            "مصدر",
+            "نتأكد من"
+          ],
+          "choiceSupport": {
+            "الأول": {
+              "transliteration": "el-awwal",
+              "english": "first"
+            },
+            "مصدر": {
+              "transliteration": "masdar",
+              "english": "source"
+            },
+            "نتأكد من": {
+              "transliteration": "netʾakked men",
+              "english": "we check / let’s make sure of"
+            }
+          },
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "مصدر",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-08-ar-EG-e04",
+          "type": "choice",
+          "prompt": "Choose “link”.",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar-EG-oct08-word-5"
+          },
+          "acceptedAnswers": [
+            "لينك"
+          ],
+          "hint": "Use the vocabulary example if needed.",
+          "explanation": "لينك means “link”.",
+          "trackInSrs": false,
+          "choiceAtoms": [
+            {
+              "text": "بقرا",
+              "english": "I read / I am reading",
+              "transliteration": "baʾra"
+            },
+            {
+              "text": "مقال",
+              "english": "article",
+              "transliteration": "maʾaal"
+            },
+            {
+              "text": "لينك",
+              "english": "link",
+              "transliteration": "link"
+            }
+          ],
+          "showChoiceEnglish": false,
+          "choices": [
+            "بقرا",
+            "مقال",
+            "لينك"
+          ],
+          "choiceSupport": {
+            "بقرا": {
+              "transliteration": "baʾra",
+              "english": "I read / I am reading"
+            },
+            "مقال": {
+              "transliteration": "maʾaal",
+              "english": "article"
+            },
+            "لينك": {
+              "transliteration": "link",
+              "english": "link"
+            }
+          },
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "لينك",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-08-ar-EG-e05",
+          "type": "choice",
+          "prompt": "Choose “below / under”.",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar-EG-oct08-word-7"
+          },
+          "acceptedAnswers": [
+            "تحت"
+          ],
+          "hint": "Use the vocabulary example if needed.",
+          "explanation": "تحت means “below / under”.",
+          "trackInSrs": false,
+          "choiceAtoms": [
+            {
+              "text": "تحت",
+              "english": "below / under",
+              "transliteration": "taht"
+            },
+            {
+              "text": "جديد",
+              "english": "new (masculine)",
+              "transliteration": "gedeed"
+            },
+            {
+              "text": "مصدر",
+              "english": "source",
+              "transliteration": "masdar"
+            }
+          ],
+          "showChoiceEnglish": false,
+          "choices": [
+            "تحت",
+            "جديد",
+            "مصدر"
+          ],
+          "choiceSupport": {
+            "تحت": {
+              "transliteration": "taht",
+              "english": "below / under"
+            },
+            "جديد": {
+              "transliteration": "gedeed",
+              "english": "new (masculine)"
+            },
+            "مصدر": {
+              "transliteration": "masdar",
+              "english": "source"
+            }
+          },
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "تحت",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-08-ar-EG-e06",
+          "type": "recall",
+          "prompt": "Write “article” in Arabic script.",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar-EG-oct08-word-1"
+          },
+          "acceptedAnswers": [
+            "مقال"
+          ],
+          "hint": "Example: بقرا مقال.",
+          "explanation": "مقال means “article”.",
+          "trackInSrs": true,
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "مقال",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-08-ar-EG-e07",
+          "type": "recall",
+          "prompt": "Write “source” in Arabic script.",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar_egy_source"
+          },
+          "acceptedAnswers": [
+            "مصدر"
+          ],
+          "hint": "Example: ده مصدر تاني.",
+          "explanation": "مصدر means “source”.",
+          "trackInSrs": true,
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "مصدر",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-08-ar-EG-e08",
+          "type": "recall",
+          "prompt": "Fill the gap: the link is below the article.",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar-EG-oct08-word-7"
+          },
+          "acceptedAnswers": [
+            "تحت"
+          ],
+          "hint": "Use the word for “below / under”.",
+          "explanation": "تحت means “below / under”.",
+          "trackInSrs": true,
+          "promptAtom": {
+            "id": "ai-news-2026-10-08-ar-EG-s031",
+            "text": "اللينك ___ المقال.",
+            "english": "The link is below the article.",
+            "kind": "teaching-example",
+            "sourceIds": [],
+            "transliteration": "el-link ___ el-maʾaal."
+          },
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "تحت",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-08-ar-EG-e09",
+          "type": "recall",
+          "prompt": "Fill the gap: let’s check the source.",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar-EG-oct08-word-6"
+          },
+          "acceptedAnswers": [
+            "من"
+          ],
+          "hint": "The phrase is netʾakked men.",
+          "explanation": "Use من after نتأكد.",
+          "trackInSrs": true,
+          "promptAtom": {
+            "id": "ai-news-2026-10-08-ar-EG-s032",
+            "text": "نتأكد ___ المصدر.",
+            "english": "Let’s check the source.",
+            "kind": "teaching-example",
+            "sourceIds": [],
+            "transliteration": "netʾakked ___ el-masdar."
+          },
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "من",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-08-ar-EG-e10",
+          "type": "order",
+          "prompt": "Put the words in order: Who wrote the article?",
+          "target": {
+            "type": "grammar",
+            "id": "ar-EG-oct08-grammar-1"
+          },
+          "acceptedAnswers": [
+            "مين كتب المقال"
+          ],
+          "hint": "Use the matching pattern in Grammar.",
+          "explanation": "Who wrote the article?",
+          "trackInSrs": false,
+          "tokens": [
+            "المقال",
+            "كتب",
+            "مين"
+          ],
+          "answerData": [
+            {
+              "arabic": "مين كتب المقال",
+              "transliteration": "meen katab el-maʾaal",
+              "english": "Who wrote the article?"
+            }
+          ],
+          "choices": [
+            "المقال",
+            "كتب",
+            "مين"
+          ],
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "مين كتب المقال · meen katab el-maʾaal · Who wrote the article?",
+          "answerAtoms": [
+            {
+              "id": "ai-news-2026-10-08-ar-EG-e10-model",
+              "text": "مين كتب المقال",
+              "english": "Who wrote the article?",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "meen katab el-maʾaal"
+            }
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-08-ar-EG-e11",
+          "type": "order",
+          "prompt": "Put the words in order: Where is the source?",
+          "target": {
+            "type": "grammar",
+            "id": "ar-EG-oct08-grammar-1"
+          },
+          "acceptedAnswers": [
+            "المصدر فين"
+          ],
+          "hint": "Use the matching pattern in Grammar.",
+          "explanation": "Where is the source?",
+          "trackInSrs": false,
+          "tokens": [
+            "فين",
+            "المصدر"
+          ],
+          "answerData": [
+            {
+              "arabic": "المصدر فين",
+              "transliteration": "el-masdar feen",
+              "english": "Where is the source?"
+            }
+          ],
+          "choices": [
+            "فين",
+            "المصدر"
+          ],
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "المصدر فين · el-masdar feen · Where is the source?",
+          "answerAtoms": [
+            {
+              "id": "ai-news-2026-10-08-ar-EG-e11-model",
+              "text": "المصدر فين",
+              "english": "Where is the source?",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "el-masdar feen"
+            }
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-08-ar-EG-e12",
+          "type": "order",
+          "prompt": "Put the words in order: Let’s check the source.",
+          "target": {
+            "type": "grammar",
+            "id": "ar-EG-oct08-grammar-2"
+          },
+          "acceptedAnswers": [
+            "نتأكد من المصدر"
+          ],
+          "hint": "Use the matching pattern in Grammar.",
+          "explanation": "Let’s check the source.",
+          "trackInSrs": false,
+          "tokens": [
+            "المصدر",
+            "من",
+            "نتأكد"
+          ],
+          "answerData": [
+            {
+              "arabic": "نتأكد من المصدر",
+              "transliteration": "netʾakked men el-masdar",
+              "english": "Let’s check the source."
+            }
+          ],
+          "choices": [
+            "المصدر",
+            "من",
+            "نتأكد"
+          ],
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "نتأكد من المصدر · netʾakked men el-masdar · Let’s check the source.",
+          "answerAtoms": [
+            {
+              "id": "ai-news-2026-10-08-ar-EG-e12-model",
+              "text": "نتأكد من المصدر",
+              "english": "Let’s check the source.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "netʾakked men el-masdar"
+            }
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-08-ar-EG-e13",
+          "type": "matching",
+          "prompt": "Match each word to its meaning.",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar-EG-oct08-word-1"
+          },
+          "acceptedAnswers": [
+            "{\"0\": \"article\", \"1\": \"source\", \"2\": \"link\", \"3\": \"below / under\"}"
+          ],
+          "hint": "Use the short vocabulary examples.",
+          "explanation": "Read each complete pair aloud.",
+          "trackInSrs": false,
+          "matchingPairs": [
+            {
+              "id": "0",
+              "text": "مقال",
+              "answer": "article",
+              "transliteration": "maʾaal",
+              "target": {
+                "type": "vocabulary",
+                "id": "ar-EG-oct08-word-1"
+              }
+            },
+            {
+              "id": "1",
+              "text": "مصدر",
+              "answer": "source",
+              "transliteration": "masdar",
+              "target": {
+                "type": "vocabulary",
+                "id": "ar_egy_source"
+              }
+            },
+            {
+              "id": "2",
+              "text": "لينك",
+              "answer": "link",
+              "transliteration": "link",
+              "target": {
+                "type": "vocabulary",
+                "id": "ar-EG-oct08-word-5"
+              }
+            },
+            {
+              "id": "3",
+              "text": "تحت",
+              "answer": "below / under",
+              "transliteration": "taht",
+              "target": {
+                "type": "vocabulary",
+                "id": "ar-EG-oct08-word-7"
+              }
+            }
+          ],
+          "choices": [
+            "below / under",
+            "link",
+            "source",
+            "article"
+          ],
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "{\"0\": \"article\", \"1\": \"source\", \"2\": \"link\", \"3\": \"below / under\"}",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-08-ar-EG-e14",
+          "type": "self-check",
+          "prompt": "Ask who wrote the article, then ask where the source is.",
+          "target": {
+            "type": "grammar",
+            "id": "ar-EG-oct08-grammar-1"
+          },
+          "acceptedAnswers": [
+            "مين كتب المقال؟ المصدر فين؟"
+          ],
+          "hint": "Build short sentences from the vocabulary and grammar examples.",
+          "explanation": "Compare the requested meaning and forms; other natural answers can work.",
+          "trackInSrs": false,
+          "answerData": [
+            {
+              "arabic": "مين كتب المقال؟ المصدر فين؟",
+              "transliteration": "meen katab el-maʾaal? el-masdar feen?",
+              "english": "Who wrote the article? Where is the source?"
+            }
+          ],
+          "rubric": {
+            "criteria": "Include every requested meaning. Check the question or verb form, then assess your answer."
+          },
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Include every requested meaning. Check the question or verb form, then assess your answer.",
+          "modelAnswer": "مين كتب المقال؟ المصدر فين؟ · meen katab el-maʾaal? el-masdar feen? · Who wrote the article? Where is the source?",
+          "answerAtoms": [
+            {
+              "id": "ai-news-2026-10-08-ar-EG-e14-model",
+              "text": "مين كتب المقال؟ المصدر فين؟",
+              "english": "Who wrote the article? Where is the source?",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "meen katab el-maʾaal? el-masdar feen?"
+            }
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-08-ar-EG-e15",
+          "type": "self-check",
+          "prompt": "Suggest checking a source.",
+          "target": {
+            "type": "grammar",
+            "id": "ar-EG-oct08-grammar-2"
+          },
+          "acceptedAnswers": [
+            "نتأكد من المصدر."
+          ],
+          "hint": "Build short sentences from the vocabulary and grammar examples.",
+          "explanation": "Compare the requested meaning and forms; other natural answers can work.",
+          "trackInSrs": false,
+          "answerData": [
+            {
+              "arabic": "نتأكد من المصدر.",
+              "transliteration": "netʾakked men el-masdar.",
+              "english": "Let’s check the source."
+            }
+          ],
+          "rubric": {
+            "criteria": "Include every requested meaning. Check the question or verb form, then assess your answer."
+          },
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Include every requested meaning. Check the question or verb form, then assess your answer.",
+          "modelAnswer": "نتأكد من المصدر. · netʾakked men el-masdar. · Let’s check the source.",
+          "answerAtoms": [
+            {
+              "id": "ai-news-2026-10-08-ar-EG-e15-model",
+              "text": "نتأكد من المصدر.",
+              "english": "Let’s check the source.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "netʾakked men el-masdar."
+            }
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-08-ar-EG-e16",
+          "type": "self-check",
+          "prompt": "As Mona, say you are still not sure; then suggest reading first.",
+          "target": {
+            "type": "grammar",
+            "id": "ar-EG-oct08-grammar-2"
+          },
+          "acceptedAnswers": [
+            "لسه مش متأكدة. نقرأ الأول."
+          ],
+          "hint": "Build short sentences from the vocabulary and grammar examples.",
+          "explanation": "Compare the requested meaning and forms; other natural answers can work.",
+          "trackInSrs": false,
+          "answerData": [
+            {
+              "arabic": "لسه مش متأكدة. نقرأ الأول.",
+              "transliteration": "lissa mesh metʾakkeda. neʾra el-awwal.",
+              "english": "I am still not sure. Let’s read first."
+            }
+          ],
+          "rubric": {
+            "criteria": "Include every requested meaning. Check the question or verb form, then assess your answer."
+          },
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Include every requested meaning. Check the question or verb form, then assess your answer.",
+          "modelAnswer": "لسه مش متأكدة. نقرأ الأول. · lissa mesh metʾakkeda. neʾra el-awwal. · I am still not sure. Let’s read first.",
+          "answerAtoms": [
+            {
+              "id": "ai-news-2026-10-08-ar-EG-e16-model",
+              "text": "لسه مش متأكدة. نقرأ الأول.",
+              "english": "I am still not sure. Let’s read first.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "lissa mesh metʾakkeda. neʾra el-awwal."
+            }
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-08-ar-EG-e17",
+          "type": "recall",
+          "prompt": "Review: write “I read / I am reading”.",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar_egy_i_read"
+          },
+          "acceptedAnswers": [
+            "بقرا"
+          ],
+          "hint": "Example: بقرا مقال قصير.",
+          "explanation": "بقرا means “I read / I am reading”.",
+          "trackInSrs": true,
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "بقرا",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-08-ar-EG-e18",
+          "type": "recall",
+          "prompt": "Review: write “first”.",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar_egy_first"
+          },
+          "acceptedAnswers": [
+            "الأول"
+          ],
+          "hint": "Example: نقرأ الأول.",
+          "explanation": "الأول means “first”.",
+          "trackInSrs": true,
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "الأول",
+          "answerAtoms": []
+        }
+      ],
+      "route": [
+        "Read · 10 min",
+        "Words and grammar · 8 min",
+        "Practise · 17 min",
+        "Own example · 5 min"
+      ],
+      "review": {
+        "instructions": "Try the review words from earlier lessons if they are familiar; otherwise open the hint and use the examples.",
+        "prompts": [
+          "Write “I read” and “first”, then make a new sentence."
+        ]
+      },
+      "sourceIds": [
+        "openai_false_fronts_2026_10_08"
+      ],
+      "instructionBlocks": [],
+      "optionalDialogue": []
+    },
+    {
+      "schemaVersion": 1,
+      "id": "ai-news-2026-10-08-hu",
+      "courseId": "ai-news-daily-2026-10-08",
+      "day": 35,
+      "language": "hu",
+      "title": "Kérdezek és ellenőrzöm",
+      "subtitle": "October 8, 2026 · Ask, find and check",
+      "estimatedMinutes": 40,
+      "objectives": [
+        "Ask a colleague for information.",
+        "Say what you look for and check.",
+        "Ask how much time is needed."
+      ],
+      "readings": [
+        {
+          "id": "ai-news-2026-10-08-hu-r1",
+          "title": "AI at work · News",
+          "sentences": [
+            {
+              "id": "ai-news-2026-10-08-hu-s001",
+              "text": "Az OpenAI az Oracle munkájáról ír.",
+              "english": "OpenAI writes about Oracle’s work.",
+              "kind": "source-summary",
+              "sourceIds": [
+                "openai_oracle_work_2026_10_08"
+              ]
+            },
+            {
+              "id": "ai-news-2026-10-08-hu-s002",
+              "text": "Az Oracle dolgozói ChatGPT-t és Codexet használnak.",
+              "english": "Oracle employees use ChatGPT and Codex.",
+              "kind": "source-summary",
+              "sourceIds": [
+                "openai_oracle_work_2026_10_08"
+              ]
+            },
+            {
+              "id": "ai-news-2026-10-08-hu-s003",
+              "text": "A cikk szerint néhány feladat kevesebb időt igényel.",
+              "english": "According to the article, some tasks require less time.",
+              "kind": "source-summary",
+              "sourceIds": [
+                "openai_oracle_work_2026_10_08"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-08-hu-r2",
+          "title": "A colleague can help · Fictional dialogue",
+          "sentences": [
+            {
+              "id": "ai-news-2026-10-08-hu-s004",
+              "text": "Anna: Egy adatot keresek.",
+              "english": "Anna: I am looking for a piece of data.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-08-hu-s005",
+              "text": "Bence: Kérdezek egy kollégát.",
+              "english": "Bence: I will ask a colleague.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-08-hu-s006",
+              "text": "Anna: Mennyi idő kell?",
+              "english": "Anna: How much time is needed?",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-08-hu-s007",
+              "text": "Bence: Két perc.",
+              "english": "Bence: Two minutes.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-08-hu-s008",
+              "text": "Anna: Itt van a jelentés.",
+              "english": "Anna: Here is the report.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-08-hu-s009",
+              "text": "Bence: Köszönöm, ellenőrzöm az adatot.",
+              "english": "Bence: Thank you, I will check the data.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            }
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-08-hu-r3",
+          "title": "Check before answering · Fictional dialogue",
+          "sentences": [
+            {
+              "id": "ai-news-2026-10-08-hu-s010",
+              "text": "Bence: Van egy kérdésem.",
+              "english": "Bence: I have a question.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-08-hu-s011",
+              "text": "Anna: Mi a kérdés?",
+              "english": "Anna: What is the question?",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-08-hu-s012",
+              "text": "Bence: Ez a szám helyes?",
+              "english": "Bence: Is this number correct?",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-08-hu-s013",
+              "text": "Anna: Még nem tudom.",
+              "english": "Anna: I do not know yet.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-08-hu-s014",
+              "text": "Bence: Megnézem a jelentést.",
+              "english": "Bence: I will look at the report.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-08-hu-s015",
+              "text": "Anna: Jó, utána válaszolok.",
+              "english": "Anna: Good, I will answer after that.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            }
+          ]
+        }
+      ],
+      "vocabulary": [
+        {
+          "id": "hu-oct08-word-1",
+          "term": "kolléga",
+          "english": "colleague",
+          "semanticConcept": "colleague",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-08-hu-s016",
+            "text": "Egy kolléga segít.",
+            "english": "A colleague helps.",
+            "kind": "teaching-example",
+            "sourceIds": []
+          },
+          "lexicalTerm": "kolléga"
+        },
+        {
+          "id": "hu-oct08-word-2",
+          "term": "kérdezek",
+          "english": "I ask",
+          "semanticConcept": "I ask",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-08-hu-s017",
+            "text": "Kérdezek egy kollégát.",
+            "english": "I ask a colleague.",
+            "kind": "teaching-example",
+            "sourceIds": []
+          },
+          "lexicalTerm": "kérdezek"
+        },
+        {
+          "id": "hu-oct08-word-3",
+          "term": "keresek",
+          "english": "I look for",
+          "semanticConcept": "I look for",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-08-hu-s018",
+            "text": "Egy adatot keresek.",
+            "english": "I am looking for a piece of data.",
+            "kind": "teaching-example",
+            "sourceIds": []
+          },
+          "lexicalTerm": "keresek"
+        },
+        {
+          "id": "hu-oct08-word-4",
+          "term": "ellenőrzöm",
+          "english": "I check it",
+          "semanticConcept": "I check it",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-08-hu-s019",
+            "text": "Ellenőrzöm az adatot.",
+            "english": "I check the data.",
+            "kind": "teaching-example",
+            "sourceIds": []
+          },
+          "lexicalTerm": "ellenőrzöm"
+        },
+        {
+          "id": "hu-oct08-word-5",
+          "term": "jelentés",
+          "english": "report",
+          "semanticConcept": "report",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-08-hu-s020",
+            "text": "Itt van a jelentés.",
+            "english": "Here is the report.",
+            "kind": "teaching-example",
+            "sourceIds": []
+          },
+          "lexicalTerm": "jelentés"
+        },
+        {
+          "id": "hu-oct08-word-6",
+          "term": "perc",
+          "english": "minute",
+          "semanticConcept": "minute",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-08-hu-s021",
+            "text": "Két perc kell.",
+            "english": "Two minutes are needed.",
+            "kind": "teaching-example",
+            "sourceIds": []
+          },
+          "lexicalTerm": "perc"
+        },
+        {
+          "id": "hu_time",
+          "term": "idő",
+          "english": "time",
+          "semanticConcept": "time",
+          "plannedRole": "review",
+          "example": {
+            "id": "ai-news-2026-10-08-hu-s022",
+            "text": "Mennyi idő kell?",
+            "english": "How much time is needed?",
+            "kind": "teaching-example",
+            "sourceIds": []
+          },
+          "lexicalTerm": "idő"
+        },
+        {
+          "id": "hu_data",
+          "term": "adat",
+          "english": "data",
+          "semanticConcept": "data",
+          "plannedRole": "review",
+          "example": {
+            "id": "ai-news-2026-10-08-hu-s023",
+            "text": "Ez egy adat.",
+            "english": "This is a piece of data.",
+            "kind": "teaching-example",
+            "sourceIds": []
+          },
+          "lexicalTerm": "adat"
+        },
+        {
+          "id": "hu_question",
+          "term": "kérdés",
+          "english": "question",
+          "semanticConcept": "question",
+          "plannedRole": "review",
+          "example": {
+            "id": "ai-news-2026-10-08-hu-s024",
+            "text": "Ez egy kérdés.",
+            "english": "This is a question.",
+            "kind": "teaching-example",
+            "sourceIds": []
+          },
+          "lexicalTerm": "kérdés"
+        },
+        {
+          "id": "hu_answer",
+          "term": "válasz",
+          "english": "answer",
+          "semanticConcept": "answer",
+          "plannedRole": "review",
+          "example": {
+            "id": "ai-news-2026-10-08-hu-s025",
+            "text": "A válasz rövid.",
+            "english": "The answer is short.",
+            "kind": "teaching-example",
+            "sourceIds": []
+          },
+          "lexicalTerm": "válasz"
+        }
+      ],
+      "concepts": [
+        {
+          "id": "hu-oct08-grammar-1",
+          "title": "Looking for something; checking a specific thing",
+          "explanation": "Keresek is used here with an unspecified object: egy adatot, “a piece of data”. Ellenőrzöm is used with a specific object: az adatot, “the data”. Both objects take -t; the verb ending also reflects whether the object is specific. Learn the complete short phrases.",
+          "examples": [
+            {
+              "id": "ai-news-2026-10-08-hu-s026",
+              "text": "Egy adatot keresek.",
+              "english": "I am looking for a piece of data.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-08-hu-s027",
+              "text": "Ellenőrzöm az adatot.",
+              "english": "I check the data.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-08-hu-s028",
+              "text": "Kérdezek egy kollégát.",
+              "english": "I ask a colleague.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            }
+          ]
+        },
+        {
+          "id": "hu-oct08-grammar-2",
+          "title": "Ask how much time is needed",
+          "explanation": "Mennyi idő kell? means “How much time is needed?” After a number, Hungarian normally keeps the noun singular: két perc, “two minutes”. Kell expresses a need here; it does not change in these short examples.",
+          "examples": [
+            {
+              "id": "ai-news-2026-10-08-hu-s029",
+              "text": "Mennyi idő kell?",
+              "english": "How much time is needed?",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-08-hu-s030",
+              "text": "Két perc kell.",
+              "english": "Two minutes are needed.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-08-hu-s031",
+              "text": "Egy perc kell.",
+              "english": "One minute is needed.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            }
+          ]
+        }
+      ],
+      "exercises": [
+        {
+          "id": "ai-news-2026-10-08-hu-e01",
+          "type": "choice",
+          "prompt": "Choose “colleague”.",
+          "target": {
+            "type": "vocabulary",
+            "id": "hu-oct08-word-1"
+          },
+          "acceptedAnswers": [
+            "kolléga"
+          ],
+          "hint": "Use the vocabulary example if needed.",
+          "explanation": "kolléga means “colleague”.",
+          "trackInSrs": false,
+          "choiceAtoms": [
+            {
+              "text": "kolléga",
+              "english": "colleague"
+            },
+            {
+              "text": "ellenőrzöm",
+              "english": "I check it"
+            },
+            {
+              "text": "idő",
+              "english": "time"
+            }
+          ],
+          "showChoiceEnglish": false,
+          "choices": [
+            "kolléga",
+            "ellenőrzöm",
+            "idő"
+          ],
+          "choiceSupport": {
+            "kolléga": {
+              "transliteration": null,
+              "english": "colleague"
+            },
+            "ellenőrzöm": {
+              "transliteration": null,
+              "english": "I check it"
+            },
+            "idő": {
+              "transliteration": null,
+              "english": "time"
+            }
+          },
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "kolléga",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-08-hu-e02",
+          "type": "choice",
+          "prompt": "Choose “I ask”.",
+          "target": {
+            "type": "vocabulary",
+            "id": "hu-oct08-word-2"
+          },
+          "acceptedAnswers": [
+            "kérdezek"
+          ],
+          "hint": "Use the vocabulary example if needed.",
+          "explanation": "kérdezek means “I ask”.",
+          "trackInSrs": false,
+          "choiceAtoms": [
+            {
+              "text": "jelentés",
+              "english": "report"
+            },
+            {
+              "text": "adat",
+              "english": "data"
+            },
+            {
+              "text": "kérdezek",
+              "english": "I ask"
+            }
+          ],
+          "showChoiceEnglish": false,
+          "choices": [
+            "jelentés",
+            "adat",
+            "kérdezek"
+          ],
+          "choiceSupport": {
+            "jelentés": {
+              "transliteration": null,
+              "english": "report"
+            },
+            "adat": {
+              "transliteration": null,
+              "english": "data"
+            },
+            "kérdezek": {
+              "transliteration": null,
+              "english": "I ask"
+            }
+          },
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "kérdezek",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-08-hu-e03",
+          "type": "choice",
+          "prompt": "Choose “I look for”.",
+          "target": {
+            "type": "vocabulary",
+            "id": "hu-oct08-word-3"
+          },
+          "acceptedAnswers": [
+            "keresek"
+          ],
+          "hint": "Use the vocabulary example if needed.",
+          "explanation": "keresek means “I look for”.",
+          "trackInSrs": false,
+          "choiceAtoms": [
+            {
+              "text": "kérdés",
+              "english": "question"
+            },
+            {
+              "text": "keresek",
+              "english": "I look for"
+            },
+            {
+              "text": "perc",
+              "english": "minute"
+            }
+          ],
+          "showChoiceEnglish": false,
+          "choices": [
+            "kérdés",
+            "keresek",
+            "perc"
+          ],
+          "choiceSupport": {
+            "kérdés": {
+              "transliteration": null,
+              "english": "question"
+            },
+            "keresek": {
+              "transliteration": null,
+              "english": "I look for"
+            },
+            "perc": {
+              "transliteration": null,
+              "english": "minute"
+            }
+          },
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "keresek",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-08-hu-e04",
+          "type": "choice",
+          "prompt": "Choose “report”.",
+          "target": {
+            "type": "vocabulary",
+            "id": "hu-oct08-word-5"
+          },
+          "acceptedAnswers": [
+            "jelentés"
+          ],
+          "hint": "Use the vocabulary example if needed.",
+          "explanation": "jelentés means “report”.",
+          "trackInSrs": false,
+          "choiceAtoms": [
+            {
+              "text": "adat",
+              "english": "data"
+            },
+            {
+              "text": "kolléga",
+              "english": "colleague"
+            },
+            {
+              "text": "jelentés",
+              "english": "report"
+            }
+          ],
+          "showChoiceEnglish": false,
+          "choices": [
+            "adat",
+            "kolléga",
+            "jelentés"
+          ],
+          "choiceSupport": {
+            "adat": {
+              "transliteration": null,
+              "english": "data"
+            },
+            "kolléga": {
+              "transliteration": null,
+              "english": "colleague"
+            },
+            "jelentés": {
+              "transliteration": null,
+              "english": "report"
+            }
+          },
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "jelentés",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-08-hu-e05",
+          "type": "choice",
+          "prompt": "Choose “time”.",
+          "target": {
+            "type": "vocabulary",
+            "id": "hu_time"
+          },
+          "acceptedAnswers": [
+            "idő"
+          ],
+          "hint": "Use the vocabulary example if needed.",
+          "explanation": "idő means “time”.",
+          "trackInSrs": false,
+          "choiceAtoms": [
+            {
+              "text": "idő",
+              "english": "time"
+            },
+            {
+              "text": "válasz",
+              "english": "answer"
+            },
+            {
+              "text": "keresek",
+              "english": "I look for"
+            }
+          ],
+          "showChoiceEnglish": false,
+          "choices": [
+            "idő",
+            "válasz",
+            "keresek"
+          ],
+          "choiceSupport": {
+            "idő": {
+              "transliteration": null,
+              "english": "time"
+            },
+            "válasz": {
+              "transliteration": null,
+              "english": "answer"
+            },
+            "keresek": {
+              "transliteration": null,
+              "english": "I look for"
+            }
+          },
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "idő",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-08-hu-e06",
+          "type": "recall",
+          "prompt": "Write “colleague” in Hungarian.",
+          "target": {
+            "type": "vocabulary",
+            "id": "hu-oct08-word-1"
+          },
+          "acceptedAnswers": [
+            "kolléga"
+          ],
+          "hint": "Example: Egy kolléga segít.",
+          "explanation": "kolléga means “colleague”.",
+          "trackInSrs": true,
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "kolléga",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-08-hu-e07",
+          "type": "recall",
+          "prompt": "Write “I look for” in Hungarian.",
+          "target": {
+            "type": "vocabulary",
+            "id": "hu-oct08-word-3"
+          },
+          "acceptedAnswers": [
+            "keresek"
+          ],
+          "hint": "Example: Egy adatot keresek.",
+          "explanation": "keresek means “I look for”.",
+          "trackInSrs": true,
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "keresek",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-08-hu-e08",
+          "type": "recall",
+          "prompt": "Fill the gap: two minutes are needed.",
+          "target": {
+            "type": "vocabulary",
+            "id": "hu-oct08-word-6"
+          },
+          "acceptedAnswers": [
+            "perc"
+          ],
+          "hint": "After a number, keep the noun singular.",
+          "explanation": "Két perc uses singular perc, not percek.",
+          "trackInSrs": true,
+          "promptAtom": {
+            "id": "ai-news-2026-10-08-hu-s032",
+            "text": "Két ___ kell.",
+            "english": "Two minutes are needed.",
+            "kind": "teaching-example",
+            "sourceIds": []
+          },
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "perc",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-08-hu-e09",
+          "type": "recall",
+          "prompt": "Fill the gap: I check the data.",
+          "target": {
+            "type": "vocabulary",
+            "id": "hu-oct08-word-4"
+          },
+          "acceptedAnswers": [
+            "ellenőrzöm"
+          ],
+          "hint": "Use the complete verb form for a specific object.",
+          "explanation": "Ellenőrzöm goes with the specific object az adatot.",
+          "trackInSrs": true,
+          "promptAtom": {
+            "id": "ai-news-2026-10-08-hu-s033",
+            "text": "___ az adatot.",
+            "english": "I check the data.",
+            "kind": "teaching-example",
+            "sourceIds": []
+          },
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "ellenőrzöm",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-08-hu-e10",
+          "type": "order",
+          "prompt": "Put the words in order: I am looking for a piece of data.",
+          "target": {
+            "type": "grammar",
+            "id": "hu-oct08-grammar-1"
+          },
+          "acceptedAnswers": [
+            "Egy adatot keresek"
+          ],
+          "hint": "Use the matching pattern in Grammar.",
+          "explanation": "I am looking for a piece of data.",
+          "trackInSrs": false,
+          "tokens": [
+            "keresek",
+            "adatot",
+            "Egy"
+          ],
+          "answerData": [
+            {
+              "text": "Egy adatot keresek",
+              "english": "I am looking for a piece of data."
+            }
+          ],
+          "choices": [
+            "keresek",
+            "adatot",
+            "Egy"
+          ],
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "Egy adatot keresek · I am looking for a piece of data.",
+          "answerAtoms": [
+            {
+              "id": "ai-news-2026-10-08-hu-e10-model",
+              "text": "Egy adatot keresek",
+              "english": "I am looking for a piece of data.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            }
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-08-hu-e11",
+          "type": "order",
+          "prompt": "Put the words in order: I check the data.",
+          "target": {
+            "type": "grammar",
+            "id": "hu-oct08-grammar-1"
+          },
+          "acceptedAnswers": [
+            "Ellenőrzöm az adatot"
+          ],
+          "hint": "Use the matching pattern in Grammar.",
+          "explanation": "I check the data.",
+          "trackInSrs": false,
+          "tokens": [
+            "adatot",
+            "az",
+            "Ellenőrzöm"
+          ],
+          "answerData": [
+            {
+              "text": "Ellenőrzöm az adatot",
+              "english": "I check the data."
+            }
+          ],
+          "choices": [
+            "adatot",
+            "az",
+            "Ellenőrzöm"
+          ],
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "Ellenőrzöm az adatot · I check the data.",
+          "answerAtoms": [
+            {
+              "id": "ai-news-2026-10-08-hu-e11-model",
+              "text": "Ellenőrzöm az adatot",
+              "english": "I check the data.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            }
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-08-hu-e12",
+          "type": "order",
+          "prompt": "Put the words in order: Two minutes are needed.",
+          "target": {
+            "type": "grammar",
+            "id": "hu-oct08-grammar-2"
+          },
+          "acceptedAnswers": [
+            "Két perc kell"
+          ],
+          "hint": "Use the matching pattern in Grammar.",
+          "explanation": "Two minutes are needed.",
+          "trackInSrs": false,
+          "tokens": [
+            "kell",
+            "perc",
+            "Két"
+          ],
+          "answerData": [
+            {
+              "text": "Két perc kell",
+              "english": "Two minutes are needed."
+            }
+          ],
+          "choices": [
+            "kell",
+            "perc",
+            "Két"
+          ],
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "Két perc kell · Two minutes are needed.",
+          "answerAtoms": [
+            {
+              "id": "ai-news-2026-10-08-hu-e12-model",
+              "text": "Két perc kell",
+              "english": "Two minutes are needed.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            }
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-08-hu-e13",
+          "type": "matching",
+          "prompt": "Match each word to its meaning.",
+          "target": {
+            "type": "vocabulary",
+            "id": "hu-oct08-word-1"
+          },
+          "acceptedAnswers": [
+            "{\"0\": \"colleague\", \"1\": \"I look for\", \"2\": \"report\", \"3\": \"time\"}"
+          ],
+          "hint": "Use the short vocabulary examples.",
+          "explanation": "Read each complete pair aloud.",
+          "trackInSrs": false,
+          "matchingPairs": [
+            {
+              "id": "0",
+              "text": "kolléga",
+              "answer": "colleague",
+              "transliteration": null,
+              "target": {
+                "type": "vocabulary",
+                "id": "hu-oct08-word-1"
+              }
+            },
+            {
+              "id": "1",
+              "text": "keresek",
+              "answer": "I look for",
+              "transliteration": null,
+              "target": {
+                "type": "vocabulary",
+                "id": "hu-oct08-word-3"
+              }
+            },
+            {
+              "id": "2",
+              "text": "jelentés",
+              "answer": "report",
+              "transliteration": null,
+              "target": {
+                "type": "vocabulary",
+                "id": "hu-oct08-word-5"
+              }
+            },
+            {
+              "id": "3",
+              "text": "idő",
+              "answer": "time",
+              "transliteration": null,
+              "target": {
+                "type": "vocabulary",
+                "id": "hu_time"
+              }
+            }
+          ],
+          "choices": [
+            "time",
+            "report",
+            "I look for",
+            "colleague"
+          ],
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "{\"0\": \"colleague\", \"1\": \"I look for\", \"2\": \"report\", \"3\": \"time\"}",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-08-hu-e14",
+          "type": "self-check",
+          "prompt": "Say you are looking for a piece of data, then say you will ask a colleague.",
+          "target": {
+            "type": "grammar",
+            "id": "hu-oct08-grammar-1"
+          },
+          "acceptedAnswers": [
+            "Egy adatot keresek. Kérdezek egy kollégát."
+          ],
+          "hint": "Build short sentences from the vocabulary and grammar examples.",
+          "explanation": "Compare the requested meaning and forms; other natural answers can work.",
+          "trackInSrs": false,
+          "answerData": [
+            {
+              "text": "Egy adatot keresek. Kérdezek egy kollégát.",
+              "english": "I am looking for a piece of data. I will ask a colleague."
+            }
+          ],
+          "rubric": {
+            "criteria": "Include every requested meaning. Check the question or verb form, then assess your answer."
+          },
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Include every requested meaning. Check the question or verb form, then assess your answer.",
+          "modelAnswer": "Egy adatot keresek. Kérdezek egy kollégát. · I am looking for a piece of data. I will ask a colleague.",
+          "answerAtoms": [
+            {
+              "id": "ai-news-2026-10-08-hu-e14-model",
+              "text": "Egy adatot keresek. Kérdezek egy kollégát.",
+              "english": "I am looking for a piece of data. I will ask a colleague.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            }
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-08-hu-e15",
+          "type": "self-check",
+          "prompt": "Ask how much time is needed, then answer “two minutes”.",
+          "target": {
+            "type": "grammar",
+            "id": "hu-oct08-grammar-2"
+          },
+          "acceptedAnswers": [
+            "Mennyi idő kell? Két perc."
+          ],
+          "hint": "Build short sentences from the vocabulary and grammar examples.",
+          "explanation": "Compare the requested meaning and forms; other natural answers can work.",
+          "trackInSrs": false,
+          "answerData": [
+            {
+              "text": "Mennyi idő kell? Két perc.",
+              "english": "How much time is needed? Two minutes."
+            }
+          ],
+          "rubric": {
+            "criteria": "Include every requested meaning. Check the question or verb form, then assess your answer."
+          },
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Include every requested meaning. Check the question or verb form, then assess your answer.",
+          "modelAnswer": "Mennyi idő kell? Két perc. · How much time is needed? Two minutes.",
+          "answerAtoms": [
+            {
+              "id": "ai-news-2026-10-08-hu-e15-model",
+              "text": "Mennyi idő kell? Két perc.",
+              "english": "How much time is needed? Two minutes.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            }
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-08-hu-e16",
+          "type": "self-check",
+          "prompt": "Say the report is here, then say you will check the data.",
+          "target": {
+            "type": "grammar",
+            "id": "hu-oct08-grammar-1"
+          },
+          "acceptedAnswers": [
+            "Itt van a jelentés. Ellenőrzöm az adatot."
+          ],
+          "hint": "Build short sentences from the vocabulary and grammar examples.",
+          "explanation": "Compare the requested meaning and forms; other natural answers can work.",
+          "trackInSrs": false,
+          "answerData": [
+            {
+              "text": "Itt van a jelentés. Ellenőrzöm az adatot.",
+              "english": "Here is the report. I will check the data."
+            }
+          ],
+          "rubric": {
+            "criteria": "Include every requested meaning. Check the question or verb form, then assess your answer."
+          },
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Include every requested meaning. Check the question or verb form, then assess your answer.",
+          "modelAnswer": "Itt van a jelentés. Ellenőrzöm az adatot. · Here is the report. I will check the data.",
+          "answerAtoms": [
+            {
+              "id": "ai-news-2026-10-08-hu-e16-model",
+              "text": "Itt van a jelentés. Ellenőrzöm az adatot.",
+              "english": "Here is the report. I will check the data.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            }
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-08-hu-e17",
+          "type": "recall",
+          "prompt": "Review: write “data”.",
+          "target": {
+            "type": "vocabulary",
+            "id": "hu_data"
+          },
+          "acceptedAnswers": [
+            "adat"
+          ],
+          "hint": "Example: Ez egy adat.",
+          "explanation": "adat means “data”.",
+          "trackInSrs": true,
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "adat",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-08-hu-e18",
+          "type": "recall",
+          "prompt": "Review: write “question”.",
+          "target": {
+            "type": "vocabulary",
+            "id": "hu_question"
+          },
+          "acceptedAnswers": [
+            "kérdés"
+          ],
+          "hint": "Example: Ez egy kérdés.",
+          "explanation": "kérdés means “question”.",
+          "trackInSrs": true,
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "kérdés",
+          "answerAtoms": []
+        }
+      ],
+      "route": [
+        "Read · 10 min",
+        "Words and grammar · 8 min",
+        "Practise · 17 min",
+        "Own example · 5 min"
+      ],
+      "review": {
+        "instructions": "Try the review words from earlier lessons if they are familiar; otherwise open the hint and use the examples.",
+        "prompts": [
+          "Write “data”, “question” and “answer”, then make a new sentence."
+        ]
+      },
+      "sourceIds": [
+        "openai_oracle_work_2026_10_08"
+      ],
+      "instructionBlocks": [],
+      "optionalDialogue": []
+    }
+  ]
+}

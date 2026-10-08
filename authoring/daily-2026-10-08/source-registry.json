@@ -1,0 +1,20 @@
+[
+  {
+    "id": "openai_oracle_work_2026_10_08",
+    "title": "How Oracle turns days of work into minutes with ChatGPT and Codex",
+    "url": "https://openai.com/index/oracle/",
+    "publishedOn": "2026-10-08",
+    "verifiedAsOf": "2026-10-08",
+    "publisher": "OpenAI",
+    "factSummary": "OpenAI’s Oracle customer story describes staff using ChatGPT Work and Codex for research and business questions. Reported time savings are customer examples, not a guarantee for every task; people remain responsible for outputs."
+  },
+  {
+    "id": "openai_false_fronts_2026_10_08",
+    "title": "Disrupting AI-enabled “false front” operations",
+    "url": "https://openai.com/index/disrupting-ai-enabled-false-front-operations/",
+    "publishedOn": "2026-10-08",
+    "verifiedAsOf": "2026-10-08",
+    "publisher": "OpenAI",
+    "factSummary": "OpenAI reports banning accounts linked to two covert influence operations. One used fabricated journalist identities to submit articles. These findings concern identified operations, not all online writers or AI-assisted text."
+  }
+]

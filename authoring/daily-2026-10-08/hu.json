@@ -1,0 +1,878 @@
+{
+  "schemaVersion": 1,
+  "id": "ai-news-2026-10-08-hu",
+  "courseId": "ai-news-daily-2026-10-08",
+  "day": 35,
+  "language": "hu",
+  "title": "Kérdezek és ellenőrzöm",
+  "subtitle": "October 8, 2026 · Ask, find and check",
+  "estimatedMinutes": 40,
+  "objectives": [
+    "Ask a colleague for information.",
+    "Say what you look for and check.",
+    "Ask how much time is needed."
+  ],
+  "sources": [
+    {
+      "id": "openai_oracle_work_2026_10_08",
+      "title": "How Oracle turns days of work into minutes with ChatGPT and Codex",
+      "url": "https://openai.com/index/oracle/",
+      "publishedOn": "2026-10-08",
+      "verifiedAsOf": "2026-10-08",
+      "publisher": "OpenAI",
+      "factSummary": "OpenAI’s Oracle customer story describes staff using ChatGPT Work and Codex for research and business questions. Reported time savings are customer examples, not a guarantee for every task; people remain responsible for outputs."
+    }
+  ],
+  "readings": [
+    {
+      "id": "ai-news-2026-10-08-hu-r1",
+      "title": "AI at work · News",
+      "sentences": [
+        {
+          "id": "ai-news-2026-10-08-hu-s001",
+          "text": "Az OpenAI az Oracle munkájáról ír.",
+          "english": "OpenAI writes about Oracle’s work.",
+          "kind": "source-summary",
+          "sourceIds": [
+            "openai_oracle_work_2026_10_08"
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-08-hu-s002",
+          "text": "Az Oracle dolgozói ChatGPT-t és Codexet használnak.",
+          "english": "Oracle employees use ChatGPT and Codex.",
+          "kind": "source-summary",
+          "sourceIds": [
+            "openai_oracle_work_2026_10_08"
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-08-hu-s003",
+          "text": "A cikk szerint néhány feladat kevesebb időt igényel.",
+          "english": "According to the article, some tasks require less time.",
+          "kind": "source-summary",
+          "sourceIds": [
+            "openai_oracle_work_2026_10_08"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-08-hu-r2",
+      "title": "A colleague can help · Fictional dialogue",
+      "sentences": [
+        {
+          "id": "ai-news-2026-10-08-hu-s004",
+          "text": "Anna: Egy adatot keresek.",
+          "english": "Anna: I am looking for a piece of data.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-08-hu-s005",
+          "text": "Bence: Kérdezek egy kollégát.",
+          "english": "Bence: I will ask a colleague.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-08-hu-s006",
+          "text": "Anna: Mennyi idő kell?",
+          "english": "Anna: How much time is needed?",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-08-hu-s007",
+          "text": "Bence: Két perc.",
+          "english": "Bence: Two minutes.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-08-hu-s008",
+          "text": "Anna: Itt van a jelentés.",
+          "english": "Anna: Here is the report.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-08-hu-s009",
+          "text": "Bence: Köszönöm, ellenőrzöm az adatot.",
+          "english": "Bence: Thank you, I will check the data.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        }
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-08-hu-r3",
+      "title": "Check before answering · Fictional dialogue",
+      "sentences": [
+        {
+          "id": "ai-news-2026-10-08-hu-s010",
+          "text": "Bence: Van egy kérdésem.",
+          "english": "Bence: I have a question.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-08-hu-s011",
+          "text": "Anna: Mi a kérdés?",
+          "english": "Anna: What is the question?",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-08-hu-s012",
+          "text": "Bence: Ez a szám helyes?",
+          "english": "Bence: Is this number correct?",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-08-hu-s013",
+          "text": "Anna: Még nem tudom.",
+          "english": "Anna: I do not know yet.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-08-hu-s014",
+          "text": "Bence: Megnézem a jelentést.",
+          "english": "Bence: I will look at the report.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-08-hu-s015",
+          "text": "Anna: Jó, utána válaszolok.",
+          "english": "Anna: Good, I will answer after that.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        }
+      ]
+    }
+  ],
+  "vocabulary": [
+    {
+      "id": "hu-oct08-word-1",
+      "term": "kolléga",
+      "english": "colleague",
+      "semanticConcept": "colleague",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-08-hu-s016",
+        "text": "Egy kolléga segít.",
+        "english": "A colleague helps.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "hu-oct08-word-2",
+      "term": "kérdezek",
+      "english": "I ask",
+      "semanticConcept": "I ask",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-08-hu-s017",
+        "text": "Kérdezek egy kollégát.",
+        "english": "I ask a colleague.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "hu-oct08-word-3",
+      "term": "keresek",
+      "english": "I look for",
+      "semanticConcept": "I look for",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-08-hu-s018",
+        "text": "Egy adatot keresek.",
+        "english": "I am looking for a piece of data.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "hu-oct08-word-4",
+      "term": "ellenőrzöm",
+      "english": "I check it",
+      "semanticConcept": "I check it",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-08-hu-s019",
+        "text": "Ellenőrzöm az adatot.",
+        "english": "I check the data.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "hu-oct08-word-5",
+      "term": "jelentés",
+      "english": "report",
+      "semanticConcept": "report",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-08-hu-s020",
+        "text": "Itt van a jelentés.",
+        "english": "Here is the report.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "hu-oct08-word-6",
+      "term": "perc",
+      "english": "minute",
+      "semanticConcept": "minute",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-08-hu-s021",
+        "text": "Két perc kell.",
+        "english": "Two minutes are needed.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "hu_time",
+      "term": "idő",
+      "english": "time",
+      "semanticConcept": "time",
+      "plannedRole": "review",
+      "example": {
+        "id": "ai-news-2026-10-08-hu-s022",
+        "text": "Mennyi idő kell?",
+        "english": "How much time is needed?",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "hu_data",
+      "term": "adat",
+      "english": "data",
+      "semanticConcept": "data",
+      "plannedRole": "review",
+      "example": {
+        "id": "ai-news-2026-10-08-hu-s023",
+        "text": "Ez egy adat.",
+        "english": "This is a piece of data.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "hu_question",
+      "term": "kérdés",
+      "english": "question",
+      "semanticConcept": "question",
+      "plannedRole": "review",
+      "example": {
+        "id": "ai-news-2026-10-08-hu-s024",
+        "text": "Ez egy kérdés.",
+        "english": "This is a question.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "hu_answer",
+      "term": "válasz",
+      "english": "answer",
+      "semanticConcept": "answer",
+      "plannedRole": "review",
+      "example": {
+        "id": "ai-news-2026-10-08-hu-s025",
+        "text": "A válasz rövid.",
+        "english": "The answer is short.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    }
+  ],
+  "concepts": [
+    {
+      "id": "hu-oct08-grammar-1",
+      "title": "Looking for something; checking a specific thing",
+      "explanation": "Keresek is used here with an unspecified object: egy adatot, “a piece of data”. Ellenőrzöm is used with a specific object: az adatot, “the data”. Both objects take -t; the verb ending also reflects whether the object is specific. Learn the complete short phrases.",
+      "examples": [
+        {
+          "id": "ai-news-2026-10-08-hu-s026",
+          "text": "Egy adatot keresek.",
+          "english": "I am looking for a piece of data.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-08-hu-s027",
+          "text": "Ellenőrzöm az adatot.",
+          "english": "I check the data.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-08-hu-s028",
+          "text": "Kérdezek egy kollégát.",
+          "english": "I ask a colleague.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        }
+      ]
+    },
+    {
+      "id": "hu-oct08-grammar-2",
+      "title": "Ask how much time is needed",
+      "explanation": "Mennyi idő kell? means “How much time is needed?” After a number, Hungarian normally keeps the noun singular: két perc, “two minutes”. Kell expresses a need here; it does not change in these short examples.",
+      "examples": [
+        {
+          "id": "ai-news-2026-10-08-hu-s029",
+          "text": "Mennyi idő kell?",
+          "english": "How much time is needed?",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-08-hu-s030",
+          "text": "Két perc kell.",
+          "english": "Two minutes are needed.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-08-hu-s031",
+          "text": "Egy perc kell.",
+          "english": "One minute is needed.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        }
+      ]
+    }
+  ],
+  "exercises": [
+    {
+      "id": "ai-news-2026-10-08-hu-e01",
+      "type": "choice",
+      "prompt": "Choose “colleague”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu-oct08-word-1"
+      },
+      "acceptedAnswers": [
+        "kolléga"
+      ],
+      "hint": "Use the vocabulary example if needed.",
+      "explanation": "kolléga means “colleague”.",
+      "trackInSrs": false,
+      "choiceAtoms": [
+        {
+          "text": "kolléga",
+          "english": "colleague"
+        },
+        {
+          "text": "ellenőrzöm",
+          "english": "I check it"
+        },
+        {
+          "text": "idő",
+          "english": "time"
+        }
+      ],
+      "showChoiceEnglish": false,
+      "choices": [
+        "kolléga",
+        "ellenőrzöm",
+        "idő"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-08-hu-e02",
+      "type": "choice",
+      "prompt": "Choose “I ask”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu-oct08-word-2"
+      },
+      "acceptedAnswers": [
+        "kérdezek"
+      ],
+      "hint": "Use the vocabulary example if needed.",
+      "explanation": "kérdezek means “I ask”.",
+      "trackInSrs": false,
+      "choiceAtoms": [
+        {
+          "text": "jelentés",
+          "english": "report"
+        },
+        {
+          "text": "adat",
+          "english": "data"
+        },
+        {
+          "text": "kérdezek",
+          "english": "I ask"
+        }
+      ],
+      "showChoiceEnglish": false,
+      "choices": [
+        "jelentés",
+        "adat",
+        "kérdezek"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-08-hu-e03",
+      "type": "choice",
+      "prompt": "Choose “I look for”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu-oct08-word-3"
+      },
+      "acceptedAnswers": [
+        "keresek"
+      ],
+      "hint": "Use the vocabulary example if needed.",
+      "explanation": "keresek means “I look for”.",
+      "trackInSrs": false,
+      "choiceAtoms": [
+        {
+          "text": "kérdés",
+          "english": "question"
+        },
+        {
+          "text": "keresek",
+          "english": "I look for"
+        },
+        {
+          "text": "perc",
+          "english": "minute"
+        }
+      ],
+      "showChoiceEnglish": false,
+      "choices": [
+        "kérdés",
+        "keresek",
+        "perc"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-08-hu-e04",
+      "type": "choice",
+      "prompt": "Choose “report”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu-oct08-word-5"
+      },
+      "acceptedAnswers": [
+        "jelentés"
+      ],
+      "hint": "Use the vocabulary example if needed.",
+      "explanation": "jelentés means “report”.",
+      "trackInSrs": false,
+      "choiceAtoms": [
+        {
+          "text": "adat",
+          "english": "data"
+        },
+        {
+          "text": "kolléga",
+          "english": "colleague"
+        },
+        {
+          "text": "jelentés",
+          "english": "report"
+        }
+      ],
+      "showChoiceEnglish": false,
+      "choices": [
+        "adat",
+        "kolléga",
+        "jelentés"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-08-hu-e05",
+      "type": "choice",
+      "prompt": "Choose “time”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu_time"
+      },
+      "acceptedAnswers": [
+        "idő"
+      ],
+      "hint": "Use the vocabulary example if needed.",
+      "explanation": "idő means “time”.",
+      "trackInSrs": false,
+      "choiceAtoms": [
+        {
+          "text": "idő",
+          "english": "time"
+        },
+        {
+          "text": "válasz",
+          "english": "answer"
+        },
+        {
+          "text": "keresek",
+          "english": "I look for"
+        }
+      ],
+      "showChoiceEnglish": false,
+      "choices": [
+        "idő",
+        "válasz",
+        "keresek"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-08-hu-e06",
+      "type": "recall",
+      "prompt": "Write “colleague” in Hungarian.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu-oct08-word-1"
+      },
+      "acceptedAnswers": [
+        "kolléga"
+      ],
+      "hint": "Example: Egy kolléga segít.",
+      "explanation": "kolléga means “colleague”.",
+      "trackInSrs": true
+    },
+    {
+      "id": "ai-news-2026-10-08-hu-e07",
+      "type": "recall",
+      "prompt": "Write “I look for” in Hungarian.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu-oct08-word-3"
+      },
+      "acceptedAnswers": [
+        "keresek"
+      ],
+      "hint": "Example: Egy adatot keresek.",
+      "explanation": "keresek means “I look for”.",
+      "trackInSrs": true
+    },
+    {
+      "id": "ai-news-2026-10-08-hu-e08",
+      "type": "recall",
+      "prompt": "Fill the gap: two minutes are needed.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu-oct08-word-6"
+      },
+      "acceptedAnswers": [
+        "perc"
+      ],
+      "hint": "After a number, keep the noun singular.",
+      "explanation": "Két perc uses singular perc, not percek.",
+      "trackInSrs": true,
+      "promptAtom": {
+        "id": "ai-news-2026-10-08-hu-s032",
+        "text": "Két ___ kell.",
+        "english": "Two minutes are needed.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "ai-news-2026-10-08-hu-e09",
+      "type": "recall",
+      "prompt": "Fill the gap: I check the data.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu-oct08-word-4"
+      },
+      "acceptedAnswers": [
+        "ellenőrzöm"
+      ],
+      "hint": "Use the complete verb form for a specific object.",
+      "explanation": "Ellenőrzöm goes with the specific object az adatot.",
+      "trackInSrs": true,
+      "promptAtom": {
+        "id": "ai-news-2026-10-08-hu-s033",
+        "text": "___ az adatot.",
+        "english": "I check the data.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "ai-news-2026-10-08-hu-e10",
+      "type": "order",
+      "prompt": "Put the words in order: I am looking for a piece of data.",
+      "target": {
+        "type": "grammar",
+        "id": "hu-oct08-grammar-1"
+      },
+      "acceptedAnswers": [
+        "Egy adatot keresek"
+      ],
+      "hint": "Use the matching pattern in Grammar.",
+      "explanation": "I am looking for a piece of data.",
+      "trackInSrs": false,
+      "tokens": [
+        "keresek",
+        "adatot",
+        "Egy"
+      ],
+      "answerData": [
+        {
+          "text": "Egy adatot keresek",
+          "english": "I am looking for a piece of data."
+        }
+      ],
+      "choices": [
+        "keresek",
+        "adatot",
+        "Egy"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-08-hu-e11",
+      "type": "order",
+      "prompt": "Put the words in order: I check the data.",
+      "target": {
+        "type": "grammar",
+        "id": "hu-oct08-grammar-1"
+      },
+      "acceptedAnswers": [
+        "Ellenőrzöm az adatot"
+      ],
+      "hint": "Use the matching pattern in Grammar.",
+      "explanation": "I check the data.",
+      "trackInSrs": false,
+      "tokens": [
+        "adatot",
+        "az",
+        "Ellenőrzöm"
+      ],
+      "answerData": [
+        {
+          "text": "Ellenőrzöm az adatot",
+          "english": "I check the data."
+        }
+      ],
+      "choices": [
+        "adatot",
+        "az",
+        "Ellenőrzöm"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-08-hu-e12",
+      "type": "order",
+      "prompt": "Put the words in order: Two minutes are needed.",
+      "target": {
+        "type": "grammar",
+        "id": "hu-oct08-grammar-2"
+      },
+      "acceptedAnswers": [
+        "Két perc kell"
+      ],
+      "hint": "Use the matching pattern in Grammar.",
+      "explanation": "Two minutes are needed.",
+      "trackInSrs": false,
+      "tokens": [
+        "kell",
+        "perc",
+        "Két"
+      ],
+      "answerData": [
+        {
+          "text": "Két perc kell",
+          "english": "Two minutes are needed."
+        }
+      ],
+      "choices": [
+        "kell",
+        "perc",
+        "Két"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-08-hu-e13",
+      "type": "matching",
+      "prompt": "Match each word to its meaning.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu-oct08-word-1"
+      },
+      "acceptedAnswers": [
+        "{\"0\": \"colleague\", \"1\": \"I look for\", \"2\": \"report\", \"3\": \"time\"}"
+      ],
+      "hint": "Use the short vocabulary examples.",
+      "explanation": "Read each complete pair aloud.",
+      "trackInSrs": false,
+      "matchingPairs": [
+        {
+          "id": "0",
+          "text": "kolléga",
+          "answer": "colleague",
+          "transliteration": null,
+          "target": {
+            "type": "vocabulary",
+            "id": "hu-oct08-word-1"
+          }
+        },
+        {
+          "id": "1",
+          "text": "keresek",
+          "answer": "I look for",
+          "transliteration": null,
+          "target": {
+            "type": "vocabulary",
+            "id": "hu-oct08-word-3"
+          }
+        },
+        {
+          "id": "2",
+          "text": "jelentés",
+          "answer": "report",
+          "transliteration": null,
+          "target": {
+            "type": "vocabulary",
+            "id": "hu-oct08-word-5"
+          }
+        },
+        {
+          "id": "3",
+          "text": "idő",
+          "answer": "time",
+          "transliteration": null,
+          "target": {
+            "type": "vocabulary",
+            "id": "hu_time"
+          }
+        }
+      ],
+      "choices": [
+        "time",
+        "report",
+        "I look for",
+        "colleague"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-08-hu-e14",
+      "type": "self-check",
+      "prompt": "Say you are looking for a piece of data, then say you will ask a colleague.",
+      "target": {
+        "type": "grammar",
+        "id": "hu-oct08-grammar-1"
+      },
+      "acceptedAnswers": [
+        "Egy adatot keresek. Kérdezek egy kollégát."
+      ],
+      "hint": "Build short sentences from the vocabulary and grammar examples.",
+      "explanation": "Compare the requested meaning and forms; other natural answers can work.",
+      "trackInSrs": false,
+      "answerData": [
+        {
+          "text": "Egy adatot keresek. Kérdezek egy kollégát.",
+          "english": "I am looking for a piece of data. I will ask a colleague."
+        }
+      ],
+      "rubric": {
+        "criteria": "Include every requested meaning. Check the question or verb form, then assess your answer."
+      }
+    },
+    {
+      "id": "ai-news-2026-10-08-hu-e15",
+      "type": "self-check",
+      "prompt": "Ask how much time is needed, then answer “two minutes”.",
+      "target": {
+        "type": "grammar",
+        "id": "hu-oct08-grammar-2"
+      },
+      "acceptedAnswers": [
+        "Mennyi idő kell? Két perc."
+      ],
+      "hint": "Build short sentences from the vocabulary and grammar examples.",
+      "explanation": "Compare the requested meaning and forms; other natural answers can work.",
+      "trackInSrs": false,
+      "answerData": [
+        {
+          "text": "Mennyi idő kell? Két perc.",
+          "english": "How much time is needed? Two minutes."
+        }
+      ],
+      "rubric": {
+        "criteria": "Include every requested meaning. Check the question or verb form, then assess your answer."
+      }
+    },
+    {
+      "id": "ai-news-2026-10-08-hu-e16",
+      "type": "self-check",
+      "prompt": "Say the report is here, then say you will check the data.",
+      "target": {
+        "type": "grammar",
+        "id": "hu-oct08-grammar-1"
+      },
+      "acceptedAnswers": [
+        "Itt van a jelentés. Ellenőrzöm az adatot."
+      ],
+      "hint": "Build short sentences from the vocabulary and grammar examples.",
+      "explanation": "Compare the requested meaning and forms; other natural answers can work.",
+      "trackInSrs": false,
+      "answerData": [
+        {
+          "text": "Itt van a jelentés. Ellenőrzöm az adatot.",
+          "english": "Here is the report. I will check the data."
+        }
+      ],
+      "rubric": {
+        "criteria": "Include every requested meaning. Check the question or verb form, then assess your answer."
+      }
+    },
+    {
+      "id": "ai-news-2026-10-08-hu-e17",
+      "type": "recall",
+      "prompt": "Review: write “data”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu_data"
+      },
+      "acceptedAnswers": [
+        "adat"
+      ],
+      "hint": "Example: Ez egy adat.",
+      "explanation": "adat means “data”.",
+      "trackInSrs": true
+    },
+    {
+      "id": "ai-news-2026-10-08-hu-e18",
+      "type": "recall",
+      "prompt": "Review: write “question”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu_question"
+      },
+      "acceptedAnswers": [
+        "kérdés"
+      ],
+      "hint": "Example: Ez egy kérdés.",
+      "explanation": "kérdés means “question”.",
+      "trackInSrs": true
+    }
+  ],
+  "route": [
+    "Read · 10 min",
+    "Words and grammar · 8 min",
+    "Practise · 17 min",
+    "Own example · 5 min"
+  ],
+  "review": {
+    "instructions": "Try the review words from earlier lessons if they are familiar; otherwise open the hint and use the examples.",
+    "prompts": [
+      "Write “data”, “question” and “answer”, then make a new sentence."
+    ]
+  }
+}
