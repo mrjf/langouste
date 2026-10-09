@@ -1952,6 +1952,91 @@
         "lemma": "igényel",
         "gloss": "requires",
         "form": "Third person singular present."
+      },
+      "asana": {
+        "lemma": "Asana",
+        "gloss": "Asana",
+        "form": "Company name."
+      },
+      "ai-eszközt": {
+        "lemma": "AI-eszköz",
+        "gloss": "AI tool",
+        "form": "Accusative object: -t."
+      },
+      "tesztelt": {
+        "lemma": "tesztel",
+        "gloss": "tested",
+        "form": "Third-person singular past."
+      },
+      "tesztben": {
+        "lemma": "teszt",
+        "gloss": "in the test",
+        "form": "Inessive: -ben."
+      },
+      "változat": {
+        "lemma": "változat",
+        "gloss": "version",
+        "form": ""
+      },
+      "volt": {
+        "lemma": "van",
+        "gloss": "was",
+        "form": "Third-person singular past of be."
+      },
+      "erre": {
+        "lemma": "ez",
+        "gloss": "to this",
+        "form": "Sublative form."
+      },
+      "tesztre": {
+        "lemma": "teszt",
+        "gloss": "to the test",
+        "form": "Sublative: -re."
+      },
+      "oldalt": {
+        "lemma": "oldal",
+        "gloss": "page",
+        "form": "Accusative: -t."
+      },
+      "űrlap": {
+        "lemma": "űrlap",
+        "gloss": "form",
+        "form": ""
+      },
+      "mező": {
+        "lemma": "mező",
+        "gloss": "field",
+        "form": ""
+      },
+      "üres": {
+        "lemma": "üres",
+        "gloss": "empty",
+        "form": ""
+      },
+      "beírok": {
+        "lemma": "beír",
+        "gloss": "I enter",
+        "form": "First-person singular indefinite present."
+      },
+      "nevet": {
+        "lemma": "név",
+        "gloss": "a name",
+        "form": "Accusative; név shortens to nev-."
+      },
+      "kitöltöm": {
+        "lemma": "kitölt",
+        "gloss": "I fill in",
+        "form": "First-person singular definite present."
+      },
+      "űrlapot": {
+        "lemma": "űrlap",
+        "gloss": "the form",
+        "form": "Accusative: -ot."
+      },
+      "kész": {
+        "lemma": "kész",
+        "gloss": "ready / finished",
+        "form": ""
       }
     },
     "ar-EG": {
@@ -4384,6 +4469,131 @@
         "lemma": "متأكد",
         "gloss": "sure",
         "form": "Masculine form for a male speaker."
+      },
+      "sanas": {
+        "lemma": "Sanas",
+        "gloss": "Sanas",
+        "form": "Company name."
+      },
+      "الذكاء": {
+        "lemma": "ذكاء",
+        "gloss": "intelligence",
+        "form": "Definite noun."
+      },
+      "الاصطناعي": {
+        "lemma": "اصطناعي",
+        "gloss": "artificial",
+        "form": "Definite adjective."
+      },
+      "بيرد": {
+        "lemma": "ردّ",
+        "gloss": "answers",
+        "form": "Third-person masculine singular habitual present."
+      },
+      "المكالمات": {
+        "lemma": "مكالمة",
+        "gloss": "the calls",
+        "form": "Definite plural."
+      },
+      "ومشرف": {
+        "lemma": "مشرف",
+        "gloss": "and a supervisor",
+        "form": "we- means and."
+      },
+      "بيتابع": {
+        "lemma": "تابع",
+        "gloss": "monitors / follows",
+        "form": "Third-person masculine singular habitual present."
+      },
+      "ألو": {
+        "lemma": "ألو",
+        "gloss": "hello",
+        "form": "Telephone greeting."
+      },
+      "تعيد": {
+        "lemma": "أعاد",
+        "gloss": "you repeat",
+        "form": "Second-person masculine singular after momken."
+      },
+      "تعيدي": {
+        "lemma": "أعاد",
+        "gloss": "you repeat",
+        "form": "Second-person feminine singular after momken."
+      },
+      "الصفحة": {
+        "lemma": "صفحة",
+        "gloss": "the page",
+        "form": "Definite noun."
+      },
+      "ثانية": {
+        "lemma": "ثانية",
+        "gloss": "second",
+        "form": "Unit of time."
+      },
+      "مستنية": {
+        "lemma": "استنى",
+        "gloss": "waiting",
+        "form": "Feminine active participle."
+      },
+      "تحبي": {
+        "lemma": "حبّ",
+        "gloss": "you would like",
+        "form": "Second-person feminine singular."
+      },
+      "تتكلمي": {
+        "lemma": "اتكلم",
+        "gloss": "you speak",
+        "form": "Second-person feminine singular."
+      },
+      "موظف": {
+        "lemma": "موظف",
+        "gloss": "employee / agent",
+        "form": "Masculine singular."
+      },
+      "مساعدة": {
+        "lemma": "مساعدة",
+        "gloss": "help",
+        "form": "Noun."
+      },
+      "الموظف": {
+        "lemma": "موظف",
+        "gloss": "the employee",
+        "form": "Definite noun."
+      },
+      "معانا": {
+        "lemma": "مع",
+        "gloss": "with us",
+        "form": "Preposition plus first-person plural suffix."
+      },
+      "شكراً": {
+        "lemma": "شكراً",
+        "gloss": "thank you",
+        "form": "Fixed expression."
+      },
+      "أشرح": {
+        "lemma": "شرح",
+        "gloss": "I explain",
+        "form": "First-person singular after momken."
+      },
+      "المشكلة": {
+        "lemma": "مشكلة",
+        "gloss": "the problem",
+        "form": "Definite noun."
+      },
+      "أكيد": {
+        "lemma": "أكيد",
+        "gloss": "of course / certainly",
+        "form": "Response."
+      },
+      "اتفضلي": {
+        "lemma": "اتفضل",
+        "gloss": "go ahead",
+        "form": "Polite imperative addressed to a woman."
+      },
+      "مكالمة": {
+        "lemma": "مكالمة",
+        "gloss": "call",
+        "form": "Singular noun."
       }
     }
   }

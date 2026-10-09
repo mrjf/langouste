@@ -1,0 +1,878 @@
+{
+  "schemaVersion": 1,
+  "id": "ai-news-2026-10-09-hu",
+  "courseId": "ai-news-daily-2026-10-09",
+  "day": 36,
+  "language": "hu",
+  "title": "Kitöltöm az űrlapot",
+  "subtitle": "October 9, 2026 · A form, a field and a name",
+  "estimatedMinutes": 40,
+  "objectives": [
+    "Describe a form and an empty field.",
+    "Say what you open and fill out.",
+    "Say whether something is ready yet."
+  ],
+  "sources": [
+    {
+      "id": "openai_asana_browser_2026_10_09",
+      "title": "Asana cuts model costs 76x in browser tests with GPT-6.1 Sol",
+      "url": "https://openai.com/index/asana-browser-agent/",
+      "publishedOn": "2026-10-09",
+      "verifiedAsOf": "2026-10-09",
+      "publisher": "OpenAI",
+      "factSummary": "OpenAI describes Asana testing an optimized browser-agent workflow. The reported cost and speed improvements compare particular tested setups; they are not a guarantee for every browser task."
+    }
+  ],
+  "readings": [
+    {
+      "id": "ai-news-2026-10-09-hu-r1",
+      "title": "A browser-agent test · October 9 news",
+      "sentences": [
+        {
+          "id": "ai-news-2026-10-09-hu-s001",
+          "text": "Az Asana egy AI-eszközt tesztelt.",
+          "english": "Asana tested an AI tool.",
+          "kind": "source-summary",
+          "sourceIds": [
+            "openai_asana_browser_2026_10_09"
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-09-hu-s002",
+          "text": "A tesztben az új változat gyorsabb és olcsóbb volt.",
+          "english": "In the test, the new version was faster and cheaper.",
+          "kind": "source-summary",
+          "sourceIds": [
+            "openai_asana_browser_2026_10_09"
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-09-hu-s003",
+          "text": "Az eredmény erre a tesztre vonatkozik.",
+          "english": "The result applies to this test.",
+          "kind": "source-summary",
+          "sourceIds": [
+            "openai_asana_browser_2026_10_09"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-09-hu-r2",
+      "title": "A short form · Fictional dialogue",
+      "sentences": [
+        {
+          "id": "ai-news-2026-10-09-hu-s004",
+          "text": "Anna: Megnyitom az oldalt.",
+          "english": "Anna: I open the page.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-09-hu-s005",
+          "text": "Bence: Hol az űrlap?",
+          "english": "Bence: Where is the form?",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-09-hu-s006",
+          "text": "Anna: Itt van.",
+          "english": "Anna: Here it is.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-09-hu-s007",
+          "text": "Bence: Ez a mező üres.",
+          "english": "Bence: This field is empty.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-09-hu-s008",
+          "text": "Anna: Beírok egy nevet.",
+          "english": "Anna: I enter a name.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-09-hu-s009",
+          "text": "Bence: Most kitöltöm az űrlapot.",
+          "english": "Bence: Now I fill out the form.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        }
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-09-hu-r3",
+      "title": "Is it ready? · Fictional dialogue",
+      "sentences": [
+        {
+          "id": "ai-news-2026-10-09-hu-s010",
+          "text": "Anna: Kész az űrlap?",
+          "english": "Anna: Is the form ready?",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-09-hu-s011",
+          "text": "Bence: Még nem kész.",
+          "english": "Bence: It is not ready yet.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-09-hu-s012",
+          "text": "Anna: Melyik mező üres?",
+          "english": "Anna: Which field is empty?",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-09-hu-s013",
+          "text": "Bence: Ez a mező.",
+          "english": "Bence: This field.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-09-hu-s014",
+          "text": "Anna: Ellenőrzöm az adatot.",
+          "english": "Anna: I check the data.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-09-hu-s015",
+          "text": "Bence: Jó, most már kész.",
+          "english": "Bence: Good, now it is ready.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        }
+      ]
+    }
+  ],
+  "vocabulary": [
+    {
+      "id": "hu-oct09-word-1",
+      "term": "űrlap",
+      "english": "form",
+      "semanticConcept": "form",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-09-hu-s016",
+        "text": "Ez egy űrlap.",
+        "english": "This is a form.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "hu-oct09-word-2",
+      "term": "mező",
+      "english": "field",
+      "semanticConcept": "field",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-09-hu-s017",
+        "text": "A mező üres.",
+        "english": "The field is empty.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "hu-oct09-word-3",
+      "term": "üres",
+      "english": "empty",
+      "semanticConcept": "empty",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-09-hu-s018",
+        "text": "Ez a mező üres.",
+        "english": "This field is empty.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "hu-oct09-word-4",
+      "term": "megnyitom",
+      "english": "I open it",
+      "semanticConcept": "I open it",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-09-hu-s019",
+        "text": "Megnyitom az oldalt.",
+        "english": "I open the page.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "hu-oct09-word-5",
+      "term": "beírok",
+      "english": "I enter / type in",
+      "semanticConcept": "I enter / type in",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-09-hu-s020",
+        "text": "Beírok egy nevet.",
+        "english": "I enter a name.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "hu-oct09-word-6",
+      "term": "kitöltöm",
+      "english": "I fill it out",
+      "semanticConcept": "I fill it out",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-09-hu-s021",
+        "text": "Kitöltöm az űrlapot.",
+        "english": "I fill out the form.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "hu-oct09-word-7",
+      "term": "kész",
+      "english": "ready / finished",
+      "semanticConcept": "ready / finished",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-09-hu-s022",
+        "text": "Az űrlap kész.",
+        "english": "The form is ready.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "hu_data",
+      "term": "adat",
+      "english": "data",
+      "semanticConcept": "data",
+      "plannedRole": "review",
+      "example": {
+        "id": "ai-news-2026-10-09-hu-s023",
+        "text": "Ellenőrzöm az adatot.",
+        "english": "I check the data.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "hu_question",
+      "term": "kérdés",
+      "english": "question",
+      "semanticConcept": "question",
+      "plannedRole": "review",
+      "example": {
+        "id": "ai-news-2026-10-09-hu-s024",
+        "text": "Van egy kérdésem.",
+        "english": "I have a question.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "hu_new",
+      "term": "új",
+      "english": "new",
+      "semanticConcept": "new",
+      "plannedRole": "review",
+      "example": {
+        "id": "ai-news-2026-10-09-hu-s025",
+        "text": "Ez egy új űrlap.",
+        "english": "This is a new form.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    }
+  ],
+  "concepts": [
+    {
+      "id": "hu-oct09-grammar-1",
+      "title": "Open it; fill it out",
+      "explanation": "Megnyitom and kitöltöm are complete forms for “I open it” and “I fill it out”. With a specific object, use the definite article and the object ending: az oldalt, az űrlapot. Beírok egy nevet uses an unspecified “a name”; név changes to nevet.",
+      "examples": [
+        {
+          "id": "ai-news-2026-10-09-hu-s026",
+          "text": "Megnyitom az oldalt.",
+          "english": "I open the page.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-09-hu-s027",
+          "text": "Kitöltöm az űrlapot.",
+          "english": "I fill out the form.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-09-hu-s028",
+          "text": "Beírok egy nevet.",
+          "english": "I enter a name.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        }
+      ]
+    },
+    {
+      "id": "hu-oct09-grammar-2",
+      "title": "Not ready yet; ready now",
+      "explanation": "Még nem kész means “not ready yet”. Most már kész means “now it is ready”, marking a change. In these third-person present descriptions, Hungarian has no separate word for “is”. The same pattern works for an empty field.",
+      "examples": [
+        {
+          "id": "ai-news-2026-10-09-hu-s029",
+          "text": "Még nem kész.",
+          "english": "It is not ready yet.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-09-hu-s030",
+          "text": "Most már kész.",
+          "english": "Now it is ready.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-09-hu-s031",
+          "text": "A mező nem üres.",
+          "english": "The field is not empty.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        }
+      ]
+    }
+  ],
+  "exercises": [
+    {
+      "id": "ai-news-2026-10-09-hu-e01",
+      "type": "choice",
+      "prompt": "Choose “form”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu-oct09-word-1"
+      },
+      "acceptedAnswers": [
+        "űrlap"
+      ],
+      "hint": "Use the vocabulary example if needed.",
+      "explanation": "űrlap means “form”.",
+      "trackInSrs": false,
+      "choiceAtoms": [
+        {
+          "text": "űrlap",
+          "english": "form"
+        },
+        {
+          "text": "megnyitom",
+          "english": "I open it"
+        },
+        {
+          "text": "kész",
+          "english": "ready / finished"
+        }
+      ],
+      "showChoiceEnglish": false,
+      "choices": [
+        "űrlap",
+        "megnyitom",
+        "kész"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-09-hu-e02",
+      "type": "choice",
+      "prompt": "Choose “field”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu-oct09-word-2"
+      },
+      "acceptedAnswers": [
+        "mező"
+      ],
+      "hint": "Use the vocabulary example if needed.",
+      "explanation": "mező means “field”.",
+      "trackInSrs": false,
+      "choiceAtoms": [
+        {
+          "text": "beírok",
+          "english": "I enter / type in"
+        },
+        {
+          "text": "adat",
+          "english": "data"
+        },
+        {
+          "text": "mező",
+          "english": "field"
+        }
+      ],
+      "showChoiceEnglish": false,
+      "choices": [
+        "beírok",
+        "adat",
+        "mező"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-09-hu-e03",
+      "type": "choice",
+      "prompt": "Choose “empty”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu-oct09-word-3"
+      },
+      "acceptedAnswers": [
+        "üres"
+      ],
+      "hint": "Use the vocabulary example if needed.",
+      "explanation": "üres means “empty”.",
+      "trackInSrs": false,
+      "choiceAtoms": [
+        {
+          "text": "kérdés",
+          "english": "question"
+        },
+        {
+          "text": "üres",
+          "english": "empty"
+        },
+        {
+          "text": "kitöltöm",
+          "english": "I fill it out"
+        }
+      ],
+      "showChoiceEnglish": false,
+      "choices": [
+        "kérdés",
+        "üres",
+        "kitöltöm"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-09-hu-e04",
+      "type": "choice",
+      "prompt": "Choose “I enter / type in”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu-oct09-word-5"
+      },
+      "acceptedAnswers": [
+        "beírok"
+      ],
+      "hint": "Use the vocabulary example if needed.",
+      "explanation": "beírok means “I enter / type in”.",
+      "trackInSrs": false,
+      "choiceAtoms": [
+        {
+          "text": "adat",
+          "english": "data"
+        },
+        {
+          "text": "űrlap",
+          "english": "form"
+        },
+        {
+          "text": "beírok",
+          "english": "I enter / type in"
+        }
+      ],
+      "showChoiceEnglish": false,
+      "choices": [
+        "adat",
+        "űrlap",
+        "beírok"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-09-hu-e05",
+      "type": "choice",
+      "prompt": "Choose “ready / finished”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu-oct09-word-7"
+      },
+      "acceptedAnswers": [
+        "kész"
+      ],
+      "hint": "Use the vocabulary example if needed.",
+      "explanation": "kész means “ready / finished”.",
+      "trackInSrs": false,
+      "choiceAtoms": [
+        {
+          "text": "kész",
+          "english": "ready / finished"
+        },
+        {
+          "text": "új",
+          "english": "new"
+        },
+        {
+          "text": "üres",
+          "english": "empty"
+        }
+      ],
+      "showChoiceEnglish": false,
+      "choices": [
+        "kész",
+        "új",
+        "üres"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-09-hu-e06",
+      "type": "recall",
+      "prompt": "Write “form” in Hungarian.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu-oct09-word-1"
+      },
+      "acceptedAnswers": [
+        "űrlap"
+      ],
+      "hint": "Example: Ez egy űrlap.",
+      "explanation": "űrlap means “form”.",
+      "trackInSrs": true
+    },
+    {
+      "id": "ai-news-2026-10-09-hu-e07",
+      "type": "recall",
+      "prompt": "Write “empty” in Hungarian.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu-oct09-word-3"
+      },
+      "acceptedAnswers": [
+        "üres"
+      ],
+      "hint": "Example: Ez a mező üres.",
+      "explanation": "üres means “empty”.",
+      "trackInSrs": true
+    },
+    {
+      "id": "ai-news-2026-10-09-hu-e08",
+      "type": "recall",
+      "prompt": "Fill the gap: this field is empty.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu-oct09-word-3"
+      },
+      "acceptedAnswers": [
+        "üres"
+      ],
+      "hint": "Use the adjective meaning “empty”.",
+      "explanation": "Üres means “empty”.",
+      "trackInSrs": true,
+      "promptAtom": {
+        "id": "ai-news-2026-10-09-hu-s032",
+        "text": "Ez a mező ___.",
+        "english": "This field is empty.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "ai-news-2026-10-09-hu-e09",
+      "type": "recall",
+      "prompt": "Fill the gap: now it is ready.",
+      "target": {
+        "type": "grammar",
+        "id": "hu-oct09-grammar-2"
+      },
+      "acceptedAnswers": [
+        "már"
+      ],
+      "hint": "Pair most with the word marking “already / by now”.",
+      "explanation": "Most már kész marks a change: now it is ready.",
+      "trackInSrs": true,
+      "promptAtom": {
+        "id": "ai-news-2026-10-09-hu-s033",
+        "text": "Most ___ kész.",
+        "english": "Now it is ready.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "ai-news-2026-10-09-hu-e10",
+      "type": "order",
+      "prompt": "Put the words in order: I open the page.",
+      "target": {
+        "type": "grammar",
+        "id": "hu-oct09-grammar-1"
+      },
+      "acceptedAnswers": [
+        "Megnyitom az oldalt"
+      ],
+      "hint": "Use the matching pattern in Grammar.",
+      "explanation": "I open the page.",
+      "trackInSrs": false,
+      "tokens": [
+        "oldalt",
+        "az",
+        "Megnyitom"
+      ],
+      "answerData": [
+        {
+          "text": "Megnyitom az oldalt",
+          "english": "I open the page."
+        }
+      ],
+      "choices": [
+        "oldalt",
+        "az",
+        "Megnyitom"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-09-hu-e11",
+      "type": "order",
+      "prompt": "Put the words in order: I fill out the form.",
+      "target": {
+        "type": "grammar",
+        "id": "hu-oct09-grammar-1"
+      },
+      "acceptedAnswers": [
+        "Kitöltöm az űrlapot"
+      ],
+      "hint": "Use the matching pattern in Grammar.",
+      "explanation": "I fill out the form.",
+      "trackInSrs": false,
+      "tokens": [
+        "űrlapot",
+        "az",
+        "Kitöltöm"
+      ],
+      "answerData": [
+        {
+          "text": "Kitöltöm az űrlapot",
+          "english": "I fill out the form."
+        }
+      ],
+      "choices": [
+        "űrlapot",
+        "az",
+        "Kitöltöm"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-09-hu-e12",
+      "type": "order",
+      "prompt": "Put the words in order: Now it is ready.",
+      "target": {
+        "type": "grammar",
+        "id": "hu-oct09-grammar-2"
+      },
+      "acceptedAnswers": [
+        "Most már kész"
+      ],
+      "hint": "Use the matching pattern in Grammar.",
+      "explanation": "Now it is ready.",
+      "trackInSrs": false,
+      "tokens": [
+        "kész",
+        "már",
+        "Most"
+      ],
+      "answerData": [
+        {
+          "text": "Most már kész",
+          "english": "Now it is ready."
+        }
+      ],
+      "choices": [
+        "kész",
+        "már",
+        "Most"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-09-hu-e13",
+      "type": "matching",
+      "prompt": "Match each word or phrase to its meaning.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu-oct09-word-1"
+      },
+      "acceptedAnswers": [
+        "{\"0\": \"form\", \"1\": \"empty\", \"2\": \"I enter / type in\", \"3\": \"ready / finished\"}"
+      ],
+      "hint": "Use the short vocabulary examples.",
+      "explanation": "Read each complete pair aloud.",
+      "trackInSrs": false,
+      "matchingPairs": [
+        {
+          "id": "0",
+          "text": "űrlap",
+          "answer": "form",
+          "transliteration": null,
+          "target": {
+            "type": "vocabulary",
+            "id": "hu-oct09-word-1"
+          }
+        },
+        {
+          "id": "1",
+          "text": "üres",
+          "answer": "empty",
+          "transliteration": null,
+          "target": {
+            "type": "vocabulary",
+            "id": "hu-oct09-word-3"
+          }
+        },
+        {
+          "id": "2",
+          "text": "beírok",
+          "answer": "I enter / type in",
+          "transliteration": null,
+          "target": {
+            "type": "vocabulary",
+            "id": "hu-oct09-word-5"
+          }
+        },
+        {
+          "id": "3",
+          "text": "kész",
+          "answer": "ready / finished",
+          "transliteration": null,
+          "target": {
+            "type": "vocabulary",
+            "id": "hu-oct09-word-7"
+          }
+        }
+      ],
+      "choices": [
+        "ready / finished",
+        "I enter / type in",
+        "empty",
+        "form"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-09-hu-e14",
+      "type": "self-check",
+      "prompt": "Say you open the page, then say you fill out the form.",
+      "target": {
+        "type": "grammar",
+        "id": "hu-oct09-grammar-1"
+      },
+      "acceptedAnswers": [
+        "Megnyitom az oldalt. Kitöltöm az űrlapot."
+      ],
+      "hint": "Build short sentences using the examples.",
+      "explanation": "Compare the requested meaning and forms; other natural answers can work.",
+      "trackInSrs": false,
+      "answerData": [
+        {
+          "text": "Megnyitom az oldalt. Kitöltöm az űrlapot.",
+          "english": "I open the page. I fill out the form."
+        }
+      ],
+      "rubric": {
+        "criteria": "Include every requested meaning. Check the verb or adjective form, then assess your answer."
+      }
+    },
+    {
+      "id": "ai-news-2026-10-09-hu-e15",
+      "type": "self-check",
+      "prompt": "Say the form is not ready yet, then point out an empty field.",
+      "target": {
+        "type": "grammar",
+        "id": "hu-oct09-grammar-2"
+      },
+      "acceptedAnswers": [
+        "Még nem kész. Ez a mező üres."
+      ],
+      "hint": "Build short sentences using the examples.",
+      "explanation": "Compare the requested meaning and forms; other natural answers can work.",
+      "trackInSrs": false,
+      "answerData": [
+        {
+          "text": "Még nem kész. Ez a mező üres.",
+          "english": "It is not ready yet. This field is empty."
+        }
+      ],
+      "rubric": {
+        "criteria": "Include every requested meaning. Check the verb or adjective form, then assess your answer."
+      }
+    },
+    {
+      "id": "ai-news-2026-10-09-hu-e16",
+      "type": "self-check",
+      "prompt": "Say you enter a name, then say it is ready now.",
+      "target": {
+        "type": "grammar",
+        "id": "hu-oct09-grammar-2"
+      },
+      "acceptedAnswers": [
+        "Beírok egy nevet. Most már kész."
+      ],
+      "hint": "Build short sentences using the examples.",
+      "explanation": "Compare the requested meaning and forms; other natural answers can work.",
+      "trackInSrs": false,
+      "answerData": [
+        {
+          "text": "Beírok egy nevet. Most már kész.",
+          "english": "I enter a name. Now it is ready."
+        }
+      ],
+      "rubric": {
+        "criteria": "Include every requested meaning. Check the verb or adjective form, then assess your answer."
+      }
+    },
+    {
+      "id": "ai-news-2026-10-09-hu-e17",
+      "type": "recall",
+      "prompt": "Review: write “data”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu_data"
+      },
+      "acceptedAnswers": [
+        "adat"
+      ],
+      "hint": "Example: Ellenőrzöm az adatot.",
+      "explanation": "adat means “data”.",
+      "trackInSrs": true
+    },
+    {
+      "id": "ai-news-2026-10-09-hu-e18",
+      "type": "recall",
+      "prompt": "Review: write “question”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu_question"
+      },
+      "acceptedAnswers": [
+        "kérdés"
+      ],
+      "hint": "Example: Van egy kérdésem.",
+      "explanation": "kérdés means “question”.",
+      "trackInSrs": true
+    }
+  ],
+  "route": [
+    "Read · 10 min",
+    "Words and grammar · 8 min",
+    "Practise · 17 min",
+    "Own example · 5 min"
+  ],
+  "review": {
+    "instructions": "Try familiar words from earlier lessons before opening the hint. If a word is new to you, use its example.",
+    "prompts": [
+      "Say “data” and “question”, then use them in a short sentence."
+    ]
+  }
+}

@@ -1,0 +1,20 @@
+[
+  {
+    "id": "openai_asana_browser_2026_10_09",
+    "title": "Asana cuts model costs 76x in browser tests with GPT-6.1 Sol",
+    "url": "https://openai.com/index/asana-browser-agent/",
+    "publishedOn": "2026-10-09",
+    "verifiedAsOf": "2026-10-09",
+    "publisher": "OpenAI",
+    "factSummary": "OpenAI describes Asana testing an optimized browser-agent workflow. The reported cost and speed improvements compare particular tested setups; they are not a guarantee for every browser task."
+  },
+  {
+    "id": "sanas_supervised_calls_2026_10_08",
+    "title": "Sanas Introduces Supervised AI, Putting a Human at the Helm of Every AI Customer Conversation",
+    "url": "https://www.prnewswire.com/news-releases/sanas-introduces-supervised-ai-putting-a-human-at-the-helm-of-every-ai-customer-conversation-302902468.html",
+    "publishedOn": "2026-10-08",
+    "verifiedAsOf": "2026-10-09",
+    "publisher": "Sanas via PR Newswire",
+    "factSummary": "In its October 8 announcement, Sanas describes AI handling customer calls while a human supervisor monitors them and can intervene. This describes the company’s announced design, not independently verified service quality."
+  }
+]

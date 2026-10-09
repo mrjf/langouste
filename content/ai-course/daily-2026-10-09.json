@@ -1,0 +1,2265 @@
+{
+  "schemaVersion": 1,
+  "sourceRegistry": [
+    {
+      "id": "openai_asana_browser_2026_10_09",
+      "title": "Asana cuts model costs 76x in browser tests with GPT-6.1 Sol",
+      "url": "https://openai.com/index/asana-browser-agent/",
+      "publishedOn": "2026-10-09",
+      "verifiedAsOf": "2026-10-09",
+      "publisher": "OpenAI",
+      "factSummary": "OpenAI describes Asana testing an optimized browser-agent workflow. The reported cost and speed improvements compare particular tested setups; they are not a guarantee for every browser task."
+    },
+    {
+      "id": "sanas_supervised_calls_2026_10_08",
+      "title": "Sanas Introduces Supervised AI, Putting a Human at the Helm of Every AI Customer Conversation",
+      "url": "https://www.prnewswire.com/news-releases/sanas-introduces-supervised-ai-putting-a-human-at-the-helm-of-every-ai-customer-conversation-302902468.html",
+      "publishedOn": "2026-10-08",
+      "verifiedAsOf": "2026-10-09",
+      "publisher": "Sanas via PR Newswire",
+      "factSummary": "In its October 8 announcement, Sanas describes AI handling customer calls while a human supervisor monitors them and can intervene. This describes the company’s announced design, not independently verified service quality."
+    }
+  ],
+  "lessons": [
+    {
+      "schemaVersion": 1,
+      "id": "ai-news-2026-10-09-ar-EG",
+      "courseId": "ai-news-daily-2026-10-09",
+      "day": 36,
+      "language": "ar-EG",
+      "title": "ممكن تعيد السؤال؟",
+      "subtitle": "October 9, 2026 · Could you repeat the question?",
+      "estimatedMinutes": 40,
+      "objectives": [
+        "Ask someone to repeat a question.",
+        "Say whether the sound is clear.",
+        "Ask for help on a call."
+      ],
+      "readings": [
+        {
+          "id": "ai-news-2026-10-09-ar-EG-r1",
+          "title": "AI calls with a supervisor · October 8 announcement",
+          "sentences": [
+            {
+              "id": "ai-news-2026-10-09-ar-EG-s001",
+              "text": "شركة Sanas أعلنت عن أداة جديدة.",
+              "english": "Sanas announced a new tool.",
+              "kind": "source-summary",
+              "sourceIds": [
+                "sanas_supervised_calls_2026_10_08"
+              ],
+              "transliteration": "sherket Sanas aʿlanet ʿan adaa gedeeda."
+            },
+            {
+              "id": "ai-news-2026-10-09-ar-EG-s002",
+              "text": "حسب الشركة، الذكاء الاصطناعي بيرد على المكالمات.",
+              "english": "According to the company, AI answers the calls.",
+              "kind": "source-summary",
+              "sourceIds": [
+                "sanas_supervised_calls_2026_10_08"
+              ],
+              "transliteration": "hasab esh-sherka, ez-zakaaʾ el-estenaaʿi beyerodd ʿala el-mokalmaat."
+            },
+            {
+              "id": "ai-news-2026-10-09-ar-EG-s003",
+              "text": "ومشرف بيتابع المكالمات.",
+              "english": "And a supervisor monitors the calls.",
+              "kind": "source-summary",
+              "sourceIds": [
+                "sanas_supervised_calls_2026_10_08"
+              ],
+              "transliteration": "we-moshref beytaabeʿ el-mokalmaat."
+            }
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-09-ar-EG-r2",
+          "title": "Please repeat that · Fictional dialogue",
+          "sentences": [
+            {
+              "id": "ai-news-2026-10-09-ar-EG-s004",
+              "text": "منى: ألو، الصوت مش واضح.",
+              "english": "Mona: Hello, the sound is not clear.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "Mona: alo, es-soot mesh waadeh."
+            },
+            {
+              "id": "ai-news-2026-10-09-ar-EG-s005",
+              "text": "كريم: ممكن تعيدي السؤال؟",
+              "english": "Karim: Could you repeat the question?",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "Kareem: momken teʿeedi es-soʾaal?"
+            },
+            {
+              "id": "ai-news-2026-10-09-ar-EG-s006",
+              "text": "منى: عندي مشكلة في الصفحة.",
+              "english": "Mona: I have a problem with the page.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "Mona: ʿandi moshkela fi es-safha."
+            },
+            {
+              "id": "ai-news-2026-10-09-ar-EG-s007",
+              "text": "كريم: ثانية واحدة، من فضلك.",
+              "english": "Karim: One second, please.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "Kareem: sanya waahda, men fadlik."
+            },
+            {
+              "id": "ai-news-2026-10-09-ar-EG-s008",
+              "text": "منى: أيوه، أنا مستنية.",
+              "english": "Mona: Yes, I am waiting.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "Mona: aywa, ana mestanneyya."
+            },
+            {
+              "id": "ai-news-2026-10-09-ar-EG-s009",
+              "text": "كريم: دلوقتي الصوت واضح؟",
+              "english": "Karim: Is the sound clear now?",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "Kareem: delwaʾti es-soot waadeh?"
+            }
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-09-ar-EG-r3",
+          "title": "Ask for help · Fictional dialogue",
+          "sentences": [
+            {
+              "id": "ai-news-2026-10-09-ar-EG-s010",
+              "text": "منى: أيوه، بس لسه عندي مشكلة.",
+              "english": "Mona: Yes, but I still have a problem.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "Mona: aywa, bass lissa ʿandi moshkela."
+            },
+            {
+              "id": "ai-news-2026-10-09-ar-EG-s011",
+              "text": "كريم: تحبي تتكلمي مع موظف؟",
+              "english": "Karim: Would you like to speak with an employee?",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "Kareem: tehebbi tetkallemi maʿa mowazzaf?"
+            },
+            {
+              "id": "ai-news-2026-10-09-ar-EG-s012",
+              "text": "منى: أيوه، محتاجة مساعدة.",
+              "english": "Mona: Yes, I need help.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "Mona: aywa, mehtaaga mosaaʿda."
+            },
+            {
+              "id": "ai-news-2026-10-09-ar-EG-s013",
+              "text": "كريم: الموظف معانا دلوقتي.",
+              "english": "Karim: The employee is with us now.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "Kareem: el-mowazzaf maʿaana delwaʾti."
+            },
+            {
+              "id": "ai-news-2026-10-09-ar-EG-s014",
+              "text": "منى: شكراً، ممكن أشرح المشكلة؟",
+              "english": "Mona: Thanks, may I explain the problem?",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "Mona: shokran, momken ashrah el-moshkela?"
+            },
+            {
+              "id": "ai-news-2026-10-09-ar-EG-s015",
+              "text": "كريم: أكيد، اتفضلي.",
+              "english": "Karim: Of course, go ahead.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "Kareem: akeed, etfaddali."
+            }
+          ]
+        }
+      ],
+      "vocabulary": [
+        {
+          "id": "ar-EG-oct09-word-1",
+          "term": "مكالمة",
+          "english": "call",
+          "semanticConcept": "call",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-09-ar-EG-s016",
+            "text": "دي مكالمة قصيرة.",
+            "english": "This is a short call.",
+            "kind": "teaching-example",
+            "sourceIds": [],
+            "transliteration": "di mokalma ʾosayyara."
+          },
+          "transliteration": "mokalma",
+          "lexicalTerm": "مكالمة"
+        },
+        {
+          "id": "ar_egy_voice",
+          "term": "صوت",
+          "english": "sound / voice",
+          "semanticConcept": "voice",
+          "plannedRole": "review",
+          "example": {
+            "id": "ai-news-2026-10-09-ar-EG-s017",
+            "text": "الصوت واضح.",
+            "english": "The sound is clear.",
+            "kind": "teaching-example",
+            "sourceIds": [],
+            "transliteration": "es-soot waadeh."
+          },
+          "transliteration": "soot",
+          "lexicalTerm": "صوت"
+        },
+        {
+          "id": "ar_egy_clear",
+          "term": "واضح",
+          "english": "clear",
+          "semanticConcept": "clear",
+          "plannedRole": "review",
+          "example": {
+            "id": "ai-news-2026-10-09-ar-EG-s018",
+            "text": "الصوت مش واضح.",
+            "english": "The sound is not clear.",
+            "kind": "teaching-example",
+            "sourceIds": [],
+            "transliteration": "es-soot mesh waadeh."
+          },
+          "transliteration": "waadeh",
+          "lexicalTerm": "واضح"
+        },
+        {
+          "id": "ar-EG-oct09-word-4",
+          "term": "ممكن تعيد",
+          "english": "could you repeat",
+          "semanticConcept": "could you repeat",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-09-ar-EG-s019",
+            "text": "ممكن تعيد السؤال؟",
+            "english": "Could you repeat the question?",
+            "kind": "teaching-example",
+            "sourceIds": [],
+            "transliteration": "momken teʿeed es-soʾaal?"
+          },
+          "transliteration": "momken teʿeed",
+          "lexicalTerm": "ممكن تعيد"
+        },
+        {
+          "id": "ar-EG-oct09-word-5",
+          "term": "موظف",
+          "english": "employee",
+          "semanticConcept": "employee",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-09-ar-EG-s020",
+            "text": "الموظف معانا.",
+            "english": "The employee is with us.",
+            "kind": "teaching-example",
+            "sourceIds": [],
+            "transliteration": "el-mowazzaf maʿaana."
+          },
+          "transliteration": "mowazzaf",
+          "lexicalTerm": "موظف"
+        },
+        {
+          "id": "ar-EG-oct09-word-6",
+          "term": "مساعدة",
+          "english": "help / assistance",
+          "semanticConcept": "help / assistance",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-09-ar-EG-s021",
+            "text": "محتاجة مساعدة.",
+            "english": "I need help.",
+            "kind": "teaching-example",
+            "sourceIds": [],
+            "transliteration": "mehtaaga mosaaʿda."
+          },
+          "transliteration": "mosaaʿda",
+          "lexicalTerm": "مساعدة"
+        },
+        {
+          "id": "ar-EG-oct09-word-7",
+          "term": "ثانية واحدة",
+          "english": "one second",
+          "semanticConcept": "one second",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-09-ar-EG-s022",
+            "text": "ثانية واحدة، من فضلك.",
+            "english": "One second, please.",
+            "kind": "teaching-example",
+            "sourceIds": [],
+            "transliteration": "sanya waahda, men fadlak."
+          },
+          "transliteration": "sanya waahda",
+          "lexicalTerm": "ثانية واحدة"
+        },
+        {
+          "id": "ar_egy_first",
+          "term": "الأول",
+          "english": "first",
+          "semanticConcept": "first",
+          "plannedRole": "review",
+          "example": {
+            "id": "ai-news-2026-10-09-ar-EG-s023",
+            "text": "أشرح المشكلة الأول.",
+            "english": "I will explain the problem first.",
+            "kind": "teaching-example",
+            "sourceIds": [],
+            "transliteration": "ashrah el-moshkela el-awwal."
+          },
+          "transliteration": "el-awwal",
+          "lexicalTerm": "الأول"
+        },
+        {
+          "id": "ar_egy_new",
+          "term": "جديد",
+          "english": "new (masculine)",
+          "semanticConcept": "new",
+          "plannedRole": "review",
+          "example": {
+            "id": "ai-news-2026-10-09-ar-EG-s024",
+            "text": "ده سؤال جديد.",
+            "english": "This is a new question.",
+            "kind": "teaching-example",
+            "sourceIds": [],
+            "transliteration": "da soʾaal gedeed."
+          },
+          "transliteration": "gedeed",
+          "lexicalTerm": "جديد"
+        },
+        {
+          "id": "ar_egy_plan",
+          "term": "خطة",
+          "english": "plan",
+          "semanticConcept": "plan",
+          "plannedRole": "review",
+          "example": {
+            "id": "ai-news-2026-10-09-ar-EG-s025",
+            "text": "دي خطة بسيطة.",
+            "english": "This is a simple plan.",
+            "kind": "teaching-example",
+            "sourceIds": [],
+            "transliteration": "di khetta baseeta."
+          },
+          "transliteration": "khetta",
+          "lexicalTerm": "خطة"
+        }
+      ],
+      "concepts": [
+        {
+          "id": "ar-EG-oct09-grammar-1",
+          "title": "A polite request with momken",
+          "explanation": "Momken before a verb makes a request: “could you…?” Teʿeed addresses one man; teʿeedi addresses one woman. Momken ashrah asks “may I explain?” Learn the person-specific verb forms as short chunks.",
+          "examples": [
+            {
+              "id": "ai-news-2026-10-09-ar-EG-s026",
+              "text": "ممكن تعيد السؤال؟",
+              "english": "Could you repeat the question?",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "momken teʿeed es-soʾaal?"
+            },
+            {
+              "id": "ai-news-2026-10-09-ar-EG-s027",
+              "text": "ممكن تعيدي السؤال؟",
+              "english": "Could you repeat the question?",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "momken teʿeedi es-soʾaal?"
+            },
+            {
+              "id": "ai-news-2026-10-09-ar-EG-s028",
+              "text": "ممكن أشرح المشكلة؟",
+              "english": "May I explain the problem?",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "momken ashrah el-moshkela?"
+            }
+          ]
+        },
+        {
+          "id": "ar-EG-oct09-grammar-2",
+          "title": "Say what you need",
+          "explanation": "A female speaker says mehtaaga, while a male speaker says mehtaag. Both mean “needing / I need” in these examples. Put mosaaʿda after it. Mesh before an adjective negates a description; no separate present-tense “is” is needed.",
+          "examples": [
+            {
+              "id": "ai-news-2026-10-09-ar-EG-s029",
+              "text": "محتاجة مساعدة.",
+              "english": "I need help.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "mehtaaga mosaaʿda."
+            },
+            {
+              "id": "ai-news-2026-10-09-ar-EG-s030",
+              "text": "محتاج مساعدة.",
+              "english": "I need help.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "mehtaag mosaaʿda."
+            },
+            {
+              "id": "ai-news-2026-10-09-ar-EG-s031",
+              "text": "الصوت مش واضح.",
+              "english": "The sound is not clear.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "es-soot mesh waadeh."
+            }
+          ]
+        }
+      ],
+      "exercises": [
+        {
+          "id": "ai-news-2026-10-09-ar-EG-e01",
+          "type": "choice",
+          "prompt": "Choose “call”.",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar-EG-oct09-word-1"
+          },
+          "acceptedAnswers": [
+            "مكالمة"
+          ],
+          "hint": "Use the vocabulary example if needed.",
+          "explanation": "مكالمة means “call”.",
+          "trackInSrs": false,
+          "choiceAtoms": [
+            {
+              "text": "مكالمة",
+              "english": "call",
+              "transliteration": "mokalma"
+            },
+            {
+              "text": "ممكن تعيد",
+              "english": "could you repeat",
+              "transliteration": "momken teʿeed"
+            },
+            {
+              "text": "ثانية واحدة",
+              "english": "one second",
+              "transliteration": "sanya waahda"
+            }
+          ],
+          "showChoiceEnglish": false,
+          "choices": [
+            "مكالمة",
+            "ممكن تعيد",
+            "ثانية واحدة"
+          ],
+          "choiceSupport": {
+            "مكالمة": {
+              "transliteration": "mokalma",
+              "english": "call"
+            },
+            "ممكن تعيد": {
+              "transliteration": "momken teʿeed",
+              "english": "could you repeat"
+            },
+            "ثانية واحدة": {
+              "transliteration": "sanya waahda",
+              "english": "one second"
+            }
+          },
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "مكالمة",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-09-ar-EG-e02",
+          "type": "choice",
+          "prompt": "Choose “sound / voice”.",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar_egy_voice"
+          },
+          "acceptedAnswers": [
+            "صوت"
+          ],
+          "hint": "Use the vocabulary example if needed.",
+          "explanation": "صوت means “sound / voice”.",
+          "trackInSrs": false,
+          "choiceAtoms": [
+            {
+              "text": "موظف",
+              "english": "employee",
+              "transliteration": "mowazzaf"
+            },
+            {
+              "text": "الأول",
+              "english": "first",
+              "transliteration": "el-awwal"
+            },
+            {
+              "text": "صوت",
+              "english": "sound / voice",
+              "transliteration": "soot"
+            }
+          ],
+          "showChoiceEnglish": false,
+          "choices": [
+            "موظف",
+            "الأول",
+            "صوت"
+          ],
+          "choiceSupport": {
+            "موظف": {
+              "transliteration": "mowazzaf",
+              "english": "employee"
+            },
+            "الأول": {
+              "transliteration": "el-awwal",
+              "english": "first"
+            },
+            "صوت": {
+              "transliteration": "soot",
+              "english": "sound / voice"
+            }
+          },
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "صوت",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-09-ar-EG-e03",
+          "type": "choice",
+          "prompt": "Choose “clear”.",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar_egy_clear"
+          },
+          "acceptedAnswers": [
+            "واضح"
+          ],
+          "hint": "Use the vocabulary example if needed.",
+          "explanation": "واضح means “clear”.",
+          "trackInSrs": false,
+          "choiceAtoms": [
+            {
+              "text": "جديد",
+              "english": "new (masculine)",
+              "transliteration": "gedeed"
+            },
+            {
+              "text": "واضح",
+              "english": "clear",
+              "transliteration": "waadeh"
+            },
+            {
+              "text": "مساعدة",
+              "english": "help / assistance",
+              "transliteration": "mosaaʿda"
+            }
+          ],
+          "showChoiceEnglish": false,
+          "choices": [
+            "جديد",
+            "واضح",
+            "مساعدة"
+          ],
+          "choiceSupport": {
+            "جديد": {
+              "transliteration": "gedeed",
+              "english": "new (masculine)"
+            },
+            "واضح": {
+              "transliteration": "waadeh",
+              "english": "clear"
+            },
+            "مساعدة": {
+              "transliteration": "mosaaʿda",
+              "english": "help / assistance"
+            }
+          },
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "واضح",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-09-ar-EG-e04",
+          "type": "choice",
+          "prompt": "Choose “employee”.",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar-EG-oct09-word-5"
+          },
+          "acceptedAnswers": [
+            "موظف"
+          ],
+          "hint": "Use the vocabulary example if needed.",
+          "explanation": "موظف means “employee”.",
+          "trackInSrs": false,
+          "choiceAtoms": [
+            {
+              "text": "الأول",
+              "english": "first",
+              "transliteration": "el-awwal"
+            },
+            {
+              "text": "مكالمة",
+              "english": "call",
+              "transliteration": "mokalma"
+            },
+            {
+              "text": "موظف",
+              "english": "employee",
+              "transliteration": "mowazzaf"
+            }
+          ],
+          "showChoiceEnglish": false,
+          "choices": [
+            "الأول",
+            "مكالمة",
+            "موظف"
+          ],
+          "choiceSupport": {
+            "الأول": {
+              "transliteration": "el-awwal",
+              "english": "first"
+            },
+            "مكالمة": {
+              "transliteration": "mokalma",
+              "english": "call"
+            },
+            "موظف": {
+              "transliteration": "mowazzaf",
+              "english": "employee"
+            }
+          },
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "موظف",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-09-ar-EG-e05",
+          "type": "choice",
+          "prompt": "Choose “one second”.",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar-EG-oct09-word-7"
+          },
+          "acceptedAnswers": [
+            "ثانية واحدة"
+          ],
+          "hint": "Use the vocabulary example if needed.",
+          "explanation": "ثانية واحدة means “one second”.",
+          "trackInSrs": false,
+          "choiceAtoms": [
+            {
+              "text": "ثانية واحدة",
+              "english": "one second",
+              "transliteration": "sanya waahda"
+            },
+            {
+              "text": "خطة",
+              "english": "plan",
+              "transliteration": "khetta"
+            },
+            {
+              "text": "واضح",
+              "english": "clear",
+              "transliteration": "waadeh"
+            }
+          ],
+          "showChoiceEnglish": false,
+          "choices": [
+            "ثانية واحدة",
+            "خطة",
+            "واضح"
+          ],
+          "choiceSupport": {
+            "ثانية واحدة": {
+              "transliteration": "sanya waahda",
+              "english": "one second"
+            },
+            "خطة": {
+              "transliteration": "khetta",
+              "english": "plan"
+            },
+            "واضح": {
+              "transliteration": "waadeh",
+              "english": "clear"
+            }
+          },
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "ثانية واحدة",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-09-ar-EG-e06",
+          "type": "recall",
+          "prompt": "Write “call” in Arabic script.",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar-EG-oct09-word-1"
+          },
+          "acceptedAnswers": [
+            "مكالمة"
+          ],
+          "hint": "Example: دي مكالمة قصيرة.",
+          "explanation": "مكالمة means “call”.",
+          "trackInSrs": true,
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "مكالمة",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-09-ar-EG-e07",
+          "type": "recall",
+          "prompt": "Write “clear” in Arabic script.",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar_egy_clear"
+          },
+          "acceptedAnswers": [
+            "واضح"
+          ],
+          "hint": "Example: الصوت مش واضح.",
+          "explanation": "واضح means “clear”.",
+          "trackInSrs": true,
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "واضح",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-09-ar-EG-e08",
+          "type": "recall",
+          "prompt": "Fill the gap: the sound is clear.",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar_egy_clear"
+          },
+          "acceptedAnswers": [
+            "واضح"
+          ],
+          "hint": "Use the adjective meaning “clear”.",
+          "explanation": "واضح means “clear”.",
+          "trackInSrs": true,
+          "promptAtom": {
+            "id": "ai-news-2026-10-09-ar-EG-s032",
+            "text": "الصوت ___.",
+            "english": "The sound is clear.",
+            "kind": "teaching-example",
+            "sourceIds": [],
+            "transliteration": "es-soot ___."
+          },
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "واضح",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-09-ar-EG-e09",
+          "type": "recall",
+          "prompt": "Fill the gap: I need help (female speaker).",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar-EG-oct09-word-6"
+          },
+          "acceptedAnswers": [
+            "مساعدة"
+          ],
+          "hint": "Use the noun meaning “help / assistance”.",
+          "explanation": "مساعدة is the help that the speaker needs.",
+          "trackInSrs": true,
+          "promptAtom": {
+            "id": "ai-news-2026-10-09-ar-EG-s033",
+            "text": "محتاجة ___.",
+            "english": "I need help.",
+            "kind": "teaching-example",
+            "sourceIds": [],
+            "transliteration": "mehtaaga ___."
+          },
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "مساعدة",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-09-ar-EG-e10",
+          "type": "order",
+          "prompt": "Put the words in order: Could you repeat the question?",
+          "target": {
+            "type": "grammar",
+            "id": "ar-EG-oct09-grammar-1"
+          },
+          "acceptedAnswers": [
+            "ممكن تعيد السؤال"
+          ],
+          "hint": "Use the matching pattern in Grammar.",
+          "explanation": "Could you repeat the question?",
+          "trackInSrs": false,
+          "tokens": [
+            "السؤال",
+            "تعيد",
+            "ممكن"
+          ],
+          "answerData": [
+            {
+              "arabic": "ممكن تعيد السؤال",
+              "transliteration": "momken teʿeed es-soʾaal",
+              "english": "Could you repeat the question?"
+            }
+          ],
+          "choices": [
+            "السؤال",
+            "تعيد",
+            "ممكن"
+          ],
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "ممكن تعيد السؤال · momken teʿeed es-soʾaal · Could you repeat the question?",
+          "answerAtoms": [
+            {
+              "id": "ai-news-2026-10-09-ar-EG-e10-model",
+              "text": "ممكن تعيد السؤال",
+              "english": "Could you repeat the question?",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "momken teʿeed es-soʾaal"
+            }
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-09-ar-EG-e11",
+          "type": "order",
+          "prompt": "Put the words in order: May I explain the problem?",
+          "target": {
+            "type": "grammar",
+            "id": "ar-EG-oct09-grammar-1"
+          },
+          "acceptedAnswers": [
+            "ممكن أشرح المشكلة"
+          ],
+          "hint": "Use the matching pattern in Grammar.",
+          "explanation": "May I explain the problem?",
+          "trackInSrs": false,
+          "tokens": [
+            "المشكلة",
+            "أشرح",
+            "ممكن"
+          ],
+          "answerData": [
+            {
+              "arabic": "ممكن أشرح المشكلة",
+              "transliteration": "momken ashrah el-moshkela",
+              "english": "May I explain the problem?"
+            }
+          ],
+          "choices": [
+            "المشكلة",
+            "أشرح",
+            "ممكن"
+          ],
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "ممكن أشرح المشكلة · momken ashrah el-moshkela · May I explain the problem?",
+          "answerAtoms": [
+            {
+              "id": "ai-news-2026-10-09-ar-EG-e11-model",
+              "text": "ممكن أشرح المشكلة",
+              "english": "May I explain the problem?",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "momken ashrah el-moshkela"
+            }
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-09-ar-EG-e12",
+          "type": "order",
+          "prompt": "Put the words in order: The sound is not clear.",
+          "target": {
+            "type": "grammar",
+            "id": "ar-EG-oct09-grammar-2"
+          },
+          "acceptedAnswers": [
+            "الصوت مش واضح"
+          ],
+          "hint": "Use the matching pattern in Grammar.",
+          "explanation": "The sound is not clear.",
+          "trackInSrs": false,
+          "tokens": [
+            "واضح",
+            "مش",
+            "الصوت"
+          ],
+          "answerData": [
+            {
+              "arabic": "الصوت مش واضح",
+              "transliteration": "es-soot mesh waadeh",
+              "english": "The sound is not clear."
+            }
+          ],
+          "choices": [
+            "واضح",
+            "مش",
+            "الصوت"
+          ],
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "الصوت مش واضح · es-soot mesh waadeh · The sound is not clear.",
+          "answerAtoms": [
+            {
+              "id": "ai-news-2026-10-09-ar-EG-e12-model",
+              "text": "الصوت مش واضح",
+              "english": "The sound is not clear.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "es-soot mesh waadeh"
+            }
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-09-ar-EG-e13",
+          "type": "matching",
+          "prompt": "Match each word or phrase to its meaning.",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar-EG-oct09-word-1"
+          },
+          "acceptedAnswers": [
+            "{\"0\": \"call\", \"1\": \"clear\", \"2\": \"employee\", \"3\": \"one second\"}"
+          ],
+          "hint": "Use the short vocabulary examples.",
+          "explanation": "Read each complete pair aloud.",
+          "trackInSrs": false,
+          "matchingPairs": [
+            {
+              "id": "0",
+              "text": "مكالمة",
+              "answer": "call",
+              "transliteration": "mokalma",
+              "target": {
+                "type": "vocabulary",
+                "id": "ar-EG-oct09-word-1"
+              }
+            },
+            {
+              "id": "1",
+              "text": "واضح",
+              "answer": "clear",
+              "transliteration": "waadeh",
+              "target": {
+                "type": "vocabulary",
+                "id": "ar_egy_clear"
+              }
+            },
+            {
+              "id": "2",
+              "text": "موظف",
+              "answer": "employee",
+              "transliteration": "mowazzaf",
+              "target": {
+                "type": "vocabulary",
+                "id": "ar-EG-oct09-word-5"
+              }
+            },
+            {
+              "id": "3",
+              "text": "ثانية واحدة",
+              "answer": "one second",
+              "transliteration": "sanya waahda",
+              "target": {
+                "type": "vocabulary",
+                "id": "ar-EG-oct09-word-7"
+              }
+            }
+          ],
+          "choices": [
+            "one second",
+            "employee",
+            "clear",
+            "call"
+          ],
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "{\"0\": \"call\", \"1\": \"clear\", \"2\": \"employee\", \"3\": \"one second\"}",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-09-ar-EG-e14",
+          "type": "self-check",
+          "prompt": "Politely ask Karim to repeat the question.",
+          "target": {
+            "type": "grammar",
+            "id": "ar-EG-oct09-grammar-1"
+          },
+          "acceptedAnswers": [
+            "ممكن تعيد السؤال؟"
+          ],
+          "hint": "Build short sentences using the examples.",
+          "explanation": "Compare the requested meaning and forms; other natural answers can work.",
+          "trackInSrs": false,
+          "answerData": [
+            {
+              "arabic": "ممكن تعيد السؤال؟",
+              "transliteration": "momken teʿeed es-soʾaal?",
+              "english": "Could you repeat the question?"
+            }
+          ],
+          "rubric": {
+            "criteria": "Include every requested meaning. Check the verb or adjective form, then assess your answer."
+          },
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Include every requested meaning. Check the verb or adjective form, then assess your answer.",
+          "modelAnswer": "ممكن تعيد السؤال؟ · momken teʿeed es-soʾaal? · Could you repeat the question?",
+          "answerAtoms": [
+            {
+              "id": "ai-news-2026-10-09-ar-EG-e14-model",
+              "text": "ممكن تعيد السؤال؟",
+              "english": "Could you repeat the question?",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "momken teʿeed es-soʾaal?"
+            }
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-09-ar-EG-e15",
+          "type": "self-check",
+          "prompt": "As Mona, say you need help, then ask to explain the problem.",
+          "target": {
+            "type": "grammar",
+            "id": "ar-EG-oct09-grammar-2"
+          },
+          "acceptedAnswers": [
+            "محتاجة مساعدة. ممكن أشرح المشكلة؟"
+          ],
+          "hint": "Build short sentences using the examples.",
+          "explanation": "Compare the requested meaning and forms; other natural answers can work.",
+          "trackInSrs": false,
+          "answerData": [
+            {
+              "arabic": "محتاجة مساعدة. ممكن أشرح المشكلة؟",
+              "transliteration": "mehtaaga mosaaʿda. momken ashrah el-moshkela?",
+              "english": "I need help. May I explain the problem?"
+            }
+          ],
+          "rubric": {
+            "criteria": "Include every requested meaning. Check the verb or adjective form, then assess your answer."
+          },
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Include every requested meaning. Check the verb or adjective form, then assess your answer.",
+          "modelAnswer": "محتاجة مساعدة. ممكن أشرح المشكلة؟ · mehtaaga mosaaʿda. momken ashrah el-moshkela? · I need help. May I explain the problem?",
+          "answerAtoms": [
+            {
+              "id": "ai-news-2026-10-09-ar-EG-e15-model",
+              "text": "محتاجة مساعدة. ممكن أشرح المشكلة؟",
+              "english": "I need help. May I explain the problem?",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "mehtaaga mosaaʿda. momken ashrah el-moshkela?"
+            }
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-09-ar-EG-e16",
+          "type": "self-check",
+          "prompt": "Say the sound is not clear, then ask for one second.",
+          "target": {
+            "type": "grammar",
+            "id": "ar-EG-oct09-grammar-2"
+          },
+          "acceptedAnswers": [
+            "الصوت مش واضح. ثانية واحدة، من فضلك."
+          ],
+          "hint": "Build short sentences using the examples.",
+          "explanation": "Compare the requested meaning and forms; other natural answers can work.",
+          "trackInSrs": false,
+          "answerData": [
+            {
+              "arabic": "الصوت مش واضح. ثانية واحدة، من فضلك.",
+              "transliteration": "es-soot mesh waadeh. sanya waahda, men fadlak.",
+              "english": "The sound is not clear. One second, please."
+            }
+          ],
+          "rubric": {
+            "criteria": "Include every requested meaning. Check the verb or adjective form, then assess your answer."
+          },
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Include every requested meaning. Check the verb or adjective form, then assess your answer.",
+          "modelAnswer": "الصوت مش واضح. ثانية واحدة، من فضلك. · es-soot mesh waadeh. sanya waahda, men fadlak. · The sound is not clear. One second, please.",
+          "answerAtoms": [
+            {
+              "id": "ai-news-2026-10-09-ar-EG-e16-model",
+              "text": "الصوت مش واضح. ثانية واحدة، من فضلك.",
+              "english": "The sound is not clear. One second, please.",
+              "kind": "teaching-example",
+              "sourceIds": [],
+              "transliteration": "es-soot mesh waadeh. sanya waahda, men fadlak."
+            }
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-09-ar-EG-e17",
+          "type": "recall",
+          "prompt": "Review: write “first”.",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar_egy_first"
+          },
+          "acceptedAnswers": [
+            "الأول"
+          ],
+          "hint": "Example: أشرح المشكلة الأول.",
+          "explanation": "الأول means “first”.",
+          "trackInSrs": true,
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "الأول",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-09-ar-EG-e18",
+          "type": "recall",
+          "prompt": "Review: write “new (masculine)”.",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar_egy_new"
+          },
+          "acceptedAnswers": [
+            "جديد"
+          ],
+          "hint": "Example: ده سؤال جديد.",
+          "explanation": "جديد means “new (masculine)”.",
+          "trackInSrs": true,
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "جديد",
+          "answerAtoms": []
+        }
+      ],
+      "route": [
+        "Read · 10 min",
+        "Words and grammar · 8 min",
+        "Practise · 17 min",
+        "Own example · 5 min"
+      ],
+      "review": {
+        "instructions": "Try familiar words from earlier lessons before opening the hint. If a word is new to you, use its example.",
+        "prompts": [
+          "Say “first” and “new”, then use them in a short sentence."
+        ]
+      },
+      "sourceIds": [
+        "sanas_supervised_calls_2026_10_08"
+      ],
+      "instructionBlocks": [],
+      "optionalDialogue": []
+    },
+    {
+      "schemaVersion": 1,
+      "id": "ai-news-2026-10-09-hu",
+      "courseId": "ai-news-daily-2026-10-09",
+      "day": 36,
+      "language": "hu",
+      "title": "Kitöltöm az űrlapot",
+      "subtitle": "October 9, 2026 · A form, a field and a name",
+      "estimatedMinutes": 40,
+      "objectives": [
+        "Describe a form and an empty field.",
+        "Say what you open and fill out.",
+        "Say whether something is ready yet."
+      ],
+      "readings": [
+        {
+          "id": "ai-news-2026-10-09-hu-r1",
+          "title": "A browser-agent test · October 9 news",
+          "sentences": [
+            {
+              "id": "ai-news-2026-10-09-hu-s001",
+              "text": "Az Asana egy AI-eszközt tesztelt.",
+              "english": "Asana tested an AI tool.",
+              "kind": "source-summary",
+              "sourceIds": [
+                "openai_asana_browser_2026_10_09"
+              ]
+            },
+            {
+              "id": "ai-news-2026-10-09-hu-s002",
+              "text": "A tesztben az új változat gyorsabb és olcsóbb volt.",
+              "english": "In the test, the new version was faster and cheaper.",
+              "kind": "source-summary",
+              "sourceIds": [
+                "openai_asana_browser_2026_10_09"
+              ]
+            },
+            {
+              "id": "ai-news-2026-10-09-hu-s003",
+              "text": "Az eredmény erre a tesztre vonatkozik.",
+              "english": "The result applies to this test.",
+              "kind": "source-summary",
+              "sourceIds": [
+                "openai_asana_browser_2026_10_09"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-09-hu-r2",
+          "title": "A short form · Fictional dialogue",
+          "sentences": [
+            {
+              "id": "ai-news-2026-10-09-hu-s004",
+              "text": "Anna: Megnyitom az oldalt.",
+              "english": "Anna: I open the page.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-09-hu-s005",
+              "text": "Bence: Hol az űrlap?",
+              "english": "Bence: Where is the form?",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-09-hu-s006",
+              "text": "Anna: Itt van.",
+              "english": "Anna: Here it is.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-09-hu-s007",
+              "text": "Bence: Ez a mező üres.",
+              "english": "Bence: This field is empty.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-09-hu-s008",
+              "text": "Anna: Beírok egy nevet.",
+              "english": "Anna: I enter a name.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-09-hu-s009",
+              "text": "Bence: Most kitöltöm az űrlapot.",
+              "english": "Bence: Now I fill out the form.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            }
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-09-hu-r3",
+          "title": "Is it ready? · Fictional dialogue",
+          "sentences": [
+            {
+              "id": "ai-news-2026-10-09-hu-s010",
+              "text": "Anna: Kész az űrlap?",
+              "english": "Anna: Is the form ready?",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-09-hu-s011",
+              "text": "Bence: Még nem kész.",
+              "english": "Bence: It is not ready yet.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-09-hu-s012",
+              "text": "Anna: Melyik mező üres?",
+              "english": "Anna: Which field is empty?",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-09-hu-s013",
+              "text": "Bence: Ez a mező.",
+              "english": "Bence: This field.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-09-hu-s014",
+              "text": "Anna: Ellenőrzöm az adatot.",
+              "english": "Anna: I check the data.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-09-hu-s015",
+              "text": "Bence: Jó, most már kész.",
+              "english": "Bence: Good, now it is ready.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            }
+          ]
+        }
+      ],
+      "vocabulary": [
+        {
+          "id": "hu-oct09-word-1",
+          "term": "űrlap",
+          "english": "form",
+          "semanticConcept": "form",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-09-hu-s016",
+            "text": "Ez egy űrlap.",
+            "english": "This is a form.",
+            "kind": "teaching-example",
+            "sourceIds": []
+          },
+          "lexicalTerm": "űrlap"
+        },
+        {
+          "id": "hu-oct09-word-2",
+          "term": "mező",
+          "english": "field",
+          "semanticConcept": "field",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-09-hu-s017",
+            "text": "A mező üres.",
+            "english": "The field is empty.",
+            "kind": "teaching-example",
+            "sourceIds": []
+          },
+          "lexicalTerm": "mező"
+        },
+        {
+          "id": "hu-oct09-word-3",
+          "term": "üres",
+          "english": "empty",
+          "semanticConcept": "empty",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-09-hu-s018",
+            "text": "Ez a mező üres.",
+            "english": "This field is empty.",
+            "kind": "teaching-example",
+            "sourceIds": []
+          },
+          "lexicalTerm": "üres"
+        },
+        {
+          "id": "hu-oct09-word-4",
+          "term": "megnyitom",
+          "english": "I open it",
+          "semanticConcept": "I open it",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-09-hu-s019",
+            "text": "Megnyitom az oldalt.",
+            "english": "I open the page.",
+            "kind": "teaching-example",
+            "sourceIds": []
+          },
+          "lexicalTerm": "megnyitom"
+        },
+        {
+          "id": "hu-oct09-word-5",
+          "term": "beírok",
+          "english": "I enter / type in",
+          "semanticConcept": "I enter / type in",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-09-hu-s020",
+            "text": "Beírok egy nevet.",
+            "english": "I enter a name.",
+            "kind": "teaching-example",
+            "sourceIds": []
+          },
+          "lexicalTerm": "beírok"
+        },
+        {
+          "id": "hu-oct09-word-6",
+          "term": "kitöltöm",
+          "english": "I fill it out",
+          "semanticConcept": "I fill it out",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-09-hu-s021",
+            "text": "Kitöltöm az űrlapot.",
+            "english": "I fill out the form.",
+            "kind": "teaching-example",
+            "sourceIds": []
+          },
+          "lexicalTerm": "kitöltöm"
+        },
+        {
+          "id": "hu-oct09-word-7",
+          "term": "kész",
+          "english": "ready / finished",
+          "semanticConcept": "ready / finished",
+          "plannedRole": "new",
+          "example": {
+            "id": "ai-news-2026-10-09-hu-s022",
+            "text": "Az űrlap kész.",
+            "english": "The form is ready.",
+            "kind": "teaching-example",
+            "sourceIds": []
+          },
+          "lexicalTerm": "kész"
+        },
+        {
+          "id": "hu_data",
+          "term": "adat",
+          "english": "data",
+          "semanticConcept": "data",
+          "plannedRole": "review",
+          "example": {
+            "id": "ai-news-2026-10-09-hu-s023",
+            "text": "Ellenőrzöm az adatot.",
+            "english": "I check the data.",
+            "kind": "teaching-example",
+            "sourceIds": []
+          },
+          "lexicalTerm": "adat"
+        },
+        {
+          "id": "hu_question",
+          "term": "kérdés",
+          "english": "question",
+          "semanticConcept": "question",
+          "plannedRole": "review",
+          "example": {
+            "id": "ai-news-2026-10-09-hu-s024",
+            "text": "Van egy kérdésem.",
+            "english": "I have a question.",
+            "kind": "teaching-example",
+            "sourceIds": []
+          },
+          "lexicalTerm": "kérdés"
+        },
+        {
+          "id": "hu_new",
+          "term": "új",
+          "english": "new",
+          "semanticConcept": "new",
+          "plannedRole": "review",
+          "example": {
+            "id": "ai-news-2026-10-09-hu-s025",
+            "text": "Ez egy új űrlap.",
+            "english": "This is a new form.",
+            "kind": "teaching-example",
+            "sourceIds": []
+          },
+          "lexicalTerm": "új"
+        }
+      ],
+      "concepts": [
+        {
+          "id": "hu-oct09-grammar-1",
+          "title": "Open it; fill it out",
+          "explanation": "Megnyitom and kitöltöm are complete forms for “I open it” and “I fill it out”. With a specific object, use the definite article and the object ending: az oldalt, az űrlapot. Beírok egy nevet uses an unspecified “a name”; név changes to nevet.",
+          "examples": [
+            {
+              "id": "ai-news-2026-10-09-hu-s026",
+              "text": "Megnyitom az oldalt.",
+              "english": "I open the page.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-09-hu-s027",
+              "text": "Kitöltöm az űrlapot.",
+              "english": "I fill out the form.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-09-hu-s028",
+              "text": "Beírok egy nevet.",
+              "english": "I enter a name.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            }
+          ]
+        },
+        {
+          "id": "hu-oct09-grammar-2",
+          "title": "Not ready yet; ready now",
+          "explanation": "Még nem kész means “not ready yet”. Most már kész means “now it is ready”, marking a change. In these third-person present descriptions, Hungarian has no separate word for “is”. The same pattern works for an empty field.",
+          "examples": [
+            {
+              "id": "ai-news-2026-10-09-hu-s029",
+              "text": "Még nem kész.",
+              "english": "It is not ready yet.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-09-hu-s030",
+              "text": "Most már kész.",
+              "english": "Now it is ready.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            },
+            {
+              "id": "ai-news-2026-10-09-hu-s031",
+              "text": "A mező nem üres.",
+              "english": "The field is not empty.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            }
+          ]
+        }
+      ],
+      "exercises": [
+        {
+          "id": "ai-news-2026-10-09-hu-e01",
+          "type": "choice",
+          "prompt": "Choose “form”.",
+          "target": {
+            "type": "vocabulary",
+            "id": "hu-oct09-word-1"
+          },
+          "acceptedAnswers": [
+            "űrlap"
+          ],
+          "hint": "Use the vocabulary example if needed.",
+          "explanation": "űrlap means “form”.",
+          "trackInSrs": false,
+          "choiceAtoms": [
+            {
+              "text": "űrlap",
+              "english": "form"
+            },
+            {
+              "text": "megnyitom",
+              "english": "I open it"
+            },
+            {
+              "text": "kész",
+              "english": "ready / finished"
+            }
+          ],
+          "showChoiceEnglish": false,
+          "choices": [
+            "űrlap",
+            "megnyitom",
+            "kész"
+          ],
+          "choiceSupport": {
+            "űrlap": {
+              "transliteration": null,
+              "english": "form"
+            },
+            "megnyitom": {
+              "transliteration": null,
+              "english": "I open it"
+            },
+            "kész": {
+              "transliteration": null,
+              "english": "ready / finished"
+            }
+          },
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "űrlap",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-09-hu-e02",
+          "type": "choice",
+          "prompt": "Choose “field”.",
+          "target": {
+            "type": "vocabulary",
+            "id": "hu-oct09-word-2"
+          },
+          "acceptedAnswers": [
+            "mező"
+          ],
+          "hint": "Use the vocabulary example if needed.",
+          "explanation": "mező means “field”.",
+          "trackInSrs": false,
+          "choiceAtoms": [
+            {
+              "text": "beírok",
+              "english": "I enter / type in"
+            },
+            {
+              "text": "adat",
+              "english": "data"
+            },
+            {
+              "text": "mező",
+              "english": "field"
+            }
+          ],
+          "showChoiceEnglish": false,
+          "choices": [
+            "beírok",
+            "adat",
+            "mező"
+          ],
+          "choiceSupport": {
+            "beírok": {
+              "transliteration": null,
+              "english": "I enter / type in"
+            },
+            "adat": {
+              "transliteration": null,
+              "english": "data"
+            },
+            "mező": {
+              "transliteration": null,
+              "english": "field"
+            }
+          },
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "mező",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-09-hu-e03",
+          "type": "choice",
+          "prompt": "Choose “empty”.",
+          "target": {
+            "type": "vocabulary",
+            "id": "hu-oct09-word-3"
+          },
+          "acceptedAnswers": [
+            "üres"
+          ],
+          "hint": "Use the vocabulary example if needed.",
+          "explanation": "üres means “empty”.",
+          "trackInSrs": false,
+          "choiceAtoms": [
+            {
+              "text": "kérdés",
+              "english": "question"
+            },
+            {
+              "text": "üres",
+              "english": "empty"
+            },
+            {
+              "text": "kitöltöm",
+              "english": "I fill it out"
+            }
+          ],
+          "showChoiceEnglish": false,
+          "choices": [
+            "kérdés",
+            "üres",
+            "kitöltöm"
+          ],
+          "choiceSupport": {
+            "kérdés": {
+              "transliteration": null,
+              "english": "question"
+            },
+            "üres": {
+              "transliteration": null,
+              "english": "empty"
+            },
+            "kitöltöm": {
+              "transliteration": null,
+              "english": "I fill it out"
+            }
+          },
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "üres",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-09-hu-e04",
+          "type": "choice",
+          "prompt": "Choose “I enter / type in”.",
+          "target": {
+            "type": "vocabulary",
+            "id": "hu-oct09-word-5"
+          },
+          "acceptedAnswers": [
+            "beírok"
+          ],
+          "hint": "Use the vocabulary example if needed.",
+          "explanation": "beírok means “I enter / type in”.",
+          "trackInSrs": false,
+          "choiceAtoms": [
+            {
+              "text": "adat",
+              "english": "data"
+            },
+            {
+              "text": "űrlap",
+              "english": "form"
+            },
+            {
+              "text": "beírok",
+              "english": "I enter / type in"
+            }
+          ],
+          "showChoiceEnglish": false,
+          "choices": [
+            "adat",
+            "űrlap",
+            "beírok"
+          ],
+          "choiceSupport": {
+            "adat": {
+              "transliteration": null,
+              "english": "data"
+            },
+            "űrlap": {
+              "transliteration": null,
+              "english": "form"
+            },
+            "beírok": {
+              "transliteration": null,
+              "english": "I enter / type in"
+            }
+          },
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "beírok",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-09-hu-e05",
+          "type": "choice",
+          "prompt": "Choose “ready / finished”.",
+          "target": {
+            "type": "vocabulary",
+            "id": "hu-oct09-word-7"
+          },
+          "acceptedAnswers": [
+            "kész"
+          ],
+          "hint": "Use the vocabulary example if needed.",
+          "explanation": "kész means “ready / finished”.",
+          "trackInSrs": false,
+          "choiceAtoms": [
+            {
+              "text": "kész",
+              "english": "ready / finished"
+            },
+            {
+              "text": "új",
+              "english": "new"
+            },
+            {
+              "text": "üres",
+              "english": "empty"
+            }
+          ],
+          "showChoiceEnglish": false,
+          "choices": [
+            "kész",
+            "új",
+            "üres"
+          ],
+          "choiceSupport": {
+            "kész": {
+              "transliteration": null,
+              "english": "ready / finished"
+            },
+            "új": {
+              "transliteration": null,
+              "english": "new"
+            },
+            "üres": {
+              "transliteration": null,
+              "english": "empty"
+            }
+          },
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "kész",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-09-hu-e06",
+          "type": "recall",
+          "prompt": "Write “form” in Hungarian.",
+          "target": {
+            "type": "vocabulary",
+            "id": "hu-oct09-word-1"
+          },
+          "acceptedAnswers": [
+            "űrlap"
+          ],
+          "hint": "Example: Ez egy űrlap.",
+          "explanation": "űrlap means “form”.",
+          "trackInSrs": true,
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "űrlap",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-09-hu-e07",
+          "type": "recall",
+          "prompt": "Write “empty” in Hungarian.",
+          "target": {
+            "type": "vocabulary",
+            "id": "hu-oct09-word-3"
+          },
+          "acceptedAnswers": [
+            "üres"
+          ],
+          "hint": "Example: Ez a mező üres.",
+          "explanation": "üres means “empty”.",
+          "trackInSrs": true,
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "üres",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-09-hu-e08",
+          "type": "recall",
+          "prompt": "Fill the gap: this field is empty.",
+          "target": {
+            "type": "vocabulary",
+            "id": "hu-oct09-word-3"
+          },
+          "acceptedAnswers": [
+            "üres"
+          ],
+          "hint": "Use the adjective meaning “empty”.",
+          "explanation": "Üres means “empty”.",
+          "trackInSrs": true,
+          "promptAtom": {
+            "id": "ai-news-2026-10-09-hu-s032",
+            "text": "Ez a mező ___.",
+            "english": "This field is empty.",
+            "kind": "teaching-example",
+            "sourceIds": []
+          },
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "üres",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-09-hu-e09",
+          "type": "recall",
+          "prompt": "Fill the gap: now it is ready.",
+          "target": {
+            "type": "grammar",
+            "id": "hu-oct09-grammar-2"
+          },
+          "acceptedAnswers": [
+            "már"
+          ],
+          "hint": "Pair most with the word marking “already / by now”.",
+          "explanation": "Most már kész marks a change: now it is ready.",
+          "trackInSrs": true,
+          "promptAtom": {
+            "id": "ai-news-2026-10-09-hu-s033",
+            "text": "Most ___ kész.",
+            "english": "Now it is ready.",
+            "kind": "teaching-example",
+            "sourceIds": []
+          },
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "már",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-09-hu-e10",
+          "type": "order",
+          "prompt": "Put the words in order: I open the page.",
+          "target": {
+            "type": "grammar",
+            "id": "hu-oct09-grammar-1"
+          },
+          "acceptedAnswers": [
+            "Megnyitom az oldalt"
+          ],
+          "hint": "Use the matching pattern in Grammar.",
+          "explanation": "I open the page.",
+          "trackInSrs": false,
+          "tokens": [
+            "oldalt",
+            "az",
+            "Megnyitom"
+          ],
+          "answerData": [
+            {
+              "text": "Megnyitom az oldalt",
+              "english": "I open the page."
+            }
+          ],
+          "choices": [
+            "oldalt",
+            "az",
+            "Megnyitom"
+          ],
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "Megnyitom az oldalt · I open the page.",
+          "answerAtoms": [
+            {
+              "id": "ai-news-2026-10-09-hu-e10-model",
+              "text": "Megnyitom az oldalt",
+              "english": "I open the page.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            }
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-09-hu-e11",
+          "type": "order",
+          "prompt": "Put the words in order: I fill out the form.",
+          "target": {
+            "type": "grammar",
+            "id": "hu-oct09-grammar-1"
+          },
+          "acceptedAnswers": [
+            "Kitöltöm az űrlapot"
+          ],
+          "hint": "Use the matching pattern in Grammar.",
+          "explanation": "I fill out the form.",
+          "trackInSrs": false,
+          "tokens": [
+            "űrlapot",
+            "az",
+            "Kitöltöm"
+          ],
+          "answerData": [
+            {
+              "text": "Kitöltöm az űrlapot",
+              "english": "I fill out the form."
+            }
+          ],
+          "choices": [
+            "űrlapot",
+            "az",
+            "Kitöltöm"
+          ],
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "Kitöltöm az űrlapot · I fill out the form.",
+          "answerAtoms": [
+            {
+              "id": "ai-news-2026-10-09-hu-e11-model",
+              "text": "Kitöltöm az űrlapot",
+              "english": "I fill out the form.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            }
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-09-hu-e12",
+          "type": "order",
+          "prompt": "Put the words in order: Now it is ready.",
+          "target": {
+            "type": "grammar",
+            "id": "hu-oct09-grammar-2"
+          },
+          "acceptedAnswers": [
+            "Most már kész"
+          ],
+          "hint": "Use the matching pattern in Grammar.",
+          "explanation": "Now it is ready.",
+          "trackInSrs": false,
+          "tokens": [
+            "kész",
+            "már",
+            "Most"
+          ],
+          "answerData": [
+            {
+              "text": "Most már kész",
+              "english": "Now it is ready."
+            }
+          ],
+          "choices": [
+            "kész",
+            "már",
+            "Most"
+          ],
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "Most már kész · Now it is ready.",
+          "answerAtoms": [
+            {
+              "id": "ai-news-2026-10-09-hu-e12-model",
+              "text": "Most már kész",
+              "english": "Now it is ready.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            }
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-09-hu-e13",
+          "type": "matching",
+          "prompt": "Match each word or phrase to its meaning.",
+          "target": {
+            "type": "vocabulary",
+            "id": "hu-oct09-word-1"
+          },
+          "acceptedAnswers": [
+            "{\"0\": \"form\", \"1\": \"empty\", \"2\": \"I enter / type in\", \"3\": \"ready / finished\"}"
+          ],
+          "hint": "Use the short vocabulary examples.",
+          "explanation": "Read each complete pair aloud.",
+          "trackInSrs": false,
+          "matchingPairs": [
+            {
+              "id": "0",
+              "text": "űrlap",
+              "answer": "form",
+              "transliteration": null,
+              "target": {
+                "type": "vocabulary",
+                "id": "hu-oct09-word-1"
+              }
+            },
+            {
+              "id": "1",
+              "text": "üres",
+              "answer": "empty",
+              "transliteration": null,
+              "target": {
+                "type": "vocabulary",
+                "id": "hu-oct09-word-3"
+              }
+            },
+            {
+              "id": "2",
+              "text": "beírok",
+              "answer": "I enter / type in",
+              "transliteration": null,
+              "target": {
+                "type": "vocabulary",
+                "id": "hu-oct09-word-5"
+              }
+            },
+            {
+              "id": "3",
+              "text": "kész",
+              "answer": "ready / finished",
+              "transliteration": null,
+              "target": {
+                "type": "vocabulary",
+                "id": "hu-oct09-word-7"
+              }
+            }
+          ],
+          "choices": [
+            "ready / finished",
+            "I enter / type in",
+            "empty",
+            "form"
+          ],
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "{\"0\": \"form\", \"1\": \"empty\", \"2\": \"I enter / type in\", \"3\": \"ready / finished\"}",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-09-hu-e14",
+          "type": "self-check",
+          "prompt": "Say you open the page, then say you fill out the form.",
+          "target": {
+            "type": "grammar",
+            "id": "hu-oct09-grammar-1"
+          },
+          "acceptedAnswers": [
+            "Megnyitom az oldalt. Kitöltöm az űrlapot."
+          ],
+          "hint": "Build short sentences using the examples.",
+          "explanation": "Compare the requested meaning and forms; other natural answers can work.",
+          "trackInSrs": false,
+          "answerData": [
+            {
+              "text": "Megnyitom az oldalt. Kitöltöm az űrlapot.",
+              "english": "I open the page. I fill out the form."
+            }
+          ],
+          "rubric": {
+            "criteria": "Include every requested meaning. Check the verb or adjective form, then assess your answer."
+          },
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Include every requested meaning. Check the verb or adjective form, then assess your answer.",
+          "modelAnswer": "Megnyitom az oldalt. Kitöltöm az űrlapot. · I open the page. I fill out the form.",
+          "answerAtoms": [
+            {
+              "id": "ai-news-2026-10-09-hu-e14-model",
+              "text": "Megnyitom az oldalt. Kitöltöm az űrlapot.",
+              "english": "I open the page. I fill out the form.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            }
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-09-hu-e15",
+          "type": "self-check",
+          "prompt": "Say the form is not ready yet, then point out an empty field.",
+          "target": {
+            "type": "grammar",
+            "id": "hu-oct09-grammar-2"
+          },
+          "acceptedAnswers": [
+            "Még nem kész. Ez a mező üres."
+          ],
+          "hint": "Build short sentences using the examples.",
+          "explanation": "Compare the requested meaning and forms; other natural answers can work.",
+          "trackInSrs": false,
+          "answerData": [
+            {
+              "text": "Még nem kész. Ez a mező üres.",
+              "english": "It is not ready yet. This field is empty."
+            }
+          ],
+          "rubric": {
+            "criteria": "Include every requested meaning. Check the verb or adjective form, then assess your answer."
+          },
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Include every requested meaning. Check the verb or adjective form, then assess your answer.",
+          "modelAnswer": "Még nem kész. Ez a mező üres. · It is not ready yet. This field is empty.",
+          "answerAtoms": [
+            {
+              "id": "ai-news-2026-10-09-hu-e15-model",
+              "text": "Még nem kész. Ez a mező üres.",
+              "english": "It is not ready yet. This field is empty.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            }
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-09-hu-e16",
+          "type": "self-check",
+          "prompt": "Say you enter a name, then say it is ready now.",
+          "target": {
+            "type": "grammar",
+            "id": "hu-oct09-grammar-2"
+          },
+          "acceptedAnswers": [
+            "Beírok egy nevet. Most már kész."
+          ],
+          "hint": "Build short sentences using the examples.",
+          "explanation": "Compare the requested meaning and forms; other natural answers can work.",
+          "trackInSrs": false,
+          "answerData": [
+            {
+              "text": "Beírok egy nevet. Most már kész.",
+              "english": "I enter a name. Now it is ready."
+            }
+          ],
+          "rubric": {
+            "criteria": "Include every requested meaning. Check the verb or adjective form, then assess your answer."
+          },
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Include every requested meaning. Check the verb or adjective form, then assess your answer.",
+          "modelAnswer": "Beírok egy nevet. Most már kész. · I enter a name. Now it is ready.",
+          "answerAtoms": [
+            {
+              "id": "ai-news-2026-10-09-hu-e16-model",
+              "text": "Beírok egy nevet. Most már kész.",
+              "english": "I enter a name. Now it is ready.",
+              "kind": "teaching-example",
+              "sourceIds": []
+            }
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-09-hu-e17",
+          "type": "recall",
+          "prompt": "Review: write “data”.",
+          "target": {
+            "type": "vocabulary",
+            "id": "hu_data"
+          },
+          "acceptedAnswers": [
+            "adat"
+          ],
+          "hint": "Example: Ellenőrzöm az adatot.",
+          "explanation": "adat means “data”.",
+          "trackInSrs": true,
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "adat",
+          "answerAtoms": []
+        },
+        {
+          "id": "ai-news-2026-10-09-hu-e18",
+          "type": "recall",
+          "prompt": "Review: write “question”.",
+          "target": {
+            "type": "vocabulary",
+            "id": "hu_question"
+          },
+          "acceptedAnswers": [
+            "kérdés"
+          ],
+          "hint": "Example: Van egy kérdésem.",
+          "explanation": "kérdés means “question”.",
+          "trackInSrs": true,
+          "choiceSupport": {},
+          "supportAtoms": [],
+          "rubricText": "Compare the requested meaning and grammar with the model. Valid alternatives may exist.",
+          "modelAnswer": "kérdés",
+          "answerAtoms": []
+        }
+      ],
+      "route": [
+        "Read · 10 min",
+        "Words and grammar · 8 min",
+        "Practise · 17 min",
+        "Own example · 5 min"
+      ],
+      "review": {
+        "instructions": "Try familiar words from earlier lessons before opening the hint. If a word is new to you, use its example.",
+        "prompts": [
+          "Say “data” and “question”, then use them in a short sentence."
+        ]
+      },
+      "sourceIds": [
+        "openai_asana_browser_2026_10_09"
+      ],
+      "instructionBlocks": [],
+      "optionalDialogue": []
+    }
+  ]
+}
