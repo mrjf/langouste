@@ -18,7 +18,7 @@ describe('course display coverage',()=>{
  test('all course counts and lesson identities remain stable',()=>{const prior=lessons.filter(l=>l.day<=32);expect(prior.length).toBe(64);expect(new Set(lessons.map(l=>l.id)).size).toBe(lessons.length);expect(prior.reduce((n,l)=>n+l.exercises.length,0)).toBe(1148);const ids=lessons.flatMap(l=>l.exercises.map(e=>e.id));expect(new Set(ids).size).toBe(ids.length);});
 });
 
-for(const [date,day] of [['2026-10-07',34],['2026-10-08',35],['2026-10-09',36]] as const)test(`${date} provides complete beginner lessons with grounded facts and varied tasks`,()=>{
+for(const [date,day] of [['2026-10-07',34],['2026-10-08',35],['2026-10-09',36],['2026-10-10',37]] as const)test(`${date} provides complete beginner lessons with grounded facts and varied tasks`,()=>{
  const daily=lessons.filter(l=>l.id.includes(date));expect(daily.length).toBe(2);
  for(const l of daily){expect(l.day).toBe(day);expect(l.estimatedMinutes).toBeGreaterThanOrEqual(30);expect(l.estimatedMinutes).toBeLessThanOrEqual(45);expect(l.vocabulary.length).toBe(10);expect(l.exercises.length).toBe(18);expect(new Set(l.exercises.map(e=>e.type)).size).toBe(5);
  for(const v of l.vocabulary){expect(v.term).toBeTruthy();expect(v.english).toBeTruthy();expect(v.example.english).toBeTruthy();if(v.plannedRole==='review')expect(lessons.some(old=>old.day<l.day&&old.language===l.language&&old.vocabulary.some(w=>w.id===v.id))).toBe(true);}

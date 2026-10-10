@@ -1,0 +1,881 @@
+{
+  "schemaVersion": 1,
+  "id": "ai-news-2026-10-10-hu",
+  "courseId": "ai-news-daily-2026-10-10",
+  "day": 37,
+  "language": "hu",
+  "title": "Először elolvasom",
+  "subtitle": "October 10, 2026 · First I read it",
+  "estimatedMinutes": 40,
+  "objectives": [
+    "Find and read a short instruction.",
+    "Say which step is difficult.",
+    "Put two actions in order."
+  ],
+  "sources": [
+    {
+      "id": "microsoft_ax_2026_10_09",
+      "title": "Introducing the Agent Experience (AX) Practitioner Playbook",
+      "url": "https://developer.microsoft.com/blog/introducing-the-agent-experience-ax-practitioner-playbook/",
+      "publishedOn": "2026-10-09",
+      "verifiedAsOf": "2026-10-10",
+      "publisher": "Microsoft",
+      "factSummary": "Microsoft published a guide to evaluating coding agents, finding causes of errors and testing changes to the sources agents use. It describes a method, not a guarantee of correct code."
+    }
+  ],
+  "readings": [
+    {
+      "id": "ai-news-2026-10-10-hu-r1",
+      "title": "A guide for testing agents · October 9 publication",
+      "sentences": [
+        {
+          "id": "ai-news-2026-10-10-hu-s001",
+          "text": "A Microsoft új útmutatót adott ki.",
+          "english": "Microsoft published a new guide.",
+          "kind": "source-summary",
+          "sourceIds": [
+            "microsoft_ax_2026_10_09"
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-10-hu-s002",
+          "text": "Az útmutató AI-eszközök teszteléséről szól.",
+          "english": "The guide is about testing AI tools.",
+          "kind": "source-summary",
+          "sourceIds": [
+            "microsoft_ax_2026_10_09"
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-10-hu-s003",
+          "text": "Segít megtalálni a hibák okát.",
+          "english": "It helps find the cause of errors.",
+          "kind": "source-summary",
+          "sourceIds": [
+            "microsoft_ax_2026_10_09"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-10-hu-r2",
+      "title": "Read the instructions · Fictional dialogue",
+      "sentences": [
+        {
+          "id": "ai-news-2026-10-10-hu-s004",
+          "text": "Anna: Hol az útmutató?",
+          "english": "Anna: Where is the guide?",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-10-hu-s005",
+          "text": "Bence: Itt van, a képernyőn.",
+          "english": "Bence: Here it is, on the screen.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-10-hu-s006",
+          "text": "Anna: Először elolvasom az utasítást.",
+          "english": "Anna: First I read the instruction.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-10-hu-s007",
+          "text": "Bence: Van benne példa?",
+          "english": "Bence: Is there an example in it?",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-10-hu-s008",
+          "text": "Anna: Igen, itt egy rövid példa.",
+          "english": "Anna: Yes, here is a short example.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-10-hu-s009",
+          "text": "Bence: Utána kipróbálom.",
+          "english": "Bence: I will try it afterwards.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        }
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-10-hu-r3",
+      "title": "Check one step · Fictional dialogue",
+      "sentences": [
+        {
+          "id": "ai-news-2026-10-10-hu-s010",
+          "text": "Anna: Melyik lépés nehéz?",
+          "english": "Anna: Which step is difficult?",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-10-hu-s011",
+          "text": "Bence: Ez a lépés. Nem értem.",
+          "english": "Bence: This step. I do not understand.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-10-hu-s012",
+          "text": "Anna: Nézzük meg a példát!",
+          "english": "Anna: Let us look at the example!",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-10-hu-s013",
+          "text": "Bence: Most már értem.",
+          "english": "Bence: Now I understand.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-10-hu-s014",
+          "text": "Anna: Kész az első feladat?",
+          "english": "Anna: Is the first task finished?",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-10-hu-s015",
+          "text": "Bence: Igen, kész. Jöhet a következő.",
+          "english": "Bence: Yes, it is finished. Next one, please.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        }
+      ]
+    }
+  ],
+  "vocabulary": [
+    {
+      "id": "hu-oct10-word-1",
+      "term": "útmutató",
+      "english": "guide",
+      "semanticConcept": "guide",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-10-hu-s016",
+        "text": "Itt az útmutató.",
+        "english": "Here is the guide.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "hu-oct10-word-2",
+      "term": "utasítás",
+      "english": "instruction",
+      "semanticConcept": "instruction",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-10-hu-s017",
+        "text": "Ez egy rövid utasítás.",
+        "english": "This is a short instruction.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "hu_difficult",
+      "term": "nehéz",
+      "english": "difficult",
+      "semanticConcept": "difficult",
+      "plannedRole": "review",
+      "example": {
+        "id": "ai-news-2026-10-10-hu-s018",
+        "text": "Ez a lépés nehéz.",
+        "english": "This step is difficult.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "hu-oct10-word-4",
+      "term": "elolvasom",
+      "english": "I read it through",
+      "semanticConcept": "I read it through",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-10-hu-s019",
+        "text": "Elolvasom az utasítást.",
+        "english": "I read the instruction.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "hu-oct10-word-5",
+      "term": "kipróbálom",
+      "english": "I try it out",
+      "semanticConcept": "I try it out",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-10-hu-s020",
+        "text": "Utána kipróbálom.",
+        "english": "I try it afterwards.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "hu-oct10-word-6",
+      "term": "lépés",
+      "english": "step",
+      "semanticConcept": "step",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-10-hu-s021",
+        "text": "Ez az első lépés.",
+        "english": "This is the first step.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "hu-oct10-word-7",
+      "term": "utána",
+      "english": "afterwards",
+      "semanticConcept": "afterwards",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-10-hu-s022",
+        "text": "Utána elolvasom a példát.",
+        "english": "Afterwards I read the example.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "hu-oct09-word-7",
+      "term": "kész",
+      "english": "ready / finished",
+      "semanticConcept": "ready / finished",
+      "plannedRole": "review",
+      "example": {
+        "id": "ai-news-2026-10-10-hu-s023",
+        "text": "Kész a feladat.",
+        "english": "The task is finished.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "hu_question",
+      "term": "kérdés",
+      "english": "question",
+      "semanticConcept": "question",
+      "plannedRole": "review",
+      "example": {
+        "id": "ai-news-2026-10-10-hu-s024",
+        "text": "Van egy kérdésem.",
+        "english": "I have a question.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "hu_example",
+      "term": "példa",
+      "english": "example",
+      "semanticConcept": "example",
+      "plannedRole": "review",
+      "example": {
+        "id": "ai-news-2026-10-10-hu-s025",
+        "text": "Itt egy példa.",
+        "english": "Here is an example.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    }
+  ],
+  "concepts": [
+    {
+      "id": "hu-oct10-grammar-1",
+      "title": "First read, then try",
+      "explanation": "Először means first; utána means afterwards. Put either at the start to order actions. Elolvasom and kipróbálom refer to a specific object: I read it through; I try it out. With an explicit object use -t: az utasítást, a példát.",
+      "examples": [
+        {
+          "id": "ai-news-2026-10-10-hu-s026",
+          "text": "Először elolvasom az utasítást.",
+          "english": "First I read the instruction.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-10-hu-s027",
+          "text": "Utána kipróbálom.",
+          "english": "I try it afterwards.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-10-hu-s028",
+          "text": "Elolvasom a példát.",
+          "english": "I read the example.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        }
+      ]
+    },
+    {
+      "id": "hu-oct10-grammar-2",
+      "title": "Describe a step",
+      "explanation": "Melyik lépés nehéz? asks which step is difficult. Ez a lépés nehéz identifies this step. Nem before the adjective makes it negative. There is no separate “is” in these third-person present descriptions.",
+      "examples": [
+        {
+          "id": "ai-news-2026-10-10-hu-s029",
+          "text": "Melyik lépés nehéz?",
+          "english": "Which step is difficult?",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-10-hu-s030",
+          "text": "Ez a lépés nehéz.",
+          "english": "This step is difficult.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-10-hu-s031",
+          "text": "Ez a lépés nem nehéz.",
+          "english": "This step is not difficult.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        }
+      ]
+    }
+  ],
+  "exercises": [
+    {
+      "id": "ai-news-2026-10-10-hu-e01",
+      "type": "choice",
+      "prompt": "Choose “guide”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu-oct10-word-1"
+      },
+      "acceptedAnswers": [
+        "útmutató"
+      ],
+      "hint": "Use the vocabulary example if needed.",
+      "explanation": "útmutató means “guide”.",
+      "trackInSrs": false,
+      "choiceAtoms": [
+        {
+          "text": "útmutató",
+          "english": "guide"
+        },
+        {
+          "text": "elolvasom",
+          "english": "I read it through"
+        },
+        {
+          "text": "utána",
+          "english": "afterwards"
+        }
+      ],
+      "showChoiceEnglish": false,
+      "choices": [
+        "útmutató",
+        "elolvasom",
+        "utána"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-10-hu-e02",
+      "type": "choice",
+      "prompt": "Choose “instruction”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu-oct10-word-2"
+      },
+      "acceptedAnswers": [
+        "utasítás"
+      ],
+      "hint": "Use the vocabulary example if needed.",
+      "explanation": "utasítás means “instruction”.",
+      "trackInSrs": false,
+      "choiceAtoms": [
+        {
+          "text": "kipróbálom",
+          "english": "I try it out"
+        },
+        {
+          "text": "kész",
+          "english": "ready / finished"
+        },
+        {
+          "text": "utasítás",
+          "english": "instruction"
+        }
+      ],
+      "showChoiceEnglish": false,
+      "choices": [
+        "kipróbálom",
+        "kész",
+        "utasítás"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-10-hu-e03",
+      "type": "choice",
+      "prompt": "Choose “difficult”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu_difficult"
+      },
+      "acceptedAnswers": [
+        "nehéz"
+      ],
+      "hint": "Use the vocabulary example if needed.",
+      "explanation": "nehéz means “difficult”.",
+      "trackInSrs": false,
+      "choiceAtoms": [
+        {
+          "text": "kérdés",
+          "english": "question"
+        },
+        {
+          "text": "nehéz",
+          "english": "difficult"
+        },
+        {
+          "text": "lépés",
+          "english": "step"
+        }
+      ],
+      "showChoiceEnglish": false,
+      "choices": [
+        "kérdés",
+        "nehéz",
+        "lépés"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-10-hu-e04",
+      "type": "choice",
+      "prompt": "Choose “I try it out”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu-oct10-word-5"
+      },
+      "acceptedAnswers": [
+        "kipróbálom"
+      ],
+      "hint": "Use the vocabulary example if needed.",
+      "explanation": "kipróbálom means “I try it out”.",
+      "trackInSrs": false,
+      "choiceAtoms": [
+        {
+          "text": "kész",
+          "english": "ready / finished"
+        },
+        {
+          "text": "útmutató",
+          "english": "guide"
+        },
+        {
+          "text": "kipróbálom",
+          "english": "I try it out"
+        }
+      ],
+      "showChoiceEnglish": false,
+      "choices": [
+        "kész",
+        "útmutató",
+        "kipróbálom"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-10-hu-e05",
+      "type": "choice",
+      "prompt": "Choose “afterwards”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu-oct10-word-7"
+      },
+      "acceptedAnswers": [
+        "utána"
+      ],
+      "hint": "Use the vocabulary example if needed.",
+      "explanation": "utána means “afterwards”.",
+      "trackInSrs": false,
+      "choiceAtoms": [
+        {
+          "text": "utána",
+          "english": "afterwards"
+        },
+        {
+          "text": "példa",
+          "english": "example"
+        },
+        {
+          "text": "nehéz",
+          "english": "difficult"
+        }
+      ],
+      "showChoiceEnglish": false,
+      "choices": [
+        "utána",
+        "példa",
+        "nehéz"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-10-hu-e06",
+      "type": "recall",
+      "prompt": "Write “guide” in Hungarian.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu-oct10-word-1"
+      },
+      "acceptedAnswers": [
+        "útmutató"
+      ],
+      "hint": "Example: Itt az útmutató.",
+      "explanation": "útmutató means “guide”.",
+      "trackInSrs": true
+    },
+    {
+      "id": "ai-news-2026-10-10-hu-e07",
+      "type": "recall",
+      "prompt": "Write “difficult” in Hungarian.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu_difficult"
+      },
+      "acceptedAnswers": [
+        "nehéz"
+      ],
+      "hint": "Example: Ez a lépés nehéz.",
+      "explanation": "nehéz means “difficult”.",
+      "trackInSrs": true
+    },
+    {
+      "id": "ai-news-2026-10-10-hu-e08",
+      "type": "recall",
+      "prompt": "Fill the gap: this step is difficult.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu_difficult"
+      },
+      "acceptedAnswers": [
+        "nehéz"
+      ],
+      "hint": "Use the adjective meaning difficult.",
+      "explanation": "Nehéz describes a difficult step.",
+      "trackInSrs": true,
+      "promptAtom": {
+        "id": "ai-news-2026-10-10-hu-s032",
+        "text": "Ez a lépés ___.",
+        "english": "This step is difficult.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "ai-news-2026-10-10-hu-e09",
+      "type": "recall",
+      "prompt": "Fill the gap: afterwards I try it out.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu-oct10-word-7"
+      },
+      "acceptedAnswers": [
+        "Utána",
+        "utána"
+      ],
+      "hint": "Use the word meaning afterwards.",
+      "explanation": "Utána puts this action after the first one.",
+      "trackInSrs": true,
+      "promptAtom": {
+        "id": "ai-news-2026-10-10-hu-s033",
+        "text": "___ kipróbálom.",
+        "english": "Afterwards I try it out.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "ai-news-2026-10-10-hu-e10",
+      "type": "order",
+      "prompt": "Put the words in order: First I read the instruction.",
+      "target": {
+        "type": "grammar",
+        "id": "hu-oct10-grammar-1"
+      },
+      "acceptedAnswers": [
+        "Először elolvasom az utasítást"
+      ],
+      "hint": "Use the matching pattern in Grammar.",
+      "explanation": "First I read the instruction.",
+      "trackInSrs": false,
+      "tokens": [
+        "utasítást",
+        "az",
+        "elolvasom",
+        "Először"
+      ],
+      "answerData": [
+        {
+          "text": "Először elolvasom az utasítást",
+          "english": "First I read the instruction."
+        }
+      ],
+      "choices": [
+        "utasítást",
+        "az",
+        "elolvasom",
+        "Először"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-10-hu-e11",
+      "type": "order",
+      "prompt": "Put the words in order: I try it afterwards.",
+      "target": {
+        "type": "grammar",
+        "id": "hu-oct10-grammar-1"
+      },
+      "acceptedAnswers": [
+        "Utána kipróbálom"
+      ],
+      "hint": "Use the matching pattern in Grammar.",
+      "explanation": "I try it afterwards.",
+      "trackInSrs": false,
+      "tokens": [
+        "kipróbálom",
+        "Utána"
+      ],
+      "answerData": [
+        {
+          "text": "Utána kipróbálom",
+          "english": "I try it afterwards."
+        }
+      ],
+      "choices": [
+        "kipróbálom",
+        "Utána"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-10-hu-e12",
+      "type": "order",
+      "prompt": "Put the words in order: This step is difficult.",
+      "target": {
+        "type": "grammar",
+        "id": "hu-oct10-grammar-2"
+      },
+      "acceptedAnswers": [
+        "Ez a lépés nehéz"
+      ],
+      "hint": "Use the matching pattern in Grammar.",
+      "explanation": "This step is difficult.",
+      "trackInSrs": false,
+      "tokens": [
+        "nehéz",
+        "lépés",
+        "a",
+        "Ez"
+      ],
+      "answerData": [
+        {
+          "text": "Ez a lépés nehéz",
+          "english": "This step is difficult."
+        }
+      ],
+      "choices": [
+        "nehéz",
+        "lépés",
+        "a",
+        "Ez"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-10-hu-e13",
+      "type": "matching",
+      "prompt": "Match each word or phrase to its meaning.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu-oct10-word-1"
+      },
+      "acceptedAnswers": [
+        "{\"0\": \"guide\", \"1\": \"difficult\", \"2\": \"I try it out\", \"3\": \"afterwards\"}"
+      ],
+      "hint": "Use the short vocabulary examples.",
+      "explanation": "Read each complete pair aloud.",
+      "trackInSrs": false,
+      "matchingPairs": [
+        {
+          "id": "0",
+          "text": "útmutató",
+          "answer": "guide",
+          "transliteration": null,
+          "target": {
+            "type": "vocabulary",
+            "id": "hu-oct10-word-1"
+          }
+        },
+        {
+          "id": "1",
+          "text": "nehéz",
+          "answer": "difficult",
+          "transliteration": null,
+          "target": {
+            "type": "vocabulary",
+            "id": "hu_difficult"
+          }
+        },
+        {
+          "id": "2",
+          "text": "kipróbálom",
+          "answer": "I try it out",
+          "transliteration": null,
+          "target": {
+            "type": "vocabulary",
+            "id": "hu-oct10-word-5"
+          }
+        },
+        {
+          "id": "3",
+          "text": "utána",
+          "answer": "afterwards",
+          "transliteration": null,
+          "target": {
+            "type": "vocabulary",
+            "id": "hu-oct10-word-7"
+          }
+        }
+      ],
+      "choices": [
+        "afterwards",
+        "I try it out",
+        "difficult",
+        "guide"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-10-hu-e14",
+      "type": "self-check",
+      "prompt": "Say you read the instruction first, then try it out.",
+      "target": {
+        "type": "grammar",
+        "id": "hu-oct10-grammar-1"
+      },
+      "acceptedAnswers": [
+        "Először elolvasom az utasítást. Utána kipróbálom."
+      ],
+      "hint": "Build short sentences using the examples.",
+      "explanation": "Compare the requested meaning and forms; other natural answers can work.",
+      "trackInSrs": false,
+      "answerData": [
+        {
+          "text": "Először elolvasom az utasítást. Utána kipróbálom.",
+          "english": "First I read the instruction. I try it afterwards."
+        }
+      ],
+      "rubric": {
+        "criteria": "Include every requested meaning. Check the verb or adjective form, then assess your answer."
+      }
+    },
+    {
+      "id": "ai-news-2026-10-10-hu-e15",
+      "type": "self-check",
+      "prompt": "Ask which step is difficult, then say this step is not difficult.",
+      "target": {
+        "type": "grammar",
+        "id": "hu-oct10-grammar-2"
+      },
+      "acceptedAnswers": [
+        "Melyik lépés nehéz? Ez a lépés nem nehéz."
+      ],
+      "hint": "Build short sentences using the examples.",
+      "explanation": "Compare the requested meaning and forms; other natural answers can work.",
+      "trackInSrs": false,
+      "answerData": [
+        {
+          "text": "Melyik lépés nehéz? Ez a lépés nem nehéz.",
+          "english": "Which step is difficult? This step is not difficult."
+        }
+      ],
+      "rubric": {
+        "criteria": "Include every requested meaning. Check the verb or adjective form, then assess your answer."
+      }
+    },
+    {
+      "id": "ai-news-2026-10-10-hu-e16",
+      "type": "self-check",
+      "prompt": "Say the task is finished, then say you have a question.",
+      "target": {
+        "type": "grammar",
+        "id": "hu-oct10-grammar-2"
+      },
+      "acceptedAnswers": [
+        "Kész a feladat. Van egy kérdésem."
+      ],
+      "hint": "Build short sentences using the examples.",
+      "explanation": "Compare the requested meaning and forms; other natural answers can work.",
+      "trackInSrs": false,
+      "answerData": [
+        {
+          "text": "Kész a feladat. Van egy kérdésem.",
+          "english": "The task is finished. I have a question."
+        }
+      ],
+      "rubric": {
+        "criteria": "Include every requested meaning. Check the verb or adjective form, then assess your answer."
+      }
+    },
+    {
+      "id": "ai-news-2026-10-10-hu-e17",
+      "type": "recall",
+      "prompt": "Review: write “ready / finished”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu-oct09-word-7"
+      },
+      "acceptedAnswers": [
+        "kész"
+      ],
+      "hint": "Example: Kész a feladat.",
+      "explanation": "kész means “ready / finished”.",
+      "trackInSrs": true
+    },
+    {
+      "id": "ai-news-2026-10-10-hu-e18",
+      "type": "recall",
+      "prompt": "Review: write “question”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu_question"
+      },
+      "acceptedAnswers": [
+        "kérdés"
+      ],
+      "hint": "Example: Van egy kérdésem.",
+      "explanation": "kérdés means “question”.",
+      "trackInSrs": true
+    }
+  ],
+  "route": [
+    "Read · 10 min",
+    "Words and grammar · 8 min",
+    "Practise · 17 min",
+    "Own example · 5 min"
+  ],
+  "review": {
+    "instructions": "Retrieve the two review words before opening hints. After one day and three days, try the three speaking prompts again without the models.",
+    "prompts": [
+      "Say whether the task is finished, ask a question, then describe your next step."
+    ]
+  }
+}

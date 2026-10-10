@@ -1,0 +1,942 @@
+{
+  "schemaVersion": 1,
+  "id": "ai-news-2026-10-10-ar-EG",
+  "courseId": "ai-news-daily-2026-10-10",
+  "day": 37,
+  "language": "ar-EG",
+  "title": "خطوة خطوة",
+  "subtitle": "October 10, 2026 · Step by step",
+  "estimatedMinutes": 40,
+  "objectives": [
+    "Divide work into steps.",
+    "Say which file you will take.",
+    "Review together and say whether you are ready."
+  ],
+  "sources": [
+    {
+      "id": "anthropic_workflows_2026_10_09",
+      "title": "Claude Platform release notes: October 9, 2026",
+      "url": "https://platform.claude.com/docs/en/release-notes/overview#october-9-2026",
+      "publishedOn": "2026-10-09",
+      "verifiedAsOf": "2026-10-10",
+      "publisher": "Anthropic",
+      "factSummary": "Anthropic announced dynamic workflows in beta for Claude Managed Agents. These programs run agents in phases and combine results, including for work such as reviewing many documents."
+    }
+  ],
+  "readings": [
+    {
+      "id": "ai-news-2026-10-10-ar-EG-r1",
+      "title": "Work in phases · October 9 beta release",
+      "sentences": [
+        {
+          "id": "ai-news-2026-10-10-ar-EG-s001",
+          "text": "Anthropic أعلنت عن ميزة جديدة.",
+          "english": "Anthropic announced a new feature.",
+          "kind": "source-summary",
+          "sourceIds": [
+            "anthropic_workflows_2026_10_09"
+          ],
+          "transliteration": "Anthropic aʿlanet ʿan meeza gedeeda."
+        },
+        {
+          "id": "ai-news-2026-10-10-ar-EG-s002",
+          "text": "الميزة بتشغّل وكلاء AI على مراحل.",
+          "english": "The feature runs AI agents in phases.",
+          "kind": "source-summary",
+          "sourceIds": [
+            "anthropic_workflows_2026_10_09"
+          ],
+          "transliteration": "el-meeza betshagghal wokalaaʾ AI ʿala maraahel."
+        },
+        {
+          "id": "ai-news-2026-10-10-ar-EG-s003",
+          "text": "وبتجمع النتايج. الميزة لسه تجريبية.",
+          "english": "And it combines results. The feature is still in beta.",
+          "kind": "source-summary",
+          "sourceIds": [
+            "anthropic_workflows_2026_10_09"
+          ],
+          "transliteration": "we-betgammaʿ en-nataayeg. el-meeza lissa tagreebeyya."
+        }
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-10-ar-EG-r2",
+      "title": "Divide the work · Fictional dialogue",
+      "sentences": [
+        {
+          "id": "ai-news-2026-10-10-ar-EG-s004",
+          "text": "منى: عندنا تلات ملفات.",
+          "english": "Mona: We have three files.",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "Mona: ʿandena talaat malaffaat."
+        },
+        {
+          "id": "ai-news-2026-10-10-ar-EG-s005",
+          "text": "كريم: نبدأ بإيه؟",
+          "english": "Karim: What shall we start with?",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "Kareem: nebdaʾ be-eh?"
+        },
+        {
+          "id": "ai-news-2026-10-10-ar-EG-s006",
+          "text": "منى: نقسم الشغل الأول.",
+          "english": "Mona: Let us divide the work first.",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "Mona: neʾsem esh-shoghl el-awwal."
+        },
+        {
+          "id": "ai-news-2026-10-10-ar-EG-s007",
+          "text": "كريم: أنا هاخد الملف ده.",
+          "english": "Karim: I will take this file.",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "Kareem: ana haakhod el-malaff da."
+        },
+        {
+          "id": "ai-news-2026-10-10-ar-EG-s008",
+          "text": "منى: تمام، وأنا هاخد الملف التاني.",
+          "english": "Mona: Great, and I will take the second file.",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "Mona: tamaam, we-ana haakhod el-malaff et-taani."
+        },
+        {
+          "id": "ai-news-2026-10-10-ar-EG-s009",
+          "text": "كريم: وبعدين نراجع النتايج سوا.",
+          "english": "Karim: Then we will review the results together.",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "Kareem: we-baʿdeen neraageʿ en-nataayeg sawa."
+        }
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-10-ar-EG-r3",
+      "title": "One step at a time · Fictional dialogue",
+      "sentences": [
+        {
+          "id": "ai-news-2026-10-10-ar-EG-s010",
+          "text": "منى: خلصت الخطوة الأولى؟",
+          "english": "Mona: Have you finished the first step?",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "Mona: khallast el-khatwa el-oola?"
+        },
+        {
+          "id": "ai-news-2026-10-10-ar-EG-s011",
+          "text": "كريم: لسه، محتاج دقيقة.",
+          "english": "Karim: Not yet, I need a minute.",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "Kareem: lissa, mehtaag deʾeeʾa."
+        },
+        {
+          "id": "ai-news-2026-10-10-ar-EG-s012",
+          "text": "منى: ماشي، أنا جاهزة.",
+          "english": "Mona: Okay, I am ready.",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "Mona: maashi, ana gahza."
+        },
+        {
+          "id": "ai-news-2026-10-10-ar-EG-s013",
+          "text": "كريم: دلوقتي خلصت.",
+          "english": "Karim: Now I have finished.",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "Kareem: delwaʾti khallast."
+        },
+        {
+          "id": "ai-news-2026-10-10-ar-EG-s014",
+          "text": "منى: نراجع سوا؟",
+          "english": "Mona: Shall we review together?",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "Mona: neraageʿ sawa?"
+        },
+        {
+          "id": "ai-news-2026-10-10-ar-EG-s015",
+          "text": "كريم: أيوه، خطوة خطوة.",
+          "english": "Karim: Yes, step by step.",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "Kareem: aywa, khatwa khatwa."
+        }
+      ]
+    }
+  ],
+  "vocabulary": [
+    {
+      "id": "ar-EG-oct07-word-4",
+      "term": "خطوة",
+      "english": "step",
+      "semanticConcept": "step",
+      "plannedRole": "review",
+      "example": {
+        "id": "ai-news-2026-10-10-ar-EG-s016",
+        "text": "دي خطوة بسيطة.",
+        "english": "This is a simple step.",
+        "kind": "teaching-example",
+        "sourceIds": [],
+        "transliteration": "di khatwa baseeta."
+      },
+      "transliteration": "khatwa"
+    },
+    {
+      "id": "ar-EG-oct10-word-2",
+      "term": "نقسم",
+      "english": "we divide / let us divide",
+      "semanticConcept": "we divide / let us divide",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-10-ar-EG-s017",
+        "text": "نقسم الشغل.",
+        "english": "Let us divide the work.",
+        "kind": "teaching-example",
+        "sourceIds": [],
+        "transliteration": "neʾsem esh-shoghl."
+      },
+      "transliteration": "neʾsem"
+    },
+    {
+      "id": "ar-EG-oct10-word-3",
+      "term": "جاهز",
+      "english": "ready (masculine)",
+      "semanticConcept": "ready (masculine)",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-10-ar-EG-s018",
+        "text": "أنا جاهز.",
+        "english": "I am ready.",
+        "kind": "teaching-example",
+        "sourceIds": [],
+        "transliteration": "ana gahez."
+      },
+      "transliteration": "gahez"
+    },
+    {
+      "id": "ar-EG-oct10-word-4",
+      "term": "هاخد",
+      "english": "I will take",
+      "semanticConcept": "I will take",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-10-ar-EG-s019",
+        "text": "هاخد الملف ده.",
+        "english": "I will take this file.",
+        "kind": "teaching-example",
+        "sourceIds": [],
+        "transliteration": "haakhod el-malaff da."
+      },
+      "transliteration": "haakhod"
+    },
+    {
+      "id": "ar-EG-oct07-word-10",
+      "term": "نراجع",
+      "english": "we review / let us review",
+      "semanticConcept": "we check / let’s check",
+      "plannedRole": "review",
+      "example": {
+        "id": "ai-news-2026-10-10-ar-EG-s020",
+        "text": "نراجع النتايج.",
+        "english": "Let us review the results.",
+        "kind": "teaching-example",
+        "sourceIds": [],
+        "transliteration": "neraageʿ en-nataayeg."
+      },
+      "transliteration": "neraageʿ"
+    },
+    {
+      "id": "ar-EG-oct10-word-6",
+      "term": "سوا",
+      "english": "together",
+      "semanticConcept": "together",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-10-ar-EG-s021",
+        "text": "نراجع سوا.",
+        "english": "Let us review together.",
+        "kind": "teaching-example",
+        "sourceIds": [],
+        "transliteration": "neraageʿ sawa."
+      },
+      "transliteration": "sawa"
+    },
+    {
+      "id": "ar_egy_later",
+      "term": "بعدين",
+      "english": "then / later",
+      "semanticConcept": "later",
+      "plannedRole": "review",
+      "example": {
+        "id": "ai-news-2026-10-10-ar-EG-s022",
+        "text": "بعدين نراجع.",
+        "english": "Then we will review.",
+        "kind": "teaching-example",
+        "sourceIds": [],
+        "transliteration": "baʿdeen neraageʿ."
+      },
+      "transliteration": "baʿdeen"
+    },
+    {
+      "id": "ar_egy_first",
+      "term": "الأول",
+      "english": "first",
+      "semanticConcept": "first",
+      "plannedRole": "review",
+      "example": {
+        "id": "ai-news-2026-10-10-ar-EG-s023",
+        "text": "نقسم الشغل الأول.",
+        "english": "Let us divide the work first.",
+        "kind": "teaching-example",
+        "sourceIds": [],
+        "transliteration": "neʾsem esh-shoghl el-awwal."
+      },
+      "transliteration": "el-awwal"
+    },
+    {
+      "id": "ar-EG-oct09-word-6",
+      "term": "مساعدة",
+      "english": "help / assistance",
+      "semanticConcept": "help / assistance",
+      "plannedRole": "review",
+      "example": {
+        "id": "ai-news-2026-10-10-ar-EG-s024",
+        "text": "محتاج مساعدة.",
+        "english": "I need help.",
+        "kind": "teaching-example",
+        "sourceIds": [],
+        "transliteration": "mehtaag mosaaʿda."
+      },
+      "transliteration": "mosaaʿda"
+    },
+    {
+      "id": "ar-EG-oct10-word-10",
+      "term": "دقيقة",
+      "english": "minute",
+      "semanticConcept": "minute",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-10-ar-EG-s025",
+        "text": "محتاج دقيقة.",
+        "english": "I need a minute.",
+        "kind": "teaching-example",
+        "sourceIds": [],
+        "transliteration": "mehtaag deʾeeʾa."
+      },
+      "transliteration": "deʾeeʾa"
+    }
+  ],
+  "concepts": [
+    {
+      "id": "ar-EG-oct10-grammar-1",
+      "title": "Suggest a shared action",
+      "explanation": "The n- verb forms here mean “we”: neʾsem, we divide; neraageʿ, we review. In context they also suggest “let us”. Add sawa to mean together. Nebdaʾ be-eh? asks what to start with.",
+      "examples": [
+        {
+          "id": "ai-news-2026-10-10-ar-EG-s026",
+          "text": "نقسم الشغل.",
+          "english": "Let us divide the work.",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "neʾsem esh-shoghl."
+        },
+        {
+          "id": "ai-news-2026-10-10-ar-EG-s027",
+          "text": "نراجع سوا.",
+          "english": "Let us review together.",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "neraageʿ sawa."
+        },
+        {
+          "id": "ai-news-2026-10-10-ar-EG-s028",
+          "text": "نبدأ بإيه؟",
+          "english": "What shall we start with?",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "nebdaʾ be-eh?"
+        }
+      ]
+    },
+    {
+      "id": "ar-EG-oct10-grammar-2",
+      "title": "I will take; I am ready",
+      "explanation": "Haakhod is a useful future chunk: “I will take”. For readiness a man says gahez, a woman gahza. No separate present-tense “am” is needed. Add mesh before the adjective for “not ready”.",
+      "examples": [
+        {
+          "id": "ai-news-2026-10-10-ar-EG-s029",
+          "text": "أنا هاخد الملف ده.",
+          "english": "I will take this file.",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "ana haakhod el-malaff da."
+        },
+        {
+          "id": "ai-news-2026-10-10-ar-EG-s030",
+          "text": "أنا جاهزة.",
+          "english": "I am ready.",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "ana gahza."
+        },
+        {
+          "id": "ai-news-2026-10-10-ar-EG-s031",
+          "text": "أنا مش جاهز.",
+          "english": "I am not ready.",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "ana mesh gahez."
+        }
+      ]
+    }
+  ],
+  "exercises": [
+    {
+      "id": "ai-news-2026-10-10-ar-EG-e01",
+      "type": "choice",
+      "prompt": "Choose “step”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "ar-EG-oct07-word-4"
+      },
+      "acceptedAnswers": [
+        "خطوة"
+      ],
+      "hint": "Use the vocabulary example if needed.",
+      "explanation": "خطوة means “step”.",
+      "trackInSrs": false,
+      "choiceAtoms": [
+        {
+          "text": "خطوة",
+          "english": "step",
+          "transliteration": "khatwa"
+        },
+        {
+          "text": "هاخد",
+          "english": "I will take",
+          "transliteration": "haakhod"
+        },
+        {
+          "text": "بعدين",
+          "english": "then / later",
+          "transliteration": "baʿdeen"
+        }
+      ],
+      "showChoiceEnglish": false,
+      "choices": [
+        "خطوة",
+        "هاخد",
+        "بعدين"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-10-ar-EG-e02",
+      "type": "choice",
+      "prompt": "Choose “we divide / let us divide”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "ar-EG-oct10-word-2"
+      },
+      "acceptedAnswers": [
+        "نقسم"
+      ],
+      "hint": "Use the vocabulary example if needed.",
+      "explanation": "نقسم means “we divide / let us divide”.",
+      "trackInSrs": false,
+      "choiceAtoms": [
+        {
+          "text": "نراجع",
+          "english": "we review / let us review",
+          "transliteration": "neraageʿ"
+        },
+        {
+          "text": "الأول",
+          "english": "first",
+          "transliteration": "el-awwal"
+        },
+        {
+          "text": "نقسم",
+          "english": "we divide / let us divide",
+          "transliteration": "neʾsem"
+        }
+      ],
+      "showChoiceEnglish": false,
+      "choices": [
+        "نراجع",
+        "الأول",
+        "نقسم"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-10-ar-EG-e03",
+      "type": "choice",
+      "prompt": "Choose “ready (masculine)”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "ar-EG-oct10-word-3"
+      },
+      "acceptedAnswers": [
+        "جاهز"
+      ],
+      "hint": "Use the vocabulary example if needed.",
+      "explanation": "جاهز means “ready (masculine)”.",
+      "trackInSrs": false,
+      "choiceAtoms": [
+        {
+          "text": "مساعدة",
+          "english": "help / assistance",
+          "transliteration": "mosaaʿda"
+        },
+        {
+          "text": "جاهز",
+          "english": "ready (masculine)",
+          "transliteration": "gahez"
+        },
+        {
+          "text": "سوا",
+          "english": "together",
+          "transliteration": "sawa"
+        }
+      ],
+      "showChoiceEnglish": false,
+      "choices": [
+        "مساعدة",
+        "جاهز",
+        "سوا"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-10-ar-EG-e04",
+      "type": "choice",
+      "prompt": "Choose “we review / let us review”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "ar-EG-oct07-word-10"
+      },
+      "acceptedAnswers": [
+        "نراجع"
+      ],
+      "hint": "Use the vocabulary example if needed.",
+      "explanation": "نراجع means “we review / let us review”.",
+      "trackInSrs": false,
+      "choiceAtoms": [
+        {
+          "text": "الأول",
+          "english": "first",
+          "transliteration": "el-awwal"
+        },
+        {
+          "text": "خطوة",
+          "english": "step",
+          "transliteration": "khatwa"
+        },
+        {
+          "text": "نراجع",
+          "english": "we review / let us review",
+          "transliteration": "neraageʿ"
+        }
+      ],
+      "showChoiceEnglish": false,
+      "choices": [
+        "الأول",
+        "خطوة",
+        "نراجع"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-10-ar-EG-e05",
+      "type": "choice",
+      "prompt": "Choose “then / later”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "ar_egy_later"
+      },
+      "acceptedAnswers": [
+        "بعدين"
+      ],
+      "hint": "Use the vocabulary example if needed.",
+      "explanation": "بعدين means “then / later”.",
+      "trackInSrs": false,
+      "choiceAtoms": [
+        {
+          "text": "بعدين",
+          "english": "then / later",
+          "transliteration": "baʿdeen"
+        },
+        {
+          "text": "دقيقة",
+          "english": "minute",
+          "transliteration": "deʾeeʾa"
+        },
+        {
+          "text": "جاهز",
+          "english": "ready (masculine)",
+          "transliteration": "gahez"
+        }
+      ],
+      "showChoiceEnglish": false,
+      "choices": [
+        "بعدين",
+        "دقيقة",
+        "جاهز"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-10-ar-EG-e06",
+      "type": "recall",
+      "prompt": "Write “step” in Arabic script.",
+      "target": {
+        "type": "vocabulary",
+        "id": "ar-EG-oct07-word-4"
+      },
+      "acceptedAnswers": [
+        "خطوة"
+      ],
+      "hint": "Example: دي خطوة بسيطة.",
+      "explanation": "خطوة means “step”.",
+      "trackInSrs": true
+    },
+    {
+      "id": "ai-news-2026-10-10-ar-EG-e07",
+      "type": "recall",
+      "prompt": "Write “ready (masculine)” in Arabic script.",
+      "target": {
+        "type": "vocabulary",
+        "id": "ar-EG-oct10-word-3"
+      },
+      "acceptedAnswers": [
+        "جاهز"
+      ],
+      "hint": "Example: أنا جاهز.",
+      "explanation": "جاهز means “ready (masculine)”.",
+      "trackInSrs": true
+    },
+    {
+      "id": "ai-news-2026-10-10-ar-EG-e08",
+      "type": "recall",
+      "prompt": "Fill the gap: I am ready (male speaker).",
+      "target": {
+        "type": "vocabulary",
+        "id": "ar-EG-oct10-word-3"
+      },
+      "acceptedAnswers": [
+        "جاهز"
+      ],
+      "hint": "Use the masculine adjective for ready.",
+      "explanation": "جاهز describes a male speaker; جاهزة describes a female speaker.",
+      "trackInSrs": true,
+      "promptAtom": {
+        "id": "ai-news-2026-10-10-ar-EG-s032",
+        "text": "أنا ___.",
+        "english": "I am ready.",
+        "kind": "teaching-example",
+        "sourceIds": [],
+        "transliteration": "ana ___."
+      }
+    },
+    {
+      "id": "ai-news-2026-10-10-ar-EG-e09",
+      "type": "recall",
+      "prompt": "Fill the gap: let us review together.",
+      "target": {
+        "type": "vocabulary",
+        "id": "ar-EG-oct10-word-6"
+      },
+      "acceptedAnswers": [
+        "سوا"
+      ],
+      "hint": "Use the word meaning together.",
+      "explanation": "سوا means together.",
+      "trackInSrs": true,
+      "promptAtom": {
+        "id": "ai-news-2026-10-10-ar-EG-s033",
+        "text": "نراجع ___.",
+        "english": "Let us review together.",
+        "kind": "teaching-example",
+        "sourceIds": [],
+        "transliteration": "neraageʿ ___."
+      }
+    },
+    {
+      "id": "ai-news-2026-10-10-ar-EG-e10",
+      "type": "order",
+      "prompt": "Put the words in order: Let us divide the work first.",
+      "target": {
+        "type": "grammar",
+        "id": "ar-EG-oct10-grammar-1"
+      },
+      "acceptedAnswers": [
+        "نقسم الشغل الأول"
+      ],
+      "hint": "Use the matching pattern in Grammar.",
+      "explanation": "Let us divide the work first.",
+      "trackInSrs": false,
+      "tokens": [
+        "الأول",
+        "الشغل",
+        "نقسم"
+      ],
+      "answerData": [
+        {
+          "arabic": "نقسم الشغل الأول",
+          "transliteration": "neʾsem esh-shoghl el-awwal",
+          "english": "Let us divide the work first."
+        }
+      ],
+      "choices": [
+        "الأول",
+        "الشغل",
+        "نقسم"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-10-ar-EG-e11",
+      "type": "order",
+      "prompt": "Put the words in order: Then we will review together.",
+      "target": {
+        "type": "grammar",
+        "id": "ar-EG-oct10-grammar-1"
+      },
+      "acceptedAnswers": [
+        "بعدين نراجع سوا"
+      ],
+      "hint": "Use the matching pattern in Grammar.",
+      "explanation": "Then we will review together.",
+      "trackInSrs": false,
+      "tokens": [
+        "سوا",
+        "نراجع",
+        "بعدين"
+      ],
+      "answerData": [
+        {
+          "arabic": "بعدين نراجع سوا",
+          "transliteration": "baʿdeen neraageʿ sawa",
+          "english": "Then we will review together."
+        }
+      ],
+      "choices": [
+        "سوا",
+        "نراجع",
+        "بعدين"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-10-ar-EG-e12",
+      "type": "order",
+      "prompt": "Put the words in order: I am not ready.",
+      "target": {
+        "type": "grammar",
+        "id": "ar-EG-oct10-grammar-2"
+      },
+      "acceptedAnswers": [
+        "أنا مش جاهز"
+      ],
+      "hint": "Use the matching pattern in Grammar.",
+      "explanation": "I am not ready.",
+      "trackInSrs": false,
+      "tokens": [
+        "جاهز",
+        "مش",
+        "أنا"
+      ],
+      "answerData": [
+        {
+          "arabic": "أنا مش جاهز",
+          "transliteration": "ana mesh gahez",
+          "english": "I am not ready."
+        }
+      ],
+      "choices": [
+        "جاهز",
+        "مش",
+        "أنا"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-10-ar-EG-e13",
+      "type": "matching",
+      "prompt": "Match each word or phrase to its meaning.",
+      "target": {
+        "type": "vocabulary",
+        "id": "ar-EG-oct07-word-4"
+      },
+      "acceptedAnswers": [
+        "{\"0\": \"step\", \"1\": \"ready (masculine)\", \"2\": \"we review / let us review\", \"3\": \"then / later\"}"
+      ],
+      "hint": "Use the short vocabulary examples.",
+      "explanation": "Read each complete pair aloud.",
+      "trackInSrs": false,
+      "matchingPairs": [
+        {
+          "id": "0",
+          "text": "خطوة",
+          "answer": "step",
+          "transliteration": "khatwa",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar-EG-oct07-word-4"
+          }
+        },
+        {
+          "id": "1",
+          "text": "جاهز",
+          "answer": "ready (masculine)",
+          "transliteration": "gahez",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar-EG-oct10-word-3"
+          }
+        },
+        {
+          "id": "2",
+          "text": "نراجع",
+          "answer": "we review / let us review",
+          "transliteration": "neraageʿ",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar-EG-oct07-word-10"
+          }
+        },
+        {
+          "id": "3",
+          "text": "بعدين",
+          "answer": "then / later",
+          "transliteration": "baʿdeen",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar_egy_later"
+          }
+        }
+      ],
+      "choices": [
+        "then / later",
+        "we review / let us review",
+        "ready (masculine)",
+        "step"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-10-ar-EG-e14",
+      "type": "self-check",
+      "prompt": "Suggest dividing the work first.",
+      "target": {
+        "type": "grammar",
+        "id": "ar-EG-oct10-grammar-1"
+      },
+      "acceptedAnswers": [
+        "نقسم الشغل الأول."
+      ],
+      "hint": "Build short sentences using the examples.",
+      "explanation": "Compare the requested meaning and forms; other natural answers can work.",
+      "trackInSrs": false,
+      "answerData": [
+        {
+          "arabic": "نقسم الشغل الأول.",
+          "transliteration": "neʾsem esh-shoghl el-awwal.",
+          "english": "Let us divide the work first."
+        }
+      ],
+      "rubric": {
+        "criteria": "Include every requested meaning. Check the verb or adjective form, then assess your answer."
+      }
+    },
+    {
+      "id": "ai-news-2026-10-10-ar-EG-e15",
+      "type": "self-check",
+      "prompt": "As Mona, say you are ready, then say you will take this file.",
+      "target": {
+        "type": "grammar",
+        "id": "ar-EG-oct10-grammar-2"
+      },
+      "acceptedAnswers": [
+        "أنا جاهزة. هاخد الملف ده."
+      ],
+      "hint": "Build short sentences using the examples.",
+      "explanation": "Compare the requested meaning and forms; other natural answers can work.",
+      "trackInSrs": false,
+      "answerData": [
+        {
+          "arabic": "أنا جاهزة. هاخد الملف ده.",
+          "transliteration": "ana gahza. haakhod el-malaff da.",
+          "english": "I am ready. I will take this file."
+        }
+      ],
+      "rubric": {
+        "criteria": "Include every requested meaning. Check the verb or adjective form, then assess your answer."
+      }
+    },
+    {
+      "id": "ai-news-2026-10-10-ar-EG-e16",
+      "type": "self-check",
+      "prompt": "Say you need a minute, then suggest reviewing together.",
+      "target": {
+        "type": "grammar",
+        "id": "ar-EG-oct10-grammar-2"
+      },
+      "acceptedAnswers": [
+        "محتاج دقيقة. نراجع سوا."
+      ],
+      "hint": "Build short sentences using the examples.",
+      "explanation": "Compare the requested meaning and forms; other natural answers can work.",
+      "trackInSrs": false,
+      "answerData": [
+        {
+          "arabic": "محتاج دقيقة. نراجع سوا.",
+          "transliteration": "mehtaag deʾeeʾa. neraageʿ sawa.",
+          "english": "I need a minute. Let us review together."
+        }
+      ],
+      "rubric": {
+        "criteria": "Include every requested meaning. Check the verb or adjective form, then assess your answer."
+      }
+    },
+    {
+      "id": "ai-news-2026-10-10-ar-EG-e17",
+      "type": "recall",
+      "prompt": "Review: write “first”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "ar_egy_first"
+      },
+      "acceptedAnswers": [
+        "الأول"
+      ],
+      "hint": "Example: نقسم الشغل الأول.",
+      "explanation": "الأول means “first”.",
+      "trackInSrs": true
+    },
+    {
+      "id": "ai-news-2026-10-10-ar-EG-e18",
+      "type": "recall",
+      "prompt": "Review: write “help / assistance”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "ar-EG-oct09-word-6"
+      },
+      "acceptedAnswers": [
+        "مساعدة"
+      ],
+      "hint": "Example: محتاج مساعدة.",
+      "explanation": "مساعدة means “help / assistance”.",
+      "trackInSrs": true
+    }
+  ],
+  "route": [
+    "Read · 10 min",
+    "Words and grammar · 8 min",
+    "Practise · 17 min",
+    "Own example · 5 min"
+  ],
+  "review": {
+    "instructions": "Retrieve the two review words before opening hints. After one day and three days, try the three speaking prompts again without the models.",
+    "prompts": [
+      "Say what you will do first, ask for help, then suggest reviewing together."
+    ]
+  }
+}

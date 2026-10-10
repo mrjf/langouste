@@ -2037,6 +2037,81 @@
         "lemma": "kész",
         "gloss": "ready / finished",
         "form": ""
+      },
+      "microsoft": {
+        "lemma": "Microsoft",
+        "gloss": "Microsoft",
+        "form": "Company name."
+      },
+      "útmutatót": {
+        "lemma": "útmutató",
+        "gloss": "guide",
+        "form": "Accusative: -t."
+      },
+      "adott": {
+        "lemma": "ad",
+        "gloss": "gave",
+        "form": "Third-person singular past; adott ki means published."
+      },
+      "útmutató": {
+        "lemma": "útmutató",
+        "gloss": "guide",
+        "form": ""
+      },
+      "ai-eszközök": {
+        "lemma": "AI-eszköz",
+        "gloss": "AI tools",
+        "form": "Plural: -ök."
+      },
+      "teszteléséről": {
+        "lemma": "tesztelés",
+        "gloss": "about testing",
+        "form": "Possessive -e plus delative -ről."
+      },
+      "megtalálni": {
+        "lemma": "megtalál",
+        "gloss": "to find",
+        "form": "Infinitive: -ni."
+      },
+      "hibák": {
+        "lemma": "hiba",
+        "gloss": "errors",
+        "form": "Plural; a lengthens to á."
+      },
+      "okát": {
+        "lemma": "ok",
+        "gloss": "the cause of",
+        "form": "Possessive plus accusative: -a + -t."
+      },
+      "képernyőn": {
+        "lemma": "képernyő",
+        "gloss": "on the screen",
+        "form": "Superessive: -n."
+      },
+      "benne": {
+        "lemma": "benne",
+        "gloss": "in it",
+        "form": "Pronominal form of in."
+      },
+      "lépés": {
+        "lemma": "lépés",
+        "gloss": "step",
+        "form": ""
+      },
+      "első": {
+        "lemma": "első",
+        "gloss": "first",
+        "form": "Ordinal."
+      },
+      "jöhet": {
+        "lemma": "jön",
+        "gloss": "may come",
+        "form": "Potential third-person singular; jöhet a következő invites the next item."
+      },
+      "utasítás": {
+        "lemma": "utasítás",
+        "gloss": "instruction",
+        "form": ""
       }
     },
     "ar-EG": {
@@ -4594,6 +4669,126 @@
         "lemma": "مكالمة",
         "gloss": "call",
         "form": "Singular noun."
+      },
+      "anthropic": {
+        "lemma": "Anthropic",
+        "gloss": "Anthropic",
+        "form": "Company name."
+      },
+      "ميزة": {
+        "lemma": "ميزة",
+        "gloss": "feature",
+        "form": "Feminine singular."
+      },
+      "الميزة": {
+        "lemma": "ميزة",
+        "gloss": "the feature",
+        "form": "Definite noun."
+      },
+      "بتشغّل": {
+        "lemma": "شغّل",
+        "gloss": "runs / operates",
+        "form": "Third-person feminine singular habitual present."
+      },
+      "وكلاء": {
+        "lemma": "وكيل",
+        "gloss": "agents",
+        "form": "Broken plural."
+      },
+      "ai": {
+        "lemma": "AI",
+        "gloss": "AI",
+        "form": "English abbreviation for artificial intelligence."
+      },
+      "مراحل": {
+        "lemma": "مرحلة",
+        "gloss": "phases",
+        "form": "Broken plural."
+      },
+      "وبتجمع": {
+        "lemma": "جمع",
+        "gloss": "and combines",
+        "form": "we- plus feminine singular habitual present."
+      },
+      "النتايج": {
+        "lemma": "نتيجة",
+        "gloss": "the results",
+        "form": "Definite colloquial plural."
+      },
+      "تجريبية": {
+        "lemma": "تجريبي",
+        "gloss": "experimental / in beta",
+        "form": "Feminine adjective."
+      },
+      "تلات": {
+        "lemma": "تلاتة",
+        "gloss": "three",
+        "form": "Counting form before a noun."
+      },
+      "بإيه": {
+        "lemma": "إيه",
+        "gloss": "with what",
+        "form": "be- plus question word."
+      },
+      "نقسم": {
+        "lemma": "قسم",
+        "gloss": "we divide / let us divide",
+        "form": "First-person plural; suggestion in context."
+      },
+      "هاخد": {
+        "lemma": "أخد",
+        "gloss": "I will take",
+        "form": "First-person singular future."
+      },
+      "تمام": {
+        "lemma": "تمام",
+        "gloss": "great / okay",
+        "form": "Response."
+      },
+      "وأنا": {
+        "lemma": "أنا",
+        "gloss": "and I",
+        "form": "we- plus first-person pronoun."
+      },
+      "سوا": {
+        "lemma": "سوا",
+        "gloss": "together",
+        "form": "Adverb."
+      },
+      "خلصت": {
+        "lemma": "خلّص",
+        "gloss": "finished",
+        "form": "Here khallast: I finished or you (masculine) finished, according to speaker."
+      },
+      "الخطوة": {
+        "lemma": "خطوة",
+        "gloss": "the step",
+        "form": "Definite noun."
+      },
+      "الأولى": {
+        "lemma": "أول",
+        "gloss": "first",
+        "form": "Feminine definite ordinal."
+      },
+      "دقيقة": {
+        "lemma": "دقيقة",
+        "gloss": "minute",
+        "form": "Unit of time."
+      },
+      "ماشي": {
+        "lemma": "ماشي",
+        "gloss": "okay",
+        "form": "Agreement in context."
+      },
+      "جاهزة": {
+        "lemma": "جاهز",
+        "gloss": "ready",
+        "form": "Feminine adjective."
+      },
+      "جاهز": {
+        "lemma": "جاهز",
+        "gloss": "ready",
+        "form": "Masculine adjective."
       }
     }
   }
