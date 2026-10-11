@@ -1,0 +1,942 @@
+{
+  "schemaVersion": 1,
+  "id": "ai-news-2026-10-11-ar-EG",
+  "courseId": "ai-news-daily-2026-10-11",
+  "day": 38,
+  "language": "ar-EG",
+  "title": "نستنى شوية",
+  "subtitle": "October 11, 2026 · Let us wait a bit",
+  "estimatedMinutes": 40,
+  "objectives": [
+    "Ask whether there is a connection.",
+    "Describe a disconnected connection or working program.",
+    "Suggest waiting and trying again."
+  ],
+  "sources": [
+    {
+      "id": "anthropic_evaluation_safeguards_2026_10_09",
+      "title": "Investigating unintended model actions in our evaluations and internal use",
+      "url": "https://www.anthropic.com/research/investigating-unintended-model-actions",
+      "publishedOn": "2026-10-09",
+      "verifiedAsOf": "2026-10-11",
+      "publisher": "Anthropic",
+      "factSummary": "Anthropic reported unintended model actions and said it was disabling live internet access for all internal evaluations until its safeguards and monitoring reliably catch such behavior. This does not describe an internet shutdown for every Claude customer."
+    }
+  ],
+  "readings": [
+    {
+      "id": "ai-news-2026-10-11-ar-EG-r1",
+      "title": "A pause in live internet access · October 9 report",
+      "sentences": [
+        {
+          "id": "ai-news-2026-10-11-ar-EG-s001",
+          "text": "Anthropic نشرت تقرير عن تصرفات غير مقصودة.",
+          "english": "Anthropic published a report about unintended actions.",
+          "kind": "source-summary",
+          "sourceIds": [
+            "anthropic_evaluation_safeguards_2026_10_09"
+          ],
+          "transliteration": "Anthropic nasharet taʾreer ʿan tasarrofaat gheer maʾsooda."
+        },
+        {
+          "id": "ai-news-2026-10-11-ar-EG-s002",
+          "text": "وقالت إنها هتوقف الإنترنت في كل الاختبارات الداخلية مؤقتاً.",
+          "english": "It said it would temporarily stop internet access in all internal evaluations.",
+          "kind": "source-summary",
+          "sourceIds": [
+            "anthropic_evaluation_safeguards_2026_10_09"
+          ],
+          "transliteration": "we-ʾaalet innaha hatewaʾʾaf el-internet fi koll el-ekhtebaraat ed-daakhleyya moʾaʾʾatan."
+        },
+        {
+          "id": "ai-news-2026-10-11-ar-EG-s003",
+          "text": "القرار ده مش لكل مستخدمي Claude.",
+          "english": "This decision is not for all Claude users.",
+          "kind": "source-summary",
+          "sourceIds": [
+            "anthropic_evaluation_safeguards_2026_10_09"
+          ],
+          "transliteration": "el-ʾaraar da mesh le-koll mostakhdemi Claude."
+        }
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-11-ar-EG-r2",
+      "title": "Check the connection · Fictional dialogue",
+      "sentences": [
+        {
+          "id": "ai-news-2026-10-11-ar-EG-s004",
+          "text": "منى: في إنترنت هنا؟",
+          "english": "Mona: Is there internet here?",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "Mona: fi internet hena?"
+        },
+        {
+          "id": "ai-news-2026-10-11-ar-EG-s005",
+          "text": "كريم: لأ، الاتصال مقطوع.",
+          "english": "Karim: No, the connection is down.",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "Kareem: laʾ, el-ettesaal maʾtooʿ."
+        },
+        {
+          "id": "ai-news-2026-10-11-ar-EG-s006",
+          "text": "منى: والبرنامج شغال؟",
+          "english": "Mona: And is the program working?",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "Mona: wel-bernaameg shaghghaal?"
+        },
+        {
+          "id": "ai-news-2026-10-11-ar-EG-s007",
+          "text": "كريم: أيوه، بس الصفحة مش بتفتح.",
+          "english": "Karim: Yes, but the page is not opening.",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "Kareem: aywa, bass es-safha mesh beteftah."
+        },
+        {
+          "id": "ai-news-2026-10-11-ar-EG-s008",
+          "text": "منى: طيب، نستنى شوية.",
+          "english": "Mona: Okay, let us wait a bit.",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "Mona: tayyeb, nestanna shewayya."
+        },
+        {
+          "id": "ai-news-2026-10-11-ar-EG-s009",
+          "text": "كريم: وبعدين نجرب تاني.",
+          "english": "Karim: Then we will try again.",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "Kareem: we-baʿdeen negarrab taani."
+        }
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-11-ar-EG-r3",
+      "title": "Try again later · Fictional dialogue",
+      "sentences": [
+        {
+          "id": "ai-news-2026-10-11-ar-EG-s010",
+          "text": "منى: في اتصال دلوقتي؟",
+          "english": "Mona: Is there a connection now?",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "Mona: fi ettesaal delwaʾti?"
+        },
+        {
+          "id": "ai-news-2026-10-11-ar-EG-s011",
+          "text": "كريم: أيوه، الإنترنت رجع.",
+          "english": "Karim: Yes, the internet is back.",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "Kareem: aywa, el-internet regeʿ."
+        },
+        {
+          "id": "ai-news-2026-10-11-ar-EG-s012",
+          "text": "منى: نجرب تاني؟",
+          "english": "Mona: Shall we try again?",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "Mona: negarrab taani?"
+        },
+        {
+          "id": "ai-news-2026-10-11-ar-EG-s013",
+          "text": "كريم: أيوه، أنا جاهز.",
+          "english": "Karim: Yes, I am ready.",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "Kareem: aywa, ana gahez."
+        },
+        {
+          "id": "ai-news-2026-10-11-ar-EG-s014",
+          "text": "منى: الصفحة فتحت!",
+          "english": "Mona: The page opened!",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "Mona: es-safha fatahet!"
+        },
+        {
+          "id": "ai-news-2026-10-11-ar-EG-s015",
+          "text": "كريم: كويس، نكمل الشغل.",
+          "english": "Karim: Good, let us continue the work.",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "Kareem: kwayyes, nekammel esh-shoghl."
+        }
+      ]
+    }
+  ],
+  "vocabulary": [
+    {
+      "id": "ar-EG-oct11-word-1",
+      "term": "اتصال",
+      "english": "connection",
+      "semanticConcept": "connection",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-11-ar-EG-s016",
+        "text": "في اتصال؟",
+        "english": "Is there a connection?",
+        "kind": "teaching-example",
+        "sourceIds": [],
+        "transliteration": "fi ettesaal?"
+      },
+      "transliteration": "ettesaal"
+    },
+    {
+      "id": "ar-EG-oct11-word-2",
+      "term": "إنترنت",
+      "english": "internet",
+      "semanticConcept": "internet",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-11-ar-EG-s017",
+        "text": "في إنترنت هنا؟",
+        "english": "Is there internet here?",
+        "kind": "teaching-example",
+        "sourceIds": [],
+        "transliteration": "fi internet hena?"
+      },
+      "transliteration": "internet"
+    },
+    {
+      "id": "ar-EG-oct11-word-3",
+      "term": "مقطوع",
+      "english": "disconnected / down",
+      "semanticConcept": "disconnected / down",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-11-ar-EG-s018",
+        "text": "الاتصال مقطوع.",
+        "english": "The connection is down.",
+        "kind": "teaching-example",
+        "sourceIds": [],
+        "transliteration": "el-ettesaal maʾtooʿ."
+      },
+      "transliteration": "maʾtooʿ"
+    },
+    {
+      "id": "ar-EG-oct11-word-4",
+      "term": "شغال",
+      "english": "working",
+      "semanticConcept": "working",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-11-ar-EG-s019",
+        "text": "البرنامج شغال.",
+        "english": "The program is working.",
+        "kind": "teaching-example",
+        "sourceIds": [],
+        "transliteration": "el-bernaameg shaghghaal."
+      },
+      "transliteration": "shaghghaal"
+    },
+    {
+      "id": "ar-EG-oct11-word-5",
+      "term": "نستنى",
+      "english": "we wait / let us wait",
+      "semanticConcept": "we wait / let us wait",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-11-ar-EG-s020",
+        "text": "نستنى شوية.",
+        "english": "Let us wait a bit.",
+        "kind": "teaching-example",
+        "sourceIds": [],
+        "transliteration": "nestanna shewayya."
+      },
+      "transliteration": "nestanna"
+    },
+    {
+      "id": "ar-EG-oct11-word-6",
+      "term": "نجرب",
+      "english": "we try / let us try",
+      "semanticConcept": "we try / let us try",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-11-ar-EG-s021",
+        "text": "نجرب تاني.",
+        "english": "Let us try again.",
+        "kind": "teaching-example",
+        "sourceIds": [],
+        "transliteration": "negarrab taani."
+      },
+      "transliteration": "negarrab"
+    },
+    {
+      "id": "ar_egy_few",
+      "term": "شوية",
+      "english": "a little / a bit",
+      "semanticConcept": "few",
+      "plannedRole": "review",
+      "example": {
+        "id": "ai-news-2026-10-11-ar-EG-s022",
+        "text": "نستنى شوية.",
+        "english": "Let us wait a bit.",
+        "kind": "teaching-example",
+        "sourceIds": [],
+        "transliteration": "nestanna shewayya."
+      },
+      "transliteration": "shewayya"
+    },
+    {
+      "id": "ar-EG-oct10-word-3",
+      "term": "جاهز",
+      "english": "ready (masculine)",
+      "semanticConcept": "ready (masculine)",
+      "plannedRole": "review",
+      "example": {
+        "id": "ai-news-2026-10-11-ar-EG-s023",
+        "text": "أنا جاهز.",
+        "english": "I am ready.",
+        "kind": "teaching-example",
+        "sourceIds": [],
+        "transliteration": "ana gahez."
+      },
+      "transliteration": "gahez"
+    },
+    {
+      "id": "ar-EG-oct09-word-6",
+      "term": "مساعدة",
+      "english": "help / assistance",
+      "semanticConcept": "help / assistance",
+      "plannedRole": "review",
+      "example": {
+        "id": "ai-news-2026-10-11-ar-EG-s024",
+        "text": "محتاج مساعدة.",
+        "english": "I need help.",
+        "kind": "teaching-example",
+        "sourceIds": [],
+        "transliteration": "mehtaag mosaaʿda."
+      },
+      "transliteration": "mosaaʿda"
+    },
+    {
+      "id": "ar_egy_again",
+      "term": "تاني",
+      "english": "again",
+      "semanticConcept": "again",
+      "plannedRole": "review",
+      "example": {
+        "id": "ai-news-2026-10-11-ar-EG-s025",
+        "text": "نجرب تاني.",
+        "english": "Let us try again.",
+        "kind": "teaching-example",
+        "sourceIds": [],
+        "transliteration": "negarrab taani."
+      },
+      "transliteration": "taani"
+    }
+  ],
+  "concepts": [
+    {
+      "id": "ar-EG-oct11-grammar-1",
+      "title": "Is there a connection?",
+      "explanation": "Fi means there is or there are. With question intonation it asks whether something exists. Mafeesh, written مفيش, means there is not or there are not. Hena places it here.",
+      "examples": [
+        {
+          "id": "ai-news-2026-10-11-ar-EG-s026",
+          "text": "في إنترنت هنا؟",
+          "english": "Is there internet here?",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "fi internet hena?"
+        },
+        {
+          "id": "ai-news-2026-10-11-ar-EG-s027",
+          "text": "مفيش إنترنت هنا.",
+          "english": "There is no internet here.",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "mafeesh internet hena."
+        },
+        {
+          "id": "ai-news-2026-10-11-ar-EG-s028",
+          "text": "في اتصال دلوقتي.",
+          "english": "There is a connection now.",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "fi ettesaal delwaʾti."
+        }
+      ]
+    },
+    {
+      "id": "ar-EG-oct11-grammar-2",
+      "title": "Working or not working",
+      "explanation": "Use mesh before an adjective to negate a description: el-bernaameg mesh shaghghaal. Maʾtooʿ means disconnected or down for a connection. No separate present-tense “is” is needed. Do not confuse mafeesh (there is no) with mesh (not).",
+      "examples": [
+        {
+          "id": "ai-news-2026-10-11-ar-EG-s029",
+          "text": "البرنامج شغال.",
+          "english": "The program is working.",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "el-bernaameg shaghghaal."
+        },
+        {
+          "id": "ai-news-2026-10-11-ar-EG-s030",
+          "text": "البرنامج مش شغال.",
+          "english": "The program is not working.",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "el-bernaameg mesh shaghghaal."
+        },
+        {
+          "id": "ai-news-2026-10-11-ar-EG-s031",
+          "text": "الاتصال مقطوع.",
+          "english": "The connection is down.",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "el-ettesaal maʾtooʿ."
+        }
+      ]
+    }
+  ],
+  "exercises": [
+    {
+      "id": "ai-news-2026-10-11-ar-EG-e01",
+      "type": "choice",
+      "prompt": "Choose “connection”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "ar-EG-oct11-word-1"
+      },
+      "acceptedAnswers": [
+        "اتصال"
+      ],
+      "hint": "Use the vocabulary example if needed.",
+      "explanation": "اتصال means “connection”.",
+      "trackInSrs": false,
+      "choiceAtoms": [
+        {
+          "text": "اتصال",
+          "english": "connection",
+          "transliteration": "ettesaal"
+        },
+        {
+          "text": "شغال",
+          "english": "working",
+          "transliteration": "shaghghaal"
+        },
+        {
+          "text": "شوية",
+          "english": "a little / a bit",
+          "transliteration": "shewayya"
+        }
+      ],
+      "showChoiceEnglish": false,
+      "choices": [
+        "اتصال",
+        "شغال",
+        "شوية"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-11-ar-EG-e02",
+      "type": "choice",
+      "prompt": "Choose “internet”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "ar-EG-oct11-word-2"
+      },
+      "acceptedAnswers": [
+        "إنترنت"
+      ],
+      "hint": "Use the vocabulary example if needed.",
+      "explanation": "إنترنت means “internet”.",
+      "trackInSrs": false,
+      "choiceAtoms": [
+        {
+          "text": "نستنى",
+          "english": "we wait / let us wait",
+          "transliteration": "nestanna"
+        },
+        {
+          "text": "جاهز",
+          "english": "ready (masculine)",
+          "transliteration": "gahez"
+        },
+        {
+          "text": "إنترنت",
+          "english": "internet",
+          "transliteration": "internet"
+        }
+      ],
+      "showChoiceEnglish": false,
+      "choices": [
+        "نستنى",
+        "جاهز",
+        "إنترنت"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-11-ar-EG-e03",
+      "type": "choice",
+      "prompt": "Choose “disconnected / down”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "ar-EG-oct11-word-3"
+      },
+      "acceptedAnswers": [
+        "مقطوع"
+      ],
+      "hint": "Use the vocabulary example if needed.",
+      "explanation": "مقطوع means “disconnected / down”.",
+      "trackInSrs": false,
+      "choiceAtoms": [
+        {
+          "text": "مساعدة",
+          "english": "help / assistance",
+          "transliteration": "mosaaʿda"
+        },
+        {
+          "text": "مقطوع",
+          "english": "disconnected / down",
+          "transliteration": "maʾtooʿ"
+        },
+        {
+          "text": "نجرب",
+          "english": "we try / let us try",
+          "transliteration": "negarrab"
+        }
+      ],
+      "showChoiceEnglish": false,
+      "choices": [
+        "مساعدة",
+        "مقطوع",
+        "نجرب"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-11-ar-EG-e04",
+      "type": "choice",
+      "prompt": "Choose “we wait / let us wait”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "ar-EG-oct11-word-5"
+      },
+      "acceptedAnswers": [
+        "نستنى"
+      ],
+      "hint": "Use the vocabulary example if needed.",
+      "explanation": "نستنى means “we wait / let us wait”.",
+      "trackInSrs": false,
+      "choiceAtoms": [
+        {
+          "text": "جاهز",
+          "english": "ready (masculine)",
+          "transliteration": "gahez"
+        },
+        {
+          "text": "اتصال",
+          "english": "connection",
+          "transliteration": "ettesaal"
+        },
+        {
+          "text": "نستنى",
+          "english": "we wait / let us wait",
+          "transliteration": "nestanna"
+        }
+      ],
+      "showChoiceEnglish": false,
+      "choices": [
+        "جاهز",
+        "اتصال",
+        "نستنى"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-11-ar-EG-e05",
+      "type": "choice",
+      "prompt": "Choose “a little / a bit”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "ar_egy_few"
+      },
+      "acceptedAnswers": [
+        "شوية"
+      ],
+      "hint": "Use the vocabulary example if needed.",
+      "explanation": "شوية means “a little / a bit”.",
+      "trackInSrs": false,
+      "choiceAtoms": [
+        {
+          "text": "شوية",
+          "english": "a little / a bit",
+          "transliteration": "shewayya"
+        },
+        {
+          "text": "تاني",
+          "english": "again",
+          "transliteration": "taani"
+        },
+        {
+          "text": "مقطوع",
+          "english": "disconnected / down",
+          "transliteration": "maʾtooʿ"
+        }
+      ],
+      "showChoiceEnglish": false,
+      "choices": [
+        "شوية",
+        "تاني",
+        "مقطوع"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-11-ar-EG-e06",
+      "type": "recall",
+      "prompt": "Write “connection” in Arabic script.",
+      "target": {
+        "type": "vocabulary",
+        "id": "ar-EG-oct11-word-1"
+      },
+      "acceptedAnswers": [
+        "اتصال"
+      ],
+      "hint": "Example: في اتصال؟",
+      "explanation": "اتصال means “connection”.",
+      "trackInSrs": true
+    },
+    {
+      "id": "ai-news-2026-10-11-ar-EG-e07",
+      "type": "recall",
+      "prompt": "Write “disconnected / down” in Arabic script.",
+      "target": {
+        "type": "vocabulary",
+        "id": "ar-EG-oct11-word-3"
+      },
+      "acceptedAnswers": [
+        "مقطوع"
+      ],
+      "hint": "Example: الاتصال مقطوع.",
+      "explanation": "مقطوع means “disconnected / down”.",
+      "trackInSrs": true
+    },
+    {
+      "id": "ai-news-2026-10-11-ar-EG-e08",
+      "type": "recall",
+      "prompt": "Fill the gap: the connection is down.",
+      "target": {
+        "type": "vocabulary",
+        "id": "ar-EG-oct11-word-3"
+      },
+      "acceptedAnswers": [
+        "مقطوع"
+      ],
+      "hint": "Use the adjective for a disconnected connection.",
+      "explanation": "مقطوع describes a connection that is down.",
+      "trackInSrs": true,
+      "promptAtom": {
+        "id": "ai-news-2026-10-11-ar-EG-s032",
+        "text": "الاتصال ___.",
+        "english": "The connection is down.",
+        "kind": "teaching-example",
+        "sourceIds": [],
+        "transliteration": "el-ettesaal ___."
+      }
+    },
+    {
+      "id": "ai-news-2026-10-11-ar-EG-e09",
+      "type": "recall",
+      "prompt": "Fill the gap: let us wait a bit.",
+      "target": {
+        "type": "vocabulary",
+        "id": "ar_egy_few"
+      },
+      "acceptedAnswers": [
+        "شوية"
+      ],
+      "hint": "Use the phrase meaning a bit.",
+      "explanation": "شوية means a little or a bit.",
+      "trackInSrs": true,
+      "promptAtom": {
+        "id": "ai-news-2026-10-11-ar-EG-s033",
+        "text": "نستنى ___.",
+        "english": "Let us wait a bit.",
+        "kind": "teaching-example",
+        "sourceIds": [],
+        "transliteration": "nestanna ___."
+      }
+    },
+    {
+      "id": "ai-news-2026-10-11-ar-EG-e10",
+      "type": "order",
+      "prompt": "Put the words in order: There is internet here.",
+      "target": {
+        "type": "grammar",
+        "id": "ar-EG-oct11-grammar-1"
+      },
+      "acceptedAnswers": [
+        "في إنترنت هنا"
+      ],
+      "hint": "Use the matching pattern in Grammar.",
+      "explanation": "There is internet here.",
+      "trackInSrs": false,
+      "tokens": [
+        "هنا",
+        "إنترنت",
+        "في"
+      ],
+      "answerData": [
+        {
+          "arabic": "في إنترنت هنا",
+          "transliteration": "fi internet hena",
+          "english": "There is internet here."
+        }
+      ],
+      "choices": [
+        "هنا",
+        "إنترنت",
+        "في"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-11-ar-EG-e11",
+      "type": "order",
+      "prompt": "Put the words in order: There is no connection now.",
+      "target": {
+        "type": "grammar",
+        "id": "ar-EG-oct11-grammar-1"
+      },
+      "acceptedAnswers": [
+        "مفيش اتصال دلوقتي"
+      ],
+      "hint": "Use the matching pattern in Grammar.",
+      "explanation": "There is no connection now.",
+      "trackInSrs": false,
+      "tokens": [
+        "دلوقتي",
+        "اتصال",
+        "مفيش"
+      ],
+      "answerData": [
+        {
+          "arabic": "مفيش اتصال دلوقتي",
+          "transliteration": "mafeesh ettesaal delwaʾti",
+          "english": "There is no connection now."
+        }
+      ],
+      "choices": [
+        "دلوقتي",
+        "اتصال",
+        "مفيش"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-11-ar-EG-e12",
+      "type": "order",
+      "prompt": "Put the words in order: The program is not working.",
+      "target": {
+        "type": "grammar",
+        "id": "ar-EG-oct11-grammar-2"
+      },
+      "acceptedAnswers": [
+        "البرنامج مش شغال"
+      ],
+      "hint": "Use the matching pattern in Grammar.",
+      "explanation": "The program is not working.",
+      "trackInSrs": false,
+      "tokens": [
+        "شغال",
+        "مش",
+        "البرنامج"
+      ],
+      "answerData": [
+        {
+          "arabic": "البرنامج مش شغال",
+          "transliteration": "el-bernaameg mesh shaghghaal",
+          "english": "The program is not working."
+        }
+      ],
+      "choices": [
+        "شغال",
+        "مش",
+        "البرنامج"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-11-ar-EG-e13",
+      "type": "matching",
+      "prompt": "Match each word or phrase to its meaning.",
+      "target": {
+        "type": "vocabulary",
+        "id": "ar-EG-oct11-word-1"
+      },
+      "acceptedAnswers": [
+        "{\"0\": \"connection\", \"1\": \"disconnected / down\", \"2\": \"we wait / let us wait\", \"3\": \"a little / a bit\"}"
+      ],
+      "hint": "Use the short vocabulary examples.",
+      "explanation": "Read each complete pair aloud.",
+      "trackInSrs": false,
+      "matchingPairs": [
+        {
+          "id": "0",
+          "text": "اتصال",
+          "answer": "connection",
+          "transliteration": "ettesaal",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar-EG-oct11-word-1"
+          }
+        },
+        {
+          "id": "1",
+          "text": "مقطوع",
+          "answer": "disconnected / down",
+          "transliteration": "maʾtooʿ",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar-EG-oct11-word-3"
+          }
+        },
+        {
+          "id": "2",
+          "text": "نستنى",
+          "answer": "we wait / let us wait",
+          "transliteration": "nestanna",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar-EG-oct11-word-5"
+          }
+        },
+        {
+          "id": "3",
+          "text": "شوية",
+          "answer": "a little / a bit",
+          "transliteration": "shewayya",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar_egy_few"
+          }
+        }
+      ],
+      "choices": [
+        "a little / a bit",
+        "we wait / let us wait",
+        "disconnected / down",
+        "connection"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-11-ar-EG-e14",
+      "type": "self-check",
+      "prompt": "Ask whether there is internet here.",
+      "target": {
+        "type": "grammar",
+        "id": "ar-EG-oct11-grammar-1"
+      },
+      "acceptedAnswers": [
+        "في إنترنت هنا؟"
+      ],
+      "hint": "Build short sentences using the examples.",
+      "explanation": "Compare the requested meaning and forms; other natural answers can work.",
+      "trackInSrs": false,
+      "answerData": [
+        {
+          "arabic": "في إنترنت هنا؟",
+          "transliteration": "fi internet hena?",
+          "english": "Is there internet here?"
+        }
+      ],
+      "rubric": {
+        "criteria": "Include every requested meaning. Check the verb or adjective form, then assess your answer."
+      }
+    },
+    {
+      "id": "ai-news-2026-10-11-ar-EG-e15",
+      "type": "self-check",
+      "prompt": "Say the connection is down, then suggest waiting a bit.",
+      "target": {
+        "type": "grammar",
+        "id": "ar-EG-oct11-grammar-2"
+      },
+      "acceptedAnswers": [
+        "الاتصال مقطوع. نستنى شوية."
+      ],
+      "hint": "Build short sentences using the examples.",
+      "explanation": "Compare the requested meaning and forms; other natural answers can work.",
+      "trackInSrs": false,
+      "answerData": [
+        {
+          "arabic": "الاتصال مقطوع. نستنى شوية.",
+          "transliteration": "el-ettesaal maʾtooʿ. nestanna shewayya.",
+          "english": "The connection is down. Let us wait a bit."
+        }
+      ],
+      "rubric": {
+        "criteria": "Include every requested meaning. Check the verb or adjective form, then assess your answer."
+      }
+    },
+    {
+      "id": "ai-news-2026-10-11-ar-EG-e16",
+      "type": "self-check",
+      "prompt": "Say the program is not working, then suggest trying again.",
+      "target": {
+        "type": "grammar",
+        "id": "ar-EG-oct11-grammar-2"
+      },
+      "acceptedAnswers": [
+        "البرنامج مش شغال. نجرب تاني."
+      ],
+      "hint": "Build short sentences using the examples.",
+      "explanation": "Compare the requested meaning and forms; other natural answers can work.",
+      "trackInSrs": false,
+      "answerData": [
+        {
+          "arabic": "البرنامج مش شغال. نجرب تاني.",
+          "transliteration": "el-bernaameg mesh shaghghaal. negarrab taani.",
+          "english": "The program is not working. Let us try again."
+        }
+      ],
+      "rubric": {
+        "criteria": "Include every requested meaning. Check the verb or adjective form, then assess your answer."
+      }
+    },
+    {
+      "id": "ai-news-2026-10-11-ar-EG-e17",
+      "type": "recall",
+      "prompt": "Review: write “ready (masculine)”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "ar-EG-oct10-word-3"
+      },
+      "acceptedAnswers": [
+        "جاهز"
+      ],
+      "hint": "Example: أنا جاهز.",
+      "explanation": "جاهز means “ready (masculine)”.",
+      "trackInSrs": true
+    },
+    {
+      "id": "ai-news-2026-10-11-ar-EG-e18",
+      "type": "recall",
+      "prompt": "Review: write “help / assistance”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "ar-EG-oct09-word-6"
+      },
+      "acceptedAnswers": [
+        "مساعدة"
+      ],
+      "hint": "Example: محتاج مساعدة.",
+      "explanation": "مساعدة means “help / assistance”.",
+      "trackInSrs": true
+    }
+  ],
+  "route": [
+    "Read · 10 min",
+    "Words and grammar · 8 min",
+    "Practise · 17 min",
+    "Own example · 5 min"
+  ],
+  "review": {
+    "instructions": "Retrieve the two review words before opening hints. After one day and three days, repeat the speaking prompts without the models. Earlier completion is not assumed.",
+    "prompts": [
+      "Say you are ready and ask for help; then suggest waiting."
+    ]
+  }
+}

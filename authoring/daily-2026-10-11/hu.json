@@ -1,0 +1,883 @@
+{
+  "schemaVersion": 1,
+  "id": "ai-news-2026-10-11-hu",
+  "courseId": "ai-news-daily-2026-10-11",
+  "day": 38,
+  "language": "hu",
+  "title": "Hol van a másolat?",
+  "subtitle": "October 11, 2026 · Where is the copy?",
+  "estimatedMinutes": 40,
+  "objectives": [
+    "Find a file in this or that folder.",
+    "Distinguish an old version from a fresh copy.",
+    "Say you save a file and check its date."
+  ],
+  "sources": [
+    {
+      "id": "google_caixabank_2026_10_09",
+      "title": "CaixaBank Expands Strategic Collaboration with Google Cloud to Accelerate AI and Data Capabilities",
+      "url": "https://www.googlecloudpresscorner.com/2026-10-09-CaixaBank-Expands-Strategic-Collaboration-with-Google-Cloud-to-Accelerate-AI-and-Data-Capabilities",
+      "publishedOn": "2026-10-09",
+      "verifiedAsOf": "2026-10-11",
+      "publisher": "Google Cloud",
+      "factSummary": "CaixaBank announced an expanded agreement with Google Cloud and plans to deploy Gemini Enterprise. Document management and summarization are planned uses, not independently verified results."
+    }
+  ],
+  "readings": [
+    {
+      "id": "ai-news-2026-10-11-hu-r1",
+      "title": "Plans for document tools · October 9 announcement",
+      "sentences": [
+        {
+          "id": "ai-news-2026-10-11-hu-s001",
+          "text": "A CaixaBank bővíti az együttműködést a Google Clouddal.",
+          "english": "CaixaBank is expanding its collaboration with Google Cloud.",
+          "kind": "source-summary",
+          "sourceIds": [
+            "google_caixabank_2026_10_09"
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-11-hu-s002",
+          "text": "A bank AI-eszközöket tervez használni.",
+          "english": "The bank plans to use AI tools.",
+          "kind": "source-summary",
+          "sourceIds": [
+            "google_caixabank_2026_10_09"
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-11-hu-s003",
+          "text": "A cél a dokumentumok kezelése és összefoglalása.",
+          "english": "The goal is managing and summarizing documents.",
+          "kind": "source-summary",
+          "sourceIds": [
+            "google_caixabank_2026_10_09"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-11-hu-r2",
+      "title": "Save a copy · Fictional dialogue",
+      "sentences": [
+        {
+          "id": "ai-news-2026-10-11-hu-s004",
+          "text": "Anna: Hol van a fájl?",
+          "english": "Anna: Where is the file?",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-11-hu-s005",
+          "text": "Bence: Ebben a mappában.",
+          "english": "Bence: In this folder.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-11-hu-s006",
+          "text": "Anna: Ez a régi változat?",
+          "english": "Anna: Is this the old version?",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-11-hu-s007",
+          "text": "Bence: Igen. Itt a friss másolat.",
+          "english": "Bence: Yes. Here is the latest copy.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-11-hu-s008",
+          "text": "Anna: Elmentem a másolatot.",
+          "english": "Anna: I will save the copy.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-11-hu-s009",
+          "text": "Bence: Jó, nézd meg a dátumot is!",
+          "english": "Bence: Good, check the date too!",
+          "kind": "teaching-example",
+          "sourceIds": []
+        }
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-11-hu-r3",
+      "title": "Find it again · Fictional dialogue",
+      "sentences": [
+        {
+          "id": "ai-news-2026-10-11-hu-s010",
+          "text": "Anna: Melyik mappában van?",
+          "english": "Anna: Which folder is it in?",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-11-hu-s011",
+          "text": "Bence: Abban a mappában.",
+          "english": "Bence: In that folder.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-11-hu-s012",
+          "text": "Anna: Megvan! A dátum jó.",
+          "english": "Anna: Found it! The date is correct.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-11-hu-s013",
+          "text": "Bence: Megnyitod a fájlt?",
+          "english": "Bence: Will you open the file?",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-11-hu-s014",
+          "text": "Anna: Igen. A másolat kész.",
+          "english": "Anna: Yes. The copy is ready.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-11-hu-s015",
+          "text": "Bence: Akkor folytathatjuk.",
+          "english": "Bence: Then we can continue.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        }
+      ]
+    }
+  ],
+  "vocabulary": [
+    {
+      "id": "hu-oct11-word-1",
+      "term": "mappa",
+      "english": "folder",
+      "semanticConcept": "folder",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-11-hu-s016",
+        "text": "Ebben a mappában van.",
+        "english": "It is in this folder.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "hu-oct11-word-2",
+      "term": "másolat",
+      "english": "copy",
+      "semanticConcept": "copy",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-11-hu-s017",
+        "text": "Ez egy másolat.",
+        "english": "This is a copy.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "hu-oct11-word-3",
+      "term": "régi",
+      "english": "old",
+      "semanticConcept": "old",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-11-hu-s018",
+        "text": "Ez a régi változat.",
+        "english": "This is the old version.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "hu-oct11-word-4",
+      "term": "friss",
+      "english": "fresh / latest",
+      "semanticConcept": "fresh / latest",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-11-hu-s019",
+        "text": "Itt a friss másolat.",
+        "english": "Here is the latest copy.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "hu-oct11-word-5",
+      "term": "elmentem",
+      "english": "I save it",
+      "semanticConcept": "I save it",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-11-hu-s020",
+        "text": "Elmentem a fájlt.",
+        "english": "I save the file.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "hu_date",
+      "term": "dátum",
+      "english": "date",
+      "semanticConcept": "date",
+      "plannedRole": "review",
+      "example": {
+        "id": "ai-news-2026-10-11-hu-s021",
+        "text": "A dátum jó.",
+        "english": "The date is correct.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "hu-oct11-word-7",
+      "term": "megvan",
+      "english": "found it / have it",
+      "semanticConcept": "found it / have it",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-11-hu-s022",
+        "text": "Megvan a fájl!",
+        "english": "I have found the file!",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "hu-oct09-word-7",
+      "term": "kész",
+      "english": "ready / finished",
+      "semanticConcept": "ready / finished",
+      "plannedRole": "review",
+      "example": {
+        "id": "ai-news-2026-10-11-hu-s023",
+        "text": "A másolat kész.",
+        "english": "The copy is ready.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "hu_question",
+      "term": "kérdés",
+      "english": "question",
+      "semanticConcept": "question",
+      "plannedRole": "review",
+      "example": {
+        "id": "ai-news-2026-10-11-hu-s024",
+        "text": "Van egy kérdésem.",
+        "english": "I have a question.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "hu-oct11-word-10",
+      "term": "ebben",
+      "english": "in this",
+      "semanticConcept": "in this",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-11-hu-s025",
+        "text": "Ebben a mappában van.",
+        "english": "It is in this folder.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    }
+  ],
+  "concepts": [
+    {
+      "id": "hu-oct11-grammar-1",
+      "title": "In this folder; in that folder",
+      "explanation": "Use -ban or -ben for in. Mappa becomes mappában: final a lengthens to á. With this or that, the demonstrative also takes the ending: ebben a mappában, abban a mappában. Keep the article a between them.",
+      "examples": [
+        {
+          "id": "ai-news-2026-10-11-hu-s026",
+          "text": "Ebben a mappában van.",
+          "english": "It is in this folder.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-11-hu-s027",
+          "text": "Abban a mappában van.",
+          "english": "It is in that folder.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-11-hu-s028",
+          "text": "Melyik mappában van?",
+          "english": "Which folder is it in?",
+          "kind": "teaching-example",
+          "sourceIds": []
+        }
+      ]
+    },
+    {
+      "id": "hu-oct11-grammar-2",
+      "title": "Save a specific file",
+      "explanation": "Elmentem is the complete first-person definite form for I save it in this context. A specific object takes -t: a fájlt, a másolatot. In Itt a friss másolat, the adjective precedes the noun and there is no separate is.",
+      "examples": [
+        {
+          "id": "ai-news-2026-10-11-hu-s029",
+          "text": "Elmentem a fájlt.",
+          "english": "I save the file.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-11-hu-s030",
+          "text": "Elmentem a másolatot.",
+          "english": "I save the copy.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-11-hu-s031",
+          "text": "Itt a friss másolat.",
+          "english": "Here is the latest copy.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        }
+      ]
+    }
+  ],
+  "exercises": [
+    {
+      "id": "ai-news-2026-10-11-hu-e01",
+      "type": "choice",
+      "prompt": "Choose “folder”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu-oct11-word-1"
+      },
+      "acceptedAnswers": [
+        "mappa"
+      ],
+      "hint": "Use the vocabulary example if needed.",
+      "explanation": "mappa means “folder”.",
+      "trackInSrs": false,
+      "choiceAtoms": [
+        {
+          "text": "mappa",
+          "english": "folder"
+        },
+        {
+          "text": "friss",
+          "english": "fresh / latest"
+        },
+        {
+          "text": "megvan",
+          "english": "found it / have it"
+        }
+      ],
+      "showChoiceEnglish": false,
+      "choices": [
+        "mappa",
+        "friss",
+        "megvan"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-11-hu-e02",
+      "type": "choice",
+      "prompt": "Choose “copy”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu-oct11-word-2"
+      },
+      "acceptedAnswers": [
+        "másolat"
+      ],
+      "hint": "Use the vocabulary example if needed.",
+      "explanation": "másolat means “copy”.",
+      "trackInSrs": false,
+      "choiceAtoms": [
+        {
+          "text": "elmentem",
+          "english": "I save it"
+        },
+        {
+          "text": "kész",
+          "english": "ready / finished"
+        },
+        {
+          "text": "másolat",
+          "english": "copy"
+        }
+      ],
+      "showChoiceEnglish": false,
+      "choices": [
+        "elmentem",
+        "kész",
+        "másolat"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-11-hu-e03",
+      "type": "choice",
+      "prompt": "Choose “old”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu-oct11-word-3"
+      },
+      "acceptedAnswers": [
+        "régi"
+      ],
+      "hint": "Use the vocabulary example if needed.",
+      "explanation": "régi means “old”.",
+      "trackInSrs": false,
+      "choiceAtoms": [
+        {
+          "text": "kérdés",
+          "english": "question"
+        },
+        {
+          "text": "régi",
+          "english": "old"
+        },
+        {
+          "text": "dátum",
+          "english": "date"
+        }
+      ],
+      "showChoiceEnglish": false,
+      "choices": [
+        "kérdés",
+        "régi",
+        "dátum"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-11-hu-e04",
+      "type": "choice",
+      "prompt": "Choose “I save it”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu-oct11-word-5"
+      },
+      "acceptedAnswers": [
+        "elmentem"
+      ],
+      "hint": "Use the vocabulary example if needed.",
+      "explanation": "elmentem means “I save it”.",
+      "trackInSrs": false,
+      "choiceAtoms": [
+        {
+          "text": "kész",
+          "english": "ready / finished"
+        },
+        {
+          "text": "mappa",
+          "english": "folder"
+        },
+        {
+          "text": "elmentem",
+          "english": "I save it"
+        }
+      ],
+      "showChoiceEnglish": false,
+      "choices": [
+        "kész",
+        "mappa",
+        "elmentem"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-11-hu-e05",
+      "type": "choice",
+      "prompt": "Choose “found it / have it”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu-oct11-word-7"
+      },
+      "acceptedAnswers": [
+        "megvan"
+      ],
+      "hint": "Use the vocabulary example if needed.",
+      "explanation": "megvan means “found it / have it”.",
+      "trackInSrs": false,
+      "choiceAtoms": [
+        {
+          "text": "megvan",
+          "english": "found it / have it"
+        },
+        {
+          "text": "ebben",
+          "english": "in this"
+        },
+        {
+          "text": "régi",
+          "english": "old"
+        }
+      ],
+      "showChoiceEnglish": false,
+      "choices": [
+        "megvan",
+        "ebben",
+        "régi"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-11-hu-e06",
+      "type": "recall",
+      "prompt": "Write “folder” in Hungarian.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu-oct11-word-1"
+      },
+      "acceptedAnswers": [
+        "mappa"
+      ],
+      "hint": "Example: Ebben a mappában van.",
+      "explanation": "mappa means “folder”.",
+      "trackInSrs": true
+    },
+    {
+      "id": "ai-news-2026-10-11-hu-e07",
+      "type": "recall",
+      "prompt": "Write “old” in Hungarian.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu-oct11-word-3"
+      },
+      "acceptedAnswers": [
+        "régi"
+      ],
+      "hint": "Example: Ez a régi változat.",
+      "explanation": "régi means “old”.",
+      "trackInSrs": true
+    },
+    {
+      "id": "ai-news-2026-10-11-hu-e08",
+      "type": "recall",
+      "prompt": "Fill the gap: this is the old version.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu-oct11-word-3"
+      },
+      "acceptedAnswers": [
+        "régi"
+      ],
+      "hint": "Use the adjective meaning old.",
+      "explanation": "Régi precedes the noun változat.",
+      "trackInSrs": true,
+      "promptAtom": {
+        "id": "ai-news-2026-10-11-hu-s032",
+        "text": "Ez a ___ változat.",
+        "english": "This is the old version.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "ai-news-2026-10-11-hu-e09",
+      "type": "recall",
+      "prompt": "Fill the gap: I save the copy.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu-oct11-word-5"
+      },
+      "acceptedAnswers": [
+        "Elmentem",
+        "elmentem"
+      ],
+      "hint": "Use the complete form for I save it.",
+      "explanation": "Elmentem takes the specific object a másolatot here.",
+      "trackInSrs": true,
+      "promptAtom": {
+        "id": "ai-news-2026-10-11-hu-s033",
+        "text": "___ a másolatot.",
+        "english": "I save the copy.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "ai-news-2026-10-11-hu-e10",
+      "type": "order",
+      "prompt": "Put the words in order: It is in this folder.",
+      "target": {
+        "type": "grammar",
+        "id": "hu-oct11-grammar-1"
+      },
+      "acceptedAnswers": [
+        "Ebben a mappában van"
+      ],
+      "hint": "Use the matching pattern in Grammar.",
+      "explanation": "It is in this folder.",
+      "trackInSrs": false,
+      "tokens": [
+        "van",
+        "mappában",
+        "a",
+        "Ebben"
+      ],
+      "answerData": [
+        {
+          "text": "Ebben a mappában van",
+          "english": "It is in this folder."
+        }
+      ],
+      "choices": [
+        "van",
+        "mappában",
+        "a",
+        "Ebben"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-11-hu-e11",
+      "type": "order",
+      "prompt": "Put the words in order: It is in that folder.",
+      "target": {
+        "type": "grammar",
+        "id": "hu-oct11-grammar-1"
+      },
+      "acceptedAnswers": [
+        "Abban a mappában van"
+      ],
+      "hint": "Use the matching pattern in Grammar.",
+      "explanation": "It is in that folder.",
+      "trackInSrs": false,
+      "tokens": [
+        "van",
+        "mappában",
+        "a",
+        "Abban"
+      ],
+      "answerData": [
+        {
+          "text": "Abban a mappában van",
+          "english": "It is in that folder."
+        }
+      ],
+      "choices": [
+        "van",
+        "mappában",
+        "a",
+        "Abban"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-11-hu-e12",
+      "type": "order",
+      "prompt": "Put the words in order: I save the copy.",
+      "target": {
+        "type": "grammar",
+        "id": "hu-oct11-grammar-2"
+      },
+      "acceptedAnswers": [
+        "Elmentem a másolatot"
+      ],
+      "hint": "Use the matching pattern in Grammar.",
+      "explanation": "I save the copy.",
+      "trackInSrs": false,
+      "tokens": [
+        "másolatot",
+        "a",
+        "Elmentem"
+      ],
+      "answerData": [
+        {
+          "text": "Elmentem a másolatot",
+          "english": "I save the copy."
+        }
+      ],
+      "choices": [
+        "másolatot",
+        "a",
+        "Elmentem"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-11-hu-e13",
+      "type": "matching",
+      "prompt": "Match each word or phrase to its meaning.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu-oct11-word-1"
+      },
+      "acceptedAnswers": [
+        "{\"0\": \"folder\", \"1\": \"old\", \"2\": \"I save it\", \"3\": \"found it / have it\"}"
+      ],
+      "hint": "Use the short vocabulary examples.",
+      "explanation": "Read each complete pair aloud.",
+      "trackInSrs": false,
+      "matchingPairs": [
+        {
+          "id": "0",
+          "text": "mappa",
+          "answer": "folder",
+          "transliteration": null,
+          "target": {
+            "type": "vocabulary",
+            "id": "hu-oct11-word-1"
+          }
+        },
+        {
+          "id": "1",
+          "text": "régi",
+          "answer": "old",
+          "transliteration": null,
+          "target": {
+            "type": "vocabulary",
+            "id": "hu-oct11-word-3"
+          }
+        },
+        {
+          "id": "2",
+          "text": "elmentem",
+          "answer": "I save it",
+          "transliteration": null,
+          "target": {
+            "type": "vocabulary",
+            "id": "hu-oct11-word-5"
+          }
+        },
+        {
+          "id": "3",
+          "text": "megvan",
+          "answer": "found it / have it",
+          "transliteration": null,
+          "target": {
+            "type": "vocabulary",
+            "id": "hu-oct11-word-7"
+          }
+        }
+      ],
+      "choices": [
+        "found it / have it",
+        "I save it",
+        "old",
+        "folder"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-11-hu-e14",
+      "type": "self-check",
+      "prompt": "Say the file is in this folder.",
+      "target": {
+        "type": "grammar",
+        "id": "hu-oct11-grammar-1"
+      },
+      "acceptedAnswers": [
+        "Ebben a mappában van a fájl."
+      ],
+      "hint": "Build short sentences using the examples.",
+      "explanation": "Compare the requested meaning and forms; other natural answers can work.",
+      "trackInSrs": false,
+      "answerData": [
+        {
+          "text": "Ebben a mappában van a fájl.",
+          "english": "The file is in this folder."
+        }
+      ],
+      "rubric": {
+        "criteria": "Include every requested meaning. Check the verb or adjective form, then assess your answer."
+      }
+    },
+    {
+      "id": "ai-news-2026-10-11-hu-e15",
+      "type": "self-check",
+      "prompt": "Say this is the old version, then say you save the copy.",
+      "target": {
+        "type": "grammar",
+        "id": "hu-oct11-grammar-2"
+      },
+      "acceptedAnswers": [
+        "Ez a régi változat. Elmentem a másolatot."
+      ],
+      "hint": "Build short sentences using the examples.",
+      "explanation": "Compare the requested meaning and forms; other natural answers can work.",
+      "trackInSrs": false,
+      "answerData": [
+        {
+          "text": "Ez a régi változat. Elmentem a másolatot.",
+          "english": "This is the old version. I save the copy."
+        }
+      ],
+      "rubric": {
+        "criteria": "Include every requested meaning. Check the verb or adjective form, then assess your answer."
+      }
+    },
+    {
+      "id": "ai-news-2026-10-11-hu-e16",
+      "type": "self-check",
+      "prompt": "Say you have found the file and the copy is ready.",
+      "target": {
+        "type": "grammar",
+        "id": "hu-oct11-grammar-2"
+      },
+      "acceptedAnswers": [
+        "Megvan a fájl! A másolat kész."
+      ],
+      "hint": "Build short sentences using the examples.",
+      "explanation": "Compare the requested meaning and forms; other natural answers can work.",
+      "trackInSrs": false,
+      "answerData": [
+        {
+          "text": "Megvan a fájl! A másolat kész.",
+          "english": "I have found the file! The copy is ready."
+        }
+      ],
+      "rubric": {
+        "criteria": "Include every requested meaning. Check the verb or adjective form, then assess your answer."
+      }
+    },
+    {
+      "id": "ai-news-2026-10-11-hu-e17",
+      "type": "recall",
+      "prompt": "Review: write “ready / finished”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu-oct09-word-7"
+      },
+      "acceptedAnswers": [
+        "kész"
+      ],
+      "hint": "Example: A másolat kész.",
+      "explanation": "kész means “ready / finished”.",
+      "trackInSrs": true
+    },
+    {
+      "id": "ai-news-2026-10-11-hu-e18",
+      "type": "recall",
+      "prompt": "Review: write “question”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu_question"
+      },
+      "acceptedAnswers": [
+        "kérdés"
+      ],
+      "hint": "Example: Van egy kérdésem.",
+      "explanation": "kérdés means “question”.",
+      "trackInSrs": true
+    }
+  ],
+  "route": [
+    "Read · 10 min",
+    "Words and grammar · 8 min",
+    "Practise · 17 min",
+    "Own example · 5 min"
+  ],
+  "review": {
+    "instructions": "Retrieve the two review words before opening hints. After one day and three days, repeat the speaking prompts without the models. Earlier completion is not assumed.",
+    "prompts": [
+      "Say the copy is ready and that you have a question; then locate the file."
+    ]
+  }
+}

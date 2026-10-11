@@ -2112,6 +2112,111 @@
         "lemma": "utasítás",
         "gloss": "instruction",
         "form": ""
+      },
+      "caixabank": {
+        "lemma": "CaixaBank",
+        "gloss": "CaixaBank",
+        "form": "Bank name."
+      },
+      "bővíti": {
+        "lemma": "bővít",
+        "gloss": "expands",
+        "form": "Third-person singular definite present."
+      },
+      "együttműködést": {
+        "lemma": "együttműködés",
+        "gloss": "collaboration",
+        "form": "Accusative: -t."
+      },
+      "clouddal": {
+        "lemma": "Cloud",
+        "gloss": "with Cloud",
+        "form": "Instrumental -val assimilates to final d."
+      },
+      "bank": {
+        "lemma": "bank",
+        "gloss": "bank",
+        "form": ""
+      },
+      "ai-eszközöket": {
+        "lemma": "AI-eszköz",
+        "gloss": "AI tools",
+        "form": "Plural accusative: -ök + -et."
+      },
+      "használni": {
+        "lemma": "használ",
+        "gloss": "to use",
+        "form": "Infinitive: -ni."
+      },
+      "dokumentumok": {
+        "lemma": "dokumentum",
+        "gloss": "documents",
+        "form": "Plural: -ok."
+      },
+      "kezelése": {
+        "lemma": "kezelés",
+        "gloss": "management of",
+        "form": "Possessive form of the action noun."
+      },
+      "összefoglalása": {
+        "lemma": "összefoglalás",
+        "gloss": "summarization of",
+        "form": "Possessive form of the action noun."
+      },
+      "régi": {
+        "lemma": "régi",
+        "gloss": "old",
+        "form": ""
+      },
+      "friss": {
+        "lemma": "friss",
+        "gloss": "fresh / latest",
+        "form": "Latest in the context of a copy."
+      },
+      "másolat": {
+        "lemma": "másolat",
+        "gloss": "copy",
+        "form": ""
+      },
+      "elmentem": {
+        "lemma": "elment",
+        "gloss": "I save it",
+        "form": "First-person definite present of save in this context; not the past of leave."
+      },
+      "másolatot": {
+        "lemma": "másolat",
+        "gloss": "copy",
+        "form": "Accusative: -ot."
+      },
+      "nézd": {
+        "lemma": "néz",
+        "gloss": "look at it",
+        "form": "Second-person singular definite imperative."
+      },
+      "abban": {
+        "lemma": "az",
+        "gloss": "in that",
+        "form": "Demonstrative with inessive ending."
+      },
+      "megvan": {
+        "lemma": "megvan",
+        "gloss": "found / located",
+        "form": "Fixed expression: megvan a fájl means the file is found."
+      },
+      "megnyitod": {
+        "lemma": "megnyit",
+        "gloss": "you open it",
+        "form": "Second-person singular definite present."
+      },
+      "akkor": {
+        "lemma": "akkor",
+        "gloss": "then",
+        "form": ""
+      },
+      "folytathatjuk": {
+        "lemma": "folytat",
+        "gloss": "we can continue it",
+        "form": "First-person plural definite potential: -hat + -juk."
       }
     },
     "ar-EG": {
@@ -4789,6 +4894,141 @@
         "lemma": "جاهز",
         "gloss": "ready",
         "form": "Masculine adjective."
+      },
+      "تصرفات": {
+        "lemma": "تصرف",
+        "gloss": "actions / behaviors",
+        "form": "Plural."
+      },
+      "غير": {
+        "lemma": "غير",
+        "gloss": "not / non-",
+        "form": "Negates an adjective here."
+      },
+      "مقصودة": {
+        "lemma": "مقصود",
+        "gloss": "intended",
+        "form": "Feminine adjective with a nonhuman plural."
+      },
+      "وقالت": {
+        "lemma": "قال",
+        "gloss": "and said",
+        "form": "we- plus third-person feminine past."
+      },
+      "إنها": {
+        "lemma": "إن",
+        "gloss": "that it / she",
+        "form": "Complementizer plus feminine suffix."
+      },
+      "هتوقف": {
+        "lemma": "وقّف",
+        "gloss": "it will stop",
+        "form": "Third-person feminine future, transitive."
+      },
+      "الإنترنت": {
+        "lemma": "إنترنت",
+        "gloss": "the internet",
+        "form": "Definite noun."
+      },
+      "الاختبارات": {
+        "lemma": "اختبار",
+        "gloss": "the evaluations / tests",
+        "form": "Definite plural."
+      },
+      "الداخلية": {
+        "lemma": "داخلي",
+        "gloss": "internal",
+        "form": "Feminine adjective with a nonhuman plural."
+      },
+      "مؤقتاً": {
+        "lemma": "مؤقت",
+        "gloss": "temporarily",
+        "form": "Adverb."
+      },
+      "القرار": {
+        "lemma": "قرار",
+        "gloss": "the decision",
+        "form": "Definite noun."
+      },
+      "لكل": {
+        "lemma": "كل",
+        "gloss": "for all",
+        "form": "le- plus all."
+      },
+      "مستخدمي": {
+        "lemma": "مستخدم",
+        "gloss": "users of",
+        "form": "Plural in a possessive construction."
+      },
+      "claude": {
+        "lemma": "Claude",
+        "gloss": "Claude",
+        "form": "Product name."
+      },
+      "إنترنت": {
+        "lemma": "إنترنت",
+        "gloss": "internet",
+        "form": "Loanword."
+      },
+      "الاتصال": {
+        "lemma": "اتصال",
+        "gloss": "the connection",
+        "form": "Definite noun."
+      },
+      "مقطوع": {
+        "lemma": "قطع",
+        "gloss": "disconnected / down",
+        "form": "Passive participle describing a connection."
+      },
+      "والبرنامج": {
+        "lemma": "برنامج",
+        "gloss": "and the program",
+        "form": "we- plus definite noun."
+      },
+      "شغال": {
+        "lemma": "شغال",
+        "gloss": "working",
+        "form": "Masculine adjective."
+      },
+      "بتفتح": {
+        "lemma": "فتح",
+        "gloss": "opens / is opening",
+        "form": "Third-person feminine habitual present."
+      },
+      "نستنى": {
+        "lemma": "استنى",
+        "gloss": "we wait / let us wait",
+        "form": "First-person plural."
+      },
+      "نجرب": {
+        "lemma": "جرّب",
+        "gloss": "we try / let us try",
+        "form": "First-person plural."
+      },
+      "اتصال": {
+        "lemma": "اتصال",
+        "gloss": "connection",
+        "form": "Noun."
+      },
+      "رجع": {
+        "lemma": "رجع",
+        "gloss": "came back / is back",
+        "form": "Third-person masculine past."
+      },
+      "فتحت": {
+        "lemma": "فتح",
+        "gloss": "opened",
+        "form": "Here fatahet: third-person feminine past."
+      },
+      "كويس": {
+        "lemma": "كويس",
+        "gloss": "good",
+        "form": "Response in context."
+      },
+      "نكمل": {
+        "lemma": "كمّل",
+        "gloss": "we continue / let us continue",
+        "form": "First-person plural."
       }
     }
   }

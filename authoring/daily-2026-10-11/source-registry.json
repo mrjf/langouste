@@ -1,0 +1,20 @@
+[
+  {
+    "id": "google_caixabank_2026_10_09",
+    "title": "CaixaBank Expands Strategic Collaboration with Google Cloud to Accelerate AI and Data Capabilities",
+    "url": "https://www.googlecloudpresscorner.com/2026-10-09-CaixaBank-Expands-Strategic-Collaboration-with-Google-Cloud-to-Accelerate-AI-and-Data-Capabilities",
+    "publishedOn": "2026-10-09",
+    "verifiedAsOf": "2026-10-11",
+    "publisher": "Google Cloud",
+    "factSummary": "CaixaBank announced an expanded agreement with Google Cloud and plans to deploy Gemini Enterprise. Document management and summarization are planned uses, not independently verified results."
+  },
+  {
+    "id": "anthropic_evaluation_safeguards_2026_10_09",
+    "title": "Investigating unintended model actions in our evaluations and internal use",
+    "url": "https://www.anthropic.com/research/investigating-unintended-model-actions",
+    "publishedOn": "2026-10-09",
+    "verifiedAsOf": "2026-10-11",
+    "publisher": "Anthropic",
+    "factSummary": "Anthropic reported unintended model actions and said it was disabling live internet access for all internal evaluations until its safeguards and monitoring reliably catch such behavior. This does not describe an internet shutdown for every Claude customer."
+  }
+]
