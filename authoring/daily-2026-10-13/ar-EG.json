@@ -1,0 +1,952 @@
+{
+  "schemaVersion": 1,
+  "id": "ai-news-2026-10-13-ar-EG",
+  "courseId": "ai-news-daily-2026-10-13",
+  "day": 40,
+  "language": "ar-EG",
+  "title": "كام مشكلة؟",
+  "subtitle": "October 13, 2026 · How many issues?",
+  "estimatedMinutes": 40,
+  "objectives": [
+    "Ask how many issues there are.",
+    "Say two issues remain.",
+    "Compare today with yesterday."
+  ],
+  "sources": [
+    {
+      "id": "github_ai_scan_metrics_2026_10_13",
+      "title": "Code scanning AI Scan metrics in security overview",
+      "url": "https://github.blog/changelog/2026-10-13-code-scanning-ai-scan-metrics-in-security-overview/",
+      "publishedOn": "2026-10-13",
+      "verifiedAsOf": "2026-10-13",
+      "publisher": "GitHub",
+      "factSummary": "GitHub added AI Scan metrics showing findings, resolutions and trends to security overview. This is a public preview for eligible GitHub Code Security or Advanced Security customers on github.com, not all deployments."
+    }
+  ],
+  "readings": [
+    {
+      "id": "ai-news-2026-10-13-ar-EG-r1",
+      "title": "Count AI Scan findings · October 13 preview",
+      "sentences": [
+        {
+          "id": "ai-news-2026-10-13-ar-EG-s001",
+          "text": "GitHub أضافت إحصائيات جديدة لأداة AI Scan.",
+          "english": "GitHub added new statistics for AI Scan.",
+          "kind": "source-summary",
+          "sourceIds": [
+            "github_ai_scan_metrics_2026_10_13"
+          ],
+          "transliteration": "GitHub adaafet ehsaaʾeyyaat gedeeda le-adaa AI Scan."
+        },
+        {
+          "id": "ai-news-2026-10-13-ar-EG-s002",
+          "text": "الإحصائيات بتعرض عدد المشاكل واللي اتحل منها.",
+          "english": "The statistics show the number of issues and how many were resolved.",
+          "kind": "source-summary",
+          "sourceIds": [
+            "github_ai_scan_metrics_2026_10_13"
+          ],
+          "transliteration": "el-ehsaaʾeyyaat beteʿred ʿadad el-mashaakel wel-li ethall menha."
+        },
+        {
+          "id": "ai-news-2026-10-13-ar-EG-s003",
+          "text": "الميزة تجريبية ومش متاحة لكل العملاء.",
+          "english": "The feature is in preview and is not available to all customers.",
+          "kind": "source-summary",
+          "sourceIds": [
+            "github_ai_scan_metrics_2026_10_13"
+          ],
+          "transliteration": "el-meeza tagreebeyya we-mesh motaaha le-koll el-ʿomala."
+        }
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-13-ar-EG-r2",
+      "title": "Read the numbers · Fictional dialogue",
+      "sentences": [
+        {
+          "id": "ai-news-2026-10-13-ar-EG-s004",
+          "text": "منى: كام مشكلة في التقرير؟",
+          "english": "Mona: How many issues are in the report?",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "Mona: kaam moshkela fi et-taʾreer?"
+        },
+        {
+          "id": "ai-news-2026-10-13-ar-EG-s005",
+          "text": "كريم: تلات مشاكل.",
+          "english": "Karim: Three issues.",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "Kareem: talaat mashaakel."
+        },
+        {
+          "id": "ai-news-2026-10-13-ar-EG-s006",
+          "text": "منى: اتحل كام؟",
+          "english": "Mona: How many have been resolved?",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "Mona: ethall kaam?"
+        },
+        {
+          "id": "ai-news-2026-10-13-ar-EG-s007",
+          "text": "كريم: اتحلت مشكلة واحدة.",
+          "english": "Karim: One issue has been resolved.",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "Kareem: ethallet moshkela waahda."
+        },
+        {
+          "id": "ai-news-2026-10-13-ar-EG-s008",
+          "text": "منى: يبقى فاضل مشكلتين.",
+          "english": "Mona: So there are two issues left.",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "Mona: yebʾa faadel moshkelteen."
+        },
+        {
+          "id": "ai-news-2026-10-13-ar-EG-s009",
+          "text": "كريم: صح، نراجعهم سوا.",
+          "english": "Karim: Right, let us review them together.",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "Kareem: sahh, neraageʿhom sawa."
+        }
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-13-ar-EG-r3",
+      "title": "Compare two reports · Fictional dialogue",
+      "sentences": [
+        {
+          "id": "ai-news-2026-10-13-ar-EG-s010",
+          "text": "منى: ده تقرير امبارح؟",
+          "english": "Mona: Is this yesterday’s report?",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "Mona: da taʾreer embaareh?"
+        },
+        {
+          "id": "ai-news-2026-10-13-ar-EG-s011",
+          "text": "كريم: لأ، ده تقرير النهارده.",
+          "english": "Karim: No, this is today’s report.",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "Kareem: laʾ, da taʾreer en-naharda."
+        },
+        {
+          "id": "ai-news-2026-10-13-ar-EG-s012",
+          "text": "منى: العدد أقل من امبارح.",
+          "english": "Mona: The number is lower than yesterday.",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "Mona: el-ʿadad aʾall men embaareh."
+        },
+        {
+          "id": "ai-news-2026-10-13-ar-EG-s013",
+          "text": "كريم: أيوه، بس لسه في مشاكل.",
+          "english": "Karim: Yes, but there are still issues.",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "Kareem: aywa, bass lissa fi mashaakel."
+        },
+        {
+          "id": "ai-news-2026-10-13-ar-EG-s014",
+          "text": "منى: محتاجين وقت أكتر؟",
+          "english": "Mona: Do we need more time?",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "Mona: mehtaageen waʾt aktar?"
+        },
+        {
+          "id": "ai-news-2026-10-13-ar-EG-s015",
+          "text": "كريم: أيوه، شوية وقت.",
+          "english": "Karim: Yes, a little time.",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "Kareem: aywa, shewayyet waʾt."
+        }
+      ]
+    }
+  ],
+  "vocabulary": [
+    {
+      "id": "ar-EG-oct13-word-1",
+      "term": "عدد",
+      "english": "number / count",
+      "semanticConcept": "number / count",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-13-ar-EG-s016",
+        "text": "العدد أقل.",
+        "english": "The number is lower.",
+        "kind": "teaching-example",
+        "sourceIds": [],
+        "transliteration": "el-ʿadad aʾall."
+      },
+      "transliteration": "ʿadad"
+    },
+    {
+      "id": "ar-EG-oct13-word-2",
+      "term": "كام",
+      "english": "how many",
+      "semanticConcept": "how many",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-13-ar-EG-s017",
+        "text": "كام مشكلة؟",
+        "english": "How many issues?",
+        "kind": "teaching-example",
+        "sourceIds": [],
+        "transliteration": "kaam moshkela?"
+      },
+      "transliteration": "kaam"
+    },
+    {
+      "id": "ar-EG-oct13-word-3",
+      "term": "أقل",
+      "english": "less / fewer",
+      "semanticConcept": "less / fewer",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-13-ar-EG-s018",
+        "text": "العدد أقل من امبارح.",
+        "english": "The number is lower than yesterday.",
+        "kind": "teaching-example",
+        "sourceIds": [],
+        "transliteration": "el-ʿadad aʾall men embaareh."
+      },
+      "transliteration": "aʾall"
+    },
+    {
+      "id": "ar-EG-oct13-word-4",
+      "term": "أكتر",
+      "english": "more",
+      "semanticConcept": "more",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-13-ar-EG-s019",
+        "text": "محتاجين وقت أكتر.",
+        "english": "We need more time.",
+        "kind": "teaching-example",
+        "sourceIds": [],
+        "transliteration": "mehtaageen waʾt aktar."
+      },
+      "transliteration": "aktar"
+    },
+    {
+      "id": "ar-EG-oct13-word-5",
+      "term": "فاضل",
+      "english": "remaining / left",
+      "semanticConcept": "remaining / left",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-13-ar-EG-s020",
+        "text": "فاضل مشكلتين.",
+        "english": "There are two issues left.",
+        "kind": "teaching-example",
+        "sourceIds": [],
+        "transliteration": "faadel moshkelteen."
+      },
+      "transliteration": "faadel"
+    },
+    {
+      "id": "ar_egy_yesterday",
+      "term": "امبارح",
+      "english": "yesterday",
+      "semanticConcept": "yesterday",
+      "plannedRole": "review",
+      "example": {
+        "id": "ai-news-2026-10-13-ar-EG-s021",
+        "text": "ده تقرير امبارح.",
+        "english": "This is yesterday’s report.",
+        "kind": "teaching-example",
+        "sourceIds": [],
+        "transliteration": "da taʾreer embaareh."
+      },
+      "transliteration": "embaareh"
+    },
+    {
+      "id": "ar_egy_today",
+      "term": "النهارده",
+      "english": "today",
+      "semanticConcept": "today",
+      "plannedRole": "review",
+      "example": {
+        "id": "ai-news-2026-10-13-ar-EG-s022",
+        "text": "ده تقرير النهارده.",
+        "english": "This is today’s report.",
+        "kind": "teaching-example",
+        "sourceIds": [],
+        "transliteration": "da taʾreer en-naharda."
+      },
+      "transliteration": "en-naharda"
+    },
+    {
+      "id": "ar-EG-oct10-word-6",
+      "term": "سوا",
+      "english": "together",
+      "semanticConcept": "together",
+      "plannedRole": "review",
+      "example": {
+        "id": "ai-news-2026-10-13-ar-EG-s023",
+        "text": "نراجع سوا.",
+        "english": "Let us review together.",
+        "kind": "teaching-example",
+        "sourceIds": [],
+        "transliteration": "neraageʿ sawa."
+      },
+      "transliteration": "sawa"
+    },
+    {
+      "id": "ar-EG-oct09-word-6",
+      "term": "مساعدة",
+      "english": "help / assistance",
+      "semanticConcept": "help / assistance",
+      "plannedRole": "review",
+      "example": {
+        "id": "ai-news-2026-10-13-ar-EG-s024",
+        "text": "محتاج مساعدة.",
+        "english": "I need help.",
+        "kind": "teaching-example",
+        "sourceIds": [],
+        "transliteration": "mehtaag mosaaʿda."
+      },
+      "transliteration": "mosaaʿda"
+    },
+    {
+      "id": "ar-EG-oct13-word-10",
+      "term": "مشكلتين",
+      "english": "two issues",
+      "semanticConcept": "two issues",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-13-ar-EG-s025",
+        "text": "فاضل مشكلتين.",
+        "english": "There are two issues left.",
+        "kind": "teaching-example",
+        "sourceIds": [],
+        "transliteration": "faadel moshkelteen."
+      },
+      "transliteration": "moshkelteen"
+    }
+  ],
+  "concepts": [
+    {
+      "id": "ar-EG-oct13-grammar-1",
+      "title": "How many? One, two, three",
+      "explanation": "Kaam is followed by a singular noun in this question: kaam moshkela? One issue is moshkela waahda. Two uses the dual ending -teen: moshkelteen. With three use the plural: talaat mashaakel.",
+      "examples": [
+        {
+          "id": "ai-news-2026-10-13-ar-EG-s026",
+          "text": "كام مشكلة؟",
+          "english": "How many issues?",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "kaam moshkela?"
+        },
+        {
+          "id": "ai-news-2026-10-13-ar-EG-s027",
+          "text": "مشكلة واحدة.",
+          "english": "One issue.",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "moshkela waahda."
+        },
+        {
+          "id": "ai-news-2026-10-13-ar-EG-s028",
+          "text": "مشكلتين.",
+          "english": "Two issues.",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "moshkelteen."
+        },
+        {
+          "id": "ai-news-2026-10-13-ar-EG-s029",
+          "text": "تلات مشاكل.",
+          "english": "Three issues.",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "talaat mashaakel."
+        }
+      ]
+    },
+    {
+      "id": "ar-EG-oct13-grammar-2",
+      "title": "Less and more",
+      "explanation": "Aʾall means less or fewer; aktar means more. Men introduces a comparison: aʾall men embaareh, less than yesterday. Waʾt aktar means more time. With el-ʿadad there is no separate present-tense is.",
+      "examples": [
+        {
+          "id": "ai-news-2026-10-13-ar-EG-s030",
+          "text": "العدد أقل من امبارح.",
+          "english": "The number is lower than yesterday.",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "el-ʿadad aʾall men embaareh."
+        },
+        {
+          "id": "ai-news-2026-10-13-ar-EG-s031",
+          "text": "محتاجين وقت أكتر.",
+          "english": "We need more time.",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "mehtaageen waʾt aktar."
+        },
+        {
+          "id": "ai-news-2026-10-13-ar-EG-s032",
+          "text": "فاضل مشكلتين.",
+          "english": "There are two issues left.",
+          "kind": "teaching-example",
+          "sourceIds": [],
+          "transliteration": "faadel moshkelteen."
+        }
+      ]
+    }
+  ],
+  "exercises": [
+    {
+      "id": "ai-news-2026-10-13-ar-EG-e01",
+      "type": "choice",
+      "prompt": "Choose “number / count”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "ar-EG-oct13-word-1"
+      },
+      "acceptedAnswers": [
+        "عدد"
+      ],
+      "hint": "Use the vocabulary example if needed.",
+      "explanation": "عدد means “number / count”.",
+      "trackInSrs": false,
+      "choiceAtoms": [
+        {
+          "text": "عدد",
+          "english": "number / count",
+          "transliteration": "ʿadad"
+        },
+        {
+          "text": "أكتر",
+          "english": "more",
+          "transliteration": "aktar"
+        },
+        {
+          "text": "النهارده",
+          "english": "today",
+          "transliteration": "en-naharda"
+        }
+      ],
+      "showChoiceEnglish": false,
+      "choices": [
+        "عدد",
+        "أكتر",
+        "النهارده"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-13-ar-EG-e02",
+      "type": "choice",
+      "prompt": "Choose “how many”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "ar-EG-oct13-word-2"
+      },
+      "acceptedAnswers": [
+        "كام"
+      ],
+      "hint": "Use the vocabulary example if needed.",
+      "explanation": "كام means “how many”.",
+      "trackInSrs": false,
+      "choiceAtoms": [
+        {
+          "text": "فاضل",
+          "english": "remaining / left",
+          "transliteration": "faadel"
+        },
+        {
+          "text": "سوا",
+          "english": "together",
+          "transliteration": "sawa"
+        },
+        {
+          "text": "كام",
+          "english": "how many",
+          "transliteration": "kaam"
+        }
+      ],
+      "showChoiceEnglish": false,
+      "choices": [
+        "فاضل",
+        "سوا",
+        "كام"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-13-ar-EG-e03",
+      "type": "choice",
+      "prompt": "Choose “less / fewer”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "ar-EG-oct13-word-3"
+      },
+      "acceptedAnswers": [
+        "أقل"
+      ],
+      "hint": "Use the vocabulary example if needed.",
+      "explanation": "أقل means “less / fewer”.",
+      "trackInSrs": false,
+      "choiceAtoms": [
+        {
+          "text": "مساعدة",
+          "english": "help / assistance",
+          "transliteration": "mosaaʿda"
+        },
+        {
+          "text": "أقل",
+          "english": "less / fewer",
+          "transliteration": "aʾall"
+        },
+        {
+          "text": "امبارح",
+          "english": "yesterday",
+          "transliteration": "embaareh"
+        }
+      ],
+      "showChoiceEnglish": false,
+      "choices": [
+        "مساعدة",
+        "أقل",
+        "امبارح"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-13-ar-EG-e04",
+      "type": "choice",
+      "prompt": "Choose “remaining / left”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "ar-EG-oct13-word-5"
+      },
+      "acceptedAnswers": [
+        "فاضل"
+      ],
+      "hint": "Use the vocabulary example if needed.",
+      "explanation": "فاضل means “remaining / left”.",
+      "trackInSrs": false,
+      "choiceAtoms": [
+        {
+          "text": "سوا",
+          "english": "together",
+          "transliteration": "sawa"
+        },
+        {
+          "text": "عدد",
+          "english": "number / count",
+          "transliteration": "ʿadad"
+        },
+        {
+          "text": "فاضل",
+          "english": "remaining / left",
+          "transliteration": "faadel"
+        }
+      ],
+      "showChoiceEnglish": false,
+      "choices": [
+        "سوا",
+        "عدد",
+        "فاضل"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-13-ar-EG-e05",
+      "type": "choice",
+      "prompt": "Choose “today”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "ar_egy_today"
+      },
+      "acceptedAnswers": [
+        "النهارده"
+      ],
+      "hint": "Use the vocabulary example if needed.",
+      "explanation": "النهارده means “today”.",
+      "trackInSrs": false,
+      "choiceAtoms": [
+        {
+          "text": "النهارده",
+          "english": "today",
+          "transliteration": "en-naharda"
+        },
+        {
+          "text": "مشكلتين",
+          "english": "two issues",
+          "transliteration": "moshkelteen"
+        },
+        {
+          "text": "أقل",
+          "english": "less / fewer",
+          "transliteration": "aʾall"
+        }
+      ],
+      "showChoiceEnglish": false,
+      "choices": [
+        "النهارده",
+        "مشكلتين",
+        "أقل"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-13-ar-EG-e06",
+      "type": "recall",
+      "prompt": "Write “number / count” in Arabic script.",
+      "target": {
+        "type": "vocabulary",
+        "id": "ar-EG-oct13-word-1"
+      },
+      "acceptedAnswers": [
+        "عدد"
+      ],
+      "hint": "Example: العدد أقل.",
+      "explanation": "عدد means “number / count”.",
+      "trackInSrs": true
+    },
+    {
+      "id": "ai-news-2026-10-13-ar-EG-e07",
+      "type": "recall",
+      "prompt": "Write “less / fewer” in Arabic script.",
+      "target": {
+        "type": "vocabulary",
+        "id": "ar-EG-oct13-word-3"
+      },
+      "acceptedAnswers": [
+        "أقل"
+      ],
+      "hint": "Example: العدد أقل من امبارح.",
+      "explanation": "أقل means “less / fewer”.",
+      "trackInSrs": true
+    },
+    {
+      "id": "ai-news-2026-10-13-ar-EG-e08",
+      "type": "recall",
+      "prompt": "Fill the gap: the number is lower.",
+      "target": {
+        "type": "vocabulary",
+        "id": "ar-EG-oct13-word-3"
+      },
+      "acceptedAnswers": [
+        "أقل"
+      ],
+      "hint": "Use the comparison word meaning less or lower.",
+      "explanation": "أقل means less or fewer.",
+      "trackInSrs": true,
+      "promptAtom": {
+        "id": "ai-news-2026-10-13-ar-EG-s033",
+        "text": "العدد ___.",
+        "english": "The number is lower.",
+        "kind": "teaching-example",
+        "sourceIds": [],
+        "transliteration": "el-ʿadad ___."
+      }
+    },
+    {
+      "id": "ai-news-2026-10-13-ar-EG-e09",
+      "type": "recall",
+      "prompt": "Fill the gap: there are two issues left.",
+      "target": {
+        "type": "vocabulary",
+        "id": "ar-EG-oct13-word-10"
+      },
+      "acceptedAnswers": [
+        "مشكلتين"
+      ],
+      "hint": "Use the dual form for two issues.",
+      "explanation": "The ending -teen marks two: مشكلتين.",
+      "trackInSrs": true,
+      "promptAtom": {
+        "id": "ai-news-2026-10-13-ar-EG-s034",
+        "text": "فاضل ___.",
+        "english": "There are two issues left.",
+        "kind": "teaching-example",
+        "sourceIds": [],
+        "transliteration": "faadel ___."
+      }
+    },
+    {
+      "id": "ai-news-2026-10-13-ar-EG-e10",
+      "type": "order",
+      "prompt": "Put the words in order: How many issues are in the report?",
+      "target": {
+        "type": "grammar",
+        "id": "ar-EG-oct13-grammar-1"
+      },
+      "acceptedAnswers": [
+        "كام مشكلة في التقرير"
+      ],
+      "hint": "Use the matching pattern in Grammar.",
+      "explanation": "How many issues are in the report?",
+      "trackInSrs": false,
+      "tokens": [
+        "التقرير",
+        "في",
+        "مشكلة",
+        "كام"
+      ],
+      "answerData": [
+        {
+          "arabic": "كام مشكلة في التقرير",
+          "transliteration": "kaam moshkela fi et-taʾreer",
+          "english": "How many issues are in the report?"
+        }
+      ],
+      "choices": [
+        "التقرير",
+        "في",
+        "مشكلة",
+        "كام"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-13-ar-EG-e11",
+      "type": "order",
+      "prompt": "Put the words in order: There are two issues left.",
+      "target": {
+        "type": "grammar",
+        "id": "ar-EG-oct13-grammar-1"
+      },
+      "acceptedAnswers": [
+        "فاضل مشكلتين"
+      ],
+      "hint": "Use the matching pattern in Grammar.",
+      "explanation": "There are two issues left.",
+      "trackInSrs": false,
+      "tokens": [
+        "مشكلتين",
+        "فاضل"
+      ],
+      "answerData": [
+        {
+          "arabic": "فاضل مشكلتين",
+          "transliteration": "faadel moshkelteen",
+          "english": "There are two issues left."
+        }
+      ],
+      "choices": [
+        "مشكلتين",
+        "فاضل"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-13-ar-EG-e12",
+      "type": "order",
+      "prompt": "Put the words in order: The number is lower than yesterday.",
+      "target": {
+        "type": "grammar",
+        "id": "ar-EG-oct13-grammar-2"
+      },
+      "acceptedAnswers": [
+        "العدد أقل من امبارح"
+      ],
+      "hint": "Use the matching pattern in Grammar.",
+      "explanation": "The number is lower than yesterday.",
+      "trackInSrs": false,
+      "tokens": [
+        "امبارح",
+        "من",
+        "أقل",
+        "العدد"
+      ],
+      "answerData": [
+        {
+          "arabic": "العدد أقل من امبارح",
+          "transliteration": "el-ʿadad aʾall men embaareh",
+          "english": "The number is lower than yesterday."
+        }
+      ],
+      "choices": [
+        "امبارح",
+        "من",
+        "أقل",
+        "العدد"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-13-ar-EG-e13",
+      "type": "matching",
+      "prompt": "Match each word or phrase to its meaning.",
+      "target": {
+        "type": "vocabulary",
+        "id": "ar-EG-oct13-word-1"
+      },
+      "acceptedAnswers": [
+        "{\"0\": \"number / count\", \"1\": \"less / fewer\", \"2\": \"remaining / left\", \"3\": \"today\"}"
+      ],
+      "hint": "Use the short vocabulary examples.",
+      "explanation": "Read each complete pair aloud.",
+      "trackInSrs": false,
+      "matchingPairs": [
+        {
+          "id": "0",
+          "text": "عدد",
+          "answer": "number / count",
+          "transliteration": "ʿadad",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar-EG-oct13-word-1"
+          }
+        },
+        {
+          "id": "1",
+          "text": "أقل",
+          "answer": "less / fewer",
+          "transliteration": "aʾall",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar-EG-oct13-word-3"
+          }
+        },
+        {
+          "id": "2",
+          "text": "فاضل",
+          "answer": "remaining / left",
+          "transliteration": "faadel",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar-EG-oct13-word-5"
+          }
+        },
+        {
+          "id": "3",
+          "text": "النهارده",
+          "answer": "today",
+          "transliteration": "en-naharda",
+          "target": {
+            "type": "vocabulary",
+            "id": "ar_egy_today"
+          }
+        }
+      ],
+      "choices": [
+        "today",
+        "remaining / left",
+        "less / fewer",
+        "number / count"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-13-ar-EG-e14",
+      "type": "self-check",
+      "prompt": "Ask how many issues are in the report.",
+      "target": {
+        "type": "grammar",
+        "id": "ar-EG-oct13-grammar-1"
+      },
+      "acceptedAnswers": [
+        "كام مشكلة في التقرير؟"
+      ],
+      "hint": "Build short sentences using the examples.",
+      "explanation": "Compare the requested meaning and forms; other natural answers can work.",
+      "trackInSrs": false,
+      "answerData": [
+        {
+          "arabic": "كام مشكلة في التقرير؟",
+          "transliteration": "kaam moshkela fi et-taʾreer?",
+          "english": "How many issues are in the report?"
+        }
+      ],
+      "rubric": {
+        "criteria": "Include every requested meaning. Check the verb or adjective form, then assess your answer."
+      }
+    },
+    {
+      "id": "ai-news-2026-10-13-ar-EG-e15",
+      "type": "self-check",
+      "prompt": "Say two issues remain, then suggest reviewing together.",
+      "target": {
+        "type": "grammar",
+        "id": "ar-EG-oct13-grammar-2"
+      },
+      "acceptedAnswers": [
+        "فاضل مشكلتين. نراجع سوا."
+      ],
+      "hint": "Build short sentences using the examples.",
+      "explanation": "Compare the requested meaning and forms; other natural answers can work.",
+      "trackInSrs": false,
+      "answerData": [
+        {
+          "arabic": "فاضل مشكلتين. نراجع سوا.",
+          "transliteration": "faadel moshkelteen. neraageʿ sawa.",
+          "english": "There are two issues left. Let us review together."
+        }
+      ],
+      "rubric": {
+        "criteria": "Include every requested meaning. Check the verb or adjective form, then assess your answer."
+      }
+    },
+    {
+      "id": "ai-news-2026-10-13-ar-EG-e16",
+      "type": "self-check",
+      "prompt": "Say the number is lower than yesterday, but you need more time.",
+      "target": {
+        "type": "grammar",
+        "id": "ar-EG-oct13-grammar-2"
+      },
+      "acceptedAnswers": [
+        "العدد أقل من امبارح، بس محتاجين وقت أكتر."
+      ],
+      "hint": "Build short sentences using the examples.",
+      "explanation": "Compare the requested meaning and forms; other natural answers can work.",
+      "trackInSrs": false,
+      "answerData": [
+        {
+          "arabic": "العدد أقل من امبارح، بس محتاجين وقت أكتر.",
+          "transliteration": "el-ʿadad aʾall men embaareh, bass mehtaageen waʾt aktar.",
+          "english": "The number is lower than yesterday, but we need more time."
+        }
+      ],
+      "rubric": {
+        "criteria": "Include every requested meaning. Check the verb or adjective form, then assess your answer."
+      }
+    },
+    {
+      "id": "ai-news-2026-10-13-ar-EG-e17",
+      "type": "recall",
+      "prompt": "Review: write “together”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "ar-EG-oct10-word-6"
+      },
+      "acceptedAnswers": [
+        "سوا"
+      ],
+      "hint": "Example: نراجع سوا.",
+      "explanation": "سوا means “together”.",
+      "trackInSrs": true
+    },
+    {
+      "id": "ai-news-2026-10-13-ar-EG-e18",
+      "type": "recall",
+      "prompt": "Review: write “help / assistance”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "ar-EG-oct09-word-6"
+      },
+      "acceptedAnswers": [
+        "مساعدة"
+      ],
+      "hint": "Example: محتاج مساعدة.",
+      "explanation": "مساعدة means “help / assistance”.",
+      "trackInSrs": true
+    }
+  ],
+  "route": [
+    "Read · 10 min",
+    "Words and grammar · 8 min",
+    "Practise · 17 min",
+    "Own example · 5 min"
+  ],
+  "review": {
+    "instructions": "Retrieve the review words before hints. Repeat the speaking prompts after one day and three days without looking at the models. No prior completion is assumed.",
+    "prompts": [
+      "Ask for help and suggest reviewing together; then compare two counts."
+    ]
+  }
+}

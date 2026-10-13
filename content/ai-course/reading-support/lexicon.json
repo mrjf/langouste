@@ -2217,6 +2217,121 @@
         "lemma": "folytat",
         "gloss": "we can continue it",
         "form": "First-person plural definite potential: -hat + -juk."
+      },
+      "github": {
+        "lemma": "GitHub",
+        "gloss": "GitHub",
+        "form": "Company name."
+      },
+      "beállítást": {
+        "lemma": "beállítás",
+        "gloss": "setting",
+        "form": "Accusative: -t."
+      },
+      "rendszergazda": {
+        "lemma": "rendszergazda",
+        "gloss": "administrator",
+        "form": ""
+      },
+      "szabályokat": {
+        "lemma": "szabály",
+        "gloss": "rules",
+        "form": "Plural accusative: -ok + -at."
+      },
+      "copilot": {
+        "lemma": "Copilot",
+        "gloss": "Copilot",
+        "form": "Product name."
+      },
+      "indításakor": {
+        "lemma": "indítás",
+        "gloss": "when starting",
+        "form": "Possessive -a plus temporal -kor."
+      },
+      "ezzel": {
+        "lemma": "ez",
+        "gloss": "with this",
+        "form": "Instrumental form."
+      },
+      "beállítással": {
+        "lemma": "beállítás",
+        "gloss": "with the setting",
+        "form": "Instrumental -val assimilates to s."
+      },
+      "ellenőrzött": {
+        "lemma": "ellenőriz",
+        "gloss": "verified / checked",
+        "form": "Past participle."
+      },
+      "szabályokkal": {
+        "lemma": "szabály",
+        "gloss": "with rules",
+        "form": "Plural plus instrumental: -ok + -kal."
+      },
+      "verzió": {
+        "lemma": "verzió",
+        "gloss": "version",
+        "form": ""
+      },
+      "gépen": {
+        "lemma": "gép",
+        "gloss": "on the computer",
+        "form": "Superessive: -en."
+      },
+      "frissítés": {
+        "lemma": "frissítés",
+        "gloss": "update",
+        "form": "Noun."
+      },
+      "vagy": {
+        "lemma": "vagy",
+        "gloss": "or",
+        "form": "Conjunction here."
+      },
+      "bezárom": {
+        "lemma": "bezár",
+        "gloss": "I close it",
+        "form": "First-person singular definite present."
+      },
+      "programot": {
+        "lemma": "program",
+        "gloss": "program",
+        "form": "Accusative: -ot."
+      },
+      "rendben": {
+        "lemma": "rendben",
+        "gloss": "okay",
+        "form": "Fixed response."
+      },
+      "frissítünk": {
+        "lemma": "frissít",
+        "gloss": "we update",
+        "form": "First-person plural indefinite present."
+      },
+      "újraindítom": {
+        "lemma": "újraindít",
+        "gloss": "I restart it",
+        "form": "First-person singular definite present."
+      },
+      "beállítások": {
+        "lemma": "beállítás",
+        "gloss": "settings",
+        "form": "Plural: -ok."
+      },
+      "menüben": {
+        "lemma": "menü",
+        "gloss": "in the menu",
+        "form": "Inessive: -ben."
+      },
+      "kezdhetjük": {
+        "lemma": "kezd",
+        "gloss": "we can start it",
+        "form": "First-person plural definite potential."
+      },
+      "kezdjük": {
+        "lemma": "kezd",
+        "gloss": "we start it",
+        "form": "First-person plural definite present here."
       }
     },
     "ar-EG": {
@@ -5029,6 +5144,111 @@
         "lemma": "كمّل",
         "gloss": "we continue / let us continue",
         "form": "First-person plural."
+      },
+      "github": {
+        "lemma": "GitHub",
+        "gloss": "GitHub",
+        "form": "Company name."
+      },
+      "أضافت": {
+        "lemma": "أضاف",
+        "gloss": "added",
+        "form": "Third-person feminine past."
+      },
+      "إحصائيات": {
+        "lemma": "إحصائية",
+        "gloss": "statistics",
+        "form": "Plural."
+      },
+      "scan": {
+        "lemma": "Scan",
+        "gloss": "Scan",
+        "form": "Part of the product name AI Scan."
+      },
+      "الإحصائيات": {
+        "lemma": "إحصائية",
+        "gloss": "the statistics",
+        "form": "Definite plural."
+      },
+      "بتعرض": {
+        "lemma": "عرض",
+        "gloss": "shows / displays",
+        "form": "Third-person feminine habitual present."
+      },
+      "المشاكل": {
+        "lemma": "مشكلة",
+        "gloss": "the issues / problems",
+        "form": "Definite broken plural."
+      },
+      "واللي": {
+        "lemma": "اللي",
+        "gloss": "and what / those that",
+        "form": "we- plus relative pronoun."
+      },
+      "اتحل": {
+        "lemma": "اتحل",
+        "gloss": "was resolved",
+        "form": "Passive/intransitive past; masculine singular form."
+      },
+      "منها": {
+        "lemma": "من",
+        "gloss": "of them",
+        "form": "Preposition with feminine suffix referring to issues."
+      },
+      "ومش": {
+        "lemma": "مش",
+        "gloss": "and not",
+        "form": "we- plus negation."
+      },
+      "العملاء": {
+        "lemma": "عميل",
+        "gloss": "the customers",
+        "form": "Definite plural."
+      },
+      "كام": {
+        "lemma": "كام",
+        "gloss": "how many",
+        "form": "Question word followed by singular noun here."
+      },
+      "مشاكل": {
+        "lemma": "مشكلة",
+        "gloss": "issues / problems",
+        "form": "Broken plural."
+      },
+      "اتحلت": {
+        "lemma": "اتحل",
+        "gloss": "was resolved",
+        "form": "Third-person feminine past, agreeing with problem."
+      },
+      "فاضل": {
+        "lemma": "فضل",
+        "gloss": "remaining / left",
+        "form": "Active participle used for what remains."
+      },
+      "مشكلتين": {
+        "lemma": "مشكلة",
+        "gloss": "two issues / problems",
+        "form": "Dual: -teen."
+      },
+      "نراجعهم": {
+        "lemma": "راجع",
+        "gloss": "we review them",
+        "form": "First-person plural plus object suffix -hom."
+      },
+      "العدد": {
+        "lemma": "عدد",
+        "gloss": "the number / count",
+        "form": "Definite noun."
+      },
+      "أقل": {
+        "lemma": "قليل",
+        "gloss": "less / fewer",
+        "form": "Comparative."
+      },
+      "محتاجين": {
+        "lemma": "احتاج",
+        "gloss": "we need / needing",
+        "form": "Plural active participle."
       }
     }
   }

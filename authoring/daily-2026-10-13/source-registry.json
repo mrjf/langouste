@@ -1,0 +1,20 @@
+[
+  {
+    "id": "github_settings_2026_10_13",
+    "title": "Enterprise managed settings enforcement updates",
+    "url": "https://github.blog/changelog/2026-10-13-enterprise-managed-settings-enforcement-updates/",
+    "publishedOn": "2026-10-13",
+    "verifiedAsOf": "2026-10-13",
+    "publisher": "GitHub",
+    "factSummary": "Enterprise administrators can require supported Copilot clients to retrieve current managed settings at startup. With this requirement enabled, a client stops if it cannot confirm current policy; this is not the default for every user."
+  },
+  {
+    "id": "github_ai_scan_metrics_2026_10_13",
+    "title": "Code scanning AI Scan metrics in security overview",
+    "url": "https://github.blog/changelog/2026-10-13-code-scanning-ai-scan-metrics-in-security-overview/",
+    "publishedOn": "2026-10-13",
+    "verifiedAsOf": "2026-10-13",
+    "publisher": "GitHub",
+    "factSummary": "GitHub added AI Scan metrics showing findings, resolutions and trends to security overview. This is a public preview for eligible GitHub Code Security or Advanced Security customers on github.com, not all deployments."
+  }
+]

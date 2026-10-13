@@ -1,0 +1,882 @@
+{
+  "schemaVersion": 1,
+  "id": "ai-news-2026-10-13-hu",
+  "courseId": "ai-news-daily-2026-10-13",
+  "day": 40,
+  "language": "hu",
+  "title": "Kell egy frissítés",
+  "subtitle": "October 13, 2026 · An update is needed",
+  "estimatedMinutes": 40,
+  "objectives": [
+    "Ask which version is installed.",
+    "Say an update is needed.",
+    "Describe closing and restarting a program."
+  ],
+  "sources": [
+    {
+      "id": "github_settings_2026_10_13",
+      "title": "Enterprise managed settings enforcement updates",
+      "url": "https://github.blog/changelog/2026-10-13-enterprise-managed-settings-enforcement-updates/",
+      "publishedOn": "2026-10-13",
+      "verifiedAsOf": "2026-10-13",
+      "publisher": "GitHub",
+      "factSummary": "Enterprise administrators can require supported Copilot clients to retrieve current managed settings at startup. With this requirement enabled, a client stops if it cannot confirm current policy; this is not the default for every user."
+    }
+  ],
+  "readings": [
+    {
+      "id": "ai-news-2026-10-13-hu-r1",
+      "title": "Current settings at startup · October 13 announcement",
+      "sentences": [
+        {
+          "id": "ai-news-2026-10-13-hu-s001",
+          "text": "A GitHub új beállítást jelentett be.",
+          "english": "GitHub announced a new setting.",
+          "kind": "source-summary",
+          "sourceIds": [
+            "github_settings_2026_10_13"
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-13-hu-s002",
+          "text": "A rendszergazda friss szabályokat kérhet a Copilot indításakor.",
+          "english": "The administrator can require current rules when Copilot starts.",
+          "kind": "source-summary",
+          "sourceIds": [
+            "github_settings_2026_10_13"
+          ]
+        },
+        {
+          "id": "ai-news-2026-10-13-hu-s003",
+          "text": "Ezzel a beállítással a program csak ellenőrzött szabályokkal indul.",
+          "english": "With this setting, the program starts only with verified rules.",
+          "kind": "source-summary",
+          "sourceIds": [
+            "github_settings_2026_10_13"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-13-hu-r2",
+      "title": "Which version? · Fictional dialogue",
+      "sentences": [
+        {
+          "id": "ai-news-2026-10-13-hu-s004",
+          "text": "Anna: Melyik verzió van a gépen?",
+          "english": "Anna: Which version is on the computer?",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-13-hu-s005",
+          "text": "Bence: A régi verzió.",
+          "english": "Bence: The old version.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-13-hu-s006",
+          "text": "Anna: Kell egy frissítés.",
+          "english": "Anna: An update is needed.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-13-hu-s007",
+          "text": "Bence: Most vagy később?",
+          "english": "Bence: Now or later?",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-13-hu-s008",
+          "text": "Anna: Először bezárom a programot.",
+          "english": "Anna: First I close the program.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-13-hu-s009",
+          "text": "Bence: Rendben, utána frissítünk.",
+          "english": "Bence: Okay, then we update.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        }
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-13-hu-r3",
+      "title": "Start again · Fictional dialogue",
+      "sentences": [
+        {
+          "id": "ai-news-2026-10-13-hu-s010",
+          "text": "Anna: Kész a frissítés?",
+          "english": "Anna: Is the update finished?",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-13-hu-s011",
+          "text": "Bence: Igen. Újraindítom a programot.",
+          "english": "Bence: Yes. I restart the program.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-13-hu-s012",
+          "text": "Anna: Hol vannak a beállítások?",
+          "english": "Anna: Where are the settings?",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-13-hu-s013",
+          "text": "Bence: Itt, ebben a menüben.",
+          "english": "Bence: Here, in this menu.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-13-hu-s014",
+          "text": "Anna: Most jó a verzió.",
+          "english": "Anna: The version is correct now.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-13-hu-s015",
+          "text": "Bence: Akkor kezdhetjük.",
+          "english": "Bence: Then we can start.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        }
+      ]
+    }
+  ],
+  "vocabulary": [
+    {
+      "id": "hu-oct13-word-1",
+      "term": "verzió",
+      "english": "version",
+      "semanticConcept": "version",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-13-hu-s016",
+        "text": "Melyik verzió van a gépen?",
+        "english": "Which version is on the computer?",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "hu-oct13-word-2",
+      "term": "frissítés",
+      "english": "update",
+      "semanticConcept": "update",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-13-hu-s017",
+        "text": "Kész a frissítés.",
+        "english": "The update is finished.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "hu_later",
+      "term": "később",
+      "english": "later",
+      "semanticConcept": "later",
+      "plannedRole": "review",
+      "example": {
+        "id": "ai-news-2026-10-13-hu-s018",
+        "text": "Később kezdjük.",
+        "english": "We start later.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "hu-oct13-word-4",
+      "term": "beállítások",
+      "english": "settings",
+      "semanticConcept": "settings",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-13-hu-s019",
+        "text": "Itt vannak a beállítások.",
+        "english": "Here are the settings.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "hu-oct13-word-5",
+      "term": "bezárom",
+      "english": "I close it",
+      "semanticConcept": "I close it",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-13-hu-s020",
+        "text": "Bezárom a programot.",
+        "english": "I close the program.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "hu-oct13-word-6",
+      "term": "újraindítom",
+      "english": "I restart it",
+      "semanticConcept": "I restart it",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-13-hu-s021",
+        "text": "Újraindítom a programot.",
+        "english": "I restart the program.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "hu_need",
+      "term": "kell",
+      "english": "is needed",
+      "semanticConcept": "need",
+      "plannedRole": "review",
+      "example": {
+        "id": "ai-news-2026-10-13-hu-s022",
+        "text": "Kell egy frissítés.",
+        "english": "An update is needed.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "hu-oct09-word-7",
+      "term": "kész",
+      "english": "ready / finished",
+      "semanticConcept": "ready / finished",
+      "plannedRole": "review",
+      "example": {
+        "id": "ai-news-2026-10-13-hu-s023",
+        "text": "Kész a frissítés.",
+        "english": "The update is finished.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "hu-oct11-word-3",
+      "term": "régi",
+      "english": "old",
+      "semanticConcept": "old",
+      "plannedRole": "review",
+      "example": {
+        "id": "ai-news-2026-10-13-hu-s024",
+        "text": "Ez a régi verzió.",
+        "english": "This is the old version.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "hu-oct13-word-10",
+      "term": "menü",
+      "english": "menu",
+      "semanticConcept": "menu",
+      "plannedRole": "new",
+      "example": {
+        "id": "ai-news-2026-10-13-hu-s025",
+        "text": "Ebben a menüben van.",
+        "english": "It is in this menu.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    }
+  ],
+  "concepts": [
+    {
+      "id": "hu-oct13-grammar-1",
+      "title": "Something is needed",
+      "explanation": "Kell plus a noun says something is needed: kell egy frissítés. Nem kell negates it. It does not identify who needs it. In a question, intonation makes Kell egy frissítés? mean Is an update needed?",
+      "examples": [
+        {
+          "id": "ai-news-2026-10-13-hu-s026",
+          "text": "Kell egy frissítés.",
+          "english": "An update is needed.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-13-hu-s027",
+          "text": "Nem kell új program.",
+          "english": "A new program is not needed.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-13-hu-s028",
+          "text": "Kell egy frissítés?",
+          "english": "Is an update needed?",
+          "kind": "teaching-example",
+          "sourceIds": []
+        }
+      ]
+    },
+    {
+      "id": "hu-oct13-grammar-2",
+      "title": "Close it and restart it",
+      "explanation": "Bezárom and újraindítom are first-person definite forms: I close it and I restart it. The specific object has -t: a programot. Use először and utána to give the sequence. Később means later without specifying an exact time.",
+      "examples": [
+        {
+          "id": "ai-news-2026-10-13-hu-s029",
+          "text": "Először bezárom a programot.",
+          "english": "First I close the program.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-13-hu-s030",
+          "text": "Utána újraindítom a programot.",
+          "english": "Then I restart the program.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        },
+        {
+          "id": "ai-news-2026-10-13-hu-s031",
+          "text": "Később kezdjük.",
+          "english": "We start later.",
+          "kind": "teaching-example",
+          "sourceIds": []
+        }
+      ]
+    }
+  ],
+  "exercises": [
+    {
+      "id": "ai-news-2026-10-13-hu-e01",
+      "type": "choice",
+      "prompt": "Choose “version”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu-oct13-word-1"
+      },
+      "acceptedAnswers": [
+        "verzió"
+      ],
+      "hint": "Use the vocabulary example if needed.",
+      "explanation": "verzió means “version”.",
+      "trackInSrs": false,
+      "choiceAtoms": [
+        {
+          "text": "verzió",
+          "english": "version"
+        },
+        {
+          "text": "beállítások",
+          "english": "settings"
+        },
+        {
+          "text": "kell",
+          "english": "is needed"
+        }
+      ],
+      "showChoiceEnglish": false,
+      "choices": [
+        "verzió",
+        "beállítások",
+        "kell"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-13-hu-e02",
+      "type": "choice",
+      "prompt": "Choose “update”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu-oct13-word-2"
+      },
+      "acceptedAnswers": [
+        "frissítés"
+      ],
+      "hint": "Use the vocabulary example if needed.",
+      "explanation": "frissítés means “update”.",
+      "trackInSrs": false,
+      "choiceAtoms": [
+        {
+          "text": "bezárom",
+          "english": "I close it"
+        },
+        {
+          "text": "kész",
+          "english": "ready / finished"
+        },
+        {
+          "text": "frissítés",
+          "english": "update"
+        }
+      ],
+      "showChoiceEnglish": false,
+      "choices": [
+        "bezárom",
+        "kész",
+        "frissítés"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-13-hu-e03",
+      "type": "choice",
+      "prompt": "Choose “later”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu_later"
+      },
+      "acceptedAnswers": [
+        "később"
+      ],
+      "hint": "Use the vocabulary example if needed.",
+      "explanation": "később means “later”.",
+      "trackInSrs": false,
+      "choiceAtoms": [
+        {
+          "text": "régi",
+          "english": "old"
+        },
+        {
+          "text": "később",
+          "english": "later"
+        },
+        {
+          "text": "újraindítom",
+          "english": "I restart it"
+        }
+      ],
+      "showChoiceEnglish": false,
+      "choices": [
+        "régi",
+        "később",
+        "újraindítom"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-13-hu-e04",
+      "type": "choice",
+      "prompt": "Choose “I close it”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu-oct13-word-5"
+      },
+      "acceptedAnswers": [
+        "bezárom"
+      ],
+      "hint": "Use the vocabulary example if needed.",
+      "explanation": "bezárom means “I close it”.",
+      "trackInSrs": false,
+      "choiceAtoms": [
+        {
+          "text": "kész",
+          "english": "ready / finished"
+        },
+        {
+          "text": "verzió",
+          "english": "version"
+        },
+        {
+          "text": "bezárom",
+          "english": "I close it"
+        }
+      ],
+      "showChoiceEnglish": false,
+      "choices": [
+        "kész",
+        "verzió",
+        "bezárom"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-13-hu-e05",
+      "type": "choice",
+      "prompt": "Choose “is needed”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu_need"
+      },
+      "acceptedAnswers": [
+        "kell"
+      ],
+      "hint": "Use the vocabulary example if needed.",
+      "explanation": "kell means “is needed”.",
+      "trackInSrs": false,
+      "choiceAtoms": [
+        {
+          "text": "kell",
+          "english": "is needed"
+        },
+        {
+          "text": "menü",
+          "english": "menu"
+        },
+        {
+          "text": "később",
+          "english": "later"
+        }
+      ],
+      "showChoiceEnglish": false,
+      "choices": [
+        "kell",
+        "menü",
+        "később"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-13-hu-e06",
+      "type": "recall",
+      "prompt": "Write “version” in Hungarian.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu-oct13-word-1"
+      },
+      "acceptedAnswers": [
+        "verzió"
+      ],
+      "hint": "Example: Melyik verzió van a gépen?",
+      "explanation": "verzió means “version”.",
+      "trackInSrs": true
+    },
+    {
+      "id": "ai-news-2026-10-13-hu-e07",
+      "type": "recall",
+      "prompt": "Write “later” in Hungarian.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu_later"
+      },
+      "acceptedAnswers": [
+        "később"
+      ],
+      "hint": "Example: Később kezdjük.",
+      "explanation": "később means “later”.",
+      "trackInSrs": true
+    },
+    {
+      "id": "ai-news-2026-10-13-hu-e08",
+      "type": "recall",
+      "prompt": "Fill the gap: we start later.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu_later"
+      },
+      "acceptedAnswers": [
+        "Később",
+        "később"
+      ],
+      "hint": "Use the time word meaning later.",
+      "explanation": "Később means later.",
+      "trackInSrs": true,
+      "promptAtom": {
+        "id": "ai-news-2026-10-13-hu-s032",
+        "text": "___ kezdjük.",
+        "english": "We start later.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "ai-news-2026-10-13-hu-e09",
+      "type": "recall",
+      "prompt": "Fill the gap: an update is needed.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu_need"
+      },
+      "acceptedAnswers": [
+        "Kell",
+        "kell"
+      ],
+      "hint": "Use the word expressing necessity.",
+      "explanation": "Kell plus a noun means something is needed.",
+      "trackInSrs": true,
+      "promptAtom": {
+        "id": "ai-news-2026-10-13-hu-s033",
+        "text": "___ egy frissítés.",
+        "english": "An update is needed.",
+        "kind": "teaching-example",
+        "sourceIds": []
+      }
+    },
+    {
+      "id": "ai-news-2026-10-13-hu-e10",
+      "type": "order",
+      "prompt": "Put the words in order: An update is needed.",
+      "target": {
+        "type": "grammar",
+        "id": "hu-oct13-grammar-1"
+      },
+      "acceptedAnswers": [
+        "Kell egy frissítés"
+      ],
+      "hint": "Use the matching pattern in Grammar.",
+      "explanation": "An update is needed.",
+      "trackInSrs": false,
+      "tokens": [
+        "frissítés",
+        "egy",
+        "Kell"
+      ],
+      "answerData": [
+        {
+          "text": "Kell egy frissítés",
+          "english": "An update is needed."
+        }
+      ],
+      "choices": [
+        "frissítés",
+        "egy",
+        "Kell"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-13-hu-e11",
+      "type": "order",
+      "prompt": "Put the words in order: A new program is not needed.",
+      "target": {
+        "type": "grammar",
+        "id": "hu-oct13-grammar-1"
+      },
+      "acceptedAnswers": [
+        "Nem kell új program"
+      ],
+      "hint": "Use the matching pattern in Grammar.",
+      "explanation": "A new program is not needed.",
+      "trackInSrs": false,
+      "tokens": [
+        "program",
+        "új",
+        "kell",
+        "Nem"
+      ],
+      "answerData": [
+        {
+          "text": "Nem kell új program",
+          "english": "A new program is not needed."
+        }
+      ],
+      "choices": [
+        "program",
+        "új",
+        "kell",
+        "Nem"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-13-hu-e12",
+      "type": "order",
+      "prompt": "Put the words in order: I close the program.",
+      "target": {
+        "type": "grammar",
+        "id": "hu-oct13-grammar-2"
+      },
+      "acceptedAnswers": [
+        "Bezárom a programot"
+      ],
+      "hint": "Use the matching pattern in Grammar.",
+      "explanation": "I close the program.",
+      "trackInSrs": false,
+      "tokens": [
+        "programot",
+        "a",
+        "Bezárom"
+      ],
+      "answerData": [
+        {
+          "text": "Bezárom a programot",
+          "english": "I close the program."
+        }
+      ],
+      "choices": [
+        "programot",
+        "a",
+        "Bezárom"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-13-hu-e13",
+      "type": "matching",
+      "prompt": "Match each word or phrase to its meaning.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu-oct13-word-1"
+      },
+      "acceptedAnswers": [
+        "{\"0\": \"version\", \"1\": \"later\", \"2\": \"I close it\", \"3\": \"is needed\"}"
+      ],
+      "hint": "Use the short vocabulary examples.",
+      "explanation": "Read each complete pair aloud.",
+      "trackInSrs": false,
+      "matchingPairs": [
+        {
+          "id": "0",
+          "text": "verzió",
+          "answer": "version",
+          "transliteration": null,
+          "target": {
+            "type": "vocabulary",
+            "id": "hu-oct13-word-1"
+          }
+        },
+        {
+          "id": "1",
+          "text": "később",
+          "answer": "later",
+          "transliteration": null,
+          "target": {
+            "type": "vocabulary",
+            "id": "hu_later"
+          }
+        },
+        {
+          "id": "2",
+          "text": "bezárom",
+          "answer": "I close it",
+          "transliteration": null,
+          "target": {
+            "type": "vocabulary",
+            "id": "hu-oct13-word-5"
+          }
+        },
+        {
+          "id": "3",
+          "text": "kell",
+          "answer": "is needed",
+          "transliteration": null,
+          "target": {
+            "type": "vocabulary",
+            "id": "hu_need"
+          }
+        }
+      ],
+      "choices": [
+        "is needed",
+        "I close it",
+        "later",
+        "version"
+      ]
+    },
+    {
+      "id": "ai-news-2026-10-13-hu-e14",
+      "type": "self-check",
+      "prompt": "Say an update is needed, but a new program is not needed.",
+      "target": {
+        "type": "grammar",
+        "id": "hu-oct13-grammar-1"
+      },
+      "acceptedAnswers": [
+        "Kell egy frissítés. Nem kell új program."
+      ],
+      "hint": "Build short sentences using the examples.",
+      "explanation": "Compare the requested meaning and forms; other natural answers can work.",
+      "trackInSrs": false,
+      "answerData": [
+        {
+          "text": "Kell egy frissítés. Nem kell új program.",
+          "english": "An update is needed. A new program is not needed."
+        }
+      ],
+      "rubric": {
+        "criteria": "Include every requested meaning. Check the verb or adjective form, then assess your answer."
+      }
+    },
+    {
+      "id": "ai-news-2026-10-13-hu-e15",
+      "type": "self-check",
+      "prompt": "Say you close the program first, then restart it.",
+      "target": {
+        "type": "grammar",
+        "id": "hu-oct13-grammar-2"
+      },
+      "acceptedAnswers": [
+        "Először bezárom a programot. Utána újraindítom a programot."
+      ],
+      "hint": "Build short sentences using the examples.",
+      "explanation": "Compare the requested meaning and forms; other natural answers can work.",
+      "trackInSrs": false,
+      "answerData": [
+        {
+          "text": "Először bezárom a programot. Utána újraindítom a programot.",
+          "english": "First I close the program. Then I restart the program."
+        }
+      ],
+      "rubric": {
+        "criteria": "Include every requested meaning. Check the verb or adjective form, then assess your answer."
+      }
+    },
+    {
+      "id": "ai-news-2026-10-13-hu-e16",
+      "type": "self-check",
+      "prompt": "Ask which version is on the computer, then say you will start later.",
+      "target": {
+        "type": "grammar",
+        "id": "hu-oct13-grammar-2"
+      },
+      "acceptedAnswers": [
+        "Melyik verzió van a gépen? Később kezdjük."
+      ],
+      "hint": "Build short sentences using the examples.",
+      "explanation": "Compare the requested meaning and forms; other natural answers can work.",
+      "trackInSrs": false,
+      "answerData": [
+        {
+          "text": "Melyik verzió van a gépen? Később kezdjük.",
+          "english": "Which version is on the computer? We start later."
+        }
+      ],
+      "rubric": {
+        "criteria": "Include every requested meaning. Check the verb or adjective form, then assess your answer."
+      }
+    },
+    {
+      "id": "ai-news-2026-10-13-hu-e17",
+      "type": "recall",
+      "prompt": "Review: write “ready / finished”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu-oct09-word-7"
+      },
+      "acceptedAnswers": [
+        "kész"
+      ],
+      "hint": "Example: Kész a frissítés.",
+      "explanation": "kész means “ready / finished”.",
+      "trackInSrs": true
+    },
+    {
+      "id": "ai-news-2026-10-13-hu-e18",
+      "type": "recall",
+      "prompt": "Review: write “old”.",
+      "target": {
+        "type": "vocabulary",
+        "id": "hu-oct11-word-3"
+      },
+      "acceptedAnswers": [
+        "régi"
+      ],
+      "hint": "Example: Ez a régi verzió.",
+      "explanation": "régi means “old”.",
+      "trackInSrs": true
+    }
+  ],
+  "route": [
+    "Read · 10 min",
+    "Words and grammar · 8 min",
+    "Practise · 17 min",
+    "Own example · 5 min"
+  ],
+  "review": {
+    "instructions": "Retrieve the review words before hints. Repeat the speaking prompts after one day and three days without looking at the models. No prior completion is assumed.",
+    "prompts": [
+      "Say the old version is ready; then say an update is needed."
+    ]
+  }
+}
